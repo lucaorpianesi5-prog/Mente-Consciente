@@ -273,19 +273,72 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 /* MOBILE */
 .bottom-nav{display:none}
 .fab{display:none}
+/* Badge de cobro en el header del perfil — solo mobile */
+.pd-cobro-mes-badge{display:none}
 @media(max-width:768px){
+  /* ── Layout base ── */
   .shell{grid-template-columns:1fr}
   aside{display:none}
-  main{padding:1.25rem 1rem 6rem;background:var(--bg)}
+  main{padding:1rem 0.85rem 5.5rem;background:var(--bg)}
+
+  /* ── Stats dashboard: 2 columnas ── */
   .stats{grid-template-columns:1fr 1fr}
-  .semana-grid{grid-template-columns:1fr}
+
+  /* ── Dashboard: "Hoy" primero ── */
+  #page-dashboard{display:flex;flex-direction:column}
+  #page-dashboard .stats{order:2}
+  #page-dashboard #alerta-cobros{order:3}
+  #page-dashboard .table-wrap{order:1;margin-bottom:1rem}
+  #page-dashboard .page-header{order:0}
+
+  /* ── Agenda: scroll horizontal en lugar de colapsar ── */
+  .semana-grid{grid-template-columns:repeat(5,minmax(160px,1fr));overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* ── Forms ── */
   .form-grid{grid-template-columns:1fr}
+
+  /* ── Barra inferior ── */
   .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#111B16;z-index:150;border-top:1px solid rgba(82,196,122,0.12)}
-  .bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.25rem;padding:0.6rem 0.25rem;color:#3D6B50;text-decoration:none;font-size:0.6rem;letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;transition:color 0.2s}
-  .bottom-nav a svg{width:20px;height:20px}
+  .bottom-nav a{flex:1;display:flex;align-items:center;justify-content:center;padding:0.75rem 0.25rem;color:#3D6B50;text-decoration:none;cursor:pointer;transition:color 0.2s}
+  .bottom-nav a svg{width:22px;height:22px}
   .bottom-nav a.active{color:#52C47A}
-  .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:5rem;right:1.25rem;width:52px;height:52px;border-radius:50%;background:#2E7D4F;color:#E5EDE8;font-size:1.6rem;border:none;cursor:pointer;z-index:160;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.2s}
+
+  /* ── FAB ── */
+  .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:4.75rem;right:1.25rem;width:50px;height:50px;border-radius:50%;background:#2E7D4F;color:#E5EDE8;font-size:1.6rem;border:none;cursor:pointer;z-index:160;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.2s}
   .fab:hover{transform:scale(1.08)}
+
+  /* ── Toast por encima de la barra ── */
+  .toast{bottom:5.5rem}
+
+  /* ── Perfil mobile ── */
+  /* Badge cobro mes visible en header */
+  .pd-cobro-mes-badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:600;margin-top:0.4rem}
+  .pd-cobro-mes-badge.pagado{background:rgba(82,196,122,0.12);color:#52C47A;border:0.5px solid rgba(82,196,122,0.25)}
+  .pd-cobro-mes-badge.pendiente{background:rgba(232,168,74,0.12);color:#E8A84A;border:0.5px solid rgba(232,168,74,0.25)}
+
+  /* Reordenar secciones del perfil en mobile via order */
+  #perfil-dark .pd-back{margin-bottom:0.75rem}
+  .pd-stats{grid-template-columns:repeat(3,1fr)}
+  .pd-grid{grid-template-columns:1fr}
+
+  /* Columna principal (seguimiento) y lateral (resto) se apilan */
+  /* Orden mobile: header > stats > cobro-badge > molestias > objetivos > historial-fis > seguimiento > cobros > nutri */
+  #perfil-dark .pd-header{order:0}
+  #perfil-dark .pd-stats{order:1}
+  #perfil-dark .pd-grid{display:flex;flex-direction:column}
+
+  /* Cards de la columna lateral (.pd-side) y la principal reordenadas */
+  .pd-side{display:contents}
+  .pd-card-molestias{order:2}
+  .pd-card-objetivos{order:3}
+  .pd-card-historial-fis{order:4}
+  .pd-card-seguimiento{order:5}
+  .pd-card-cobros{order:6}
+  .pd-card-nutri{order:7}
+
+  /* Stats del perfil: 3 columnas en mobile */
+  .pd-stats{grid-template-columns:repeat(3,1fr);font-size:0.85rem}
+  .pd-stat-val{font-size:1rem}
 }
 </style>
 </head>
@@ -461,7 +514,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 
       <!-- HEADER -->
       <div class="pd-header">
-        <button class="pd-back" onclick="showPage('alumnos',null);syncBottomNav('alumnos')">
+        <button class="pd-back" onclick="showPage('alumnos',null);_syncBottomNavFromPerfil()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
           Volver
         </button>
@@ -489,7 +542,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
       <!-- GRID -->
       <div class="pd-grid">
         <!-- SEGUIMIENTO -->
-        <div class="pd-card">
+        <div class="pd-card pd-card-seguimiento">
           <div class="pd-card-header">
             <span class="pd-card-title">Seguimiento</span>
             <span id="perfil-contador-sesiones" class="pd-card-sub"></span>
@@ -509,12 +562,12 @@ tr:hover td{background:rgba(82,196,122,0.04)}
         <!-- PANEL LATERAL -->
         <div class="pd-side">
           <!-- Cobros -->
-          <div class="pd-card">
+          <div class="pd-card pd-card-cobros">
             <div class="pd-card-header"><span class="pd-card-title">Cobros</span></div>
             <div class="pd-card-body" id="perfil-cobros"></div>
           </div>
           <!-- Objetivos -->
-          <div class="pd-card">
+          <div class="pd-card pd-card-objetivos">
             <div class="pd-card-header"><span class="pd-card-title">Objetivos</span></div>
             <div class="pd-card-body">
               <div id="perfil-objetivos"></div>
@@ -525,7 +578,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
             </div>
           </div>
           <!-- Molestias -->
-          <div class="pd-card">
+          <div class="pd-card pd-card-molestias">
             <div class="pd-card-header"><span class="pd-card-title">Molestias</span></div>
             <div class="pd-card-body">
               <div id="perfil-molestias"></div>
@@ -536,12 +589,12 @@ tr:hover td{background:rgba(82,196,122,0.04)}
             </div>
           </div>
           <!-- Historial físico -->
-          <div class="pd-card">
+          <div class="pd-card pd-card-historial-fis">
             <div class="pd-card-header"><span class="pd-card-title">Historial físico</span></div>
             <div class="pd-card-body" id="perfil-historial-fis"></div>
           </div>
           <!-- Nutrición -->
-          <div class="pd-card" id="perfil-nutri-panel">
+          <div class="pd-card pd-card-nutri" id="perfil-nutri-panel">
             <div class="pd-card-header"><span class="pd-card-title">Nutrición</span></div>
             <div class="pd-card-body" id="perfil-nutri"></div>
           </div>
@@ -552,23 +605,22 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 </main>
 </div>
 
-<!-- BOTTOM NAV MOBILE -->
+<!-- BOTTOM NAV MOBILE — solo íconos, 5 secciones -->
 <nav class="bottom-nav">
-  <a class="active" id="bn-dashboard" onclick="showPage('dashboard',this);syncBottomNav('dashboard')">
+  <a class="active" id="bn-dashboard" onclick="showPage('dashboard',this);syncBottomNav('dashboard')" title="Resumen">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-    <span>Resumen</span>
   </a>
-  <a id="bn-alumnos" onclick="showPage('alumnos',this);syncBottomNav('alumnos')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-    <span>Alumnos</span>
-  </a>
-  <a id="bn-agenda" onclick="showPage('agenda',this);syncBottomNav('agenda')">
+  <a id="bn-agenda" onclick="showPage('agenda',this);syncBottomNav('agenda')" title="Agenda">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-    <span>Agenda</span>
   </a>
-  <a id="bn-cobros" onclick="showPage('cobros',this);syncBottomNav('cobros')">
+  <a id="bn-alumnos" onclick="showPage('alumnos',this);syncBottomNav('alumnos')" title="Alumnos">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+  </a>
+  <a id="bn-cobros" onclick="showPage('cobros',this);syncBottomNav('cobros')" title="Cobros">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-    <span>Cobros</span>
+  </a>
+  <a id="bn-nutricion" onclick="showPage('nutricion',this);syncBottomNav('nutricion')" title="Nutrición">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
   </a>
 </nav>
 <button class="fab" onclick="abrirModalAlumno()">+</button>
@@ -731,10 +783,44 @@ const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleus
 const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar';
-const API_KEY     = '';
+
+// CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
+const RANGO = {
+  ALUMNOS_READ:        'Alumnos!A2:P1000',
+  ALUMNOS_WRITE:       'Alumnos!A2:P1000',
+  ALUMNOS_START:       'Alumnos!A2',
+  COBROS_READ:         'Cobros!A2:F1000',
+  COBROS_WRITE:        'Cobros!A2:F1000',
+  COBROS_START:        'Cobros!A2',
+  SEGUIMIENTO_READ:    'Seguimiento!A2:C10000',
+  SEGUIMIENTO_WRITE:   'Seguimiento!A2:C10000',
+  SEGUIMIENTO_START:   'Seguimiento!A2',
+  NUTRICION_READ:      'Nutricion!A2:E1000',
+  NUTRICION_WRITE:     'Nutricion!A2:E1000',
+  NUTRICION_START:     'Nutricion!A2',
+  NUTRI_COBROS_READ:   'NutricionCobros!A2:D1000',
+  NUTRI_COBROS_WRITE:  'NutricionCobros!A2:D1000',
+  NUTRI_COBROS_START:  'NutricionCobros!A2',
+  GASTOS_READ:         'Gastos!A2:D1000',
+  GASTOS_WRITE:        'Gastos!A2:D1000',
+  GASTOS_START:        'Gastos!A2',
+  AHORROS_READ:        'Ahorros!A2:B1000',
+  AHORROS_WRITE:       'Ahorros!A2:B1000',
+  AHORROS_START:       'Ahorros!A2',
+};
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function escaparHTML(str){
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
 
 let accessToken = null;
 let alumnos = [];
@@ -860,68 +946,83 @@ async function sheetsClear(range){
 async function cargarDatos(){
   try {
     toast('Sincronizando...');
+
     // Alumnos
-    const rowsA = await sheetsGet('Alumnos!A2:P1000');
-    alumnos = rowsA.map(r=>({
-      id:           r[0]||'',
-      nombre:       r[1]||'',
-      horario:      r[2]||'',
-      dias:         r[3]?(r[3].split('|')):[],
-      frecuencia:   r[4]||'2',
-      monto:        r[5]||'0',
-      objetivos:    r[6]||'',
-      notas:        r[7]||'',
-      estado:       r[8]||'activo',
-      telefono:     r[9]||'',
-      fechaNac:     r[10]||'',
-      estatura:     r[11]||'',
-      pesoInicial:  r[12]||'',
-      pesoActual:   r[13]||'',
-      historialFis: r[14]||'',
-      tieneNutri:   r[15]||'no',
-    })).filter(a=>a.id);
+    try{
+      const rowsA = await sheetsGet(RANGO.ALUMNOS_READ);
+      alumnos = rowsA.map(r=>({
+        id:           r[0]||'',
+        nombre:       r[1]||'',
+        horario:      r[2]||'',
+        dias:         r[3]?(r[3].split('|')):[],
+        frecuencia:   r[4]||'2',
+        monto:        r[5]||'0',
+        objetivos:    r[6]||'',
+        notas:        r[7]||'',
+        estado:       r[8]||'activo',
+        telefono:     r[9]||'',
+        fechaNac:     r[10]||'',
+        estatura:     r[11]||'',
+        pesoInicial:  r[12]||'',
+        pesoActual:   r[13]||'',
+        historialFis: r[14]||'',
+        tieneNutri:   r[15]||'no',
+      })).filter(a=>a.id);
+    }catch(e){console.warn('Error cargando Alumnos:',e);alumnos=[];}
 
     // Cobros
-    const rowsC = await sheetsGet('Cobros!A2:F1000');
-    cobros={};
-    rowsC.forEach(r=>{
-      if(!r[0]||!r[1]) return;
-      if(!cobros[r[0]]) cobros[r[0]]={};
-      cobros[r[0]][r[1]]={estado:r[2]||'pendiente',fecha:r[3]||'',bono:r[4]||'',fechaBono:r[5]||''};
-    });
+    try{
+      const rowsC = await sheetsGet(RANGO.COBROS_READ);
+      cobros={};
+      rowsC.forEach(r=>{
+        if(!r[0]||!r[1]) return;
+        if(!cobros[r[0]]) cobros[r[0]]={};
+        cobros[r[0]][r[1]]={estado:r[2]||'pendiente',fecha:r[3]||'',bono:r[4]||'',fechaBono:r[5]||''};
+      });
+    }catch(e){console.warn('Error cargando Cobros:',e);cobros={};}
 
     // Seguimiento
-    const rowsS = await sheetsGet('Seguimiento!A2:C1000');
-    seguimiento={};
-    rowsS.forEach(r=>{
-      if(!r[0]) return;
-      if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
-      seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||''});
-    });
+    try{
+      const rowsS = await sheetsGet(RANGO.SEGUIMIENTO_READ);
+      seguimiento={};
+      rowsS.forEach(r=>{
+        if(!r[0]) return;
+        if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
+        seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||''});
+      });
+    }catch(e){console.warn('Error cargando Seguimiento:',e);seguimiento={};}
 
     // Nutrición - Clientes
-    const rowsNC = await sheetsGet('Nutricion!A2:E1000');
-    clientesNutri=rowsNC.map(r=>({
-      id:r[0]||'',nombre:r[1]||'',telefono:r[2]||'',estado:r[3]||'activo',notas:r[4]||''
-    })).filter(c=>c.id);
+    try{
+      const rowsNC = await sheetsGet(RANGO.NUTRICION_READ);
+      clientesNutri=rowsNC.map(r=>({
+        id:r[0]||'',nombre:r[1]||'',telefono:r[2]||'',estado:r[3]||'activo',notas:r[4]||''
+      })).filter(c=>c.id);
+    }catch(e){console.warn('Error cargando Nutricion:',e);clientesNutri=[];}
 
     // Nutrición - Cobros
-    const rowsNP = await sheetsGet('NutricionCobros!A2:D1000');
-    cobrosNutri={};
-    rowsNP.forEach(r=>{
-      if(!r[0]||!r[1]) return;
-      if(!cobrosNutri[r[0]]) cobrosNutri[r[0]]={};
-      cobrosNutri[r[0]][r[1]]={monto:r[2]||'',fecha:r[3]||''};
-    });
+    try{
+      const rowsNP = await sheetsGet(RANGO.NUTRI_COBROS_READ);
+      cobrosNutri={};
+      rowsNP.forEach(r=>{
+        if(!r[0]||!r[1]) return;
+        if(!cobrosNutri[r[0]]) cobrosNutri[r[0]]={};
+        cobrosNutri[r[0]][r[1]]={monto:r[2]||'',fecha:r[3]||''};
+      });
+    }catch(e){console.warn('Error cargando NutricionCobros:',e);cobrosNutri={};}
 
     // Gastos
-    const rowsG = await sheetsGet('Gastos!A2:D1000');
-    gastos=rowsG.map(r=>({id:r[0]||'',fecha:r[1]||'',desc:r[2]||'',monto:r[3]||'0'})).filter(g=>g.id);
+    try{
+      const rowsG = await sheetsGet(RANGO.GASTOS_READ);
+      gastos=rowsG.map(r=>({id:r[0]||'',fecha:r[1]||'',desc:r[2]||'',monto:r[3]||'0'})).filter(g=>g.id);
+    }catch(e){console.warn('Error cargando Gastos:',e);gastos=[];}
 
     // Ahorros
-    const rowsA2 = await sheetsGet('Ahorros!A2:B1000');
-    ahorros={};
-    rowsA2.forEach(r=>{if(r[0]) ahorros[r[0]]=parseFloat(r[1]||0);});
+    try{
+      const rowsA2 = await sheetsGet(RANGO.AHORROS_READ);
+      ahorros={};
+      rowsA2.forEach(r=>{if(r[0]) ahorros[r[0]]=parseFloat(r[1]||0);});
+    }catch(e){console.warn('Error cargando Ahorros:',e);ahorros={};}
 
     toast('Datos sincronizados ✓');
     renderTablaAlumnos();
@@ -938,7 +1039,7 @@ async function cargarDatos(){
 
 // ── GUARDAR ALUMNO EN SHEETS ──
 async function guardarEnSheets(){
-  await sheetsClear('Alumnos!A2:P1000');
+  await sheetsClear(RANGO.ALUMNOS_WRITE);
   if(alumnos.length){
     const values=alumnos.map(a=>[
       a.id,a.nombre,a.horario,a.dias.join('|'),a.frecuencia,a.monto,
@@ -946,7 +1047,7 @@ async function guardarEnSheets(){
       a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
       a.historialFis||'',a.tieneNutri||'no'
     ]);
-    await sheetsUpdate('Alumnos!A2',values);
+    await sheetsUpdate(RANGO.ALUMNOS_START,values);
   }
 }
 
@@ -958,18 +1059,18 @@ async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
   const entrada={fecha, texto};
   seguimiento[alumnoId].unshift(entrada);
   seguimiento[alumnoId].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
-  await sheetsAppend('Seguimiento!A2',[[alumnoId, fecha, texto]]);
+  await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto]]);
 }
 
 async function guardarCobrosEnSheets(){
-  await sheetsClear('Cobros!A2:F1000');
+  await sheetsClear(RANGO.COBROS_WRITE);
   const values=[];
   Object.entries(cobros).forEach(([mk,mes])=>{
     Object.entries(mes).forEach(([aid,c])=>{
       values.push([mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'']);
     });
   });
-  if(values.length) await sheetsUpdate('Cobros!A2',values);
+  if(values.length) await sheetsUpdate(RANGO.COBROS_START,values);
 }
 
 // ── NAVEGACIÓN ──
@@ -988,6 +1089,12 @@ function showPage(id,el){
   document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active'));
   const el=document.getElementById('bn-'+id);
   if(el) el.classList.add('active');
+}
+
+// Sincroniza la barra inferior cuando se navega al perfil desde cualquier sección
+function _syncBottomNavFromPerfil(){
+  // El perfil no tiene su propio ítem en la barra; dejamos activo el de Alumnos
+  syncBottomNav('alumnos');
 }
 
 // ── FECHA ──
@@ -1038,7 +1145,7 @@ function renderDashboard(){
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
           ${alumnosPendientes.map(a=>`
-            <span onclick="verAlumno('${a.id}')" style="background:var(--blanco);border:1px solid rgba(230,126,34,0.3);padding:0.3rem 0.75rem;border-radius:20px;font-size:0.8rem;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#fde8c8'" onmouseout="this.style.background='var(--blanco)'">${a.nombre}</span>
+            <span onclick="verAlumno('${a.id}')" style="background:var(--blanco);border:1px solid rgba(230,126,34,0.3);padding:0.3rem 0.75rem;border-radius:20px;font-size:0.8rem;cursor:pointer;transition:background 0.2s" onmouseover="this.style.background='#fde8c8'" onmouseout="this.style.background='var(--blanco)'">${escaparHTML(a.nombre)}</span>
           `).join('')}
         </div>
       </div>
@@ -1052,7 +1159,7 @@ function renderDashboard(){
     :hoy.map(a=>{
       const hpd=stringToHorariosPorDia(a.horario);
       const hora=hpd[dia]||'';
-      const mk=mesKey();
+      // PERF-04: reusar mk ya calculado arriba, sin llamar mesKey() de nuevo
       const cobrado=(cobros[mk]||{})[a.id];
       const estadoCobro=cobrado&&cobrado.estado==='pagado'
         ?'<span class="badge badge-verde">Pagado</span>'
@@ -1061,7 +1168,7 @@ function renderDashboard(){
         <div style="display:flex;align-items:center;gap:1rem">
           <div style="width:36px;height:36px;border-radius:50%;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--verde);font-size:0.9rem;flex-shrink:0">${a.nombre.charAt(0).toUpperCase()}</div>
           <div>
-            <p style="font-weight:600;font-size:0.92rem">${a.nombre}</p>
+            <p style="font-weight:600;font-size:0.92rem">${escaparHTML(a.nombre)}</p>
             <p style="color:var(--suave);font-size:0.78rem;margin-top:0.1rem">${hora||'Sin horario'}</p>
           </div>
         </div>
@@ -1091,7 +1198,7 @@ function renderTablaAlumnos(){
     return;
   }
   tbody.innerHTML=lista.map(a=>`<tr>
-    <td style="font-weight:500">${a.nombre}</td>
+    <td style="font-weight:500">${escaparHTML(a.nombre)}</td>
     <td style="font-size:0.8rem">${a.dias.join(', ')}</td>
     <td>${a.frecuencia}x/sem</td>
     <td style="font-weight:600;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</td>
@@ -1173,7 +1280,7 @@ async function guardarAlumno(){
     await guardarEnSheets();
     await sincronizarAlumnoCalendar(alumno);
     toast('Alumno guardado y sincronizado ✓');
-    cerrarModal('modal-alumno');cerrarModal('modal-ver');
+    cerrarModal('modal-alumno');
     renderTablaAlumnos();renderDashboard();
   } catch(e){ toast('Error al guardar'); }
   btn.innerHTML='Guardar alumno';btn.disabled=false;
@@ -1196,14 +1303,26 @@ function verAlumno(id){
   // Header
   document.getElementById('perfil-nombre').textContent=a.nombre;
   document.getElementById('perfil-badge').innerHTML=pdBadge(a.estado);
-  const diasStr=a.dias.map(d=>hpd[d]?`${d} ${hpd[d]}`:d).join(' · ');
+  const diasStr=a.dias.map(d=>hpd[d]?`${escaparHTML(d)} ${escaparHTML(hpd[d])}`:escaparHTML(d)).join(' · ');
   document.getElementById('perfil-dias').textContent=diasStr||'Sin días asignados';
+  // Badge de cobro del mes — visible solo en mobile (CSS lo muestra)
+  const _mkBadge=mesKey();
+  const _cBadge=(cobros[_mkBadge]||{})[id];
+  const _estadoBadge=_cBadge&&_cBadge.estado==='pagado'?'pagado':'pendiente';
+  let _badgeEl=document.getElementById('perfil-cobro-mes-badge');
+  if(!_badgeEl){
+    _badgeEl=document.createElement('span');
+    _badgeEl.id='perfil-cobro-mes-badge';
+    document.getElementById('perfil-dias').after(_badgeEl);
+  }
+  _badgeEl.className=`pd-cobro-mes-badge ${_estadoBadge}`;
+  _badgeEl.textContent=_estadoBadge==='pagado'?'✓ Cuota al día':'Cuota pendiente';
 
   // Gestión inline
   document.getElementById('perfil-gestion').innerHTML=`
-    <div class="pd-gestion-item"><p>Frecuencia</p><p>${a.frecuencia}x por semana</p></div>
+    <div class="pd-gestion-item"><p>Frecuencia</p><p>${escaparHTML(a.frecuencia)}x por semana</p></div>
     <div class="pd-gestion-item"><p>Monto</p><p style="color:var(--pd-crema)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</p></div>
-    ${a.telefono?`<div class="pd-gestion-item"><p>Teléfono</p><p>${a.telefono}</p></div>`:''}
+    ${a.telefono?`<div class="pd-gestion-item"><p>Teléfono</p><p>${escaparHTML(a.telefono)}</p></div>`:''}
   `;
 
   // WhatsApp btn
@@ -1314,13 +1433,13 @@ function renderHistorial(id){
   lista.innerHTML=entradas.map((e,idx)=>`
     <div class="pd-entrada" id="entrada-${id}-${idx}">
       <div class="pd-entrada-top">
-        <span class="pd-entrada-fecha">${e.fecha}</span>
+        <span class="pd-entrada-fecha">${escaparHTML(e.fecha)}</span>
         <div class="pd-entrada-acciones">
           <button class="pd-entrada-accion" onclick="editarEntrada('${id}',${idx})">Editar</button>
           <button class="pd-entrada-accion danger" onclick="eliminarEntrada('${id}',${idx})">×</button>
         </div>
       </div>
-      <p class="pd-entrada-texto">${e.texto}</p>
+      <p class="pd-entrada-texto">${escaparHTML(e.texto)}</p>
     </div>
   `).join('');
 }
@@ -1333,7 +1452,7 @@ function editarEntrada(id, idx){
   contenedor.innerHTML=`
     <div style="display:flex;flex-direction:column;gap:0.5rem">
       <input type="date" id="edit-fecha-${idx}" value="${fechaISO}" class="pd-input"/>
-      <textarea id="edit-texto-${idx}" class="pd-textarea" style="min-height:70px">${e.texto}</textarea>
+      <textarea id="edit-texto-${idx}" class="pd-textarea" style="min-height:70px">${escaparHTML(e.texto)}</textarea>
       <div style="display:flex;gap:0.5rem">
         <button class="pd-btn pd-btn-primary" onclick="guardarEdicionEntrada('${id}',${idx})">Guardar</button>
         <button class="pd-btn pd-btn-secondary" onclick="renderHistorial('${id}')">Cancelar</button>
@@ -1371,12 +1490,12 @@ async function eliminarEntrada(id,idx){
 }
 
 async function guardarSeguimientoCompleto(){
-  await sheetsClear('Seguimiento!A2:C10000');
+  await sheetsClear(RANGO.SEGUIMIENTO_WRITE);
   const values=[];
   Object.entries(seguimiento).forEach(([aid,entradas])=>{
     entradas.forEach(e=>values.push([aid,e.fecha,e.texto]));
   });
-  if(values.length) await sheetsUpdate('Seguimiento!A2',values);
+  if(values.length) await sheetsUpdate(RANGO.SEGUIMIENTO_START,values);
 }
 
 async function agregarEntradaPerfil(id){
@@ -1413,7 +1532,7 @@ function renderObjetivos(id){
         ${lista.map((o,idx)=>`
           <div class="pd-item" id="objetivo-${id}-${idx}">
             <div class="pd-dot"></div>
-            <span style="flex:1">${o}</span>
+            <span style="flex:1">${escaparHTML(o)}</span>
             <div class="pd-item-acciones">
               <button class="pd-entrada-accion" onclick="editarObjetivo('${id}',${idx})">Editar</button>
               <button class="pd-entrada-accion danger" onclick="eliminarObjetivo('${id}',${idx})">×</button>
@@ -1489,7 +1608,7 @@ function renderMolestias(id){
         ${lista.map((o,idx)=>`
           <div class="pd-item" id="molestia-${id}-${idx}">
             <div class="pd-dot marron"></div>
-            <span style="flex:1">${o}</span>
+            <span style="flex:1">${escaparHTML(o)}</span>
             <div class="pd-item-acciones">
               <button class="pd-entrada-accion" onclick="editarMolestia('${id}',${idx})">Editar</button>
               <button class="pd-entrada-accion danger" onclick="eliminarMolestia('${id}',${idx})">×</button>
@@ -1561,16 +1680,16 @@ async function sincronizarTodosCalendar(){
 
 // ── FINANZAS ──
 async function guardarGastosEnSheets(){
-  await sheetsClear('Gastos!A2:D1000');
+  await sheetsClear(RANGO.GASTOS_WRITE);
   if(gastos.length){
     const values=gastos.map(g=>[g.id,g.fecha,g.desc,g.monto]);
-    await sheetsUpdate('Gastos!A2',values);
+    await sheetsUpdate(RANGO.GASTOS_START,values);
   }
 }
 async function guardarAhorrosEnSheets(){
-  await sheetsClear('Ahorros!A2:B1000');
+  await sheetsClear(RANGO.AHORROS_WRITE);
   const values=Object.entries(ahorros).map(([mk,v])=>[mk,v]);
-  if(values.length) await sheetsUpdate('Ahorros!A2',values);
+  if(values.length) await sheetsUpdate(RANGO.AHORROS_START,values);
 }
 
 function initFinAnios(){
@@ -1668,7 +1787,7 @@ function renderFinanzas(){
     listaGastos.innerHTML=`<table style="width:100%;border-collapse:collapse">
       ${gastosAnio.map(g=>`<tr>
         <td style="padding:0.6rem 1rem;border-bottom:1px solid var(--borde);font-size:0.82rem;color:var(--suave)">${g.fecha}</td>
-        <td style="padding:0.6rem 0.5rem;border-bottom:1px solid var(--borde);font-size:0.85rem">${g.desc}</td>
+        <td style="padding:0.6rem 0.5rem;border-bottom:1px solid var(--borde);font-size:0.85rem">${escaparHTML(g.desc)}</td>
         <td style="padding:0.6rem 1rem;border-bottom:1px solid var(--borde);font-size:0.85rem;font-weight:600;color:var(--rojo);white-space:nowrap">$${parseFloat(g.monto).toLocaleString('es-AR')}</td>
         <td style="padding:0.6rem 0.75rem;border-bottom:1px solid var(--borde)">
           <button class="btn btn-danger btn-sm" onclick="eliminarGasto('${g.id}')">×</button>
@@ -1740,21 +1859,21 @@ async function eliminarGasto(id){
 
 // ── NUTRICIÓN SHEETS ──
 async function guardarClientesNutriEnSheets(){
-  await sheetsClear('Nutricion!A2:E1000');
+  await sheetsClear(RANGO.NUTRICION_WRITE);
   if(clientesNutri.length){
     const values=clientesNutri.map(c=>[c.id,c.nombre,c.telefono||'',c.estado,c.notas||'']);
-    await sheetsUpdate('Nutricion!A2',values);
+    await sheetsUpdate(RANGO.NUTRICION_START,values);
   }
 }
 async function guardarCobrosNutriEnSheets(){
-  await sheetsClear('NutricionCobros!A2:D1000');
+  await sheetsClear(RANGO.NUTRI_COBROS_WRITE);
   const values=[];
   Object.entries(cobrosNutri).forEach(([mk,mes])=>{
     Object.entries(mes).forEach(([cid,p])=>{
       values.push([mk,cid,p.monto||'',p.fecha||'']);
     });
   });
-  if(values.length) await sheetsUpdate('NutricionCobros!A2',values);
+  if(values.length) await sheetsUpdate(RANGO.NUTRI_COBROS_START,values);
 }
 
 // ── NUTRICIÓN RENDER ──
@@ -1811,7 +1930,7 @@ function renderNutri(){
         ?`<a href="https://wa.me/54${c.telefono.replace(/\D/g,'')}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none">WhatsApp</a>`:'';
       return `<div class="cobro-row" style="flex-wrap:wrap;gap:0.75rem">
         <div class="cobro-info">
-          <div class="cobro-nombre">${c.nombre} ${esAlumno?'<span class="badge badge-verde" style="font-size:0.65rem">Alumno</span>':badgeEstado(c.estado)}</div>
+          <div class="cobro-nombre">${escaparHTML(c.nombre)} ${esAlumno?'<span class="badge badge-verde" style="font-size:0.65rem">Alumno</span>':badgeEstado(c.estado)}</div>
           ${c.telefono?`<div class="cobro-detalle">${c.telefono}</div>`:''}
         </div>
         <div style="display:flex;align-items:center;gap:0.5rem">
@@ -1898,7 +2017,9 @@ async function registrarPagoNutri(mk,id){
 
 async function editarPagoNutri(mk,id,valorActual){
   const nuevo=prompt('Nuevo monto:',valorActual);
-  if(!nuevo||isNaN(nuevo)) return;
+  // SEG-03: rechazar cancelación, no numérico y negativos
+  if(nuevo===null) return;
+  if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
   cobrosNutri[mk][id]={monto:nuevo,fecha:new Date().toLocaleDateString('es-AR')};
   try{await guardarCobrosNutriEnSheets();toast('Pago actualizado ✓');renderNutri();}
   catch(e){toast('Error al guardar');}
@@ -2075,7 +2196,6 @@ function actualizarStatsRow(id){
 // ── NUTRICIÓN EN PERFIL ──
 function renderNutriPerfil(id){
   const a=alumnos.find(x=>x.id===id); if(!a) return;
-  const panel=document.getElementById('perfil-nutri-panel');
   const el=document.getElementById('perfil-nutri');
   const tieneNutri=a.tieneNutri==='si';
 
@@ -2134,7 +2254,9 @@ async function registrarPagoNutriPerfil(id,mk){
 
 async function editarPagoNutriPerfil(id,mk,valorActual){
   const nuevo=prompt('Nuevo monto:',valorActual);
-  if(!nuevo||isNaN(nuevo)) return;
+  // SEG-03: rechazar cancelación, no numérico y negativos
+  if(nuevo===null) return;
+  if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
   cobrosNutri[mk][id]={monto:nuevo,fecha:new Date().toLocaleDateString('es-AR')};
   try{await guardarCobrosNutriEnSheets();toast('Pago actualizado ✓');renderNutriPerfil(id);}
   catch(e){toast('Error al guardar');}
@@ -2232,6 +2354,31 @@ async function marcarPendientePerfil(alumnoId, mk){
   }catch(e){toast('Error al guardar');}
 }
 
+// ── COBROS SECCIÓN ──
+async function marcarPagado(mk, id){
+  if(!cobros[mk]) cobros[mk]={};
+  const prev=cobros[mk][id]||{};
+  cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR')};
+  try{
+    await guardarCobrosEnSheets();
+    toast('Pago registrado ✓');
+    renderCobros();
+    renderDashboard();
+  }catch(e){toast('Error al guardar');}
+}
+
+async function marcarPendiente(mk, id){
+  if(!cobros[mk]) cobros[mk]={};
+  const prev=cobros[mk][id]||{};
+  cobros[mk][id]={...prev,estado:'pendiente',fecha:''};
+  try{
+    await guardarCobrosEnSheets();
+    toast('Marcado como pendiente');
+    renderCobros();
+    renderDashboard();
+  }catch(e){toast('Error al guardar');}
+}
+
 // ── AGENDA ──
 function getSemanaActual(){
   const hoy=new Date();
@@ -2251,10 +2398,13 @@ function renderAgenda(){
   const semana=getSemanaActual();
   const hoyStr=new Date().toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
 
+  // PERF-03: parsear horarios una sola vez por alumno, reutilizar en sort y render
+  const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
+
   grid.innerHTML=semana.map(({nombre,fechaStr})=>{
     const turnos=activos.filter(a=>a.dias.includes(nombre)).sort((a,b)=>{
-      const hpdA=stringToHorariosPorDia(a.horario);
-      const hpdB=stringToHorariosPorDia(b.horario);
+      const hpdA=hpdCache.get(a.id);
+      const hpdB=hpdCache.get(b.id);
       const horaA=(hpdA[nombre]||'99:99').split(':')[0].padStart(2,'0')+(hpdA[nombre]||'99:99').split(':')[1];
       const horaB=(hpdB[nombre]||'99:99').split(':')[0].padStart(2,'0')+(hpdB[nombre]||'99:99').split(':')[1];
       return horaA.localeCompare(horaB);
@@ -2271,9 +2421,9 @@ function renderAgenda(){
         ondrop="drop(event,'${nombre}')">
         ${turnos.length===0?'<p style="color:var(--suave);font-size:0.78rem;margin-top:0.5rem">Libre</p>':
           turnos.map(a=>{
-            const hpd=stringToHorariosPorDia(a.horario);
+            const hpd=hpdCache.get(a.id);
             const hora=hpd[nombre]||'Sin horario';
-            const freq=parseInt(a.frecuencia)||2;
+            const freq=parseInt(a.frecuencia, 10)||2;
             return `<div class="turno-card freq-${freq}"
               draggable="true"
               data-id="${a.id}"
@@ -2281,8 +2431,8 @@ function renderAgenda(){
               onclick="abrirQuickAgenda('${a.id}','${nombre}')"
               ondragstart="dragStart(event,'${a.id}','${nombre}')"
               ondragend="dragEnd(event)">
-              <div class="turno-hora">${hora}</div>
-              <div class="turno-nombre">${a.nombre}</div>
+              <div class="turno-hora">${escaparHTML(hora)}</div>
+              <div class="turno-nombre">${escaparHTML(a.nombre)}</div>
               <div class="turno-freq">${freq}x/sem</div>
             </div>`;
           }).join('')}
@@ -2451,7 +2601,7 @@ function renderCobros(){
       const fechaTxt=c.fecha?`<span style="font-size:0.75rem;color:var(--suave);margin-left:0.5rem">${c.fecha}</span>`:'';
       return `<div class="cobro-row" style="flex-wrap:wrap;gap:0.75rem">
         <div class="cobro-info">
-          <div class="cobro-nombre">${a.nombre}</div>
+          <div class="cobro-nombre">${escaparHTML(a.nombre)}</div>
           <div class="cobro-detalle">${a.frecuencia}x semana · ${badge}${fechaTxt}</div>
         </div>
         <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
@@ -2493,7 +2643,9 @@ async function registrarBono(mk,id){
 
 async function editarBono(mk,id,valorActual){
   const nuevo=prompt('Nuevo monto del bono:',valorActual);
-  if(!nuevo||isNaN(nuevo)) return;
+  // SEG-03: rechazar cancelación, no numérico y negativos
+  if(nuevo===null) return;
+  if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
   cobros[mk][id].bono=nuevo;
   cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
   await guardarCobrosEnSheets();
