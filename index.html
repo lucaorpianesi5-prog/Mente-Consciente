@@ -1344,8 +1344,10 @@ function verAlumno(id){
   // Drive btn
   const driveBtn=document.getElementById('perfil-btn-drive');
   if(a.carpetaDrive){
+    const driveUrl=a.carpetaDrive.trim();
     driveBtn.style.display='inline-flex';
-    driveBtn.href=a.carpetaDrive;
+    driveBtn.onclick=(e)=>{e.preventDefault();window.open(driveUrl,'_blank','noopener');};
+    driveBtn.removeAttribute('href');
   } else {
     driveBtn.style.display='none';
   }
