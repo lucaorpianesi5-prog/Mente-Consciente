@@ -1344,16 +1344,8 @@ function verAlumno(id){
   // Drive btn
   const driveBtn=document.getElementById('perfil-btn-drive');
   if(a.carpetaDrive){
-    const driveUrl=a.carpetaDrive.trim().replace(/^["']+|["']+$/g,'');
-    console.log('[Drive btn] URL:', JSON.stringify(driveUrl));
     driveBtn.style.display='inline-flex';
-    driveBtn.onclick=(e)=>{
-      e.preventDefault();
-      e.stopPropagation();
-      const url=driveUrl.startsWith('http')?driveUrl:'https://'+driveUrl;
-      window.open(url,'_blank','noopener');
-    };
-    driveBtn.removeAttribute('href');
+    driveBtn.onclick=()=>window.open(a.carpetaDrive.trim(),'_blank','noopener');
   } else {
     driveBtn.style.display='none';
   }
