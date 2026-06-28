@@ -4,6 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mente Consciente</title>
+<link rel="icon" type="image/png" href="Logo_App.png"/>
+<link rel="apple-touch-icon" href="Logo_App.png"/>
 <script>
 function scriptGoogleListo(){
   window._googleListo = true;
@@ -15,13 +17,13 @@ function scriptGoogleListo(){
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --verde:#52C47A;--verde-s:#2E7D4F;--verde-bg:rgba(82,196,122,0.1);
+  --verde:#4AB870;--verde-s:#2E7D4F;--verde-bg:rgba(74,184,112,0.1);
   --marron:#D4B896;--marron-s:#B8956A;
-  --crema:#1F3024;--crema-d:#172318;
-  --bg:#111B16;--blanco:#172318;
-  --texto:#E5EDE8;--suave:#6E9E80;--borde:rgba(82,196,122,0.12);
+  --crema:#223527;--crema-d:#1C2B20;
+  --bg:#111B16;--blanco:#1C2B20;
+  --texto:#E5EDE8;--suave:#6E9E80;--borde:rgba(74,184,112,0.12);
   --rojo:#E05C5C;--rojo-bg:rgba(224,92,92,0.12);
-  --verde-ok:#52C47A;--verde-ok-bg:rgba(82,196,122,0.12);
+  --verde-ok:#4AB870;--verde-ok-bg:rgba(74,184,112,0.12);
   --amarillo:#E8A84A;--amarillo-bg:rgba(232,168,74,0.12);
 }
 body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;line-height:1.5}
@@ -41,17 +43,17 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(
 .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 
 /* SIDEBAR */
-aside{background:#111B16;color:#E5EDE8;padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid rgba(82,196,122,0.1)}
-.logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(82,196,122,0.12);margin-bottom:1rem}
-.logo h1{font-size:1.1rem;font-weight:600;color:#52C47A}
+aside{background:#111B16;color:#E5EDE8;padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid rgba(74,184,112,0.1)}
+.logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(74,184,112,0.12);margin-bottom:1rem}
+.logo h1{font-size:1.1rem;font-weight:600;color:#4AB870}
 .logo p{font-size:0.72rem;color:#3D6B50;margin-top:0.2rem}
 .logo-user{font-size:0.72rem;color:#3D6B50;margin-top:0.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 nav a{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;color:#6E9E80;text-decoration:none;font-size:0.85rem;border-left:3px solid transparent;transition:all 0.2s;cursor:pointer}
-nav a:hover,nav a.active{color:#E5EDE8;background:rgba(82,196,122,0.08);border-left-color:#52C47A}
+nav a:hover,nav a.active{color:#E5EDE8;background:rgba(74,184,112,0.08);border-left-color:#4AB870}
 nav a svg{width:16px;height:16px;flex-shrink:0}
-.sidebar-bottom{margin-top:auto;padding:1rem 1.5rem;border-top:1px solid rgba(82,196,122,0.12);display:flex;flex-direction:column;gap:0.5rem}
-.sidebar-btn{width:100%;background:rgba(82,196,122,0.08);border:1px solid rgba(82,196,122,0.15);color:#6E9E80;padding:0.6rem 1rem;border-radius:6px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s}
-.sidebar-btn:hover{background:rgba(82,196,122,0.15);color:#E5EDE8}
+.sidebar-bottom{margin-top:auto;padding:1rem 1.5rem;border-top:1px solid rgba(74,184,112,0.12);display:flex;flex-direction:column;gap:0.5rem}
+.sidebar-btn{width:100%;background:rgba(74,184,112,0.08);border:1px solid rgba(74,184,112,0.15);color:#6E9E80;padding:0.6rem 1rem;border-radius:6px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s}
+.sidebar-btn:hover{background:rgba(74,184,112,0.15);color:#E5EDE8}
 
 /* MAIN */
 main{padding:2rem;overflow-y:auto;background:var(--bg)}
@@ -70,7 +72,7 @@ main{padding:2rem;overflow-y:auto;background:var(--bg)}
 /* BOTONES */
 .btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.1rem;border-radius:5px;font-size:0.82rem;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
 .btn-primary{background:var(--verde);color:#0D1A12;font-weight:600}.btn-primary:hover{background:#3DAF65}
-.btn-secondary{background:rgba(82,196,122,0.08);color:var(--suave);border:1px solid var(--borde)}.btn-secondary:hover{background:rgba(82,196,122,0.15);color:var(--texto)}
+.btn-secondary{background:rgba(74,184,112,0.08);color:var(--suave);border:1px solid var(--borde)}.btn-secondary:hover{background:rgba(74,184,112,0.15);color:var(--texto)}
 .btn-danger{background:var(--rojo-bg);color:var(--rojo);border:1px solid rgba(224,92,92,0.2)}.btn-danger:hover{background:rgba(224,92,92,0.2)}
 .btn-sm{padding:0.35rem 0.75rem;font-size:0.78rem}
 
@@ -82,7 +84,7 @@ table{width:100%;border-collapse:collapse}
 th{background:var(--crema);padding:0.7rem 1rem;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave);font-weight:600;border-bottom:1px solid var(--borde)}
 td{padding:0.75rem 1rem;border-bottom:1px solid var(--borde);vertical-align:middle;color:var(--texto)}
 tr:last-child td{border-bottom:none}
-tr:hover td{background:rgba(82,196,122,0.04)}
+tr:hover td{background:rgba(74,184,112,0.04)}
 
 /* BADGES */
 .badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:500}
@@ -106,7 +108,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 .turno-card.freq-2 .turno-hora{color:#9B7FD4}
 .turno-card.freq-3{background:rgba(232,168,74,0.12);border-left-color:#E8A84A}
 .turno-card.freq-3 .turno-hora{color:#E8A84A}
-.dia-body.drag-over{background:rgba(82,196,122,0.08);border-radius:4px}
+.dia-body.drag-over{background:rgba(74,184,112,0.08);border-radius:4px}
 .turno-hora{font-size:0.7rem;font-weight:600}
 .turno-nombre{font-size:0.82rem;font-weight:500;color:var(--texto);margin-top:0.1rem}
 .turno-freq{font-size:0.7rem;color:var(--suave)}
@@ -114,7 +116,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:#172318;border:1px solid rgba(82,196,122,0.15);border-radius:10px;width:min(520px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal{background:#1C2B20;border:1px solid rgba(74,184,112,0.15);border-radius:10px;width:min(520px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
 .modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center}
 .modal-header h3{font-size:1rem;font-weight:600;color:var(--texto)}
 .modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--suave);line-height:1}
@@ -125,15 +127,15 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .field{display:flex;flex-direction:column;gap:0.35rem}
 .field label{font-size:0.78rem;font-weight:500;color:var(--suave)}
-.field input,.field select,.field textarea{padding:0.55rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:#1F3024;color:var(--texto);outline:none;transition:border 0.2s;font-family:inherit}
+.field input,.field select,.field textarea{padding:0.55rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:#223527;color:var(--texto);outline:none;transition:border 0.2s;font-family:inherit}
 .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--verde)}
 .field textarea{resize:vertical;min-height:70px}
 .field input::placeholder,.field textarea::placeholder{color:#3D6B50}
 .dias-check{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem}
-.dia-check-label{display:flex;align-items:center;gap:0.35rem;background:#1F3024;border:1px solid var(--borde);padding:0.4rem 0.8rem;border-radius:20px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;user-select:none;color:var(--suave)}
+.dia-check-label{display:flex;align-items:center;gap:0.35rem;background:#223527;border:1px solid var(--borde);padding:0.4rem 0.8rem;border-radius:20px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;user-select:none;color:var(--suave)}
 .dia-check-label.checked{background:var(--verde);color:#0D1A12;border-color:var(--verde);font-weight:600}
 .dia-horario-lista{display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem}
-.dia-horario-row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;background:#1F3024;border-radius:6px;border:1px solid var(--borde)}
+.dia-horario-row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border:1px solid var(--borde)}
 .dia-horario-row label{font-size:0.8rem;font-weight:600;color:var(--verde)}
 .dia-horario-row input{padding:0.4rem 0.6rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:#111B16;color:var(--texto);outline:none;font-family:inherit}
 .dia-horario-row input:focus{border-color:var(--verde)}
@@ -141,16 +143,16 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 /* ── PERFIL DARK ── */
 #perfil-dark{
   --pd-bg:       #111B16;
-  --pd-bg2:      #172318;
-  --pd-bg3:      #1F3024;
-  --pd-card:     #172318;
-  --pd-card2:    #1F3024;
-  --pd-border:   rgba(82,196,122,0.12);
-  --pd-border2:  rgba(82,196,122,0.22);
-  --pd-verde:    #52C47A;
+  --pd-bg2:       #1C2B20;
+  --pd-bg3:       #223527;
+  --pd-card:     #1C2B20;
+  --pd-card2:    #223527;
+  --pd-border:   rgba(74,184,112,0.12);
+  --pd-border2:  rgba(74,184,112,0.22);
+  --pd-verde:    #4AB870;
   --pd-verde-d:  #2E7D4F;
-  --pd-verde-dim:rgba(82,196,122,0.12);
-  --pd-crema:    #D4B896;
+  --pd-verde-dim:rgba(74,184,112,0.12);
+  --pd-crema:    #C8A87A;
   --pd-crema-dim:rgba(212,184,150,0.12);
   --pd-text:     #E5EDE8;
   --pd-text2:    #6E9E80;
@@ -191,7 +193,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 .pd-stat-val.crema{color:var(--pd-crema)}
 .pd-stat-val.amber{color:var(--pd-amber)}
 .pd-stat-nutri-link{cursor:pointer;transition:background 0.15s}
-.pd-stat-nutri-link:hover{background:rgba(82,196,122,0.08)}
+.pd-stat-nutri-link:hover{background:rgba(74,184,112,0.08)}
 
 /* GRID */
 .pd-grid{display:grid;grid-template-columns:1fr 300px;gap:1rem;align-items:start}
@@ -261,8 +263,8 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 /* ALUMNOS CARDS MOBILE */
 #alumnos-cards{display:none;flex-direction:column;gap:0.6rem}
 .alumno-card{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:0.9rem 1rem;cursor:pointer;transition:background 0.15s}
-.alumno-card:hover{background:rgba(82,196,122,0.04)}
-.alumno-card:active{background:rgba(82,196,122,0.08)}
+.alumno-card:hover{background:rgba(74,184,112,0.04)}
+.alumno-card:active{background:rgba(74,184,112,0.08)}
 .alumno-card-top{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem}
 .alumno-card-avatar{width:36px;height:36px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .alumno-card-info{flex:1;min-width:0}
@@ -270,7 +272,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 .alumno-card-dias{font-size:0.78rem;color:var(--suave);margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .alumno-card-bottom{display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--suave);padding-top:0.6rem;border-top:1px solid var(--borde)}
 .mes-selector{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
-.mes-selector select{padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:#1F3024;color:var(--texto)}
+.mes-selector select{padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:#223527;color:var(--texto)}
 .cobros-lista{display:flex;flex-direction:column;gap:0.75rem}
 .cobro-row{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .cobro-info{flex:1}
@@ -279,11 +281,11 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 .cobro-monto{font-size:1.1rem;font-weight:700;color:var(--verde);min-width:80px;text-align:right}
 
 /* TOAST */
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1F3024;color:var(--texto);border:1px solid var(--borde);padding:0.7rem 1.5rem;border-radius:6px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#223527;color:var(--texto);border:1px solid var(--borde);padding:0.7rem 1.5rem;border-radius:6px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
 .toast.show{opacity:1}
 
 /* LOADING */
-.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(82,196,122,0.3);border-top-color:var(--verde);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(74,184,112,0.3);border-top-color:var(--verde);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* MOBILE */
@@ -318,10 +320,10 @@ tr:hover td{background:rgba(82,196,122,0.04)}
   .form-grid{grid-template-columns:1fr}
 
   /* ── Barra inferior ── */
-  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#111B16;z-index:150;border-top:1px solid rgba(82,196,122,0.12)}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#111B16;z-index:150;border-top:1px solid rgba(74,184,112,0.12)}
   .bottom-nav a{flex:1;display:flex;align-items:center;justify-content:center;padding:0.75rem 0.25rem;color:#3D6B50;text-decoration:none;cursor:pointer;transition:color 0.2s}
   .bottom-nav a svg{width:22px;height:22px}
-  .bottom-nav a.active{color:#52C47A}
+  .bottom-nav a.active{color:#4AB870}
 
   /* ── FAB ── */
   .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:4.75rem;right:1.25rem;width:50px;height:50px;border-radius:50%;background:#2E7D4F;color:#E5EDE8;font-size:1.6rem;border:none;cursor:pointer;z-index:160;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.2s}
@@ -333,7 +335,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
   /* ── Perfil mobile ── */
   /* Badge cobro mes visible en header */
   .pd-cobro-mes-badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:600;margin-top:0.4rem}
-  .pd-cobro-mes-badge.pagado{background:rgba(82,196,122,0.12);color:#52C47A;border:0.5px solid rgba(82,196,122,0.25)}
+  .pd-cobro-mes-badge.pagado{background:rgba(74,184,112,0.12);color:#4AB870;border:0.5px solid rgba(74,184,112,0.25)}
   .pd-cobro-mes-badge.pendiente{background:rgba(232,168,74,0.12);color:#E8A84A;border:0.5px solid rgba(232,168,74,0.25)}
 
   /* Reordenar secciones del perfil en mobile via order */
@@ -505,7 +507,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
   <div class="page" id="page-finanzas">
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
       <div><h2>Finanzas</h2><p>Resumen anual de ingresos, gastos y ahorros</p></div>
-      <select id="fin-anio-select" onchange="renderFinanzas()" style="padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:#1F3024;color:var(--texto)"></select>
+      <select id="fin-anio-select" onchange="renderFinanzas()" style="padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:#223527;color:var(--texto)"></select>
     </div>
     <div class="stats" style="margin-bottom:1.5rem" id="fin-stats"></div>
     <div class="table-wrap" style="margin-bottom:1.5rem">
@@ -1817,7 +1819,7 @@ function renderFinanzas(){
       <td>
         <div style="display:flex;align-items:center;gap:0.4rem">
           <input type="number" id="ahorro-${mkey}" value="${ahorro||''}" placeholder="0"
-            style="width:80px;padding:0.25rem 0.4rem;border:1px solid var(--borde);border-radius:4px;font-size:0.8rem;background:#1F3024;color:var(--texto)"
+            style="width:80px;padding:0.25rem 0.4rem;border:1px solid var(--borde);border-radius:4px;font-size:0.8rem;background:#223527;color:var(--texto)"
             onkeydown="if(event.key==='Enter') actualizarAhorro('${mkey}',this.value)"/>
           <button class="btn btn-primary btn-sm" style="padding:0.2rem 0.5rem;font-size:0.72rem" onclick="actualizarAhorro('${mkey}',document.getElementById('ahorro-${mkey}').value)">✓</button>
           ${ahorro?`<span style="font-size:0.75rem;color:var(--verde)">$${ahorro.toLocaleString('es-AR')}</span>`:''}
@@ -2274,7 +2276,7 @@ function renderNutriPerfil(id){
     <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:${tieneNutri?'1rem':'0'}">
       <label style="font-size:0.82rem;color:var(--pd-text2);display:flex;align-items:center;gap:0.5rem;cursor:pointer">
         <input type="checkbox" ${tieneNutri?'checked':''} onchange="toggleNutriAlumno('${id}',this.checked)"
-          style="width:15px;height:15px;cursor:pointer;accent-color:#52C47A"/>
+          style="width:15px;height:15px;cursor:pointer;accent-color:#4AB870"/>
         Seguimiento nutricional activo
       </label>
     </div>
@@ -2287,7 +2289,7 @@ function renderNutriCobrosPerfil(id){
   if(!cobrosNutri[mk]) cobrosNutri[mk]={};
   const p=cobrosNutri[mk][id]||{monto:'',fecha:''};
   return `
-    <div style="border-top:1px solid rgba(82,196,122,0.15);padding-top:0.75rem">
+    <div style="border-top:1px solid rgba(74,184,112,0.15);padding-top:0.75rem">
       <p style="font-size:0.65rem;color:var(--pd-text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">Pago nutri ${MESES[parseInt(mk.split('-')[1])-1]}</p>
       ${p.monto
         ?`<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
@@ -2364,7 +2366,7 @@ function renderCobrosAlumno(id){
   const ultimoPago=historial.find(m=>m.estado==='pagado');
   el.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem">
-      <div style="background:rgba(82,196,122,0.1);padding:0.6rem 0.75rem;border-radius:6px;text-align:center">
+      <div style="background:rgba(74,184,112,0.1);padding:0.6rem 0.75rem;border-radius:6px;text-align:center">
         <p style="font-size:1.2rem;font-weight:700;color:var(--pd-verde)">${pagados}</p>
         <p style="font-size:0.65rem;color:var(--pd-verde)">Pagados</p>
       </div>
