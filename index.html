@@ -188,6 +188,8 @@ tr:hover td{background:rgba(82,196,122,0.04)}
 .pd-stat-val.verde{color:var(--pd-verde)}
 .pd-stat-val.crema{color:var(--pd-crema)}
 .pd-stat-val.amber{color:var(--pd-amber)}
+.pd-stat-nutri-link{cursor:pointer;transition:background 0.15s}
+.pd-stat-nutri-link:hover{background:rgba(82,196,122,0.08)}
 
 /* GRID */
 .pd-grid{display:grid;grid-template-columns:1fr 300px;gap:1rem;align-items:start}
@@ -784,6 +786,7 @@ tr:hover td{background:rgba(82,196,122,0.04)}
             <div class="field"><label>Peso actual (kg)</label><input type="number" id="a-pesoActual" placeholder="72"/></div>
           </div>
           <div class="field" style="margin-top:0.75rem"><label>Carpeta Drive (URL)</label><input type="url" id="a-carpetaDrive" placeholder="https://drive.google.com/drive/folders/..."/></div>
+          <div class="field" style="margin-top:0.75rem"><label>Sheet Nutrición (URL)</label><input type="url" id="a-nutriDrive" placeholder="https://docs.google.com/spreadsheets/..."/></div>
         </div>
       </div>
     </div>
@@ -806,8 +809,8 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
 const RANGO = {
-  ALUMNOS_READ:        'Alumnos!A2:Q1000',
-  ALUMNOS_WRITE:       'Alumnos!A2:Q1000',
+  ALUMNOS_READ:        'Alumnos!A2:R1000',
+  ALUMNOS_WRITE:       'Alumnos!A2:R1000',
   ALUMNOS_START:       'Alumnos!A2',
   COBROS_READ:         'Cobros!A2:F1000',
   COBROS_WRITE:        'Cobros!A2:F1000',
@@ -988,6 +991,7 @@ async function cargarDatos(){
         historialFis: r[14]||'',
         tieneNutri:   r[15]||'no',
         carpetaDrive: r[16]||'',
+        nutriDrive:   r[17]||'',
       })).filter(a=>a.id);
     }catch(e){console.warn('Error cargando Alumnos:',e);alumnos=[];}
 
@@ -1066,7 +1070,7 @@ async function guardarEnSheets(){
       a.id,a.nombre,a.horario,a.dias.join('|'),a.frecuencia,a.monto,
       a.objetivos,a.notas,a.estado,a.telefono||'',
       a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
-      a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||''
+      a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||''
     ]);
     await sheetsUpdate(RANGO.ALUMNOS_START,values);
   }
@@ -1250,7 +1254,7 @@ function renderTablaAlumnos(){
 function abrirModalAlumno(id=null){
   editandoId=id;
   document.getElementById('modal-titulo').textContent=id?'Editar alumno':'Nuevo alumno';
-  ['a-nombre','a-telefono','a-monto','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive'].forEach(f=>document.getElementById(f).value='');
+  ['a-nombre','a-telefono','a-monto','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('a-frecuencia').value='2';
   document.getElementById('a-estado').value='activo';
   document.querySelectorAll('.dia-check-label').forEach(l=>l.classList.remove('checked'));
@@ -1270,6 +1274,7 @@ function abrirModalAlumno(id=null){
     document.getElementById('a-pesoInicial').value=a.pesoInicial||'';
     document.getElementById('a-pesoActual').value=a.pesoActual||'';
     document.getElementById('a-carpetaDrive').value=a.carpetaDrive||'';
+    document.getElementById('a-nutriDrive').value=a.nutriDrive||'';
     const hpd=stringToHorariosPorDia(a.horario);
     document.querySelectorAll('.dia-check-label').forEach(l=>{
       if(a.dias.includes(l.dataset.dia)) l.classList.add('checked');
@@ -1312,6 +1317,7 @@ async function guardarAlumno(){
     historialFis: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).historialFis||'':'',
     tieneNutri: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).tieneNutri||'no':'no',
     carpetaDrive: document.getElementById('a-carpetaDrive').value.trim(),
+    nutriDrive:   document.getElementById('a-nutriDrive').value.trim(),
   };
   const btn=document.getElementById('btn-guardar-alumno');
   btn.innerHTML='<span class="loading"></span>Guardando...';
@@ -1429,6 +1435,18 @@ function verAlumno(id){
       <div class="pd-stat-val ${imc?(parseFloat(imc)<25?'verde':'amber'):''}"> ${imc||'—'}</div>
       <div class="pd-stat-sub">${imcCat||'sin datos'}</div>
     </div>
+    ${a.tieneNutri==='si'
+      ? `<div class="pd-stat${a.nutriDrive?' pd-stat-nutri-link':''}" ${a.nutriDrive?`onclick="window.open('${escaparHTML(a.nutriDrive.trim())}','_blank','noopener')"`:''}>
+           <div class="pd-stat-label">Nutrición</div>
+           <div class="pd-stat-val verde">Activo</div>
+           <div class="pd-stat-sub">${a.nutriDrive?'Ver sheet →':'sin link'}</div>
+         </div>`
+      : `<div class="pd-stat">
+           <div class="pd-stat-label">Nutrición</div>
+           <div class="pd-stat-val" style="font-size:0.85rem;color:var(--pd-text3)">Sin seguimiento</div>
+           <div class="pd-stat-sub"> </div>
+         </div>`
+    }
   `;
 
   // Seguimiento
