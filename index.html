@@ -182,6 +182,9 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .pd-btn-wa{background:var(--pd-verde-dim);color:var(--pd-verde);border-color:var(--pd-border2)}
 .pd-btn-drive{background:rgba(66,133,244,0.1);color:#6BA3F5;border-color:rgba(66,133,244,0.25);text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem}
 .pd-btn-drive:hover{background:rgba(66,133,244,0.18)}
+.pd-btn-asistencia{background:rgba(74,184,112,0.1);color:var(--pd-verde);border-color:rgba(74,184,112,0.25)}
+.pd-btn-asistencia:hover{background:rgba(74,184,112,0.18)}
+.pd-btn-asistencia:disabled{opacity:0.5;cursor:not-allowed}
 
 /* STATS */
 .pd-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;margin-bottom:1rem}
@@ -396,10 +399,17 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .portal-entrada:last-child{margin-bottom:0}
 .portal-entrada-fecha{font-size:0.68rem;color:var(--suave);display:block;margin-bottom:0.25rem}
 .portal-entrada-texto{font-size:0.85rem;color:var(--texto);line-height:1.55}
-.portal-proxima{font-size:0.78rem;color:var(--verde);margin-top:0.3rem;font-weight:500}
+.portal-proxima{display:inline-block;font-size:0.75rem;font-weight:600;margin-top:0.4rem;padding:0.25rem 0.65rem;border-radius:20px}
+.portal-proxima-hoy{background:rgba(74,184,112,0.15);color:var(--verde);border:1px solid rgba(74,184,112,0.3)}
+.portal-proxima-manana{background:rgba(232,168,74,0.12);color:var(--amarillo);border:1px solid rgba(232,168,74,0.3)}
+.portal-proxima-pronto{background:rgba(110,158,128,0.1);color:var(--suave);border:1px solid rgba(110,158,128,0.2)}
 .portal-objetivos{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
 .portal-objetivo{font-size:0.85rem;color:var(--texto);padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border-left:2px solid var(--verde-s);line-height:1.45}
 .portal-objetivo::before{content:'→ ';color:var(--verde-s);font-weight:600}
+.portal-racha-card{text-align:center;padding:1.5rem 1rem}
+.portal-racha-num{font-size:3rem;font-weight:800;color:var(--verde);line-height:1}
+.portal-racha-label{font-size:0.82rem;color:var(--suave);margin-top:0.35rem;text-transform:uppercase;letter-spacing:0.06em}
+.portal-racha-cero{font-size:0.85rem;color:var(--suave);font-style:italic}
 .portal-empty{font-size:0.85rem;color:var(--suave);text-align:center;padding:0.5rem 0}
 .portal-footer{text-align:center;font-size:0.75rem;color:var(--suave);margin-top:0.5rem}
 .portal-loading{text-align:center;padding:3rem;color:var(--suave);font-size:0.9rem}
@@ -601,6 +611,7 @@ tr:hover td{background:rgba(74,184,112,0.04)}
           <div class="pd-header-btns">
             <button id="perfil-btn-whatsapp" class="pd-btn pd-btn-wa" style="display:none">WhatsApp</button>
             <button id="perfil-btn-drive" class="pd-btn pd-btn-drive" style="display:none">📁 Plan</button>
+            <button id="perfil-btn-asistencia" class="pd-btn pd-btn-asistencia">✓ Asistencia</button>
             <button id="perfil-btn-editar" class="pd-btn pd-btn-secondary">Editar</button>
             <button id="perfil-btn-eliminar" class="pd-btn pd-btn-danger">Eliminar</button>
           </div>
@@ -884,6 +895,8 @@ const RANGO = {
   AHORROS_READ:        'Ahorros!A2:B1000',
   AHORROS_WRITE:       'Ahorros!A2:B1000',
   AHORROS_START:       'Ahorros!A2',
+  ASISTENCIAS_READ:    'Asistencias!A2:B1000',
+  ASISTENCIAS_START:   'Asistencias!A2',
 };
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
@@ -931,10 +944,12 @@ async function cargarPortalAlumno(id){
   try {
     const urlA = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent('Alumnos!A2:R1000')}?key=${API_KEY}`;
     const urlS = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent('Seguimiento!A2:C10000')}?key=${API_KEY}`;
-    const [resA, resS] = await Promise.all([fetch(urlA), fetch(urlS)]);
+    const urlAs = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(RANGO.ASISTENCIAS_READ)}?key=${API_KEY}`;
+    const [resA, resS, resAs] = await Promise.all([fetch(urlA), fetch(urlS), fetch(urlAs)]);
     if(!resA.ok || !resS.ok) throw new Error('Error al leer datos');
-    const rowsA = (await resA.json()).values || [];
-    const rowsS = (await resS.json()).values || [];
+    const rowsA  = (await resA.json()).values  || [];
+    const rowsS  = (await resS.json()).values  || [];
+    const rowsAs = resAs.ok ? ((await resAs.json()).values || []) : [];
 
     const r = rowsA.find(r => r[0] === id);
     if(!r){ el.innerHTML = '<div class="portal-error">Perfil no encontrado.</div>'; return; }
@@ -963,6 +978,13 @@ async function cargarPortalAlumno(id){
         return toDate(b.fecha) - toDate(a.fecha);
       });
 
+    // Racha de asistencia — semanas consecutivas con al menos 1 asistencia
+    const fechasAsistencia = rowsAs
+      .filter(r => r[0] === id && r[1])
+      .map(r => { const [d,m,y]=r[1].split('/'); return new Date(`${y}-${m}-${d}`); })
+      .filter(d => !isNaN(d));
+    const racha = calcularRachaPortal(fechasAsistencia);
+
     const hpd = portalStringToHorarios(a.horario);
     const diasStr = a.dias.map(d => hpd[d] ? `${d} ${hpd[d]}` : d).join(' · ') || 'Sin días asignados';
     const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
@@ -972,6 +994,7 @@ async function cargarPortalAlumno(id){
     const hoy = new Date();
     const diaHoyNombre = DIAS_SEMANA[hoy.getDay()];
     let proximaSesionStr = '';
+    let proximaSesionClase = '';
     if(a.dias.length > 0){
       // Buscar el próximo día de entrenamiento (hoy inclusive)
       for(let offset = 0; offset < 7; offset++){
@@ -981,11 +1004,14 @@ async function cargarPortalAlumno(id){
         if(a.dias.includes(nombre)){
           const hora = hpd[nombre] || '';
           if(offset === 0){
-            proximaSesionStr = `Hoy entrenas${hora ? ' a las ' + hora : ''}`;
+            proximaSesionStr = `Hoy entrenás${hora ? ' · ' + hora : ''}`;
+            proximaSesionClase = 'portal-proxima-hoy';
           } else if(offset === 1){
             proximaSesionStr = `Mañana · ${nombre}${hora ? ' ' + hora : ''}`;
+            proximaSesionClase = 'portal-proxima-manana';
           } else {
             proximaSesionStr = `${nombre}${hora ? ' · ' + hora : ''}`;
+            proximaSesionClase = 'portal-proxima-pronto';
           }
           break;
         }
@@ -1016,7 +1042,7 @@ async function cargarPortalAlumno(id){
             <h1 class="portal-nombre">${escaparHTML(a.nombre)}</h1>
             <p class="portal-dias">${escaparHTML(diasStr)}</p>
             <p class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</p>
-            ${proximaSesionStr ? `<p class="portal-proxima">📅 ${escaparHTML(proximaSesionStr)}</p>` : ''}
+            ${proximaSesionStr ? `<span class="portal-proxima ${escaparHTML(proximaSesionClase)}">📅 ${escaparHTML(proximaSesionStr)}</span>` : ''}
           </div>
         </div>
 
@@ -1051,6 +1077,15 @@ async function cargarPortalAlumno(id){
             ${objetivosList.map(o => `<li class="portal-objetivo">${escaparHTML(o)}</li>`).join('')}
           </ul>
         </div>` : ''}
+
+        <!-- Racha de asistencia -->
+        <div class="portal-card portal-racha-card">
+          ${racha === 0
+            ? `<div class="portal-racha-cero">Sin asistencias recientes</div>`
+            : `<div class="portal-racha-num">${racha >= 3 ? '🔥 ' : ''}${racha}</div>
+               <div class="portal-racha-label">semana${racha !== 1 ? 's' : ''} seguida${racha !== 1 ? 's' : ''}</div>`
+          }
+        </div>
 
         <!-- Seguimiento -->
         <div class="portal-card">
@@ -1096,6 +1131,38 @@ function portalCalcEdad(fechaStr){
   if(m<0||(m===0&&hoy.getDate()<nac.getDate())) edad--;
   return edad;
 }
+
+function calcularRachaPortal(fechas){
+  if(!fechas.length) return 0;
+  // Obtener el lunes de la semana de una fecha dada
+  function lunesDe(d){
+    const r = new Date(d);
+    const dia = r.getDay(); // 0=Dom
+    const diff = dia === 0 ? -6 : 1 - dia;
+    r.setDate(r.getDate() + diff);
+    r.setHours(0,0,0,0);
+    return r.getTime();
+  }
+  // Semanas únicas con asistencia
+  const semanas = new Set(fechas.map(d => lunesDe(d)));
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  let racha = 0;
+  let semanaActual = lunesDe(hoy);
+  // Permitir que la semana actual no tenga asistencia aún (la racha no se rompe)
+  if(!semanas.has(semanaActual)){
+    // Si la semana pasada tampoco tiene, racha = 0
+    const semanaPasada = semanaActual - 7 * 86400000;
+    if(!semanas.has(semanaPasada)) return 0;
+    semanaActual = semanaPasada;
+  }
+  // Contar hacia atrás desde semanaActual
+  while(semanas.has(semanaActual)){
+    racha++;
+    semanaActual -= 7 * 86400000;
+  }
+  return racha;
+}
+
 let tokenClient = null;
 
 function iniciarSesion(){
@@ -1642,6 +1709,10 @@ function verAlumno(id){
       renderTablaAlumnos();renderDashboard();
     }
   };
+  const asistenciaBtn=document.getElementById('perfil-btn-asistencia');
+  asistenciaBtn.disabled=false;
+  asistenciaBtn.textContent='✓ Asistencia';
+  asistenciaBtn.onclick=()=>registrarAsistencia(id, asistenciaBtn);
 
   // Stats row
   const edad=calcularEdad(a.fechaNac);
@@ -1717,6 +1788,21 @@ function verAlumno(id){
   renderNutriPerfil(id);
 
   showPage('perfil',null);
+}
+
+async function registrarAsistencia(id, btn){
+  btn.disabled=true;
+  btn.textContent='Registrando...';
+  try{
+    const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    await sheetsAppend(RANGO.ASISTENCIAS_START,[[id, fecha]]);
+    toast('Asistencia registrada ✓');
+    btn.textContent='✓ Registrada';
+  }catch(e){
+    toast('Error al registrar asistencia');
+    btn.disabled=false;
+    btn.textContent='✓ Asistencia';
+  }
 }
 
 async function guardarCampoAlumno(id, campo, inputId){
