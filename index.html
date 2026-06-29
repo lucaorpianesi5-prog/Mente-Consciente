@@ -392,6 +392,10 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .portal-entrada:last-child{margin-bottom:0}
 .portal-entrada-fecha{font-size:0.68rem;color:var(--suave);display:block;margin-bottom:0.25rem}
 .portal-entrada-texto{font-size:0.85rem;color:var(--texto);line-height:1.55}
+.portal-proxima{font-size:0.78rem;color:var(--verde);margin-top:0.3rem;font-weight:500}
+.portal-objetivos{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
+.portal-objetivo{font-size:0.85rem;color:var(--texto);padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border-left:2px solid var(--verde-s);line-height:1.45}
+.portal-objetivo::before{content:'→ ';color:var(--verde-s);font-weight:600}
 .portal-empty{font-size:0.85rem;color:var(--suave);text-align:center;padding:0.5rem 0}
 .portal-footer{text-align:center;font-size:0.75rem;color:var(--suave);margin-top:0.5rem}
 .portal-loading{text-align:center;padding:3rem;color:var(--suave);font-size:0.9rem}
@@ -937,6 +941,7 @@ async function cargarPortalAlumno(id){
       horario:      r[2]||'',
       dias:         r[3]?(r[3].split('|')):[],
       frecuencia:   r[4]||'',
+      objetivos:    r[6]||'',
       fechaNac:     r[10]||'',
       estatura:     r[11]||'',
       pesoInicial:  r[12]||'',
@@ -957,6 +962,34 @@ async function cargarPortalAlumno(id){
     const hpd = portalStringToHorarios(a.horario);
     const diasStr = a.dias.map(d => hpd[d] ? `${d} ${hpd[d]}` : d).join(' · ') || 'Sin días asignados';
     const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+    // Próxima sesión
+    const DIAS_SEMANA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const hoy = new Date();
+    const diaHoyNombre = DIAS_SEMANA[hoy.getDay()];
+    let proximaSesionStr = '';
+    if(a.dias.length > 0){
+      // Buscar el próximo día de entrenamiento (hoy inclusive)
+      for(let offset = 0; offset < 7; offset++){
+        const d = new Date(hoy);
+        d.setDate(hoy.getDate() + offset);
+        const nombre = DIAS_SEMANA[d.getDay()];
+        if(a.dias.includes(nombre)){
+          const hora = hpd[nombre] || '';
+          if(offset === 0){
+            proximaSesionStr = `Hoy entrenas${hora ? ' a las ' + hora : ''}`;
+          } else if(offset === 1){
+            proximaSesionStr = `Mañana · ${nombre}${hora ? ' ' + hora : ''}`;
+          } else {
+            proximaSesionStr = `${nombre}${hora ? ' · ' + hora : ''}`;
+          }
+          break;
+        }
+      }
+    }
+
+    // Objetivos
+    const objetivosList = a.objetivos ? a.objetivos.split('\n').map(o=>o.trim()).filter(Boolean) : [];
 
     // Datos personales
     const edad = portalCalcEdad(a.fechaNac);
@@ -979,6 +1012,7 @@ async function cargarPortalAlumno(id){
             <h1 class="portal-nombre">${escaparHTML(a.nombre)}</h1>
             <p class="portal-dias">${escaparHTML(diasStr)}</p>
             <p class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</p>
+            ${proximaSesionStr ? `<p class="portal-proxima">📅 ${escaparHTML(proximaSesionStr)}</p>` : ''}
           </div>
         </div>
 
@@ -1003,6 +1037,15 @@ async function cargarPortalAlumno(id){
             ${a.carpetaDrive ? `<button class="portal-btn portal-btn-drive" onclick="window.open('${escaparHTML(a.carpetaDrive)}','_blank','noopener')">📁 Mi plan de entrenamiento</button>` : ''}
             ${a.nutriDrive ? `<button class="portal-btn portal-btn-nutri" onclick="window.open('${escaparHTML(a.nutriDrive)}','_blank','noopener')">🥗 Mi plan nutricional</button>` : ''}
           </div>
+        </div>` : ''}
+
+        <!-- Objetivos -->
+        ${objetivosList.length > 0 ? `
+        <div class="portal-card">
+          <div class="portal-card-title">Tus objetivos</div>
+          <ul class="portal-objetivos">
+            ${objetivosList.map(o => `<li class="portal-objetivo">${escaparHTML(o)}</li>`).join('')}
+          </ul>
         </div>` : ''}
 
         <!-- Seguimiento -->
