@@ -363,9 +363,55 @@ tr:hover td{background:rgba(74,184,112,0.04)}
   .pd-stats{grid-template-columns:repeat(3,1fr);font-size:0.85rem}
   .pd-stat-val{font-size:1rem}
 }
+
+/* ── PORTAL ALUMNO PÚBLICO ── */
+#portal-alumno{display:none;min-height:100vh;background:#111B16;padding:1.5rem 1rem 3rem;max-width:600px;margin:0 auto}
+#portal-alumno.visible{display:block}
+.portal-logo{display:flex;align-items:center;gap:0.75rem;margin-bottom:2rem}
+.portal-logo img{width:40px;height:40px;border-radius:10px;object-fit:cover}
+.portal-logo-txt{font-size:0.85rem;font-weight:600;color:var(--verde)}
+.portal-hero{background:#1C2B20;border:1px solid rgba(74,184,112,0.15);border-radius:12px;padding:1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem}
+.portal-avatar{width:56px;height:56px;border-radius:50%;background:rgba(74,184,112,0.12);border:2px solid var(--verde);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:700;color:var(--verde);flex-shrink:0}
+.portal-nombre{font-size:1.3rem;font-weight:700;color:var(--texto)}
+.portal-dias{font-size:0.82rem;color:var(--suave);margin-top:0.25rem;line-height:1.5}
+.portal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1.25rem}
+.portal-stat{background:#1C2B20;border:1px solid rgba(74,184,112,0.12);border-radius:8px;padding:0.85rem 0.75rem;text-align:center}
+.portal-stat-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;color:#3D6B50;margin-bottom:0.3rem}
+.portal-stat-val{font-size:1.15rem;font-weight:700;color:var(--texto)}
+.portal-stat-sub{font-size:0.65rem;color:var(--suave);margin-top:0.1rem}
+.portal-card{background:#1C2B20;border:1px solid rgba(74,184,112,0.12);border-radius:10px;margin-bottom:1rem;overflow:hidden}
+.portal-card-header{padding:0.75rem 1rem;border-bottom:1px solid rgba(74,184,112,0.1);font-size:0.78rem;font-weight:600;color:var(--texto);letter-spacing:0.03em}
+.portal-card-body{padding:1rem}
+.portal-entrada{background:#223527;border-left:2px solid #2E7D4F;border-radius:0 6px 6px 0;padding:0.65rem 0.75rem;margin-bottom:0.5rem}
+.portal-entrada-fecha{font-size:0.65rem;color:#3D6B50;margin-bottom:0.2rem}
+.portal-entrada-texto{font-size:0.85rem;color:var(--texto);line-height:1.55}
+.portal-btn{display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;padding:0.75rem;border-radius:8px;font-size:0.88rem;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;font-family:inherit;margin-bottom:0.6rem}
+.portal-btn-drive{background:rgba(66,133,244,0.12);color:#6BA3F5;border:1px solid rgba(66,133,244,0.25)}
+.portal-btn-drive:hover{background:rgba(66,133,244,0.2)}
+.portal-btn-nutri{background:rgba(74,184,112,0.1);color:var(--verde);border:1px solid rgba(74,184,112,0.2)}
+.portal-btn-nutri:hover{background:rgba(74,184,112,0.18)}
+.portal-empty{color:#3D6B50;font-size:0.82rem;font-style:italic}
+.portal-error{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:1rem;text-align:center}
+.portal-error p{color:var(--suave);font-size:0.9rem}
+.portal-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:1rem}
+.portal-loading p{color:var(--suave);font-size:0.85rem}
+.portal-spinner{width:32px;height:32px;border:3px solid rgba(74,184,112,0.2);border-top-color:var(--verde);border-radius:50%;animation:spin 0.8s linear infinite}
+@media(max-width:480px){
+  .portal-stats{grid-template-columns:repeat(3,1fr)}
+  .portal-hero{padding:1.1rem}
+}
 </style>
 </head>
 <body>
+
+<!-- PORTAL PÚBLICO ALUMNO -->
+<div id="portal-alumno">
+  <div class="portal-logo">
+    <img src="Logo_App.png" alt="Mente Consciente"/>
+    <span class="portal-logo-txt">Mente Consciente</span>
+  </div>
+  <div id="portal-contenido"></div>
+</div>
 
 <!-- LOGIN -->
 <div id="login-screen">
@@ -810,6 +856,7 @@ const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleus
 const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar';
+const API_KEY     = 'AIzaSyCoSrMHlnLoj7SSOHD2_31YE7bvJhNVo4g';
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
 const RANGO = {
@@ -2778,6 +2825,162 @@ function stringToHorariosPorDia(str){
     }
   });
   return result;
+}
+
+// ── PORTAL PÚBLICO ALUMNO ──
+(function iniciarPortalSiCorresponde(){
+  const params = new URLSearchParams(window.location.search);
+  const alumnoId = params.get('alumno');
+  if(!alumnoId) return;
+
+  // Ocultar login y app, mostrar portal
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const loginScreen = document.getElementById('login-screen');
+    const appEl       = document.getElementById('app');
+    const portalEl    = document.getElementById('portal-alumno');
+    if(loginScreen) loginScreen.style.display = 'none';
+    if(appEl)       appEl.style.display       = 'none';
+    if(portalEl)    portalEl.classList.add('visible');
+    cargarPortal(alumnoId);
+  });
+})();
+
+async function cargarPortal(alumnoId){
+  const contenido = document.getElementById('portal-contenido');
+  contenido.innerHTML = `
+    <div class="portal-loading">
+      <div class="portal-spinner"></div>
+      <p>Cargando tu perfil...</p>
+    </div>`;
+
+  try {
+    const base = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values`;
+    const key  = `key=${API_KEY}`;
+
+    const [resA, resS] = await Promise.all([
+      fetch(`${base}/${encodeURIComponent(RANGO.ALUMNOS_READ)}?${key}`),
+      fetch(`${base}/${encodeURIComponent(RANGO.SEGUIMIENTO_READ)}?${key}`)
+    ]);
+
+    if(!resA.ok || !resS.ok) throw new Error('Error al leer datos');
+
+    const rowsA = (await resA.json()).values || [];
+    const rowsS = (await resS.json()).values || [];
+
+    // Buscar alumno
+    const row = rowsA.find(r => r[0] === alumnoId);
+    if(!row){
+      contenido.innerHTML = `
+        <div class="portal-error">
+          <p>No se encontró tu perfil.<br>Pedile el link correcto a tu entrenador.</p>
+        </div>`;
+      return;
+    }
+
+    const a = {
+      nombre:      row[1]||'',
+      horario:     row[2]||'',
+      dias:        row[3]?(row[3].split('|')):[],
+      frecuencia:  row[4]||'',
+      fechaNac:    row[10]||'',
+      estatura:    row[11]||'',
+      pesoInicial: row[12]||'',
+      pesoActual:  row[13]||'',
+      tieneNutri:  row[15]||'no',
+      carpetaDrive:row[16]||'',
+      nutriDrive:  row[17]||'',
+    };
+
+    // Seguimiento del alumno
+    const entradas = rowsS
+      .filter(r => r[0] === alumnoId)
+      .map(r => ({ fecha: r[1]||'', texto: r[2]||'' }))
+      .sort((a,b) => {
+        const fa = a.fecha.split('/').reverse().join('-');
+        const fb = b.fecha.split('/').reverse().join('-');
+        return new Date(fb) - new Date(fa);
+      });
+
+    // Datos calculados
+    const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const hpd       = stringToHorariosPorDia(a.horario);
+    const diasStr   = a.dias.map(d => hpd[d] ? `${escaparHTML(d)} ${escaparHTML(hpd[d])}` : escaparHTML(d)).join(' · ');
+    const edad      = calcularEdad(a.fechaNac);
+    const imc       = calcularIMC(a.pesoActual||a.pesoInicial, a.estatura);
+    const imcCat    = imc_categoria(imc);
+    const pesoDiff  = a.pesoInicial && a.pesoActual
+      ? (parseFloat(a.pesoActual) - parseFloat(a.pesoInicial))
+      : null;
+
+    // Render
+    contenido.innerHTML = `
+      <!-- Hero -->
+      <div class="portal-hero">
+        <div class="portal-avatar">${escaparHTML(iniciales)}</div>
+        <div>
+          <div class="portal-nombre">${escaparHTML(a.nombre)}</div>
+          <div class="portal-dias">${diasStr||'Sin días asignados'}</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="portal-stats">
+        <div class="portal-stat">
+          <div class="portal-stat-label">Edad</div>
+          <div class="portal-stat-val">${edad !== null ? edad : '—'}</div>
+          <div class="portal-stat-sub">años</div>
+        </div>
+        <div class="portal-stat">
+          <div class="portal-stat-label">Peso actual</div>
+          <div class="portal-stat-val" style="color:var(--verde)">${a.pesoActual||'—'}</div>
+          <div class="portal-stat-sub">${pesoDiff !== null ? (pesoDiff <= 0 ? '' : '+') + pesoDiff + ' kg' : 'kg'}</div>
+        </div>
+        <div class="portal-stat">
+          <div class="portal-stat-label">IMC</div>
+          <div class="portal-stat-val" style="color:${imc&&parseFloat(imc)<25?'var(--verde)':'var(--amarillo)'}">${imc||'—'}</div>
+          <div class="portal-stat-sub">${imcCat||'sin datos'}</div>
+        </div>
+      </div>
+
+      <!-- Botones de recursos -->
+      ${(a.carpetaDrive || (a.tieneNutri === 'si' && a.nutriDrive)) ? `
+      <div class="portal-card">
+        <div class="portal-card-header">Mis recursos</div>
+        <div class="portal-card-body">
+          ${a.carpetaDrive ? `
+            <button class="portal-btn portal-btn-drive" onclick="window.open('${escaparHTML(a.carpetaDrive.trim())}','_blank','noopener')">
+              📁 Ver mi carpeta de planes
+            </button>` : ''}
+          ${a.tieneNutri === 'si' && a.nutriDrive ? `
+            <button class="portal-btn portal-btn-nutri" onclick="window.open('${escaparHTML(a.nutriDrive.trim())}','_blank','noopener')">
+              🥗 Ver mi plan nutricional
+            </button>` : ''}
+        </div>
+      </div>` : ''}
+
+      <!-- Seguimiento -->
+      <div class="portal-card">
+        <div class="portal-card-header">Seguimiento · ${entradas.length} entrada${entradas.length !== 1 ? 's' : ''}</div>
+        <div class="portal-card-body">
+          ${entradas.length === 0
+            ? '<p class="portal-empty">Todavía no hay entradas de seguimiento.</p>'
+            : entradas.map(e => `
+                <div class="portal-entrada">
+                  <div class="portal-entrada-fecha">${escaparHTML(e.fecha)}</div>
+                  <div class="portal-entrada-texto">${escaparHTML(e.texto)}</div>
+                </div>`).join('')
+          }
+        </div>
+      </div>
+    `;
+
+  } catch(e) {
+    contenido.innerHTML = `
+      <div class="portal-error">
+        <p>No se pudo cargar tu perfil.<br>Intentá de nuevo en unos segundos.</p>
+      </div>`;
+    console.error('Portal error:', e);
+  }
 }
 
 // ── TOAST ──
