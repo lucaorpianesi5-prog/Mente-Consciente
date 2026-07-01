@@ -630,6 +630,7 @@ tr:hover td{background:rgba(74,184,112,0.04)}
             <div id="perfil-gestion" class="pd-gestion-row"></div>
             <div class="pd-whatsapp-row">
               <button id="perfil-btn-whatsapp" class="pd-btn pd-btn-wa" style="display:none">WhatsApp</button>
+              <button id="perfil-btn-portal" class="pd-btn" onclick="copiarLinkPortal()">🔗 Copiar link del portal</button>
             </div>
           </div>
           <div class="pd-header-btns">
@@ -894,15 +895,14 @@ const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleus
 const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar';
-const API_KEY     = 'AIzaSyCoSrMHlnLoj7SSOHD2_31YE7bvJhNVo4g';
 // S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
 // Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
 const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
 const RANGO = {
-  ALUMNOS_READ:        'Alumnos!A2:R1000',
-  ALUMNOS_WRITE:       'Alumnos!A2:R1000',
+  ALUMNOS_READ:        'Alumnos!A2:S1000',
+  ALUMNOS_WRITE:       'Alumnos!A2:S1000',
   ALUMNOS_START:       'Alumnos!A2',
   COBROS_READ:         'Cobros!A2:G1000',
   COBROS_WRITE:        'Cobros!A2:G1000',
@@ -952,6 +952,8 @@ let editandoNutriId = null;
 let editandoId = null;
 
 // ── PORTAL PÚBLICO ──
+// B-5: el parámetro 'alumno' de la URL ahora es un token no adivinable
+// (columna portalToken en el Sheet), no el ID real del alumno.
 (function(){
   const params = new URLSearchParams(window.location.search);
   const alumnoId = params.get('alumno');
@@ -1294,13 +1296,6 @@ async function sheetsAppend(range, values){
   return r;
 }
 
-async function sheetsClear(range){
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}:clear`;
-  const r=await fetchConRenovacion(url,{method:'POST',headers:{Authorization:'Bearer '+accessToken}});
-  if(!r.ok) throw new Error('Error limpiando rango en Sheets');
-  return r;
-}
-
 // B3: reemplaza el patrón clear()+update() (2 llamadas, no atómico) por una sola
 // llamada que sobrescribe todo el rango — filas nuevas + filas vacías de relleno
 // hasta el techo del rango. Si falla, no se pierde nada (la hoja queda como estaba).
@@ -1315,8 +1310,11 @@ async function sheetsReplaceRange(range, values){
   const [, colIni, filaIni, colFin, filaFin] = m;
   const numCols = _colLetrasAIndice(colFin) - _colLetrasAIndice(colIni) + 1;
   const totalFilas = (+filaFin) - (+filaIni) + 1;
+  if(values.length > totalFilas){
+    throw new Error(`Se superó el alto del rango ${range}: ${values.length} filas a guardar, ${totalFilas} disponibles`);
+  }
   const filaVacia = ()=>new Array(numCols).fill('');
-  const relleno = values.slice(0, totalFilas).map(fila=>{
+  const relleno = values.map(fila=>{
     const f = fila.slice(0, numCols);
     while(f.length < numCols) f.push('');
     return f;
@@ -1354,6 +1352,7 @@ async function cargarDatos(){
             tieneNutri:   r[15]||'no',
             carpetaDrive: r[16]||'',
             nutriDrive:   r[17]||'',
+            portalToken:  r[18]||'',
           })).filter(a=>a.id);
         }catch(e){console.warn('Error cargando Alumnos:',e);alumnos=[];}
       })(),
@@ -1451,7 +1450,8 @@ function _alumnoAFila(a){
     a.id,a.nombre,a.horario,a.dias.join('|'),a.frecuencia,a.monto,
     a.objetivos,a.notas,a.estado,a.telefono||'',
     a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
-    a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||''
+    a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||'',
+    a.portalToken||''
   ];
 }
 
@@ -1745,6 +1745,26 @@ function pdBadge(estado){
   if(estado==='activo') return `<span class="pd-badge-activo">Activo</span>`;
   if(estado==='pausado') return `<span class="pd-badge-pausado">Pausado</span>`;
   return `<span class="pd-badge-inactivo">Inactivo</span>`;
+}
+
+// B-5: genera un token no adivinable la primera vez que se pide el link
+// (si el alumno ya tiene uno, lo reusa) y copia la URL del portal al
+// portapapeles. El link usa el token, nunca el ID real del alumno.
+async function copiarLinkPortal(){
+  const id = document.getElementById('page-perfil').dataset.alumnoId;
+  const i = alumnos.findIndex(x=>x.id===id);
+  if(i===-1) return;
+  try{
+    if(!alumnos[i].portalToken){
+      alumnos[i].portalToken = crypto.randomUUID();
+      await guardarFilaAlumno(alumnos[i]);
+    }
+    const url = `${window.location.origin}${window.location.pathname}?alumno=${alumnos[i].portalToken}`;
+    await navigator.clipboard.writeText(url);
+    toast('Link copiado ✓');
+  }catch(e){
+    toast('Error al generar el link');
+  }
 }
 
 function verAlumno(id){
@@ -2768,7 +2788,7 @@ function renderCobrosAlumno(id){
           </div>
           <div style="display:flex;align-items:center;gap:0.35rem">
             ${m.estado==='pagado'
-              ?`<span class="pd-cobro-pagado">✓ $${monto.toLocaleString('es-AR')}</span>
+              ?`<span class="pd-cobro-pagado">✓ $${((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto).toLocaleString('es-AR')}</span>
                 <button class="pd-cobro-btn undo" onclick="marcarPendientePerfil('${id}','${m.mes}')">↩</button>`
               :`<span class="pd-cobro-pendiente">Pendiente</span>
                 <button class="pd-cobro-btn" onclick="marcarPagadoPerfil('${id}','${m.mes}')">✓</button>`
