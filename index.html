@@ -943,6 +943,7 @@ let accessToken = null;
 let alumnos = [];
 let cobros  = {};
 let seguimiento = {};
+let asistencias = [];
 let clientesNutri = [];
 let cobrosNutri = {};
 let gastos = [];
@@ -1378,6 +1379,11 @@ async function cargarDatos(){
       rowsA2.forEach(r=>{if(r[0]) ahorros[r[0]]=parseFloat(r[1]||0);});
     }catch(e){console.warn('Error cargando Ahorros:',e);ahorros={};}
 
+    // Asistencias (B1: necesario para chequear duplicados del mismo día)
+    try{
+      asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
+    }catch(e){console.warn('Error cargando Asistencias:',e);asistencias=[];}
+
     toast('Datos sincronizados ✓');
     renderTablaAlumnos();
     renderDashboard();
@@ -1392,14 +1398,30 @@ async function cargarDatos(){
 }
 
 // ── GUARDAR ALUMNO EN SHEETS ──
-async function guardarEnSheets(){
-  const values=alumnos.map(a=>[
+function _alumnoAFila(a){
+  return [
     a.id,a.nombre,a.horario,a.dias.join('|'),a.frecuencia,a.monto,
     a.objetivos,a.notas,a.estado,a.telefono||'',
     a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
     a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||''
-  ]);
+  ];
+}
+
+async function guardarEnSheets(){
+  const values=alumnos.map(_alumnoAFila);
   await sheetsReplaceRange(RANGO.ALUMNOS_WRITE, values);
+}
+
+// P1: escribe solo la fila de UN alumno, en vez de reescribir las ~999 filas
+// del rango completo. Válido para altas al final (usar sheetsAppend) y para
+// ediciones de un alumno que ya existe en el Sheet (esta función). El índice
+// en el array local `alumnos` siempre coincide con la fila real porque nunca
+// se reordena el array y las bajas usan guardarEnSheets (reescritura completa).
+async function guardarFilaAlumno(alumno){
+  const i = alumnos.findIndex(x=>x.id===alumno.id);
+  if(i===-1) throw new Error('Alumno no encontrado en el array local');
+  const fila = i + 2; // fila 1 = encabezados, los datos arrancan en fila 2
+  await sheetsUpdate(`Alumnos!A${fila}:R${fila}`, [_alumnoAFila(alumno)]);
 }
 
 async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
@@ -1648,9 +1670,14 @@ async function guardarAlumno(){
   btn.innerHTML='<span class="loading"></span>Guardando...';
   btn.disabled=true;
   try {
-    if(editandoId){ const i=alumnos.findIndex(x=>x.id===editandoId); alumnos[i]=alumno; }
-    else alumnos.push(alumno);
-    await guardarEnSheets();
+    if(editandoId){
+      const i=alumnos.findIndex(x=>x.id===editandoId);
+      alumnos[i]=alumno;
+      await guardarFilaAlumno(alumno);
+    } else {
+      alumnos.push(alumno);
+      await sheetsAppend(RANGO.ALUMNOS_START, [_alumnoAFila(alumno)]);
+    }
     await sincronizarAlumnoCalendar(alumno);
     toast('Alumno guardado y sincronizado ✓');
     cerrarModal('modal-alumno');
@@ -1732,14 +1759,19 @@ function verAlumno(id){
       }
     }
   };
+  const fechaHoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+
   const asistenciaBtn=document.getElementById('perfil-btn-asistencia');
-  asistenciaBtn.disabled=false;
-  asistenciaBtn.textContent='💪 Asistencia';
+  // Retrocompatible: filas sin columna 'tipo' cuentan como 'asistencia'
+  const yaAsistenciaHoy = asistencias.some(r=>r[0]===id && r[1]===fechaHoy && (!r[2]||r[2]==='asistencia'));
+  asistenciaBtn.disabled = yaAsistenciaHoy;
+  asistenciaBtn.textContent = yaAsistenciaHoy ? '💪 Ya registrado hoy' : '💪 Asistencia';
   asistenciaBtn.onclick=()=>registrarAsistencia(id, asistenciaBtn, 'asistencia');
 
   const recuperacionBtn=document.getElementById('perfil-btn-recuperacion');
-  recuperacionBtn.disabled=false;
-  recuperacionBtn.textContent='🧘 Recuperación';
+  const yaRecuperacionHoy = asistencias.some(r=>r[0]===id && r[1]===fechaHoy && r[2]==='recuperacion');
+  recuperacionBtn.disabled = yaRecuperacionHoy;
+  recuperacionBtn.textContent = yaRecuperacionHoy ? '🧘 Ya registrado hoy' : '🧘 Recuperación';
   recuperacionBtn.onclick=()=>registrarAsistencia(id, recuperacionBtn, 'recuperacion');
 
   // Stats row
@@ -1825,8 +1857,9 @@ async function registrarAsistencia(id, btn, tipo){
   try{
     const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
     await sheetsAppend(RANGO.ASISTENCIAS_START,[[id, fecha, tipo]]);
+    asistencias.push([id, fecha, tipo]);
     toast(tipo === 'recuperacion' ? 'Recuperación registrada 🧘' : 'Asistencia registrada 💪');
-    btn.textContent = tipo === 'recuperacion' ? '🧘 Registrada' : '💪 Registrada';
+    btn.textContent = tipo === 'recuperacion' ? '🧘 Ya registrado hoy' : '💪 Ya registrado hoy';
   }catch(e){
     toast('Error al registrar');
     btn.disabled=false;
@@ -1840,7 +1873,7 @@ async function guardarCampoAlumno(id, campo, inputId){
   if(i===-1) return;
   alumnos[i][campo]=valor;
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos[i]);
     toast('Guardado ✓');
   }catch(e){toast('Error al guardar');}
 }
@@ -1980,7 +2013,7 @@ async function guardarEdicionObjetivo(id,idx){
   lista[idx]=valor;
   setObjetivos(id,lista);
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
     renderObjetivos(id);
     toast('Actualizado ✓');
   }catch(e){toast('Error al guardar');}
@@ -1994,7 +2027,7 @@ async function agregarObjetivo(id){
   setObjetivos(id,lista);
   input.value='';
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
     renderObjetivos(id);
     toast('Objetivo agregado ✓');
   }catch(e){toast('Error al guardar');}
@@ -2004,7 +2037,7 @@ async function eliminarObjetivo(id,idx){
   lista.splice(idx,1);
   setObjetivos(id,lista);
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
     renderObjetivos(id);
     toast('Objetivo eliminado');
   }catch(e){toast('Error al guardar');}
@@ -2056,7 +2089,7 @@ async function guardarEdicionMolestia(id,idx){
   lista[idx]=valor;
   setMolestias(id,lista);
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
     renderMolestias(id);
     toast('Actualizado ✓');
   }catch(e){toast('Error al guardar');}
@@ -2070,7 +2103,7 @@ async function agregarMolestia(id){
   setMolestias(id,lista);
   input.value='';
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
     renderMolestias(id);
     toast('Molestia agregada ✓');
   }catch(e){toast('Error al guardar');}
@@ -2080,7 +2113,7 @@ async function eliminarMolestia(id,idx){
   lista.splice(idx,1);
   setMolestias(id,lista);
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
     renderMolestias(id);
     toast('Eliminado');
   }catch(e){toast('Error al guardar');}
@@ -2652,7 +2685,7 @@ function renderNutriCobrosPerfil(id){
 async function toggleNutriAlumno(id, activo){
   const i=alumnos.findIndex(x=>x.id===id); if(i===-1) return;
   alumnos[i].tieneNutri=activo?'si':'no';
-  try{await guardarEnSheets();renderNutriPerfil(id);}
+  try{await guardarFilaAlumno(alumnos[i]);renderNutriPerfil(id);}
   catch(e){toast('Error al guardar');}
 }
 
@@ -2915,7 +2948,7 @@ async function guardarQuickAgenda(){
   alumnos[i].dias=diasSeleccionados;
   alumnos[i].horario=horariosPorDiaToString(hpd);
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos[i]);
     await sincronizarAlumnoCalendar(alumnos[i]);
     toast('Guardado y sincronizado ✓');
     cerrarModal('modal-agenda-quick');
@@ -2970,7 +3003,7 @@ async function drop(e, diaDestino){
     alumnos[i].horario=horariosPorDiaToString(hpd);
   }
   try{
-    await guardarEnSheets();
+    await guardarFilaAlumno(alumnos[i]);
     toast(`${alumnos[i].nombre} movido a ${diaDestino} ✓`);
     renderAgenda();
     renderDashboard();
