@@ -381,10 +381,12 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 /* ── PORTAL PÚBLICO ── */
 #portal-alumno{min-height:100vh;background:var(--bg)}
 .portal-wrap{max-width:560px;margin:0 auto;padding:1.25rem 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
-.portal-header{display:flex;align-items:center;justify-content:center;padding:0.5rem 0 0.25rem}
-.portal-logo{display:flex;align-items:center;gap:0.6rem}
-.portal-logo-img{width:32px;height:32px;border-radius:8px;object-fit:cover}
-.portal-logo-txt{font-size:0.9rem;font-weight:600;color:var(--verde)}
+.portal-header{display:flex;flex-direction:column;align-items:flex-start;gap:0.15rem;padding:0.25rem 0 0.5rem}
+.portal-header-brand{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem}
+.portal-logo-img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+.portal-logo-txt{font-size:0.78rem;font-weight:600;color:var(--suave);letter-spacing:0.02em}
+.portal-saludo{font-size:0.95rem;color:var(--suave);font-weight:400}
+.portal-saludo-nombre{font-size:1.7rem;font-weight:700;color:var(--texto);line-height:1.15}
 .portal-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:1.25rem}
 .portal-card-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave);font-weight:600;margin-bottom:0.85rem}
 .portal-hero{display:flex;flex-direction:column;gap:0.85rem}
@@ -398,8 +400,12 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .portal-hero-racha{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 .portal-racha-num{font-size:2.8rem;font-weight:800;line-height:1}
 .portal-racha-label{font-size:0.65rem;color:var(--suave);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;text-align:center}
-.portal-datos-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem}
-.portal-dato{background:#223527;border-radius:7px;padding:0.6rem 0.75rem;display:flex;flex-direction:column;gap:0.2rem}
+.portal-datos-grid{display:flex;flex-direction:column}
+.portal-dato-row{display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0}
+.portal-dato-row + .portal-dato-row{border-top:1px solid rgba(74,184,112,0.08)}
+.portal-dato-icon{width:34px;height:34px;border-radius:9px;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.portal-dato-icon svg{width:17px;height:17px;stroke:var(--verde)}
+.portal-dato-txt{flex:1;min-width:0}
 .portal-dato-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--suave)}
 .portal-dato-val{font-size:1rem;font-weight:700;color:var(--texto)}
 .portal-dato-verde{color:var(--verde)}
@@ -423,12 +429,15 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .portal-objetivo{font-size:0.85rem;color:var(--texto);padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border-left:2px solid var(--verde-s);line-height:1.45}
 .portal-objetivo::before{content:'→ ';color:var(--verde-s);font-weight:600}
 
+.portal-frase-card{background:linear-gradient(135deg, var(--blanco) 0%, var(--crema) 100%);border:1px solid var(--borde);border-radius:14px;padding:1.4rem 1.25rem;display:flex;gap:0.85rem;align-items:flex-start}
+.portal-frase-comilla{font-family:Georgia,serif;font-size:2.4rem;color:#C8A87A;line-height:0.6;flex-shrink:0;margin-top:0.4rem}
+.portal-frase-texto{font-size:0.98rem;color:var(--texto);font-style:italic;line-height:1.5;margin:0}
+
 .portal-empty{font-size:0.85rem;color:var(--suave);text-align:center;padding:0.5rem 0}
 .portal-footer{text-align:center;font-size:0.75rem;color:var(--suave);margin-top:0.5rem}
 .portal-loading{text-align:center;padding:3rem;color:var(--suave);font-size:0.9rem}
 .portal-error{text-align:center;padding:3rem;color:var(--rojo);font-size:0.9rem}
 @media(max-width:480px){
-  .portal-datos-grid{grid-template-columns:1fr 1fr}
   .portal-hero{gap:0.75rem}
   .portal-nombre{font-size:1.15rem}
 }
@@ -1043,10 +1052,12 @@ async function cargarPortalAlumno(id){
       <div class="portal-wrap">
         <!-- Header -->
         <div class="portal-header">
-          <div class="portal-logo">
+          <div class="portal-header-brand">
             <img src="Logo_App.png" alt="Mente Consciente" class="portal-logo-img"/>
             <span class="portal-logo-txt">Mente Consciente</span>
           </div>
+          <span class="portal-saludo">Hola de nuevo,</span>
+          <span class="portal-saludo-nombre">${escaparHTML(a.nombre)}</span>
         </div>
 
         <!-- Perfil card -->
@@ -1073,11 +1084,11 @@ async function cargarPortalAlumno(id){
         <div class="portal-card">
           <div class="portal-card-title">Datos personales</div>
           <div class="portal-datos-grid">
-            ${edad ? `<div class="portal-dato"><span class="portal-dato-label">Edad</span><span class="portal-dato-val">${edad} años</span></div>` : ''}
-            ${a.estatura ? `<div class="portal-dato"><span class="portal-dato-label">Altura</span><span class="portal-dato-val">${escaparHTML(a.estatura)} cm</span></div>` : ''}
-            ${a.pesoInicial ? `<div class="portal-dato"><span class="portal-dato-label">Peso inicial</span><span class="portal-dato-val">${escaparHTML(a.pesoInicial)} kg</span></div>` : ''}
-            ${a.pesoActual ? `<div class="portal-dato"><span class="portal-dato-label">Peso actual</span><span class="portal-dato-val portal-dato-verde">${escaparHTML(a.pesoActual)} kg</span></div>` : ''}
-            ${imc ? `<div class="portal-dato"><span class="portal-dato-label">IMC</span><span class="portal-dato-val">${imc}</span></div>` : ''}
+            ${edad ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Edad</span><span class="portal-dato-val">${edad} años</span></div></div>` : ''}
+            ${a.estatura ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Altura</span><span class="portal-dato-val">${escaparHTML(a.estatura)} cm</span></div></div>` : ''}
+            ${a.pesoInicial ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Peso inicial</span><span class="portal-dato-val">${escaparHTML(a.pesoInicial)} kg</span></div></div>` : ''}
+            ${a.pesoActual ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Peso actual</span><span class="portal-dato-val portal-dato-verde">${escaparHTML(a.pesoActual)} kg</span></div></div>` : ''}
+            ${imc ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">IMC</span><span class="portal-dato-val">${imc}</span></div></div>` : ''}
           </div>
         </div>` : ''}
 
@@ -1099,6 +1110,12 @@ async function cargarPortalAlumno(id){
             ${objetivosList.map(o => `<li class="portal-objetivo">${escaparHTML(o)}</li>`).join('')}
           </ul>
         </div>` : ''}
+
+        <!-- Frase motivacional -->
+        <div class="portal-frase-card">
+          <span class="portal-frase-comilla">&ldquo;</span>
+          <p class="portal-frase-texto">Pequeños pasos hoy,<br>una versión más fuerte de vos mañana.</p>
+        </div>
 
         <!-- Seguimiento -->
         <div class="portal-card">
