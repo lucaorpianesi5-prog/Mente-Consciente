@@ -393,7 +393,6 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .portal-hero-top{display:flex;align-items:center;gap:1rem}
 .portal-avatar{width:56px;height:56px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:1.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--verde)}
 .portal-hero-info{flex:1;min-width:0}
-.portal-nombre{font-size:1.3rem;font-weight:700;color:var(--texto);line-height:1.2}
 .portal-freq{font-size:0.78rem;color:var(--verde);font-weight:500;margin-top:0.15rem}
 .portal-hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;border-top:1px solid rgba(74,184,112,0.1);padding-top:0.85rem}
 .portal-dias{font-size:0.8rem;color:var(--suave);line-height:1.6;flex:1}
@@ -439,7 +438,6 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .portal-error{text-align:center;padding:3rem;color:var(--rojo);font-size:0.9rem}
 @media(max-width:480px){
   .portal-hero{gap:0.75rem}
-  .portal-nombre{font-size:1.15rem}
 }
 </style>
 </head>
@@ -994,6 +992,15 @@ async function cargarPortalAlumno(id){
 
     const rowsS  = data.seguimiento  || [];
     const rowsAs = data.asistencias  || [];
+    const rowsFr = data.frases       || [];
+
+    // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
+    // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
+    // está vacía.
+    const fraseDefault = 'Pequeños pasos hoy,<br>una versión más fuerte de vos mañana.';
+    const frase = rowsFr.length
+      ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)])
+      : fraseDefault;
 
     const entradas = rowsS
       .map(r => ({ fecha: r[0], texto: r[1] }))
@@ -1065,7 +1072,6 @@ async function cargarPortalAlumno(id){
           <div class="portal-hero-top">
             <div class="portal-avatar">${escaparHTML(iniciales)}</div>
             <div class="portal-hero-info">
-              <h1 class="portal-nombre">${escaparHTML(a.nombre)}</h1>
               <p class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</p>
               ${proximaSesionStr ? `<span class="portal-proxima ${escaparHTML(proximaSesionClase)}">📅 ${escaparHTML(proximaSesionStr)}</span>` : ''}
             </div>
@@ -1114,7 +1120,7 @@ async function cargarPortalAlumno(id){
         <!-- Frase motivacional -->
         <div class="portal-frase-card">
           <span class="portal-frase-comilla">&ldquo;</span>
-          <p class="portal-frase-texto">Pequeños pasos hoy,<br>una versión más fuerte de vos mañana.</p>
+          <p class="portal-frase-texto">${frase}</p>
         </div>
 
         <!-- Seguimiento -->
