@@ -295,6 +295,46 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .cobro-detalle{font-size:0.78rem;color:var(--suave);margin-top:0.15rem}
 .cobro-monto{font-size:1.1rem;font-weight:700;color:var(--verde);min-width:80px;text-align:right}
 
+/* ── COBROS: rediseño resumen + cards agrupadas (no confundir con .cobro-row de arriba, usada también en Nutrición) ── */
+.resumen-card{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2.5rem}
+.resumen-progreso{flex:1}
+.resumen-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.6rem}
+.resumen-total{font-size:1.35rem;font-weight:700}
+.resumen-total span{font-size:0.8rem;font-weight:500;color:var(--suave)}
+.resumen-pct{font-size:0.8rem;font-weight:700;color:var(--verde)}
+.barra{height:8px;border-radius:5px;background:rgba(255,255,255,0.06);overflow:hidden}
+.barra-fill{height:100%;background:var(--verde);border-radius:5px;transition:width 0.3s}
+.resumen-mini{display:flex;gap:1.8rem;border-left:1px solid var(--borde);padding-left:2rem}
+.resumen-mini-item{display:flex;flex-direction:column;gap:0.2rem}
+.resumen-mini-label{font-size:0.7rem;color:var(--suave);display:flex;align-items:center;gap:0.35rem}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-bono{background:var(--marron)}
+.dot-pendiente{background:var(--amarillo)}
+.resumen-mini-val{font-size:0.95rem;font-weight:700}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem}
+.seccion-label{font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--suave);display:flex;align-items:center;gap:0.4rem;margin-bottom:0.7rem}
+.seccion-count{background:var(--amarillo-bg);color:var(--amarillo);font-size:0.68rem;font-weight:700;padding:0.08rem 0.45rem;border-radius:20px}
+.seccion-count.ok{background:var(--verde-bg);color:var(--verde)}
+
+.cobro-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:0.7rem 0.9rem;margin-bottom:0.55rem;display:flex;align-items:center;gap:0.75rem;transition:background 0.15s}
+.cobro-card:hover{background:rgba(74,184,112,0.05)}
+.cobro-main{flex:1;min-width:0;display:flex;align-items:center;gap:0.75rem}
+.cobro-avatar{width:34px;height:34px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cobro-avatar.pendiente{background:var(--amarillo-bg);color:var(--amarillo)}
+.cobro-card .cobro-info{flex:1;min-width:0}
+.cobro-card .cobro-nombre{font-weight:600;font-size:0.85rem;color:var(--texto)}
+.cobro-card .cobro-detalle{font-size:0.72rem;color:var(--suave);margin-top:0.05rem;display:flex;align-items:center;gap:0.3rem}
+.status-icon{width:12px;height:12px;flex-shrink:0}
+.cobro-right{display:flex;align-items:center;gap:0.75rem;flex-shrink:0}
+.cobro-card .cobro-monto{font-size:0.9rem;font-weight:700;color:var(--texto);min-width:70px;text-align:right}
+
+.bono-toggle{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
+.bono-chip{font-size:0.7rem;color:var(--marron);background:rgba(212,184,150,0.1);padding:0.28rem 0.65rem;border-radius:20px;font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;cursor:pointer;border:none;font-family:inherit;white-space:nowrap}
+.bono-existente{font-size:0.72rem;color:var(--marron);font-weight:600;display:flex;align-items:center;gap:0.35rem;white-space:nowrap}
+.bono-input-wrap{display:none;align-items:center;gap:0.4rem}
+.bono-input-wrap input{width:90px;padding:0.32rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.8rem;background:var(--bg);color:var(--texto);font-family:inherit}
+
 /* TOAST */
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#223527;color:var(--texto);border:1px solid var(--borde);padding:0.7rem 1.5rem;border-radius:6px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
 .toast.show{opacity:1}
@@ -330,6 +370,20 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 
   /* ── Agenda: scroll horizontal en lugar de colapsar ── */
   .semana-grid{grid-template-columns:repeat(5,minmax(160px,1fr));overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* ── Cobros: resumen apilado, columnas a una sola, cards con bono debajo ── */
+  .resumen-card{display:block;padding:1.1rem 1.15rem}
+  .resumen-mini{border-left:none;padding-left:0;gap:1.4rem;margin-top:0.75rem}
+  .cols{display:block}
+  .cobro-card{display:block;padding:0.8rem 0.9rem}
+  .cobro-avatar{width:38px;height:38px;font-size:0.95rem}
+  .cobro-card .cobro-nombre{font-size:0.9rem}
+  .cobro-card .cobro-detalle{font-size:0.74rem}
+  .status-icon{width:13px;height:13px}
+  .cobro-right{flex-direction:column;align-items:flex-end;gap:0.4rem}
+  .cobro-card .cobro-monto{font-size:1rem}
+  .bono-toggle{margin-top:0.65rem;padding-top:0.6rem;border-top:1px solid var(--borde);width:100%;justify-content:space-between}
+  .bono-input-wrap{flex:1;justify-content:flex-end}
 
   /* ── Forms ── */
   .form-grid{grid-template-columns:1fr}
@@ -956,6 +1010,13 @@ function escaparHTML(str){
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
+}
+
+// Precio real de una cuota: si el cobro ya tiene monto congelado (se fija al marcar pagado), se usa ese;
+// si no (pendiente, o pago histórico previo al fix de montos congelados), se usa el precio actual del alumno.
+// Usado por getIngresosMes() y renderCobros() para que el número coincida en ambos lados.
+function montoCobro(a,c){
+  return (c && c.monto!==''&&c.monto!=null) ? parseFloat(c.monto) : parseFloat(a.monto||0);
 }
 
 let accessToken = null;
@@ -2269,7 +2330,7 @@ function getIngresosMes(mk){
   const cm=cobros[mk]||{};
   alumnos.filter(a=>a.estado==='activo').forEach(a=>{
     const c=cm[a.id];
-    if(c&&c.estado==='pagado') cuotas+= (c.monto!==''&&c.monto!=null) ? parseFloat(c.monto) : parseFloat(a.monto||0);
+    if(c&&c.estado==='pagado') cuotas+=montoCobro(a,c);
   });
   // Bonos
   let bonos=0;
@@ -3079,50 +3140,77 @@ function renderCobros(){
   const lista=document.getElementById('cobros-lista');
   if(!activos.length){lista.innerHTML='<p style="color:var(--suave)">No hay alumnos activos.</p>';return;}
 
-  let totalCuotas=0, totalBonos=0;
+  let totalCuotas=0, totalBonos=0, totalEsperado=0;
+  const pendientes=[], pagados=[];
   activos.forEach(a=>{
-    const c=cobros[mk][a.id]||{};
-    if(c.estado==='pagado') totalCuotas+=parseFloat(a.monto||0);
+    const c=cobros[mk][a.id]||{estado:'pendiente',fecha:'',bono:'',fechaBono:''};
+    totalEsperado+=parseFloat(a.monto||0);
+    if(c.estado==='pagado') totalCuotas+=montoCobro(a,c);
     if(c.bono) totalBonos+=parseFloat(c.bono||0);
+    (c.estado==='pagado'?pagados:pendientes).push({a,c});
   });
+  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  const iconoReloj='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const iconoCheck='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
 
-  lista.innerHTML=`
-    <div style="background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:1rem 1.25rem;margin-bottom:0.5rem;display:flex;gap:2rem;flex-wrap:wrap">
-      <div><p style="font-size:0.7rem;color:var(--suave);text-transform:uppercase">Cuotas cobradas</p><p style="font-weight:700;color:var(--verde);font-size:1.1rem;margin-top:0.2rem">$${totalCuotas.toLocaleString('es-AR')}</p></div>
-      <div><p style="font-size:0.7rem;color:var(--suave);text-transform:uppercase">Bonos recibidos</p><p style="font-weight:700;color:var(--marron);font-size:1.1rem;margin-top:0.2rem">$${totalBonos.toLocaleString('es-AR')}</p></div>
-      <div><p style="font-size:0.7rem;color:var(--suave);text-transform:uppercase">Total del mes</p><p style="font-weight:700;color:var(--texto);font-size:1.1rem;margin-top:0.2rem">$${(totalCuotas+totalBonos).toLocaleString('es-AR')}</p></div>
-    </div>
-    ${activos.map(a=>{
-      const c=cobros[mk][a.id]||{estado:'pendiente',fecha:'',bono:'',fechaBono:''};
-      const badge=c.estado==='pagado'?'<span class="badge badge-verde">Pagado</span>':'<span class="badge badge-amarillo">Pendiente</span>';
-      const fechaTxt=c.fecha?`<span style="font-size:0.75rem;color:var(--suave);margin-left:0.5rem">${c.fecha}</span>`:'';
-      return `<div class="cobro-row" style="flex-wrap:wrap;gap:0.75rem">
+  function tarjetaCobro({a,c}){
+    const esPagado=c.estado==='pagado';
+    const bonoHtml=c.bono
+      ?`<span class="bono-existente">🎁 $${parseFloat(c.bono).toLocaleString('es-AR')} · ${c.fechaBono||''}</span>
+        <button class="btn btn-secondary btn-sm" onclick="editarBono('${mk}','${a.id}','${c.bono}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarBono('${mk}','${a.id}')">×</button>`
+      :`<span class="bono-chip" onclick="toggleBono(this)">+ Agregar bono</span>
+        <div class="bono-input-wrap">
+          <input type="number" id="bono-${a.id}" placeholder="Monto"/>
+          <button class="btn btn-primary btn-sm" onclick="registrarBono('${mk}','${a.id}')">Registrar</button>
+        </div>`;
+    return `<div class="cobro-card">
+      <div class="cobro-main">
+        <div class="cobro-avatar${esPagado?'':' pendiente'}">${escaparHTML(a.nombre.charAt(0).toUpperCase())}</div>
         <div class="cobro-info">
           <div class="cobro-nombre">${escaparHTML(a.nombre)}</div>
-          <div class="cobro-detalle">${a.frecuencia}x semana · ${badge}${fechaTxt}</div>
+          <div class="cobro-detalle">${esPagado?iconoCheck:iconoReloj}${a.frecuencia}x semana${esPagado?` · Pagado ${c.fecha||''}`:' · Pendiente'}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
-          <div class="cobro-monto">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</div>
-          ${c.estado!=='pagado'
-            ?`<button class="btn btn-primary btn-sm" onclick="marcarPagado('${mk}','${a.id}')">Marcar pagado</button>`
-            :`<button class="btn btn-secondary btn-sm" onclick="marcarPendiente('${mk}','${a.id}')">Deshacer</button>`}
+        <div class="cobro-right">
+          <div class="cobro-monto">$${montoCobro(a,c).toLocaleString('es-AR')}</div>
+          ${esPagado
+            ?`<button class="btn btn-secondary btn-sm" onclick="marcarPendiente('${mk}','${a.id}')">Deshacer</button>`
+            :`<button class="btn btn-primary btn-sm" onclick="marcarPagado('${mk}','${a.id}')">Marcar pagado</button>`}
         </div>
-        <div style="display:flex;align-items:center;gap:0.5rem;width:100%;padding-top:0.5rem;border-top:1px solid var(--borde);margin-top:0.25rem">
-          <span style="font-size:0.78rem;color:var(--suave);min-width:80px">Bono:</span>
-          ${c.bono
-            ?`<span style="font-weight:600;color:var(--marron)">$${parseFloat(c.bono).toLocaleString('es-AR')}</span>
-               <span style="font-size:0.72rem;color:var(--suave)">${c.fechaBono||''}</span>
-               <button class="btn btn-secondary btn-sm" onclick="editarBono('${mk}','${a.id}','${c.bono}')">Editar</button>
-               <button class="btn btn-danger btn-sm" onclick="eliminarBono('${mk}','${a.id}')">×</button>`
-            :`<div style="display:flex;gap:0.4rem;align-items:center">
-                <input type="number" id="bono-${a.id}" placeholder="Monto" style="width:100px;padding:0.35rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:var(--blanco)"/>
-                <button class="btn btn-primary btn-sm" onclick="registrarBono('${mk}','${a.id}')">Registrar</button>
-              </div>`
-          }
-        </div>
-      </div>`;
-    }).join('')}
+      </div>
+      <div class="bono-toggle">${bonoHtml}</div>
+    </div>`;
+  }
+
+  lista.innerHTML=`
+    <div class="resumen-card">
+      <div class="resumen-progreso">
+        <div class="resumen-top"><div class="resumen-total">$${totalCuotas.toLocaleString('es-AR')} <span>/ $${totalEsperado.toLocaleString('es-AR')}</span></div><div class="resumen-pct">${pct}%</div></div>
+        <div class="barra"><div class="barra-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="resumen-mini">
+        <div class="resumen-mini-item"><span class="resumen-mini-label"><span class="dot dot-bono"></span>Bonos</span><span class="resumen-mini-val">$${totalBonos.toLocaleString('es-AR')}</span></div>
+        <div class="resumen-mini-item"><span class="resumen-mini-label"><span class="dot dot-pendiente"></span>Pendiente</span><span class="resumen-mini-val">$${(totalEsperado-totalCuotas).toLocaleString('es-AR')}</span></div>
+      </div>
+    </div>
+    <div class="cols">
+      <div>
+        <div class="seccion-label">Pendientes <span class="seccion-count">${pendientes.length}</span></div>
+        ${pendientes.length?pendientes.map(tarjetaCobro).join(''):'<p style="color:var(--suave);font-size:0.82rem">No hay pendientes 🎉</p>'}
+      </div>
+      <div>
+        <div class="seccion-label">Pagados <span class="seccion-count ok">${pagados.length}</span></div>
+        ${pagados.length?pagados.map(tarjetaCobro).join(''):'<p style="color:var(--suave);font-size:0.82rem">Todavía no hay pagos este mes.</p>'}
+      </div>
+    </div>
   `;
+}
+
+function toggleBono(el){
+  const wrap=el.closest('.bono-toggle');
+  const input=wrap?wrap.querySelector('.bono-input-wrap'):null;
+  if(!input) return;
+  input.style.display=input.style.display==='flex'?'none':'flex';
 }
 
 async function registrarBono(mk,id){
