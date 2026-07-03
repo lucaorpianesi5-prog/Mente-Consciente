@@ -361,6 +361,43 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .fin-chip{background:var(--bg);border:1px solid rgba(232,168,74,0.25);padding:0.28rem 0.7rem;border-radius:20px;font-size:0.76rem;cursor:pointer;transition:background 0.2s;color:var(--texto)}
 .fin-chip:hover{background:var(--amarillo-bg)}
 
+/* ── FINANZAS (desktop only): KPIs con namespace propio (-fin) para no chocar con .kpi-card/.kpi-val/.kpi-label de Resumen ── */
+.kpi-row-fin{display:grid;grid-template-columns:repeat(4,1fr);gap:0.9rem;margin-bottom:1.4rem}
+.kpi-card-fin{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:1rem 1.1rem}
+.kpi-label-fin{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave)}
+.kpi-val-fin{font-size:1.4rem;font-weight:700;margin-top:0.3rem;color:var(--texto)}
+.kpi-val-fin.rojo{color:var(--rojo)}
+.kpi-val-fin.verde{color:var(--verde)}
+.kpi-sub{font-size:0.72rem;color:var(--suave);margin-top:0.15rem}
+
+.tendencia-card{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.4rem}
+.tendencia-titulo{font-size:0.72rem;color:var(--suave);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.9rem}
+.tendencia-bars{display:flex;align-items:flex-end;gap:0.6rem;height:90px}
+.tbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.4rem;height:100%;justify-content:flex-end}
+.tbar{width:100%;background:var(--verde-bg);border-radius:3px 3px 0 0}
+.tbar.actual{background:var(--verde)}
+.tbar.negativo{background:var(--rojo-bg)}
+.tbar-mes{font-size:0.62rem;color:var(--suave)}
+
+/* Tabla mensual: clases en vez de style="" inline por celda */
+tr.actual td{background:var(--verde-bg);font-weight:600}
+tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--borde);border-bottom:none}
+.cell-verde{color:var(--verde);font-weight:600}
+.cell-rojo{color:var(--rojo)}
+.ahorro-input{width:70px;padding:0.25rem 0.4rem;border:1px solid var(--borde);border-radius:4px;font-size:0.78rem;background:var(--bg);color:var(--texto)}
+
+/* Listas Gastos / Ahorros */
+.lista-card{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;overflow:hidden}
+.lista-header{padding:0.9rem 1.2rem;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center}
+.lista-header h3{font-size:0.88rem;font-weight:600}
+.gasto-row{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1.2rem;border-bottom:1px solid var(--borde)}
+.gasto-desc{font-size:0.85rem;font-weight:500}
+.gasto-fecha{font-size:0.72rem;color:var(--suave);margin-top:0.1rem}
+.gasto-monto{font-size:0.85rem;font-weight:700;color:var(--rojo)}
+.ahorro-row{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1.2rem;border-bottom:1px solid var(--borde)}
+.ahorro-mes{font-size:0.85rem;font-weight:500}
+.ahorro-monto{font-size:0.85rem;font-weight:700;color:var(--verde)}
+
 /* TOAST */
 .toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#223527;color:var(--texto);border:1px solid var(--borde);padding:0.7rem 1.5rem;border-radius:6px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
 .toast.show{opacity:1}
@@ -706,7 +743,11 @@ tr:hover td{background:rgba(74,184,112,0.04)}
       <div><h2>Finanzas</h2><p>Resumen anual de ingresos, gastos y ahorros</p></div>
       <select id="fin-anio-select" onchange="renderFinanzas()" style="padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:#223527;color:var(--texto)"></select>
     </div>
-    <div class="stats" style="margin-bottom:1.5rem" id="fin-stats"></div>
+    <div class="kpi-row-fin" id="fin-stats"></div>
+    <div class="tendencia-card">
+      <div class="tendencia-titulo">Total mensual — <span id="fin-tendencia-rango"></span></div>
+      <div class="tendencia-bars" id="fin-tendencia-bars"></div>
+    </div>
     <div class="table-wrap" style="margin-bottom:1.5rem">
       <div class="table-header"><h3>Resumen mensual</h3></div>
       <table>
@@ -714,16 +755,16 @@ tr:hover td{background:rgba(74,184,112,0.04)}
         <tbody id="fin-tabla"></tbody>
       </table>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
-      <div class="table-wrap">
-        <div class="table-header" style="display:flex;justify-content:space-between;align-items:center">
+    <div class="cols">
+      <div class="lista-card">
+        <div class="lista-header">
           <h3>Gastos</h3>
           <button class="btn btn-primary btn-sm" onclick="abrirModalGasto()">+ Agregar</button>
         </div>
         <div id="fin-gastos-lista"></div>
       </div>
-      <div class="table-wrap">
-        <div class="table-header"><h3>Ahorros mensuales</h3></div>
+      <div class="lista-card">
+        <div class="lista-header"><h3>Ahorros mensuales</h3></div>
         <div id="fin-ahorros-lista"></div>
       </div>
     </div>
@@ -2395,6 +2436,7 @@ function renderFinanzas(){
 
   // Tabla mensual
   let totalCuotas=0,totalBonos=0,totalNutri=0,totalGastos=0,totalAhorros=0;
+  const totalesPorMes=[];
   const filas=MESES.map((mes,idx)=>{
     const m=String(idx+1).padStart(2,'0');
     const mkey=`${anio}-${m}`;
@@ -2405,36 +2447,32 @@ function renderFinanzas(){
     const neto=total-gastosMes;
     totalCuotas+=cuotas;totalBonos+=bonos;totalNutri+=nutri;totalGastos+=gastosMes;totalAhorros+=ahorro;
     const esActual=mkey===mk;
-    return `<tr style="${esActual?'background:var(--verde-bg);font-weight:500':''}">
+    totalesPorMes.push({mes,total,neto,esActual});
+    return `<tr class="${esActual?'actual':''}">
       <td>${mes}</td>
       <td>${cuotas?'$'+cuotas.toLocaleString('es-AR'):'—'}</td>
       <td>${bonos?'$'+bonos.toLocaleString('es-AR'):'—'}</td>
       <td>${nutri?'$'+nutri.toLocaleString('es-AR'):'—'}</td>
-      <td style="font-weight:600;color:var(--verde)">${total?'$'+total.toLocaleString('es-AR'):'—'}</td>
-      <td style="color:var(--rojo)">${gastosMes?'$'+gastosMes.toLocaleString('es-AR'):'—'}</td>
-      <td style="font-weight:600">${neto?'$'+neto.toLocaleString('es-AR'):'—'}</td>
+      <td class="cell-verde">${total?'$'+total.toLocaleString('es-AR'):'—'}</td>
+      <td class="cell-rojo">${gastosMes?'$'+gastosMes.toLocaleString('es-AR'):'—'}</td>
+      <td>${neto?'$'+neto.toLocaleString('es-AR'):'—'}</td>
       <td>
-        <div style="display:flex;align-items:center;gap:0.4rem">
-          <input type="number" id="ahorro-${mkey}" value="${ahorro||''}" placeholder="0"
-            style="width:80px;padding:0.25rem 0.4rem;border:1px solid var(--borde);border-radius:4px;font-size:0.8rem;background:#223527;color:var(--texto)"
-            onkeydown="if(event.key==='Enter') actualizarAhorro('${mkey}',this.value)"/>
-          <button class="btn btn-primary btn-sm" style="padding:0.2rem 0.5rem;font-size:0.72rem" onclick="actualizarAhorro('${mkey}',document.getElementById('ahorro-${mkey}').value)">✓</button>
-          ${ahorro?`<span style="font-size:0.75rem;color:var(--verde)">$${ahorro.toLocaleString('es-AR')}</span>`:''}
-        </div>
+        <input type="number" id="ahorro-${mkey}" value="${ahorro||''}" placeholder="0" class="ahorro-input"
+          onkeydown="if(event.key==='Enter') actualizarAhorro('${mkey}',this.value)"/>
       </td>
     </tr>`;
   });
 
   document.getElementById('fin-tabla').innerHTML=filas.join('')+`
-    <tr style="background:var(--crema);font-weight:600;border-top:2px solid var(--borde)">
+    <tr class="total">
       <td>Total ${anio}</td>
       <td>$${totalCuotas.toLocaleString('es-AR')}</td>
       <td>$${totalBonos.toLocaleString('es-AR')}</td>
       <td>$${totalNutri.toLocaleString('es-AR')}</td>
-      <td style="color:var(--verde)">$${(totalCuotas+totalBonos+totalNutri).toLocaleString('es-AR')}</td>
-      <td style="color:var(--rojo)">$${totalGastos.toLocaleString('es-AR')}</td>
+      <td>$${(totalCuotas+totalBonos+totalNutri).toLocaleString('es-AR')}</td>
+      <td>$${totalGastos.toLocaleString('es-AR')}</td>
       <td>$${(totalCuotas+totalBonos+totalNutri-totalGastos).toLocaleString('es-AR')}</td>
-      <td style="color:var(--verde)">$${totalAhorros.toLocaleString('es-AR')}</td>
+      <td>$${totalAhorros.toLocaleString('es-AR')}</td>
     </tr>
   `;
 
@@ -2442,11 +2480,26 @@ function renderFinanzas(){
   const totalIngresos=totalCuotas+totalBonos+totalNutri;
   const totalNeto=totalIngresos-totalGastos;
   document.getElementById('fin-stats').innerHTML=`
-    <div class="stat"><span class="stat-label">Ingresos ${anio}</span><span class="stat-val">$${totalIngresos.toLocaleString('es-AR')}</span><span class="stat-sub">cuotas + bonos + nutri</span></div>
-    <div class="stat"><span class="stat-label">Gastos ${anio}</span><span class="stat-val" style="color:var(--rojo)">$${totalGastos.toLocaleString('es-AR')}</span><span class="stat-sub">entrenamiento</span></div>
-    <div class="stat"><span class="stat-label">Neto ${anio}</span><span class="stat-val" style="color:var(--verde)">$${totalNeto.toLocaleString('es-AR')}</span><span class="stat-sub">ingresos − gastos</span></div>
-    <div class="stat"><span class="stat-label">Ahorros ${anio}</span><span class="stat-val" style="color:var(--verde-s)">$${totalAhorros.toLocaleString('es-AR')}</span><span class="stat-sub">acumulado del año</span></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Ingresos ${anio}</div><div class="kpi-val-fin">$${totalIngresos.toLocaleString('es-AR')}</div><div class="kpi-sub">cuotas + bonos + nutri</div></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Gastos ${anio}</div><div class="kpi-val-fin rojo">$${totalGastos.toLocaleString('es-AR')}</div><div class="kpi-sub">entrenamiento</div></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Neto ${anio}</div><div class="kpi-val-fin verde">$${totalNeto.toLocaleString('es-AR')}</div><div class="kpi-sub">ingresos − gastos</div></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Ahorros ${anio}</div><div class="kpi-val-fin verde">$${totalAhorros.toLocaleString('es-AR')}</div><div class="kpi-sub">acumulado del año</div></div>
   `;
+
+  // Tendencia mensual — deriva de totalesPorMes, ya calculado arriba en el mismo .map()
+  const hoyDate=new Date();
+  const anioActual=hoyDate.getFullYear();
+  const mesActualIdx=hoyDate.getMonth();
+  const mesesAMostrar=(anio===anioActual)?totalesPorMes.slice(0,mesActualIdx+1):totalesPorMes;
+  const maxTotal=Math.max(...mesesAMostrar.map(x=>x.total),1);
+  document.getElementById('fin-tendencia-rango').textContent=(anio===anioActual)
+    ?`${MESES[0]} a ${MESES[mesActualIdx]} ${anio}`
+    :`${MESES[0]} a ${MESES[11]} ${anio}`;
+  document.getElementById('fin-tendencia-bars').innerHTML=mesesAMostrar.map(x=>{
+    const pct=Math.max(4,Math.round((x.total/maxTotal)*100));
+    const clases=['tbar',x.esActual?'actual':'',x.neto<0?'negativo':''].filter(Boolean).join(' ');
+    return `<div class="tbar-col"><div class="${clases}" style="height:${pct}%"></div><span class="tbar-mes">${x.mes.slice(0,3)}</span></div>`;
+  }).join('');
 
   // Lista gastos del año
   const gastosAnio=gastos.filter(g=>g.fecha&&g.fecha.startsWith(String(anio))).sort((a,b)=>b.fecha.localeCompare(a.fecha));
@@ -2454,16 +2507,12 @@ function renderFinanzas(){
   if(!gastosAnio.length){
     listaGastos.innerHTML='<p style="color:var(--suave);font-size:0.85rem;padding:1rem 1.25rem">Sin gastos registrados.</p>';
   } else {
-    listaGastos.innerHTML=`<table style="width:100%;border-collapse:collapse">
-      ${gastosAnio.map(g=>`<tr>
-        <td style="padding:0.6rem 1rem;border-bottom:1px solid var(--borde);font-size:0.82rem;color:var(--suave)">${g.fecha}</td>
-        <td style="padding:0.6rem 0.5rem;border-bottom:1px solid var(--borde);font-size:0.85rem">${escaparHTML(g.desc)}</td>
-        <td style="padding:0.6rem 1rem;border-bottom:1px solid var(--borde);font-size:0.85rem;font-weight:600;color:var(--rojo);white-space:nowrap">$${parseFloat(g.monto).toLocaleString('es-AR')}</td>
-        <td style="padding:0.6rem 0.75rem;border-bottom:1px solid var(--borde)">
-          <button class="btn btn-danger btn-sm" onclick="eliminarGasto('${g.id}')">×</button>
-        </td>
-      </tr>`).join('')}
-    </table>`;
+    listaGastos.innerHTML=gastosAnio.map(g=>`
+      <div class="gasto-row">
+        <div><div class="gasto-desc">${escaparHTML(g.desc)}</div><div class="gasto-fecha">${g.fecha}</div></div>
+        <div style="display:flex;align-items:center;gap:0.7rem"><span class="gasto-monto">$${parseFloat(g.monto).toLocaleString('es-AR')}</span><button class="btn btn-danger btn-sm" onclick="eliminarGasto('${g.id}')">×</button></div>
+      </div>
+    `).join('');
   }
 
   // Lista ahorros del año
@@ -2477,14 +2526,9 @@ function renderFinanzas(){
   if(!ahorrosMeses.length){
     listaAhorros.innerHTML='<p style="color:var(--suave);font-size:0.85rem;padding:1rem 1.25rem">Sin ahorros registrados. Completá la columna Ahorro en la tabla.</p>';
   } else {
-    let acum=0;
-    listaAhorros.innerHTML=`<table style="width:100%;border-collapse:collapse">
-      ${ahorrosMeses.map(({mes,v})=>{acum+=v;return`<tr>
-        <td style="padding:0.6rem 1rem;border-bottom:1px solid var(--borde);font-size:0.85rem">${mes}</td>
-        <td style="padding:0.6rem 0.75rem;border-bottom:1px solid var(--borde);font-weight:600;color:var(--verde)">$${v.toLocaleString('es-AR')}</td>
-        <td style="padding:0.6rem 1rem;border-bottom:1px solid var(--borde);font-size:0.75rem;color:var(--suave)">Acum: $${acum.toLocaleString('es-AR')}</td>
-      </tr>`;}).join('')}
-    </table>`;
+    listaAhorros.innerHTML=ahorrosMeses.map(({mes,v})=>`
+      <div class="ahorro-row"><span class="ahorro-mes">${mes} ${anio}</span><span class="ahorro-monto">$${v.toLocaleString('es-AR')}</span></div>
+    `).join('');
   }
 }
 
