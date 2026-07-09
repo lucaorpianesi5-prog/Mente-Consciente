@@ -273,6 +273,31 @@ tr:hover td{background:rgba(74,184,112,0.04)}
   .pd-asistencia-row .pd-btn{flex:1}
 }
 
+/* Fondo atmosférico + efecto vidrio — solo escritorio, solo ficha de alumno.
+   Imagen como archivo aparte (no base64): así el navegador no la descarga
+   en mobile, donde este media query no matchea. */
+@media (min-width: 769px){
+  #page-perfil{
+    position: relative;
+    min-height: 100vh;
+    background-image:
+      linear-gradient(180deg, rgba(10,19,14,0.55), rgba(10,19,14,0.78)),
+      url('assets/fondo-perfil.webp');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+  #page-perfil .pd-header-main,
+  #page-perfil .pd-card,
+  #page-perfil .table-wrap{
+    background: rgba(28,43,32,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-color: rgba(74,184,112,0.18);
+  }
+}
+
 /* ── FIN PERFIL DARK ── */
 
 /* ALUMNOS CARDS MOBILE */
