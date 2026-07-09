@@ -1,0 +1,3417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mente Consciente</title>
+<link rel="icon" type="image/png" href="Logo_App.png"/>
+<link rel="apple-touch-icon" href="Logo_App.png"/>
+<script>
+function scriptGoogleListo(){
+  window._googleListo = true;
+  const btn = document.getElementById('login-btn');
+  if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='Iniciar sesión con Google'; }
+}
+</script>
+<script src="https://accounts.google.com/gsi/client" async defer onload="scriptGoogleListo()"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+@font-face{font-family:'Sora';src:url('Sora-Variable.woff2') format('woff2');font-weight:400 800;font-style:normal;font-display:swap}
+:root{
+  --verde:#4AB870;--verde-s:#2E7D4F;--verde-bg:rgba(74,184,112,0.1);
+  --marron:#D4B896;--marron-s:#B8956A;
+  --crema:#223527;--crema-d:#1C2B20;
+  --bg:#111B16;--blanco:#1C2B20;
+  --texto:#E5EDE8;--suave:#6E9E80;--borde:rgba(74,184,112,0.12);
+  --rojo:#E05C5C;--rojo-bg:rgba(224,92,92,0.12);
+  --verde-ok:#4AB870;--verde-ok-bg:rgba(74,184,112,0.12);
+  --amarillo:#E8A84A;--amarillo-bg:rgba(232,168,74,0.12);
+}
+body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;line-height:1.5}
+
+/* LOGIN */
+@keyframes loginFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;gap:1.25rem;padding:2rem;background:var(--bg);animation:loginFadeIn 0.6s ease both}
+#login-logo{width:130px;height:130px;border-radius:28px;object-fit:cover;display:block}
+#login-screen h1{font-size:1.6rem;font-weight:700;color:var(--verde);letter-spacing:0.01em;margin-top:0.25rem}
+#login-screen p{color:var(--suave);font-size:0.88rem;text-align:center;max-width:280px;line-height:1.6}
+#login-btn{background:var(--verde);color:#0D1A12;border:none;padding:0.8rem 2rem;border-radius:6px;font-size:0.9rem;cursor:pointer;transition:background 0.2s;font-weight:600}
+#login-btn:hover{background:#3DAF65}
+#login-btn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* LAYOUT */
+#app{display:none}
+.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+
+/* SIDEBAR */
+aside{background:#111B16;color:#E5EDE8;padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid rgba(74,184,112,0.1)}
+.logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid rgba(74,184,112,0.12);margin-bottom:1rem}
+.logo h1{font-size:1.1rem;font-weight:600;color:#4AB870}
+.logo p{font-size:0.72rem;color:#3D6B50;margin-top:0.2rem}
+.logo-user{font-size:0.72rem;color:#3D6B50;margin-top:0.3rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+nav a{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;color:#6E9E80;text-decoration:none;font-size:0.85rem;border-left:3px solid transparent;transition:all 0.2s;cursor:pointer}
+nav a:hover,nav a.active{color:#E5EDE8;background:rgba(74,184,112,0.08);border-left-color:#4AB870}
+nav a svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-bottom{margin-top:auto;padding:1rem 1.5rem;border-top:1px solid rgba(74,184,112,0.12);display:flex;flex-direction:column;gap:0.5rem}
+.sidebar-btn{width:100%;background:rgba(74,184,112,0.08);border:1px solid rgba(74,184,112,0.15);color:#6E9E80;padding:0.6rem 1rem;border-radius:6px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s}
+.sidebar-btn:hover{background:rgba(74,184,112,0.15);color:#E5EDE8}
+
+/* MAIN */
+main{padding:2rem;overflow-y:auto;background:var(--bg)}
+.page{display:none}.page.active{display:block}
+.page-header{margin-bottom:1.75rem}
+.page-header h2{font-size:1.4rem;font-weight:600;color:var(--texto)}
+.page-header p{color:var(--suave);font-size:0.85rem;margin-top:0.25rem}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem}
+.stat{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:1.25rem;display:flex;flex-direction:column;gap:0.3rem}
+.stat-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--suave)}
+.stat-val{font-size:1.75rem;font-weight:700;color:var(--verde)}
+.stat-sub{font-size:0.75rem;color:var(--suave)}
+
+/* BOTONES */
+.btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.55rem 1.1rem;border-radius:5px;font-size:0.82rem;font-weight:500;cursor:pointer;border:none;transition:all 0.2s;font-family:inherit}
+.btn-primary{background:var(--verde);color:#0D1A12;font-weight:600}.btn-primary:hover{background:#3DAF65}
+.btn-secondary{background:rgba(74,184,112,0.08);color:var(--suave);border:1px solid var(--borde)}.btn-secondary:hover{background:rgba(74,184,112,0.15);color:var(--texto)}
+.btn-danger{background:var(--rojo-bg);color:var(--rojo);border:1px solid rgba(224,92,92,0.2)}.btn-danger:hover{background:rgba(224,92,92,0.2)}
+.btn-sm{padding:0.35rem 0.75rem;font-size:0.78rem}
+
+/* TABLA */
+.table-wrap{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;overflow:hidden}
+.table-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.25rem;border-bottom:1px solid var(--borde)}
+.table-header h3{font-size:0.9rem;font-weight:600;color:var(--texto)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--crema);padding:0.7rem 1rem;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave);font-weight:600;border-bottom:1px solid var(--borde)}
+td{padding:0.75rem 1rem;border-bottom:1px solid var(--borde);vertical-align:middle;color:var(--texto)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(74,184,112,0.04)}
+
+/* BADGES */
+.badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.72rem;font-weight:500}
+.badge-verde{background:var(--verde-ok-bg);color:var(--verde-ok)}
+.badge-rojo{background:var(--rojo-bg);color:var(--rojo)}
+.badge-amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
+
+/* AGENDA */
+.semana-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--borde);border:1px solid var(--borde);border-radius:8px;overflow:hidden}
+.dia-col{background:var(--blanco);min-height:400px}
+.dia-header{background:var(--crema);padding:0.75rem 1rem;text-align:center;border-bottom:1px solid var(--borde)}
+.dia-header .dia-nombre{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--suave);font-weight:600}
+.dia-header .dia-count{font-size:0.9rem;font-weight:600;color:var(--verde);margin-top:0.1rem}
+.dia-body{padding:0.75rem}
+.turno-card{border-left:3px solid var(--verde);border-radius:4px;padding:0.5rem 0.6rem;margin-bottom:0.5rem;cursor:grab;transition:all 0.2s;user-select:none}
+.turno-card:hover{filter:brightness(1.1)}
+.turno-card.dragging{opacity:0.4;cursor:grabbing;transform:scale(0.97)}
+.turno-card.freq-1{background:rgba(74,156,199,0.12);border-left-color:#4A9CC7}
+.turno-card.freq-1 .turno-hora{color:#4A9CC7}
+.turno-card.freq-2{background:rgba(155,127,212,0.12);border-left-color:#9B7FD4}
+.turno-card.freq-2 .turno-hora{color:#9B7FD4}
+.turno-card.freq-3{background:rgba(232,168,74,0.12);border-left-color:#E8A84A}
+.turno-card.freq-3 .turno-hora{color:#E8A84A}
+.dia-body.drag-over{background:rgba(74,184,112,0.08);border-radius:4px}
+.turno-hora{font-size:0.7rem;font-weight:600}
+.turno-nombre{font-size:0.82rem;font-weight:500;color:var(--texto);margin-top:0.1rem}
+.turno-freq{font-size:0.7rem;color:var(--suave)}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#1C2B20;border:1px solid rgba(74,184,112,0.15);border-radius:10px;width:min(520px,95vw);max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.modal-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:1rem;font-weight:600;color:var(--texto)}
+.modal-close{background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--suave);line-height:1}
+.modal-body{padding:1.5rem}
+.modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--borde);display:flex;gap:0.75rem;justify-content:flex-end}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.field{display:flex;flex-direction:column;gap:0.35rem}
+.field label{font-size:0.78rem;font-weight:500;color:var(--suave)}
+.field input,.field select,.field textarea{padding:0.55rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:#223527;color:var(--texto);outline:none;transition:border 0.2s;font-family:inherit}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--verde)}
+.field textarea{resize:vertical;min-height:70px}
+.field input::placeholder,.field textarea::placeholder{color:#3D6B50}
+.dias-check{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem}
+.dia-check-label{display:flex;align-items:center;gap:0.35rem;background:#223527;border:1px solid var(--borde);padding:0.4rem 0.8rem;border-radius:20px;cursor:pointer;font-size:0.82rem;transition:all 0.2s;user-select:none;color:var(--suave)}
+.dia-check-label.checked{background:var(--verde);color:#0D1A12;border-color:var(--verde);font-weight:600}
+.dia-horario-lista{display:flex;flex-direction:column;gap:0.5rem;margin-top:0.75rem}
+.dia-horario-row{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:0.75rem;padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border:1px solid var(--borde)}
+.dia-horario-row label{font-size:0.8rem;font-weight:600;color:var(--verde)}
+.dia-horario-row input{padding:0.4rem 0.6rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:#111B16;color:var(--texto);outline:none;font-family:inherit}
+.dia-horario-row input:focus{border-color:var(--verde)}
+
+/* ── PERFIL DARK ── */
+#perfil-dark{
+  --pd-bg:       #111B16;
+  --pd-bg2:       #1C2B20;
+  --pd-bg3:       #223527;
+  --pd-card:     #1C2B20;
+  --pd-card2:    #223527;
+  --pd-border:   rgba(74,184,112,0.12);
+  --pd-border2:  rgba(74,184,112,0.22);
+  --pd-verde:    #4AB870;
+  --pd-verde-d:  #2E7D4F;
+  --pd-verde-dim:rgba(74,184,112,0.12);
+  --pd-crema:    #C8A87A;
+  --pd-crema-dim:rgba(212,184,150,0.12);
+  --pd-text:     #E5EDE8;
+  --pd-text2:    #6E9E80;
+  --pd-text3:    #3D6B50;
+  --pd-red:      #E05C5C;
+  --pd-red-dim:  rgba(224,92,92,0.12);
+  --pd-amber:    #E8A84A;
+}
+.pd-back{background:var(--pd-bg3);border:0.5px solid var(--pd-border2);color:var(--pd-text2);padding:0.4rem 0.85rem;border-radius:6px;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;gap:0.4rem;transition:background 0.2s}
+.pd-back:hover{background:var(--pd-card2)}
+.pd-header{margin-bottom:1rem}
+.pd-header-main{background:var(--pd-card);border:0.5px solid var(--pd-border2);border-radius:10px;padding:1.25rem;display:flex;align-items:flex-start;gap:1.25rem}
+.pd-avatar{width:52px;height:52px;border-radius:50%;background:var(--pd-verde-dim);border:1.5px solid var(--pd-verde);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:var(--pd-verde);flex-shrink:0}
+.pd-header-info{flex:1;min-width:0}
+.pd-nombre{font-size:1.3rem;font-weight:700;color:var(--pd-text)}
+.pd-dias{font-size:0.78rem;color:var(--pd-text2);margin-top:0.2rem}
+.pd-gestion-row{display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:0.6rem}
+.pd-gestion-item p:first-child{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3)}
+.pd-gestion-item p:last-child{font-size:0.88rem;font-weight:600;color:var(--pd-text);margin-top:0.1rem}
+.pd-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
+.pd-header-top-btns{display:flex;gap:0.5rem}
+.pd-whatsapp-row{margin-top:0.5rem}
+.pd-header-btns{display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem;flex-shrink:0}
+.pd-asistencia-row{display:flex;gap:0.5rem}
+.pd-btn{padding:0.4rem 0.9rem;border-radius:6px;font-size:0.78rem;cursor:pointer;border:0.5px solid;transition:all 0.2s;font-family:inherit}
+.pd-btn-primary{background:var(--pd-verde);color:#0D1A12;border-color:var(--pd-verde);font-weight:600}
+.pd-btn-primary:hover{background:#3DAF65}
+.pd-btn-secondary{background:transparent;color:var(--pd-text2);border-color:var(--pd-border2)}
+.pd-btn-secondary:hover{background:var(--pd-bg3)}
+.pd-btn-danger{background:var(--pd-red-dim);color:var(--pd-red);border-color:rgba(224,92,92,0.25)}
+.pd-btn-wa{background:var(--pd-verde-dim);color:var(--pd-verde);border-color:var(--pd-border2)}
+.pd-btn-drive{background:rgba(66,133,244,0.1);color:#6BA3F5;border-color:rgba(66,133,244,0.25);text-decoration:none;display:inline-flex;align-items:center;gap:0.3rem}
+.pd-btn-drive:hover{background:rgba(66,133,244,0.18)}
+.pd-btn-asistencia{background:rgba(74,184,112,0.1);color:var(--pd-verde);border-color:rgba(74,184,112,0.25)}
+.pd-btn-asistencia:hover{background:rgba(74,184,112,0.18)}
+.pd-btn-asistencia:disabled{opacity:0.5;cursor:not-allowed}
+.pd-btn-recuperacion{background:rgba(200,168,122,0.1);color:var(--pd-crema);border-color:rgba(200,168,122,0.25)}
+.pd-btn-recuperacion:hover{background:rgba(200,168,122,0.18)}
+.pd-btn-recuperacion:disabled{opacity:0.5;cursor:not-allowed}
+
+/* STATS */
+.pd-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:0.6rem;margin-bottom:1rem}
+.pd-stat{background:var(--pd-card);border:0.5px solid var(--pd-border);border-radius:8px;padding:0.85rem 1rem}
+.pd-stat-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);margin-bottom:0.3rem}
+.pd-stat-val{font-size:1.2rem;font-weight:700;color:var(--pd-text)}
+.pd-stat-sub{font-size:0.68rem;color:var(--pd-text2);margin-top:0.15rem}
+.pd-stat-val.verde{color:var(--pd-verde)}
+.pd-stat-val.crema{color:var(--pd-crema)}
+.pd-stat-val.amber{color:var(--pd-amber)}
+.pd-stat-nutri-link{cursor:pointer;transition:background 0.15s}
+.pd-stat-nutri-link:hover{background:rgba(74,184,112,0.08)}
+
+/* GRID */
+.pd-grid{display:grid;grid-template-columns:1fr 300px;gap:1rem;align-items:start}
+.pd-side{display:flex;flex-direction:column;gap:1rem}
+
+/* CARDS */
+.pd-card{background:var(--pd-card);border:0.5px solid var(--pd-border);border-radius:10px;overflow:hidden}
+.pd-card-header{padding:0.75rem 1rem;border-bottom:0.5px solid var(--pd-border);display:flex;justify-content:space-between;align-items:center}
+.pd-card-title{font-size:0.78rem;font-weight:600;color:var(--pd-text);letter-spacing:0.03em}
+.pd-card-sub{font-size:0.68rem;color:var(--pd-text3)}
+.pd-card-body{padding:1rem}
+
+/* INPUTS */
+.pd-input{width:100%;background:var(--pd-bg3);border:0.5px solid var(--pd-border2);border-radius:6px;padding:0.5rem 0.65rem;color:var(--pd-text);font-size:0.85rem;font-family:inherit;outline:none;height:36px}
+.pd-input:focus{border-color:var(--pd-verde)}
+.pd-textarea{width:100%;background:var(--pd-bg3);border:0.5px solid var(--pd-border2);border-radius:6px;padding:0.5rem 0.65rem;color:var(--pd-text);font-size:0.85rem;font-family:inherit;outline:none;resize:none;height:72px}
+.pd-textarea:focus{border-color:var(--pd-verde)}
+.pd-textarea::placeholder,.pd-input::placeholder{color:var(--pd-text3)}
+
+/* ENTRADAS */
+.pd-entrada{background:var(--pd-bg3);border-left:2px solid var(--pd-verde-d);border-radius:0 6px 6px 0;padding:0.65rem 0.75rem;margin-bottom:0.5rem}
+.pd-entrada-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem}
+.pd-entrada-fecha{font-size:0.65rem;color:var(--pd-text3)}
+.pd-entrada-acciones{display:flex;gap:0.4rem}
+.pd-entrada-accion{background:none;border:none;cursor:pointer;font-size:0.68rem;color:var(--pd-text3);text-decoration:underline;padding:0}
+.pd-entrada-accion.danger{color:var(--pd-red)}
+.pd-entrada-texto{font-size:0.82rem;color:var(--pd-text);line-height:1.55}
+
+/* ITEMS LISTA */
+.pd-item{display:flex;align-items:center;gap:0.5rem;padding:0.3rem 0;font-size:0.82rem;color:var(--pd-text)}
+.pd-dot{width:5px;height:5px;border-radius:50%;background:var(--pd-verde);flex-shrink:0}
+.pd-dot.marron{background:var(--pd-crema)}
+.pd-item-acciones{margin-left:auto;display:flex;gap:0.35rem;opacity:0;transition:opacity 0.2s}
+.pd-item:hover .pd-item-acciones{opacity:1}
+
+/* COBROS DARK */
+.pd-cobro-row{display:flex;justify-content:space-between;align-items:center;padding:0.45rem 0.6rem;border-radius:6px;background:var(--pd-bg3);margin-bottom:0.35rem}
+.pd-cobro-label{font-size:0.75rem;color:var(--pd-text2)}
+.pd-cobro-pagado{font-size:0.72rem;color:var(--pd-verde);font-weight:600}
+.pd-cobro-pendiente{font-size:0.72rem;color:var(--pd-amber);font-weight:600}
+.pd-cobro-btn{background:var(--pd-verde);color:#0D1A12;border:none;padding:0.2rem 0.55rem;border-radius:4px;font-size:0.68rem;font-weight:600;cursor:pointer}
+.pd-cobro-btn.undo{background:var(--pd-bg);color:var(--pd-text2);border:0.5px solid var(--pd-border2)}
+
+/* BADGE DARK */
+.pd-badge-activo{background:var(--pd-verde-dim);color:var(--pd-verde);border:0.5px solid var(--pd-border2);padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:500}
+.pd-badge-pausado{background:rgba(232,168,74,0.12);color:var(--pd-amber);border:0.5px solid rgba(232,168,74,0.25);padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:500}
+.pd-badge-inactivo{background:var(--pd-red-dim);color:var(--pd-red);border:0.5px solid rgba(224,92,92,0.25);padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:500}
+
+/* DATOS PERSONALES DARK */
+.pd-dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem}
+.pd-dp-field label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);display:block;margin-bottom:0.25rem}
+.pd-imc{background:var(--pd-bg3);border-radius:6px;padding:0.5rem 0.75rem;display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem}
+.pd-imc-val{font-size:1rem;font-weight:700}
+.pd-imc-cat{font-size:0.7rem;color:var(--pd-text2)}
+
+@media(max-width:900px){
+  .pd-grid{grid-template-columns:1fr}
+  .pd-stats{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:600px){
+  .pd-stats{grid-template-columns:repeat(2,1fr)}
+  .pd-header-main{flex-wrap:wrap}
+  .pd-header-btns{flex-direction:row;align-items:stretch;width:100%;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--pd-border)}
+  .pd-header-btns .pd-btn-drive{flex:1}
+  .pd-asistencia-row{flex:2;display:flex;gap:0.5rem}
+  .pd-asistencia-row .pd-btn{flex:1}
+}
+
+/* ── FIN PERFIL DARK ── */
+
+/* ALUMNOS CARDS MOBILE */
+#alumnos-cards{display:none;flex-direction:column;gap:0.6rem}
+.alumno-card{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:0.9rem 1rem;cursor:pointer;transition:background 0.15s}
+.alumno-card:hover{background:rgba(74,184,112,0.04)}
+.alumno-card:active{background:rgba(74,184,112,0.08)}
+.alumno-card-top{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem}
+.alumno-card-avatar{width:36px;height:36px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.alumno-card-info{flex:1;min-width:0}
+.alumno-card-nombre{font-weight:600;font-size:0.95rem;color:var(--texto)}
+.alumno-card-dias{font-size:0.78rem;color:var(--suave);margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alumno-card-bottom{display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--suave);padding-top:0.6rem;border-top:1px solid var(--borde)}
+.mes-selector{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
+.mes-selector select{padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:#223527;color:var(--texto)}
+.cobros-lista{display:flex;flex-direction:column;gap:0.75rem}
+.cobro-row{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:1rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.cobro-info{flex:1}
+.cobro-nombre{font-weight:600;font-size:0.92rem;color:var(--texto)}
+.cobro-detalle{font-size:0.78rem;color:var(--suave);margin-top:0.15rem}
+.cobro-monto{font-size:1.1rem;font-weight:700;color:var(--verde);min-width:80px;text-align:right}
+
+/* ── COBROS: rediseño resumen + cards agrupadas (no confundir con .cobro-row de arriba, usada también en Nutrición) ── */
+.resumen-card{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.5rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:2.5rem}
+.resumen-progreso{flex:1}
+.resumen-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.6rem}
+.resumen-total{font-size:1.35rem;font-weight:700}
+.resumen-total span{font-size:0.8rem;font-weight:500;color:var(--suave)}
+.resumen-pct{font-size:0.8rem;font-weight:700;color:var(--verde)}
+.barra{height:8px;border-radius:5px;background:rgba(255,255,255,0.06);overflow:hidden}
+.barra-fill{height:100%;background:var(--verde);border-radius:5px;transition:width 0.3s}
+.resumen-mini{display:flex;gap:1.8rem;border-left:1px solid var(--borde);padding-left:2rem}
+.resumen-mini-item{display:flex;flex-direction:column;gap:0.2rem}
+.resumen-mini-label{font-size:0.7rem;color:var(--suave);display:flex;align-items:center;gap:0.35rem}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+.dot-bono{background:var(--marron)}
+.dot-pendiente{background:var(--amarillo)}
+.resumen-mini-val{font-size:0.95rem;font-weight:700}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:1.8rem}
+.seccion-label{font-size:0.72rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--suave);display:flex;align-items:center;gap:0.4rem;margin-bottom:0.7rem}
+.seccion-count{background:var(--amarillo-bg);color:var(--amarillo);font-size:0.68rem;font-weight:700;padding:0.08rem 0.45rem;border-radius:20px}
+.seccion-count.ok{background:var(--verde-bg);color:var(--verde)}
+
+.cobro-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:0.7rem 0.9rem;margin-bottom:0.55rem;transition:background 0.15s}
+.cobro-card:hover{background:rgba(74,184,112,0.05)}
+.cobro-main{flex:1;min-width:0;display:flex;align-items:center;gap:0.75rem}
+.cobro-avatar{width:34px;height:34px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cobro-avatar.pendiente{background:var(--amarillo-bg);color:var(--amarillo)}
+.cobro-card .cobro-info{flex:1;min-width:0}
+.cobro-card .cobro-nombre{font-weight:600;font-size:0.85rem;color:var(--texto)}
+.cobro-card .cobro-detalle{font-size:0.72rem;color:var(--suave);margin-top:0.05rem;display:flex;align-items:center;gap:0.3rem}
+.status-icon{width:12px;height:12px;flex-shrink:0}
+.cobro-right{display:flex;align-items:center;gap:0.75rem;flex-shrink:0}
+.cobro-card .cobro-monto{font-size:0.9rem;font-weight:700;color:var(--texto);min-width:70px;text-align:right}
+
+.bono-toggle{display:flex;align-items:center;gap:0.5rem;margin-top:0.65rem;padding-top:0.6rem;border-top:1px solid var(--borde)}
+.bono-chip{font-size:0.7rem;color:var(--marron);background:rgba(212,184,150,0.1);padding:0.28rem 0.65rem;border-radius:20px;font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;cursor:pointer;border:none;font-family:inherit;white-space:nowrap}
+.bono-existente{font-size:0.72rem;color:var(--marron);font-weight:600;display:flex;align-items:center;gap:0.35rem;white-space:nowrap}
+.bono-input-wrap{display:none;align-items:center;gap:0.4rem}
+.bono-input-wrap input{width:90px;padding:0.32rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.8rem;background:var(--bg);color:var(--texto);font-family:inherit}
+
+/* ── RESUMEN / DASHBOARD: KPIs operativos + card financiera (reutiliza .barra/.barra-fill/.seccion-label de Cobros) ── */
+.top-row{display:grid;grid-template-columns:180px 180px 1fr;gap:1.2rem;align-items:stretch;margin-bottom:1.5rem}
+.top-row .seccion-label{display:none}
+.kpi-row{display:contents}
+.fin-wrap{display:contents}
+.kpi-card{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:0.9rem 1rem}
+.kpi-icon{width:30px;height:30px;border-radius:8px;background:var(--verde-bg);color:var(--verde);display:flex;align-items:center;justify-content:center;margin-bottom:0.55rem}
+.kpi-icon svg{width:16px;height:16px}
+.kpi-val{font-size:1.4rem;font-weight:700;color:var(--texto)}
+.kpi-label{font-size:0.72rem;color:var(--suave);margin-top:0.1rem}
+
+.fin-card{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.15rem}
+.fin-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.7rem}
+.fin-total{font-size:1.4rem;font-weight:700;color:var(--texto)}
+.fin-total span{font-size:0.82rem;font-weight:500;color:var(--suave)}
+.fin-pct{font-size:0.82rem;font-weight:700;color:var(--verde)}
+.fin-card .barra{margin-bottom:0.9rem}
+.fin-alerta{display:flex;align-items:center;justify-content:space-between;background:var(--amarillo-bg);border:1px solid rgba(232,168,74,0.25);border-radius:9px;padding:0.6rem 0.8rem;cursor:pointer}
+.fin-alerta-txt{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;font-weight:600;color:var(--amarillo)}
+.fin-alerta-txt svg{width:15px;height:15px;flex-shrink:0}
+.fin-alerta-chevron{width:14px;height:14px;color:var(--amarillo);transition:transform 0.2s;flex-shrink:0}
+.fin-alerta.open .fin-alerta-chevron{transform:rotate(180deg)}
+.fin-chips{display:none;flex-wrap:wrap;gap:0.45rem;margin-top:0.65rem}
+.fin-chip{background:var(--bg);border:1px solid rgba(232,168,74,0.25);padding:0.28rem 0.7rem;border-radius:20px;font-size:0.76rem;cursor:pointer;transition:background 0.2s;color:var(--texto)}
+.fin-chip:hover{background:var(--amarillo-bg)}
+
+/* ── FINANZAS (desktop only): KPIs con namespace propio (-fin) para no chocar con .kpi-card/.kpi-val/.kpi-label de Resumen ── */
+.kpi-row-fin{display:grid;grid-template-columns:repeat(4,1fr);gap:0.9rem;margin-bottom:1.4rem}
+.kpi-card-fin{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:1rem 1.1rem}
+.kpi-label-fin{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave)}
+.kpi-val-fin{font-size:1.4rem;font-weight:700;margin-top:0.3rem;color:var(--texto)}
+.kpi-val-fin.rojo{color:var(--rojo)}
+.kpi-val-fin.verde{color:var(--verde)}
+.kpi-sub{font-size:0.72rem;color:var(--suave);margin-top:0.15rem}
+
+.tendencia-card{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.3rem;margin-bottom:1.4rem}
+.tendencia-titulo{font-size:0.72rem;color:var(--suave);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.9rem}
+.tendencia-bars{display:flex;align-items:flex-end;gap:0.6rem;height:90px}
+.tbar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:0.4rem;height:100%;justify-content:flex-end}
+.tbar{width:100%;background:var(--verde-bg);border-radius:3px 3px 0 0}
+.tbar.actual{background:var(--verde)}
+.tbar.negativo{background:var(--rojo-bg)}
+.tbar-mes{font-size:0.62rem;color:var(--suave)}
+
+/* Tabla mensual: clases en vez de style="" inline por celda */
+tr.actual td{background:var(--verde-bg);font-weight:600}
+tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--borde);border-bottom:none}
+.cell-verde{color:var(--verde);font-weight:600}
+.cell-rojo{color:var(--rojo)}
+.ahorro-input{width:70px;padding:0.25rem 0.4rem;border:1px solid var(--borde);border-radius:4px;font-size:0.78rem;background:var(--bg);color:var(--texto)}
+
+/* Listas Gastos / Ahorros */
+.lista-card{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;overflow:hidden}
+.lista-header{padding:0.9rem 1.2rem;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center}
+.lista-header h3{font-size:0.88rem;font-weight:600}
+.gasto-row{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1.2rem;border-bottom:1px solid var(--borde)}
+.gasto-desc{font-size:0.85rem;font-weight:500}
+.gasto-fecha{font-size:0.72rem;color:var(--suave);margin-top:0.1rem}
+.gasto-monto{font-size:0.85rem;font-weight:700;color:var(--rojo)}
+.ahorro-row{display:flex;align-items:center;justify-content:space-between;padding:0.65rem 1.2rem;border-bottom:1px solid var(--borde)}
+.ahorro-mes{font-size:0.85rem;font-weight:500}
+.ahorro-monto{font-size:0.85rem;font-weight:700;color:var(--verde)}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#223527;color:var(--texto);border:1px solid var(--borde);padding:0.7rem 1.5rem;border-radius:6px;font-size:0.85rem;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* LOADING */
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(74,184,112,0.3);border-top-color:var(--verde);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MOBILE */
+.bottom-nav{display:none}
+.fab{display:none}
+/* Badge de cobro en el header del perfil — solo mobile */
+.pd-cobro-mes-badge{display:none}
+@media(max-width:768px){
+  /* ── Layout base ── */
+  .shell{grid-template-columns:1fr}
+  aside{display:none}
+  main{padding:1rem 0.85rem 5.5rem;background:var(--bg)}
+
+  /* ── Stats dashboard: 2 columnas ── */
+  .stats{grid-template-columns:1fr 1fr}
+
+  /* ── Alumnos: cards en lugar de tabla ── */
+  #alumnos-table-wrap{display:none}
+  #alumnos-cards{display:flex}
+
+  /* ── Dashboard: "Hoy" primero ── */
+  #page-dashboard.active{display:flex;flex-direction:column}
+  #page-dashboard .top-row{order:2}
+  #page-dashboard .table-wrap{order:1;margin-bottom:1rem}
+  #page-dashboard .page-header{order:0}
+
+  /* ── Resumen: KPIs + financiero apilados, en una columna ── */
+  .top-row{display:flex;flex-direction:column;gap:1.3rem}
+  .top-row .seccion-label{display:block}
+  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem}
+  .kpi-row .seccion-label{grid-column:1/-1}
+  .fin-wrap{display:block}
+
+  /* ── Agenda: scroll horizontal en lugar de colapsar ── */
+  .semana-grid{grid-template-columns:repeat(5,minmax(160px,1fr));overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  /* ── Cobros: resumen apilado, columnas a una sola, cards un poco más grandes ── */
+  .resumen-card{display:block;padding:1.1rem 1.15rem}
+  .resumen-mini{border-left:none;padding-left:0;gap:1.4rem;margin-top:0.75rem}
+  .cols{display:block}
+  .cobro-card{padding:0.8rem 0.9rem}
+  .cobro-avatar{width:38px;height:38px;font-size:0.95rem}
+  .cobro-card .cobro-nombre{font-size:0.9rem}
+  .cobro-card .cobro-detalle{font-size:0.74rem}
+  .status-icon{width:13px;height:13px}
+  .cobro-right{flex-direction:column;align-items:flex-end;gap:0.4rem}
+  .cobro-card .cobro-monto{font-size:1rem}
+  .bono-toggle{justify-content:space-between}
+  .bono-input-wrap{flex:1;justify-content:flex-end}
+
+  /* ── Forms ── */
+  .form-grid{grid-template-columns:1fr}
+
+  /* ── Barra inferior ── */
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#111B16;z-index:150;border-top:1px solid rgba(74,184,112,0.12)}
+  .bottom-nav a{flex:1;display:flex;align-items:center;justify-content:center;padding:0.75rem 0.25rem;color:#3D6B50;text-decoration:none;cursor:pointer;transition:color 0.2s;border-top:2px solid transparent;margin-top:-1px}
+  .bottom-nav a svg{width:22px;height:22px}
+  .bottom-nav a.active{color:#4AB870;border-top-color:#4AB870}
+
+  /* ── FAB ── */
+  .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:4.75rem;right:1.25rem;width:50px;height:50px;border-radius:50%;background:#2E7D4F;color:#E5EDE8;font-size:1.6rem;border:none;cursor:pointer;z-index:160;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.2s}
+  .fab:hover{transform:scale(1.08)}
+
+  /* ── Toast por encima de la barra ── */
+  .toast{bottom:5.5rem}
+
+  /* ── Perfil mobile ── */
+  /* Badge cobro mes visible en header */
+  .pd-cobro-mes-badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:600;margin-top:0.4rem}
+  .pd-cobro-mes-badge.pagado{background:rgba(74,184,112,0.12);color:#4AB870;border:0.5px solid rgba(74,184,112,0.25)}
+  .pd-cobro-mes-badge.pendiente{background:rgba(232,168,74,0.12);color:#E8A84A;border:0.5px solid rgba(232,168,74,0.25)}
+
+  /* Reordenar secciones del perfil en mobile via order */
+  #perfil-dark .pd-back{margin-bottom:0.75rem}
+  .pd-stats{grid-template-columns:repeat(3,1fr)}
+  .pd-grid{grid-template-columns:1fr}
+
+  /* Columna principal (seguimiento) y lateral (resto) se apilan */
+  /* Orden mobile: header > stats > cobro-badge > molestias > objetivos > historial-fis > seguimiento > cobros > nutri */
+  #perfil-dark .pd-header{order:0}
+  #perfil-dark .pd-stats{order:1}
+  #perfil-dark .pd-grid{display:flex;flex-direction:column}
+  #perfil-dark .pd-grid .pd-card{width:100%}
+
+  /* Cards de la columna lateral (.pd-side) y la principal reordenadas */
+  .pd-side{display:contents}
+  .pd-card-molestias{order:2}
+  .pd-card-objetivos{order:3}
+  .pd-card-historial-fis{order:4}
+  .pd-card-seguimiento{order:5}
+  .pd-card-cobros{order:6}
+  .pd-card-nutri{order:7}
+
+  /* Stats del perfil: 3 columnas en mobile */
+  .pd-stats{grid-template-columns:repeat(3,1fr);font-size:0.85rem}
+  .pd-stat-val{font-size:1rem}
+}
+
+/* ── PORTAL PÚBLICO ── */
+#portal-alumno{min-height:100vh;background:var(--bg);position:relative}
+.portal-wrap{position:relative;z-index:1}
+@media(max-width:768px){
+  #portal-alumno::before{
+    content:'';
+    position:fixed;
+    inset:0;
+    z-index:0;
+    background:linear-gradient(180deg, rgba(8,16,11,0.55) 0%, rgba(8,16,11,0.8) 100%), url('portal-fondo.webp') top center/cover no-repeat;
+    pointer-events:none;
+  }
+}
+.portal-wrap{max-width:560px;margin:0 auto;padding:1.25rem 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
+.portal-header{display:flex;flex-direction:column;align-items:flex-start;gap:0.15rem;padding:0.25rem 0 0.5rem}
+.portal-header-brand{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem}
+.portal-logo-img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+.portal-logo-txt{font-size:0.78rem;font-weight:600;color:var(--suave);letter-spacing:0.02em}
+.portal-saludo{font-size:0.95rem;color:var(--suave);font-weight:400}
+.portal-saludo-nombre{font-size:1.7rem;font-weight:700;color:var(--texto);line-height:1.15}
+.portal-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:1.25rem}
+.portal-card-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave);font-weight:600;margin-bottom:0.85rem}
+.portal-hero{display:flex;flex-direction:column;gap:0.85rem}
+.portal-hero-top{display:flex;align-items:center;gap:1rem}
+.portal-avatar{width:56px;height:56px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:1.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--verde)}
+.portal-hero-info{flex:1;min-width:0}
+.portal-freq{font-size:0.78rem;color:var(--verde);font-weight:500;margin-top:0.15rem}
+.portal-hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;border-top:1px solid rgba(74,184,112,0.1);padding-top:0.85rem}
+.portal-dias{font-size:0.8rem;color:var(--suave);line-height:1.6;flex:1}
+.portal-hero-racha{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.portal-racha-num{font-size:2.8rem;font-weight:800;line-height:1}
+.portal-racha-label{font-size:0.65rem;color:var(--suave);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;text-align:center}
+.portal-datos-grid{display:flex;flex-direction:column}
+.portal-dato-row{display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0}
+.portal-dato-row + .portal-dato-row{border-top:1px solid rgba(74,184,112,0.08)}
+.portal-dato-icon{width:34px;height:34px;border-radius:9px;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.portal-dato-icon svg{width:17px;height:17px;stroke:var(--verde)}
+.portal-dato-txt{flex:1;min-width:0}
+.portal-dato-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--suave)}
+.portal-dato-val{font-size:1rem;font-weight:700;color:var(--texto)}
+.portal-dato-verde{color:var(--verde)}
+.portal-btns{display:flex;flex-direction:column;gap:0.6rem}
+.portal-btn{width:100%;padding:0.75rem 1rem;border-radius:7px;font-size:0.88rem;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:0.6rem;transition:transform 0.12s,background 0.15s;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.portal-btn:hover{opacity:0.9}
+.portal-btn:active{transform:scale(0.97)}
+.portal-btn-drive{background:rgba(66,133,244,0.12);color:#6BA3F5;border:1px solid rgba(66,133,244,0.25)}
+.portal-btn-drive:active{background:rgba(66,133,244,0.22)}
+.portal-btn-nutri{background:rgba(74,184,112,0.12);color:var(--verde);border:1px solid var(--borde)}
+.portal-btn-nutri:active{background:rgba(74,184,112,0.22)}
+.portal-entrada{border-left:2px solid var(--verde-s);padding:0.6rem 0.75rem;margin-bottom:0.6rem;background:#223527;border-radius:0 6px 6px 0}
+.portal-entrada:last-child{margin-bottom:0}
+.portal-entrada-fecha{font-size:0.68rem;color:var(--suave);display:block;margin-bottom:0.25rem}
+.portal-entrada-texto{font-size:0.85rem;color:var(--texto);line-height:1.55}
+.portal-proxima{display:inline-block;font-size:0.75rem;font-weight:600;margin-top:0.4rem;padding:0.25rem 0.65rem;border-radius:20px}
+.portal-proxima-hoy{background:rgba(74,184,112,0.15);color:var(--verde);border:1px solid rgba(74,184,112,0.3)}
+.portal-proxima-manana{background:rgba(232,168,74,0.12);color:var(--amarillo);border:1px solid rgba(232,168,74,0.3)}
+.portal-proxima-pronto{background:rgba(110,158,128,0.1);color:var(--suave);border:1px solid rgba(110,158,128,0.2)}
+.portal-objetivos{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
+.portal-objetivo{font-size:0.85rem;color:var(--texto);padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border-left:2px solid var(--verde-s);line-height:1.45}
+.portal-objetivo::before{content:'→ ';color:var(--verde-s);font-weight:600}
+
+.portal-frase-card{background:linear-gradient(135deg, var(--blanco) 0%, var(--crema) 100%);border:1px solid var(--borde);border-radius:14px;padding:1.4rem 1.25rem;display:flex;gap:0.85rem;align-items:flex-start}
+.portal-frase-comilla{font-family:Georgia,serif;font-size:2.4rem;color:#C8A87A;line-height:0.6;flex-shrink:0;margin-top:0.4rem}
+.portal-frase-texto{font-size:0.98rem;color:var(--texto);font-style:italic;line-height:1.5;margin:0}
+
+.portal-empty{font-size:0.85rem;color:var(--suave);text-align:center;padding:0.5rem 0}
+.portal-footer{text-align:center;font-size:0.75rem;color:var(--suave);margin-top:0.5rem}
+.portal-loading{text-align:center;padding:3rem;color:var(--suave);font-size:0.9rem}
+.portal-error{text-align:center;padding:3rem;color:var(--rojo);font-size:0.9rem}
+@media(max-width:480px){
+  .portal-hero{gap:0.75rem}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <img id="login-logo" src="Logo_App.png" alt="Mente Consciente"/>
+  <h1>Mente Consciente</h1>
+  <p>Iniciá sesión con tu cuenta de Google para acceder a tus datos</p>
+  <button id="login-btn" onclick="iniciarSesion()" disabled style="opacity:0.7">Cargando...</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+<div class="shell">
+
+<aside>
+  <div class="logo">
+    <h1>Mente Consciente</h1>
+    <p>Entrenador Personal</p>
+    <p class="logo-user" id="user-email"></p>
+  </div>
+  <nav>
+    <a class="active" onclick="showPage('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Resumen
+    </a>
+    <a onclick="showPage('alumnos',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Alumnos
+    </a>
+    <a onclick="showPage('agenda',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Agenda semanal
+    </a>
+    <a onclick="showPage('cobros',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      Cobros
+    </a>
+    <a onclick="showPage('nutricion',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      Nutrición
+    </a>
+    <a onclick="showPage('finanzas',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Finanzas
+    </a>
+  </nav>
+  <div class="sidebar-bottom">
+    <button class="sidebar-btn" onclick="sincronizarTodosCalendar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Exportar a Calendar
+    </button>
+    <button class="sidebar-btn" onclick="cargarDatos()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
+      Sincronizar
+    </button>
+    <button class="sidebar-btn" onclick="cerrarSesion()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Cerrar sesión
+    </button>
+  </div>
+</aside>
+
+<main>
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <h2>Resumen</h2>
+      <p id="fecha-hoy"></p>
+    </div>
+    <div class="top-row">
+      <div class="kpi-row">
+        <div class="seccion-label">Operativo</div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="kpi-val" id="stat-alumnos">—</div>
+          <div class="kpi-label">Alumnos activos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+          <div class="kpi-val" id="stat-sesiones">—</div>
+          <div class="kpi-label">Sesiones esta semana</div>
+        </div>
+      </div>
+      <div class="fin-wrap">
+        <div class="seccion-label">Financiero</div>
+        <div class="fin-card">
+          <div class="fin-top">
+            <div class="fin-total" id="fin-total">—</div>
+            <div class="fin-pct" id="fin-pct">—</div>
+          </div>
+          <div class="barra"><div class="barra-fill" id="fin-barra-fill"></div></div>
+          <div class="fin-alerta" id="fin-alerta" onclick="toggleFinAlerta()" style="display:none">
+            <span class="fin-alerta-txt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="fin-alerta-count"></span></span>
+            <svg class="fin-alerta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
+          <div class="fin-chips" id="fin-chips" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header"><h3>Hoy</h3></div>
+      <div id="hoy-lista" style="padding:1rem 1.25rem;color:var(--suave);font-size:0.85rem">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- ALUMNOS -->
+  <div class="page" id="page-alumnos">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
+      <div><h2>Alumnos</h2><p>Gestioná tu lista de alumnos activos</p></div>
+      <div style="display:flex;gap:0.75rem;align-items:center">
+        <input type="text" id="filtro-alumnos" placeholder="Buscar por nombre..." oninput="renderTablaAlumnos()" style="padding:0.5rem 0.85rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:var(--blanco);outline:none;width:200px"/>
+        <button class="btn btn-primary" onclick="abrirModalAlumno()">+ Nuevo alumno</button>
+      </div>
+    </div>
+    <div class="table-wrap" id="alumnos-table-wrap">
+      <table>
+        <thead><tr><th>Nombre</th><th>Días</th><th>Frecuencia</th><th>Monto/mes</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tabla-alumnos"></tbody>
+      </table>
+    </div>
+    <div id="alumnos-cards"></div>
+  </div>
+
+  <!-- AGENDA -->
+  <div class="page" id="page-agenda">
+    <div class="page-header"><h2>Agenda semanal</h2><p>Vista de tus turnos de lunes a viernes · Arrastrá las tarjetas para cambiar de día</p></div>
+    <div class="semana-grid" id="semana-grid"></div>
+    <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:0.5rem"><span style="width:12px;height:12px;border-radius:2px;background:rgba(74,156,199,0.12);border-left:3px solid #4A9CC7;display:inline-block"></span><span style="font-size:0.78rem;color:var(--suave)">1x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span style="width:12px;height:12px;border-radius:2px;background:rgba(155,127,212,0.12);border-left:3px solid #9B7FD4;display:inline-block"></span><span style="font-size:0.78rem;color:var(--suave)">2x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span style="width:12px;height:12px;border-radius:2px;background:rgba(232,168,74,0.12);border-left:3px solid #E8A84A;display:inline-block"></span><span style="font-size:0.78rem;color:var(--suave)">3x por semana</span></div>
+    </div>
+  </div>
+
+  <!-- COBROS -->
+  <div class="page" id="page-cobros">
+    <div class="page-header"><h2>Cobros</h2><p>Seguimiento de pagos mensuales</p></div>
+    <div class="mes-selector">
+      <label style="font-size:0.82rem;font-weight:500">Mes:</label>
+      <select id="mes-select" onchange="renderCobros()"></select>
+    </div>
+    <div class="cobros-lista" id="cobros-lista"></div>
+  </div>
+
+  <!-- NUTRICIÓN -->
+  <div class="page" id="page-nutricion">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div><h2>Nutrición</h2><p>Seguimiento de clientes nutricionales</p></div>
+      <button class="btn btn-primary" onclick="abrirModalNutri()">+ Nuevo cliente</button>
+    </div>
+    <!-- Resumen del mes -->
+    <div id="nutri-resumen" style="margin-bottom:1.5rem"></div>
+    <!-- Selector mes -->
+    <div class="mes-selector">
+      <label style="font-size:0.82rem;font-weight:500">Mes:</label>
+      <select id="nutri-mes-select" onchange="renderNutri()"></select>
+    </div>
+    <!-- Lista clientes -->
+    <div id="nutri-lista"></div>
+  </div>
+
+  <!-- FINANZAS -->
+  <div class="page" id="page-finanzas">
+    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
+      <div><h2>Finanzas</h2><p>Resumen anual de ingresos, gastos y ahorros</p></div>
+      <select id="fin-anio-select" onchange="renderFinanzas()" style="padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:#223527;color:var(--texto)"></select>
+    </div>
+    <div class="kpi-row-fin" id="fin-stats"></div>
+    <div class="tendencia-card">
+      <div class="tendencia-titulo">Total mensual — <span id="fin-tendencia-rango"></span></div>
+      <div class="tendencia-bars" id="fin-tendencia-bars"></div>
+    </div>
+    <div class="table-wrap" style="margin-bottom:1.5rem">
+      <div class="table-header"><h3>Resumen mensual</h3></div>
+      <table>
+        <thead><tr><th>Mes</th><th>Cuotas</th><th>Bonos</th><th>Nutri</th><th>Total</th><th>Gastos</th><th>Neto</th><th>Ahorro</th></tr></thead>
+        <tbody id="fin-tabla"></tbody>
+      </table>
+    </div>
+    <div class="cols">
+      <div class="lista-card">
+        <div class="lista-header">
+          <h3>Gastos</h3>
+          <button class="btn btn-primary btn-sm" onclick="abrirModalGasto()">+ Agregar</button>
+        </div>
+        <div id="fin-gastos-lista"></div>
+      </div>
+      <div class="lista-card">
+        <div class="lista-header"><h3>Ahorros mensuales</h3></div>
+        <div id="fin-ahorros-lista"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="page-perfil">
+    <!-- PERFIL DARK WRAPPER -->
+    <div id="perfil-dark">
+
+      <!-- HEADER -->
+      <div class="pd-header">
+        <!-- Barra superior: Volver + Editar/Eliminar -->
+        <div class="pd-header-top">
+          <button class="pd-back" onclick="showPage('alumnos',null);_syncBottomNavFromPerfil()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+            Volver
+          </button>
+          <div class="pd-header-top-btns">
+            <button id="perfil-btn-editar" class="pd-btn pd-btn-secondary">Editar</button>
+            <button id="perfil-btn-eliminar" class="pd-btn pd-btn-danger">Eliminar</button>
+          </div>
+        </div>
+        <!-- Card principal -->
+        <div class="pd-header-main">
+          <div class="pd-avatar" id="perfil-avatar"></div>
+          <div class="pd-header-info">
+            <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+              <h2 id="perfil-nombre" class="pd-nombre"></h2>
+              <span id="perfil-badge"></span>
+            </div>
+            <p id="perfil-dias" class="pd-dias"></p>
+            <div id="perfil-gestion" class="pd-gestion-row"></div>
+            <div class="pd-whatsapp-row">
+              <button id="perfil-btn-whatsapp" class="pd-btn pd-btn-wa" style="display:none">WhatsApp</button>
+              <button id="perfil-btn-portal" class="pd-btn" onclick="copiarLinkPortal()">🔗 Copiar link del portal</button>
+            </div>
+          </div>
+          <div class="pd-header-btns">
+            <button id="perfil-btn-drive" class="pd-btn pd-btn-drive" style="display:none">📁 Plan</button>
+            <div class="pd-asistencia-row">
+              <button id="perfil-btn-asistencia" class="pd-btn pd-btn-asistencia">💪 Asistencia</button>
+              <button id="perfil-btn-recuperacion" class="pd-btn pd-btn-recuperacion">🧘 Recuperación</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STATS ROW -->
+      <div class="pd-stats" id="perfil-stats-row"></div>
+
+      <!-- GRID -->
+      <div class="pd-grid">
+        <!-- SEGUIMIENTO -->
+        <div class="pd-card pd-card-seguimiento">
+          <div class="pd-card-header">
+            <span class="pd-card-title">Seguimiento</span>
+            <span id="perfil-contador-sesiones" class="pd-card-sub"></span>
+          </div>
+          <div class="pd-card-body">
+            <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem">
+              <input type="date" id="perfil-nueva-fecha" class="pd-input"/>
+              <textarea id="perfil-nueva-entrada" placeholder="Anotá lo de hoy..." class="pd-textarea"></textarea>
+              <div style="display:flex;justify-content:flex-end">
+                <button class="pd-btn pd-btn-primary" id="perfil-btn-guardar-entrada">Guardar</button>
+              </div>
+            </div>
+            <div id="perfil-historial"></div>
+          </div>
+        </div>
+
+        <!-- PANEL LATERAL -->
+        <div class="pd-side">
+          <!-- Cobros -->
+          <div class="pd-card pd-card-cobros">
+            <div class="pd-card-header"><span class="pd-card-title">Cobros</span></div>
+            <div class="pd-card-body" id="perfil-cobros"></div>
+          </div>
+          <!-- Objetivos -->
+          <div class="pd-card pd-card-objetivos">
+            <div class="pd-card-header"><span class="pd-card-title">Objetivos</span></div>
+            <div class="pd-card-body">
+              <div id="perfil-objetivos"></div>
+              <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+                <input type="text" id="perfil-nuevo-objetivo" placeholder="Nuevo objetivo..." class="pd-input" style="flex:1;height:auto;padding:0.4rem 0.6rem"/>
+                <button class="pd-btn pd-btn-primary" id="perfil-btn-agregar-objetivo">+</button>
+              </div>
+            </div>
+          </div>
+          <!-- Molestias -->
+          <div class="pd-card pd-card-molestias">
+            <div class="pd-card-header"><span class="pd-card-title">Molestias</span></div>
+            <div class="pd-card-body">
+              <div id="perfil-molestias"></div>
+              <div style="display:flex;gap:0.5rem;margin-top:0.75rem">
+                <input type="text" id="perfil-nueva-molestia" placeholder="Nueva molestia..." class="pd-input" style="flex:1;height:auto;padding:0.4rem 0.6rem"/>
+                <button class="pd-btn pd-btn-primary" id="perfil-btn-agregar-molestia">+</button>
+              </div>
+            </div>
+          </div>
+          <!-- Historial físico -->
+          <div class="pd-card pd-card-historial-fis">
+            <div class="pd-card-header"><span class="pd-card-title">Historial físico</span></div>
+            <div class="pd-card-body" id="perfil-historial-fis"></div>
+          </div>
+          <!-- Nutrición -->
+          <div class="pd-card pd-card-nutri" id="perfil-nutri-panel">
+            <div class="pd-card-header"><span class="pd-card-title">Nutrición</span></div>
+            <div class="pd-card-body" id="perfil-nutri"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- BOTTOM NAV MOBILE — solo íconos, 5 secciones -->
+<nav class="bottom-nav">
+  <a class="active" id="bn-dashboard" onclick="showPage('dashboard',this);syncBottomNav('dashboard')" title="Resumen">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+  </a>
+  <a id="bn-agenda" onclick="showPage('agenda',this);syncBottomNav('agenda')" title="Agenda">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  </a>
+  <a id="bn-alumnos" onclick="showPage('alumnos',this);syncBottomNav('alumnos')" title="Alumnos">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+  </a>
+  <a id="bn-cobros" onclick="showPage('cobros',this);syncBottomNav('cobros')" title="Cobros">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  </a>
+  <a id="bn-nutricion" onclick="showPage('nutricion',this);syncBottomNav('nutricion')" title="Nutrición">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+  </a>
+</nav>
+<button class="fab" onclick="abrirModalAlumno()">+</button>
+</div>
+
+<!-- POPUP RÁPIDO AGENDA -->
+<div class="overlay" id="modal-agenda-quick">
+  <div class="modal" style="width:min(380px,95vw)">
+    <div class="modal-header">
+      <h3 id="aq-nombre"></h3>
+      <button class="modal-close" onclick="cerrarModal('modal-agenda-quick')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;gap:1rem">
+        <!-- Info -->
+        <div style="display:flex;gap:1rem;flex-wrap:wrap">
+          <div><p style="font-size:0.7rem;color:var(--suave);text-transform:uppercase">Estado cuota</p><p id="aq-cuota" style="margin-top:0.2rem;font-weight:500"></p></div>
+          <div><p style="font-size:0.7rem;color:var(--suave);text-transform:uppercase">Frecuencia</p><p id="aq-freq" style="margin-top:0.2rem;font-weight:500"></p></div>
+        </div>
+        <!-- Editar días -->
+        <div>
+          <label style="font-size:0.78rem;font-weight:500;color:var(--suave)">Días de entrenamiento</label>
+          <div class="dias-check" style="margin-top:0.5rem" id="aq-dias"></div>
+        </div>
+        <!-- Editar horarios -->
+        <div>
+          <label style="font-size:0.78rem;font-weight:500;color:var(--suave)">Horarios</label>
+          <div class="dia-horario-lista" id="aq-horarios" style="margin-top:0.5rem"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary btn-sm" onclick="verAlumnoDesdeAgenda()">Ver perfil</button>
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-agenda-quick')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarQuickAgenda()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GASTO -->
+<div class="overlay" id="modal-gasto">
+  <div class="modal" style="width:min(380px,95vw)">
+    <div class="modal-header">
+      <h3 id="gasto-modal-titulo">Nuevo gasto</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-gasto')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field"><label>Fecha</label><input type="date" id="g-fecha"/></div>
+        <div class="field"><label>Monto ($)</label><input type="number" id="g-monto" placeholder="0"/></div>
+        <div class="field" style="grid-column:1/-1"><label>Descripción</label><input type="text" id="g-desc" placeholder="ej: Bandas elásticas"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-gasto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarGasto()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NUTRICIÓN -->
+<div class="overlay" id="modal-nutri">
+  <div class="modal" style="width:min(400px,95vw)">
+    <div class="modal-header">
+      <h3 id="nutri-modal-titulo">Nuevo cliente nutricional</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-nutri')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1"><label>Nombre completo</label><input type="text" id="nc-nombre" placeholder="Nombre del cliente"/></div>
+        <div class="field"><label>Teléfono / WhatsApp</label><input type="tel" id="nc-telefono" placeholder="ej: 3516123456"/></div>
+        <div class="field"><label>Estado</label>
+          <select id="nc-estado">
+            <option value="activo">Activo</option>
+            <option value="pausado">Pausado</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="field" style="grid-column:1/-1"><label>Notas</label><textarea id="nc-notas" placeholder="Observaciones generales..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-nutri')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-guardar-nutri" onclick="guardarClienteNutri()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ALUMNO -->
+<div class="overlay" id="modal-alumno">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-titulo">Nuevo alumno</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-alumno')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1"><label>Nombre completo</label><input type="text" id="a-nombre" placeholder="Nombre del alumno"/></div>
+        <div class="field"><label>Teléfono / WhatsApp</label><input type="tel" id="a-telefono" placeholder="ej: 3516123456"/></div>
+        <div class="field"><label>Estado</label>
+          <select id="a-estado">
+            <option value="activo">Activo</option>
+            <option value="pausado">Pausado</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Días de entrenamiento</label>
+          <div class="dias-check">
+            <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Lunes">Lunes</span>
+            <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Martes">Martes</span>
+            <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Miércoles">Miércoles</span>
+            <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Jueves">Jueves</span>
+            <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Viernes">Viernes</span>
+          </div>
+          <div class="dia-horario-lista" id="dia-horario-lista"></div>
+        </div>
+        <div class="field"><label>Frecuencia semanal</label>
+          <select id="a-frecuencia">
+            <option value="1">1 vez por semana</option>
+            <option value="2" selected>2 veces por semana</option>
+            <option value="3">3 veces por semana</option>
+          </select>
+        </div>
+        <div class="field"><label>Monto mensual ($)</label><input type="number" id="a-monto" placeholder="0"/></div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Objetivos</label>
+          <p style="font-size:0.75rem;color:var(--suave);margin-bottom:0.4rem">Separados por línea. Cada línea es un objetivo.</p>
+          <textarea id="a-objetivos" placeholder="Mantenerse activo&#10;Reducir dolor de hombros&#10;Hacer la vertical" style="min-height:90px"></textarea>
+        </div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Molestias / Observaciones</label>
+          <p style="font-size:0.75rem;color:var(--suave);margin-bottom:0.4rem">Separadas por línea.</p>
+          <textarea id="a-notas" placeholder="Dolor lumbar crónico&#10;Rodilla derecha sensible" style="min-height:90px"></textarea>
+        </div>
+        <div style="grid-column:1/-1;border-top:1px solid var(--borde);padding-top:1rem;margin-top:0.25rem">
+          <p style="font-size:0.75rem;font-weight:600;color:var(--suave);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.06em">Datos personales</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+            <div class="field"><label>Fecha de nacimiento</label><input type="text" id="a-fechaNac" placeholder="dd/mm/aaaa"/></div>
+            <div class="field"><label>Estatura (cm)</label><input type="number" id="a-estatura" placeholder="175"/></div>
+            <div class="field"><label>Peso inicial (kg)</label><input type="number" id="a-pesoInicial" placeholder="75"/></div>
+            <div class="field"><label>Peso actual (kg)</label><input type="number" id="a-pesoActual" placeholder="72"/></div>
+          </div>
+          <div class="field" style="margin-top:0.75rem"><label>Carpeta Drive (URL)</label><input type="url" id="a-carpetaDrive" placeholder="https://drive.google.com/drive/folders/..."/></div>
+          <div class="field" style="margin-top:0.75rem"><label>Sheet Nutrición (URL)</label><input type="url" id="a-nutriDrive" placeholder="https://docs.google.com/spreadsheets/..."/></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-alumno')">Cancelar</button>
+      <button class="btn btn-primary" id="btn-guardar-alumno" onclick="guardarAlumno()">Guardar alumno</button>
+    </div>
+  </div>
+</div>
+
+<!-- PORTAL PÚBLICO ALUMNO -->
+<div id="portal-alumno" style="display:none"></div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ──
+const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleusercontent.com';
+const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
+const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
+const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar';
+// S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
+// Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
+const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
+
+// CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
+const RANGO = {
+  ALUMNOS_READ:        'Alumnos!A2:S1000',
+  ALUMNOS_WRITE:       'Alumnos!A2:S1000',
+  ALUMNOS_START:       'Alumnos!A2',
+  COBROS_READ:         'Cobros!A2:G1000',
+  COBROS_WRITE:        'Cobros!A2:G1000',
+  COBROS_START:        'Cobros!A2',
+  SEGUIMIENTO_READ:    'Seguimiento!A2:C10000',
+  SEGUIMIENTO_WRITE:   'Seguimiento!A2:C10000',
+  SEGUIMIENTO_START:   'Seguimiento!A2',
+  NUTRICION_READ:      'Nutricion!A2:E1000',
+  NUTRICION_WRITE:     'Nutricion!A2:E1000',
+  NUTRICION_START:     'Nutricion!A2',
+  NUTRI_COBROS_READ:   'NutricionCobros!A2:D1000',
+  NUTRI_COBROS_WRITE:  'NutricionCobros!A2:D1000',
+  NUTRI_COBROS_START:  'NutricionCobros!A2',
+  GASTOS_READ:         'Gastos!A2:D1000',
+  GASTOS_WRITE:        'Gastos!A2:D1000',
+  GASTOS_START:        'Gastos!A2',
+  AHORROS_READ:        'Ahorros!A2:B1000',
+  AHORROS_WRITE:       'Ahorros!A2:B1000',
+  AHORROS_START:       'Ahorros!A2',
+  ASISTENCIAS_READ:    'Asistencias!A2:C1000',
+  ASISTENCIAS_START:   'Asistencias!A2',
+};
+
+const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+function escaparHTML(str){
+  if(!str) return '';
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+// Precio real de una cuota: si el cobro ya tiene monto congelado (se fija al marcar pagado), se usa ese;
+// si no (pendiente, o pago histórico previo al fix de montos congelados), se usa el precio actual del alumno.
+// Usado por getIngresosMes() y renderCobros() para que el número coincida en ambos lados.
+function montoCobro(a,c){
+  return (c && c.monto!==''&&c.monto!=null) ? parseFloat(c.monto) : parseFloat(a.monto||0);
+}
+
+let accessToken = null;
+let alumnos = [];
+let cobros  = {};
+let seguimiento = {};
+let asistencias = [];
+let clientesNutri = [];
+let cobrosNutri = {};
+let gastos = [];
+let ahorros = {};
+let editandoNutriId = null;
+let editandoId = null;
+
+// ── PORTAL PÚBLICO ──
+// B-5: el parámetro 'alumno' de la URL ahora es un token no adivinable
+// (columna portalToken en el Sheet), no el ID real del alumno.
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const alumnoId = params.get('alumno');
+  if(!alumnoId) return;
+  // Inyectar CSS inmediato para bloquear el paint del login antes de DOMContentLoaded
+  const s = document.createElement('style');
+  s.textContent = '#login-screen{display:none!important}#app{display:none!important}#portal-alumno{display:block!important}';
+  document.head.appendChild(s);
+  document.addEventListener('DOMContentLoaded', () => {
+    cargarPortalAlumno(alumnoId);
+  });
+})();
+
+async function cargarPortalAlumno(id){
+  const el = document.getElementById('portal-alumno');
+  el.style.display = 'block';
+  el.innerHTML = '<div class="portal-loading">Cargando tu perfil...</div>';
+  try {
+    const res = await fetch(`${PORTAL_API_URL}?alumno=${encodeURIComponent(id)}`);
+    if(!res.ok) throw new Error('Error al leer datos');
+    const data = await res.json();
+    if(data.error === 'not_found'){ el.innerHTML = '<div class="portal-error">Perfil no encontrado.</div>'; return; }
+    if(data.error) throw new Error(data.error);
+
+    const a = {
+      ...data.alumno,
+      dias: data.alumno.dias ? data.alumno.dias.split('|') : [],
+    };
+
+    const rowsS  = data.seguimiento  || [];
+    const rowsAs = data.asistencias  || [];
+    const rowsFr = data.frases       || [];
+
+    // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
+    // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
+    // está vacía.
+    const fraseDefault = 'Pequeños pasos hoy,<br>una versión más fuerte de vos mañana.';
+    const frase = rowsFr.length
+      ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)])
+      : fraseDefault;
+
+    const entradas = rowsS
+      .map(r => ({ fecha: r[0], texto: r[1] }))
+      .sort((a,b) => {
+        const toDate = s => { const [d,m,y]=s.split('/'); return new Date(`${y}-${m}-${d}`); };
+        return toDate(b.fecha) - toDate(a.fecha);
+      });
+
+    // Racha de clases (se corta si pasa una semana sin asistencia) + recuperaciones
+    // Retrocompatible: filas viejas sin columna 'tipo' cuentan como 'asistencia'
+    const registrosAlumno = rowsAs;
+    const racha = portalCalcularRachaSemanal(registrosAlumno);
+    const recuperaciones = registrosAlumno.filter(r => r[1] === 'recuperacion').length;
+
+    const hpd = portalStringToHorarios(a.horario);
+    const diasStr = a.dias.map(d => hpd[d] ? `${d} ${hpd[d]}` : d).join(' · ') || 'Sin días asignados';
+    const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+    // Próxima sesión
+    const DIAS_SEMANA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    const hoy = new Date();
+    const diaHoyNombre = DIAS_SEMANA[hoy.getDay()];
+    let proximaSesionStr = '';
+    let proximaSesionClase = '';
+    if(a.dias.length > 0){
+      // Buscar el próximo día de entrenamiento (hoy inclusive)
+      for(let offset = 0; offset < 7; offset++){
+        const d = new Date(hoy);
+        d.setDate(hoy.getDate() + offset);
+        const nombre = DIAS_SEMANA[d.getDay()];
+        if(a.dias.includes(nombre)){
+          const hora = hpd[nombre] || '';
+          if(offset === 0){
+            proximaSesionStr = `Hoy entrenás${hora ? ' · ' + hora : ''}`;
+            proximaSesionClase = 'portal-proxima-hoy';
+          } else if(offset === 1){
+            proximaSesionStr = `Mañana · ${nombre}${hora ? ' ' + hora : ''}`;
+            proximaSesionClase = 'portal-proxima-manana';
+          } else {
+            proximaSesionStr = `${nombre}${hora ? ' · ' + hora : ''}`;
+            proximaSesionClase = 'portal-proxima-pronto';
+          }
+          break;
+        }
+      }
+    }
+
+    // Objetivos
+    const objetivosList = a.objetivos ? a.objetivos.split('\n').map(o=>o.trim()).filter(Boolean) : [];
+
+    // Datos personales
+    const edad = portalCalcEdad(a.fechaNac);
+    const imc  = (a.pesoActual && a.estatura) ? (parseFloat(a.pesoActual) / Math.pow(parseFloat(a.estatura)/100, 2)).toFixed(1) : null;
+
+    el.innerHTML = `
+      <div class="portal-wrap">
+        <!-- Header -->
+        <div class="portal-header">
+          <div class="portal-header-brand">
+            <img src="Logo_App.png" alt="Mente Consciente" class="portal-logo-img"/>
+            <span class="portal-logo-txt">Mente Consciente</span>
+          </div>
+          <span class="portal-saludo">Hola de nuevo,</span>
+          <span class="portal-saludo-nombre">${escaparHTML(a.nombre)}</span>
+        </div>
+
+        <!-- Perfil card -->
+        <div class="portal-card portal-hero">
+          <div class="portal-hero-top">
+            <div class="portal-avatar">${escaparHTML(iniciales)}</div>
+            <div class="portal-hero-info">
+              <p class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</p>
+              ${proximaSesionStr ? `<span class="portal-proxima ${escaparHTML(proximaSesionClase)}">📅 ${escaparHTML(proximaSesionStr)}</span>` : ''}
+            </div>
+          </div>
+          <div class="portal-hero-bottom">
+            <p class="portal-dias">${escaparHTML(diasStr)}</p>
+            <div class="portal-hero-racha">
+              <div class="portal-racha-num" id="portal-racha-num">${racha}</div>
+              <div class="portal-racha-label">clase${racha !== 1 ? 's' : ''} seguida${racha !== 1 ? 's' : ''}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Datos personales -->
+        ${(edad||a.estatura||a.pesoInicial||a.pesoActual) ? `
+        <div class="portal-card">
+          <div class="portal-card-title">Datos personales</div>
+          <div class="portal-datos-grid">
+            ${edad ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Edad</span><span class="portal-dato-val">${edad} años</span></div></div>` : ''}
+            ${a.estatura ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Altura</span><span class="portal-dato-val">${escaparHTML(a.estatura)} cm</span></div></div>` : ''}
+            ${a.pesoInicial ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Peso inicial</span><span class="portal-dato-val">${escaparHTML(a.pesoInicial)} kg</span></div></div>` : ''}
+            ${a.pesoActual ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Peso actual</span><span class="portal-dato-val portal-dato-verde">${escaparHTML(a.pesoActual)} kg</span></div></div>` : ''}
+            ${imc ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">IMC</span><span class="portal-dato-val">${imc}</span></div></div>` : ''}
+          </div>
+        </div>` : ''}
+
+        <!-- Materiales -->
+        ${(a.carpetaDrive || a.nutriDrive) ? `
+        <div class="portal-card">
+          <div class="portal-card-title">Tus materiales</div>
+          <div class="portal-btns">
+            ${a.carpetaDrive ? `<button class="portal-btn portal-btn-drive" onclick="window.open('${escaparHTML(a.carpetaDrive)}','_blank','noopener')">📁 Mi plan de entrenamiento</button>` : ''}
+            ${a.nutriDrive ? `<button class="portal-btn portal-btn-nutri" onclick="window.open('${escaparHTML(a.nutriDrive)}','_blank','noopener')">🥗 Mi plan nutricional</button>` : ''}
+          </div>
+        </div>` : ''}
+
+        <!-- Objetivos -->
+        ${objetivosList.length > 0 ? `
+        <div class="portal-card">
+          <div class="portal-card-title">Tus objetivos</div>
+          <ul class="portal-objetivos">
+            ${objetivosList.map(o => `<li class="portal-objetivo">${escaparHTML(o)}</li>`).join('')}
+          </ul>
+        </div>` : ''}
+
+        <!-- Frase motivacional -->
+        <div class="portal-frase-card">
+          <span class="portal-frase-comilla">&ldquo;</span>
+          <p class="portal-frase-texto">${frase}</p>
+        </div>
+
+        <!-- Seguimiento -->
+        <div class="portal-card">
+          <div class="portal-card-title">Seguimiento</div>
+          ${entradas.length === 0
+            ? '<p class="portal-empty">Aún no hay entradas de seguimiento.</p>'
+            : entradas.map(e => `
+              <div class="portal-entrada">
+                <span class="portal-entrada-fecha">${escaparHTML(e.fecha)}</span>
+                <p class="portal-entrada-texto">${escaparHTML(e.texto)}</p>
+              </div>`).join('')
+          }
+        </div>
+
+        <p class="portal-footer">Tu entrenador personal · Mente Consciente</p>
+      </div>
+    `;
+    // Gradiente dinámico racha
+    const rachaEl = document.getElementById('portal-racha-num');
+    if(rachaEl){
+      const t = Math.max(0, Math.min((racha - 1) / 14, 1));
+      const r = Math.round(0x4A + (0xC8 - 0x4A) * t);
+      const g = Math.round(0xB8 + (0xA8 - 0xB8) * t);
+      const b = Math.round(0x70 + (0x7A - 0x70) * t);
+      const end = '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+      rachaEl.style.background = `linear-gradient(135deg, #4AB870, ${end})`;
+      rachaEl.style.webkitBackgroundClip = 'text';
+      rachaEl.style.webkitTextFillColor = 'transparent';
+      rachaEl.style.backgroundClip = 'text';
+    }
+  } catch(e) {
+    el.innerHTML = '<div class="portal-error">No se pudo cargar el perfil. Intentá de nuevo más tarde.</div>';
+    console.error(e);
+  }
+}
+
+function portalStringToHorarios(str){
+  if(!str) return {};
+  const result={};
+  str.split('|').forEach(part=>{
+    const idx=part.indexOf(':');
+    if(idx>0){ result[part.slice(0,idx)]=part.slice(idx+1); }
+  });
+  return result;
+}
+
+// B4: racha real — se corta sola si pasa una semana (7+ días) sin registrar
+// asistencia. Las recuperaciones son neutras: no suman a la racha ni la
+// cortan, simplemente se ignoran para este cálculo. Retrocompatible: filas
+// viejas sin columna 'tipo' cuentan como 'asistencia'.
+function portalCalcularRachaSemanal(registros){
+  const toDate = s => { const [d,m,y]=s.split('/'); return new Date(`${y}-${m}-${d}`); };
+  const fechas = registros
+    .filter(r => !r[1] || r[1] === 'asistencia')
+    .map(r => toDate(r[0]))
+    .sort((a,b) => a - b);
+
+  if(!fechas.length) return 0;
+
+  const MS_SEMANA = 7 * 24 * 60 * 60 * 1000;
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const ultima = fechas[fechas.length - 1];
+
+  // Si pasó más de una semana desde la última clase, la racha está cortada.
+  if(hoy - ultima > MS_SEMANA) return 0;
+
+  // Cuenta hacia atrás mientras no haya un salto de más de una semana entre clases.
+  let racha = 1;
+  for(let i = fechas.length - 1; i > 0; i--){
+    const gap = fechas[i] - fechas[i-1];
+    if(gap > MS_SEMANA) break;
+    racha++;
+  }
+  return racha;
+}
+
+function portalCalcEdad(fechaStr){
+  if(!fechaStr) return null;
+  const parts = fechaStr.split('/');
+  if(parts.length!==3) return null;
+  const nac = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+  if(isNaN(nac)) return null;
+  const hoy = new Date();
+  let edad = hoy.getFullYear() - nac.getFullYear();
+  const m = hoy.getMonth() - nac.getMonth();
+  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) edad--;
+  return edad;
+}
+
+
+let tokenClient = null;
+
+function iniciarSesion(){
+  if(!window._googleListo){
+    toast('Cargando Google... intentá de nuevo en un momento');
+    return;
+  }
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    prompt: '',
+    callback: async (resp) => {
+      if(resp.error) { toast('Error al iniciar sesión'); return; }
+      accessToken = resp.access_token;
+      // Renovar automáticamente 5 min antes de que expire (55 min)
+      setTimeout(renovarToken, 55 * 60 * 1000);
+      if(document.getElementById('login-screen').style.display!=='none'){
+        try {
+          const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {headers:{Authorization:'Bearer '+accessToken}});
+          if(r.ok){
+            const u = await r.json();
+            document.getElementById('user-email').textContent = u.email||'';
+          }
+        } catch(e){}
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('app').style.display='block';
+        await cargarDatos();
+        renderDashboard();
+        initMeses();
+        initNutriMeses();
+        initFinAnios();
+      }
+    }
+  });
+  tokenClient.requestAccessToken({prompt:''});
+}
+
+function renovarToken(){
+  if(!tokenClient) return;
+  tokenClient.requestAccessToken({prompt:''});
+}
+
+async function fetchConRenovacion(url, opciones={}){
+  let r = await fetch(url, opciones);
+  if(r.status===401){
+    // Token expiró, renovar y reintentar
+    await new Promise(resolve=>{
+      const clientTemp = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        prompt: '',
+        callback: async(resp)=>{
+          if(!resp.error){ accessToken=resp.access_token; }
+          resolve();
+        }
+      });
+      clientTemp.requestAccessToken({prompt:''});
+    });
+    // Actualizar header con nuevo token
+    if(opciones.headers) opciones.headers['Authorization']='Bearer '+accessToken;
+    r = await fetch(url, opciones);
+  }
+  return r;
+}
+
+function cerrarSesion(){
+  if(accessToken) google.accounts.oauth2.revoke(accessToken);
+  accessToken=null;alumnos=[];cobros={};seguimiento={};
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+// ── SHEETS API ──
+function encodeRange(range){
+  const parts=range.split('!');
+  if(parts.length===2) return encodeURIComponent(parts[0])+'!'+parts[1];
+  return encodeURIComponent(range);
+}
+async function sheetsGet(range){
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}`;
+  const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!r.ok) throw new Error('Error leyendo Sheets');
+  return (await r.json()).values||[];
+}
+
+async function sheetsUpdate(range, values){
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}?valueInputOption=RAW`;
+  const r=await fetchConRenovacion(url,{
+    method:'PUT',
+    headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values})
+  });
+  if(!r.ok) throw new Error('Error guardando en Sheets');
+  return r;
+}
+
+async function sheetsAppend(range, values){
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
+  const r=await fetchConRenovacion(url,{
+    method:'POST',
+    headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values})
+  });
+  if(!r.ok) throw new Error('Error agregando fila en Sheets');
+  return r;
+}
+
+// B3: reemplaza el patrón clear()+update() (2 llamadas, no atómico) por una sola
+// llamada que sobrescribe todo el rango — filas nuevas + filas vacías de relleno
+// hasta el techo del rango. Si falla, no se pierde nada (la hoja queda como estaba).
+function _colLetrasAIndice(letras){
+  let n=0;
+  for(const ch of letras) n=n*26+(ch.charCodeAt(0)-64);
+  return n;
+}
+async function sheetsReplaceRange(range, values){
+  const m=range.match(/!([A-Z]+)(\d+):([A-Z]+)(\d+)/);
+  if(!m) throw new Error('Rango inválido para sheetsReplaceRange: '+range);
+  const [, colIni, filaIni, colFin, filaFin] = m;
+  const numCols = _colLetrasAIndice(colFin) - _colLetrasAIndice(colIni) + 1;
+  const totalFilas = (+filaFin) - (+filaIni) + 1;
+  if(values.length > totalFilas){
+    throw new Error(`Se superó el alto del rango ${range}: ${values.length} filas a guardar, ${totalFilas} disponibles`);
+  }
+  const filaVacia = ()=>new Array(numCols).fill('');
+  const relleno = values.map(fila=>{
+    const f = fila.slice(0, numCols);
+    while(f.length < numCols) f.push('');
+    return f;
+  });
+  while(relleno.length < totalFilas) relleno.push(filaVacia());
+  return sheetsUpdate(range, relleno);
+}
+
+// ── CARGAR DATOS ──
+async function cargarDatos(){
+  try {
+    toast('Sincronizando...');
+
+    await Promise.all([
+      // Alumnos
+      (async()=>{
+        try{
+          const rowsA = await sheetsGet(RANGO.ALUMNOS_READ);
+          alumnos = rowsA.map(r=>({
+            id:           r[0]||'',
+            nombre:       r[1]||'',
+            horario:      r[2]||'',
+            dias:         r[3]?(r[3].split('|')):[],
+            frecuencia:   r[4]||'2',
+            monto:        r[5]||'0',
+            objetivos:    r[6]||'',
+            notas:        r[7]||'',
+            estado:       r[8]||'activo',
+            telefono:     r[9]||'',
+            fechaNac:     r[10]||'',
+            estatura:     r[11]||'',
+            pesoInicial:  r[12]||'',
+            pesoActual:   r[13]||'',
+            historialFis: r[14]||'',
+            tieneNutri:   r[15]||'no',
+            carpetaDrive: r[16]||'',
+            nutriDrive:   r[17]||'',
+            portalToken:  r[18]||'',
+          })).filter(a=>a.id);
+        }catch(e){console.warn('Error cargando Alumnos:',e);alumnos=[];}
+      })(),
+
+      // Cobros
+      (async()=>{
+        try{
+          const rowsC = await sheetsGet(RANGO.COBROS_READ);
+          cobros={};
+          rowsC.forEach(r=>{
+            if(!r[0]||!r[1]) return;
+            if(!cobros[r[0]]) cobros[r[0]]={};
+            cobros[r[0]][r[1]]={estado:r[2]||'pendiente',fecha:r[3]||'',bono:r[4]||'',fechaBono:r[5]||'',monto:r[6]||''};
+          });
+        }catch(e){console.warn('Error cargando Cobros:',e);cobros={};}
+      })(),
+
+      // Seguimiento
+      (async()=>{
+        try{
+          const rowsS = await sheetsGet(RANGO.SEGUIMIENTO_READ);
+          seguimiento={};
+          rowsS.forEach(r=>{
+            if(!r[0]) return;
+            if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
+            seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||''});
+          });
+        }catch(e){console.warn('Error cargando Seguimiento:',e);seguimiento={};}
+      })(),
+
+      // Nutrición - Clientes
+      (async()=>{
+        try{
+          const rowsNC = await sheetsGet(RANGO.NUTRICION_READ);
+          clientesNutri=rowsNC.map(r=>({
+            id:r[0]||'',nombre:r[1]||'',telefono:r[2]||'',estado:r[3]||'activo',notas:r[4]||''
+          })).filter(c=>c.id);
+        }catch(e){console.warn('Error cargando Nutricion:',e);clientesNutri=[];}
+      })(),
+
+      // Nutrición - Cobros
+      (async()=>{
+        try{
+          const rowsNP = await sheetsGet(RANGO.NUTRI_COBROS_READ);
+          cobrosNutri={};
+          rowsNP.forEach(r=>{
+            if(!r[0]||!r[1]) return;
+            if(!cobrosNutri[r[0]]) cobrosNutri[r[0]]={};
+            cobrosNutri[r[0]][r[1]]={monto:r[2]||'',fecha:r[3]||''};
+          });
+        }catch(e){console.warn('Error cargando NutricionCobros:',e);cobrosNutri={};}
+      })(),
+
+      // Gastos
+      (async()=>{
+        try{
+          const rowsG = await sheetsGet(RANGO.GASTOS_READ);
+          gastos=rowsG.map(r=>({id:r[0]||'',fecha:r[1]||'',desc:r[2]||'',monto:r[3]||'0'})).filter(g=>g.id);
+        }catch(e){console.warn('Error cargando Gastos:',e);gastos=[];}
+      })(),
+
+      // Ahorros
+      (async()=>{
+        try{
+          const rowsA2 = await sheetsGet(RANGO.AHORROS_READ);
+          ahorros={};
+          rowsA2.forEach(r=>{if(r[0]) ahorros[r[0]]=parseFloat(r[1]||0);});
+        }catch(e){console.warn('Error cargando Ahorros:',e);ahorros={};}
+      })(),
+
+      // Asistencias (B1: necesario para chequear duplicados del mismo día)
+      (async()=>{
+        try{
+          asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
+        }catch(e){console.warn('Error cargando Asistencias:',e);asistencias=[];}
+      })(),
+    ]);
+
+    toast('Datos sincronizados ✓');
+    renderTablaAlumnos();
+    renderDashboard();
+    if(document.getElementById('page-cobros').classList.contains('active')) renderCobros();
+    if(document.getElementById('page-agenda').classList.contains('active')) renderAgenda();
+    if(document.getElementById('page-nutricion').classList.contains('active')) renderNutri();
+    if(document.getElementById('page-finanzas').classList.contains('active')) renderFinanzas();
+  } catch(e){
+    toast('Error al sincronizar');
+    console.error(e);
+  }
+}
+
+// ── GUARDAR ALUMNO EN SHEETS ──
+function _alumnoAFila(a){
+  return [
+    a.id,a.nombre,a.horario,a.dias.join('|'),a.frecuencia,a.monto,
+    a.objetivos,a.notas,a.estado,a.telefono||'',
+    a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
+    a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||'',
+    a.portalToken||''
+  ];
+}
+
+async function guardarEnSheets(){
+  const values=alumnos.map(_alumnoAFila);
+  await sheetsReplaceRange(RANGO.ALUMNOS_WRITE, values);
+}
+
+// P1: escribe solo la fila de UN alumno, en vez de reescribir las ~999 filas
+// del rango completo. Válido para altas al final (usar sheetsAppend) y para
+// ediciones de un alumno que ya existe en el Sheet (esta función). El índice
+// en el array local `alumnos` siempre coincide con la fila real porque nunca
+// se reordena el array y las bajas usan guardarEnSheets (reescritura completa).
+async function guardarFilaAlumno(alumno){
+  const i = alumnos.findIndex(x=>x.id===alumno.id);
+  if(i===-1) throw new Error('Alumno no encontrado en el array local');
+  const fila = i + 2; // fila 1 = encabezados, los datos arrancan en fila 2
+  await sheetsUpdate(`Alumnos!A${fila}:S${fila}`, [_alumnoAFila(alumno)]);
+}
+
+async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
+  if(!seguimiento[alumnoId]) seguimiento[alumnoId]=[];
+  const fecha=fechaISO
+    ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR')
+    : new Date().toLocaleDateString('es-AR');
+  const entrada={fecha, texto};
+  seguimiento[alumnoId].unshift(entrada);
+  seguimiento[alumnoId].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
+  await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto]]);
+}
+
+async function guardarCobrosEnSheets(){
+  const values=[];
+  Object.entries(cobros).forEach(([mk,mes])=>{
+    Object.entries(mes).forEach(([aid,c])=>{
+      values.push([mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'',c.monto||'']);
+    });
+  });
+  await sheetsReplaceRange(RANGO.COBROS_WRITE, values);
+}
+
+// ── NAVEGACIÓN ──
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('aside nav a').forEach(a=>a.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='dashboard') renderDashboard();
+  if(id==='agenda')    renderAgenda();
+  if(id==='alumnos')   renderTablaAlumnos();
+  if(id==='cobros')    renderCobros();
+  if(id==='nutricion') renderNutri();
+  if(id==='finanzas')  renderFinanzas();
+}function syncBottomNav(id){
+  document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active'));
+  const el=document.getElementById('bn-'+id);
+  if(el) el.classList.add('active');
+}
+
+// Sincroniza la barra inferior cuando se navega al perfil desde cualquier sección
+function _syncBottomNavFromPerfil(){
+  // El perfil no tiene su propio ítem en la barra; dejamos activo el de Alumnos
+  syncBottomNav('alumnos');
+}
+
+// ── FECHA ──
+function fechaHoy(){
+  return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function diaHoy(){
+  return ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
+}
+function mesKey(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+// ── DASHBOARD ──
+function renderDashboard(){
+  document.getElementById('fecha-hoy').textContent=fechaHoy();
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  document.getElementById('stat-alumnos').textContent=activos.length;
+  let sesiones=0; activos.forEach(a=>sesiones+=a.dias.length);
+  document.getElementById('stat-sesiones').textContent=sesiones;
+  const mk=mesKey(); const cm=cobros[mk]||{};
+  let totalCuotas=0, totalEsperado=0;
+  activos.forEach(a=>{
+    const c=cm[a.id];
+    totalEsperado+=parseFloat(a.monto||0);
+    if(c&&c.estado==='pagado') totalCuotas+=montoCobro(a,c);
+  });
+  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  document.getElementById('fin-total').innerHTML=`$${totalCuotas.toLocaleString('es-AR')} <span>/ $${totalEsperado.toLocaleString('es-AR')}</span>`;
+  document.getElementById('fin-pct').textContent=pct+'%';
+  document.getElementById('fin-barra-fill').style.width=pct+'%';
+
+  // Alerta cobros pendientes — colapsada dentro de fin-card
+  const alertaEl=document.getElementById('fin-alerta');
+  const chipsEl=document.getElementById('fin-chips');
+  const alumnosPendientes=activos.filter(a=>{
+    const c=cm[a.id];
+    return !c||c.estado!=='pagado';
+  });
+  if(alumnosPendientes.length===0){
+    alertaEl.style.display='none';
+    chipsEl.style.display='none';
+  } else {
+    alertaEl.style.display='flex';
+    document.getElementById('fin-alerta-count').textContent=`${alumnosPendientes.length} alumno${alumnosPendientes.length>1?'s':''} sin cobrar este mes`;
+    chipsEl.innerHTML=alumnosPendientes.map(a=>`<span class="fin-chip" onclick="verAlumno('${a.id}')">${escaparHTML(a.nombre)}</span>`).join('');
+  }
+  const dia=diaHoy();
+  const hoy=activos.filter(a=>a.dias.includes(dia));
+  const el=document.getElementById('hoy-lista');
+  el.innerHTML=hoy.length===0
+    ?'<p style="color:var(--suave)">Sin turnos hoy.</p>'
+    :hoy.map(a=>{
+      const hpd=stringToHorariosPorDia(a.horario);
+      const hora=hpd[dia]||'';
+      // PERF-04: reusar mk ya calculado arriba, sin llamar mesKey() de nuevo
+      const cobrado=(cobros[mk]||{})[a.id];
+      const estadoCobro=cobrado&&cobrado.estado==='pagado'
+        ?'<span class="badge badge-verde">Pagado</span>'
+        :'<span class="badge badge-amarillo">Pendiente</span>';
+      return `<div onclick="verAlumno('${a.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--borde);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--crema)'" onmouseout="this.style.background=''">
+        <div style="display:flex;align-items:center;gap:1rem">
+          <div style="width:36px;height:36px;border-radius:50%;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--verde);font-size:0.9rem;flex-shrink:0">${a.nombre.charAt(0).toUpperCase()}</div>
+          <div>
+            <p style="font-weight:600;font-size:0.92rem">${escaparHTML(a.nombre)}</p>
+            <p style="color:var(--suave);font-size:0.78rem;margin-top:0.1rem">${hora||'Sin horario'}</p>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.75rem">
+          ${estadoCobro}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--suave)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+// ── ALUMNOS ──
+function badgeEstado(e){
+  if(e==='activo') return '<span class="badge badge-verde">Activo</span>';
+  if(e==='pausado') return '<span class="badge badge-amarillo">Pausado</span>';
+  return '<span class="badge badge-rojo">Inactivo</span>';
+}
+function renderTablaAlumnos(){
+  const tbody=document.getElementById('tabla-alumnos');
+  const cards=document.getElementById('alumnos-cards');
+  const filtroEl=document.getElementById('filtro-alumnos');
+  const filtro=filtroEl?filtroEl.value.toLowerCase().trim():'';
+  const lista=filtro
+    ?alumnos.filter(a=>a.nombre.toLowerCase().includes(filtro))
+    :alumnos;
+  if(!lista.length){
+    const msg=filtro?`Sin resultados para "${filtro}"`:'No hay alumnos. Agregá el primero.';
+    tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--suave);padding:2rem">${msg}</td></tr>`;
+    cards.innerHTML=`<p style="text-align:center;color:var(--suave);padding:2rem">${msg}</p>`;
+    return;
+  }
+  tbody.innerHTML=lista.map(a=>`<tr>
+    <td style="font-weight:500">${escaparHTML(a.nombre)}</td>
+    <td style="font-size:0.8rem">${a.dias.join(', ')}</td>
+    <td>${a.frecuencia}x/sem</td>
+    <td style="font-weight:600;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</td>
+    <td>${badgeEstado(a.estado)}</td>
+    <td><button class="btn btn-secondary btn-sm" onclick="verAlumno('${a.id}')">Ver</button></td>
+  </tr>`).join('');
+  cards.innerHTML=lista.map(a=>`
+    <div class="alumno-card" onclick="verAlumno('${a.id}')">
+      <div class="alumno-card-top">
+        <div class="alumno-card-avatar">${a.nombre.charAt(0).toUpperCase()}</div>
+        <div class="alumno-card-info">
+          <div class="alumno-card-nombre">${escaparHTML(a.nombre)}</div>
+          <div class="alumno-card-dias">${a.dias.join(', ')}</div>
+        </div>
+        ${badgeEstado(a.estado)}
+      </div>
+      <div class="alumno-card-bottom">
+        <span>${a.frecuencia}x por semana</span>
+        <span style="font-weight:700;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function abrirModalAlumno(id=null){
+  editandoId=id;
+  document.getElementById('modal-titulo').textContent=id?'Editar alumno':'Nuevo alumno';
+  ['a-nombre','a-telefono','a-monto','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('a-frecuencia').value='2';
+  document.getElementById('a-estado').value='activo';
+  document.querySelectorAll('.dia-check-label').forEach(l=>l.classList.remove('checked'));
+  document.getElementById('dia-horario-lista').innerHTML='';
+  if(id){
+    const a=alumnos.find(x=>x.id===id);
+    if(!a) return;
+    document.getElementById('a-nombre').value=a.nombre;
+    document.getElementById('a-telefono').value=a.telefono||'';
+    document.getElementById('a-monto').value=a.monto||'';
+    document.getElementById('a-frecuencia').value=a.frecuencia||'2';
+    document.getElementById('a-objetivos').value=a.objetivos||'';
+    document.getElementById('a-notas').value=a.notas||'';
+    document.getElementById('a-estado').value=a.estado||'activo';
+    document.getElementById('a-fechaNac').value=a.fechaNac||'';
+    document.getElementById('a-estatura').value=a.estatura||'';
+    document.getElementById('a-pesoInicial').value=a.pesoInicial||'';
+    document.getElementById('a-pesoActual').value=a.pesoActual||'';
+    document.getElementById('a-carpetaDrive').value=a.carpetaDrive||'';
+    document.getElementById('a-nutriDrive').value=a.nutriDrive||'';
+    const hpd=stringToHorariosPorDia(a.horario);
+    document.querySelectorAll('.dia-check-label').forEach(l=>{
+      if(a.dias.includes(l.dataset.dia)) l.classList.add('checked');
+    });
+    renderDiaHorarios(hpd);
+  }
+  document.getElementById('modal-alumno').classList.add('open');
+  // Live age calculation
+  const fnInput=document.getElementById('a-fechaNac');
+  if(fnInput){
+    fnInput.oninput=()=>{
+      const edad=calcularEdad(fnInput.value);
+      let hint=document.getElementById('a-fechaNac-hint');
+      if(!hint){hint=document.createElement('p');hint.id='a-fechaNac-hint';hint.style.cssText='font-size:0.72rem;color:var(--verde-s);margin-top:0.2rem';fnInput.parentNode.appendChild(hint);}
+      hint.textContent=edad!==null?edad+' años':'';
+    };
+  }
+}
+
+async function guardarAlumno(){
+  const nombre=document.getElementById('a-nombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio');return;}
+  const dias=[...document.querySelectorAll('.dia-check-label.checked')].map(l=>l.dataset.dia);
+  const hpd=getDiaHorarios();
+  const alumno={
+    id: editandoId||crypto.randomUUID(),
+    nombre,
+    horario: horariosPorDiaToString(hpd),
+    dias,
+    frecuencia: document.getElementById('a-frecuencia').value,
+    monto: document.getElementById('a-monto').value,
+    objetivos: document.getElementById('a-objetivos').value.trim(),
+    notas: document.getElementById('a-notas').value.trim(),
+    estado: document.getElementById('a-estado').value,
+    telefono: document.getElementById('a-telefono').value.trim(),
+    fechaNac: document.getElementById('a-fechaNac').value.trim(),
+    estatura: document.getElementById('a-estatura').value.trim(),
+    pesoInicial: document.getElementById('a-pesoInicial').value.trim(),
+    pesoActual: document.getElementById('a-pesoActual').value.trim(),
+    historialFis: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).historialFis||'':'',
+    tieneNutri: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).tieneNutri||'no':'no',
+    carpetaDrive: document.getElementById('a-carpetaDrive').value.trim(),
+    nutriDrive:   document.getElementById('a-nutriDrive').value.trim(),
+  };
+  const btn=document.getElementById('btn-guardar-alumno');
+  btn.innerHTML='<span class="loading"></span>Guardando...';
+  btn.disabled=true;
+  try {
+    if(editandoId){
+      const i=alumnos.findIndex(x=>x.id===editandoId);
+      alumnos[i]=alumno;
+      await guardarFilaAlumno(alumno);
+    } else {
+      alumnos.push(alumno);
+      await sheetsAppend(RANGO.ALUMNOS_START, [_alumnoAFila(alumno)]);
+    }
+    await sincronizarAlumnoCalendar(alumno);
+    toast('Alumno guardado y sincronizado ✓');
+    cerrarModal('modal-alumno');
+    renderTablaAlumnos();renderDashboard();
+    // B7: si el perfil de este alumno está abierto en pantalla, refrescarlo
+    // para que la card de stats (edad/peso/IMC/nutrición) muestre los datos
+    // recién guardados sin tener que salir y volver a entrar.
+    const perfilAbierto = document.getElementById('page-perfil');
+    if(perfilAbierto && perfilAbierto.classList.contains('active') && perfilAbierto.dataset.alumnoId === alumno.id){
+      verAlumno(alumno.id);
+    }
+  } catch(e){ toast('Error al guardar'); }
+  btn.innerHTML='Guardar alumno';btn.disabled=false;
+}
+
+function pdBadge(estado){
+  if(estado==='activo') return `<span class="pd-badge-activo">Activo</span>`;
+  if(estado==='pausado') return `<span class="pd-badge-pausado">Pausado</span>`;
+  return `<span class="pd-badge-inactivo">Inactivo</span>`;
+}
+
+// B-5: genera un token no adivinable la primera vez que se pide el link
+// (si el alumno ya tiene uno, lo reusa) y copia la URL del portal al
+// portapapeles. El link usa el token, nunca el ID real del alumno.
+async function copiarLinkPortal(){
+  const id = document.getElementById('page-perfil').dataset.alumnoId;
+  const i = alumnos.findIndex(x=>x.id===id);
+  if(i===-1) return;
+  try{
+    if(!alumnos[i].portalToken){
+      alumnos[i].portalToken = crypto.randomUUID();
+      await guardarFilaAlumno(alumnos[i]);
+    }
+    const url = `${window.location.origin}${window.location.pathname}?alumno=${alumnos[i].portalToken}`;
+    await navigator.clipboard.writeText(url);
+    toast('Link copiado ✓');
+  }catch(e){
+    toast('Error al generar el link');
+  }
+}
+
+function verAlumno(id){
+  const a=alumnos.find(x=>x.id===id); if(!a) return;
+  document.getElementById('page-perfil').dataset.alumnoId = id;
+  const hpd=stringToHorariosPorDia(a.horario);
+  const iniciales=a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+
+  // Avatar
+  document.getElementById('perfil-avatar').textContent=iniciales;
+
+  // Header
+  document.getElementById('perfil-nombre').textContent=a.nombre;
+  document.getElementById('perfil-badge').innerHTML=pdBadge(a.estado);
+  const diasStr=a.dias.map(d=>hpd[d]?`${escaparHTML(d)} ${escaparHTML(hpd[d])}`:escaparHTML(d)).join(' · ');
+  document.getElementById('perfil-dias').textContent=diasStr||'Sin días asignados';
+  // Badge de cobro del mes — visible solo en mobile (CSS lo muestra)
+  const _mkBadge=mesKey();
+  const _cBadge=(cobros[_mkBadge]||{})[id];
+  const _estadoBadge=_cBadge&&_cBadge.estado==='pagado'?'pagado':'pendiente';
+  let _badgeEl=document.getElementById('perfil-cobro-mes-badge');
+  if(!_badgeEl){
+    _badgeEl=document.createElement('span');
+    _badgeEl.id='perfil-cobro-mes-badge';
+    document.getElementById('perfil-dias').after(_badgeEl);
+  }
+  _badgeEl.className=`pd-cobro-mes-badge ${_estadoBadge}`;
+  _badgeEl.textContent=_estadoBadge==='pagado'?'✓ Cuota al día':'Cuota pendiente';
+
+  // Gestión inline
+  document.getElementById('perfil-gestion').innerHTML=`
+    <div class="pd-gestion-item"><p>Frecuencia</p><p>${escaparHTML(a.frecuencia)}x por semana</p></div>
+    <div class="pd-gestion-item"><p>Monto</p><p style="color:var(--pd-crema)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</p></div>
+    ${a.telefono?`<div class="pd-gestion-item"><p>Teléfono</p><p>${escaparHTML(a.telefono)}</p></div>`:''}
+  `;
+
+  // WhatsApp btn
+  const waBtn=document.getElementById('perfil-btn-whatsapp');
+  if(a.telefono){
+    waBtn.style.display='block';
+    waBtn.onclick=()=>window.open(`https://wa.me/54${a.telefono.replace(/\D/g,'')}`, '_blank');
+  } else {
+    waBtn.style.display='none';
+  }
+
+  // Drive btn
+  const driveBtn=document.getElementById('perfil-btn-drive');
+  if(a.carpetaDrive){
+    driveBtn.style.display='inline-flex';
+    driveBtn.onclick=()=>window.open(a.carpetaDrive.trim(),'_blank','noopener');
+  } else {
+    driveBtn.style.display='none';
+  }
+
+  // Botones
+  document.getElementById('perfil-btn-editar').onclick=()=>abrirModalAlumno(id);
+  document.getElementById('perfil-btn-eliminar').onclick=async()=>{
+    if(confirm('¿Eliminar a '+a.nombre+'?')){
+      try{
+        await eliminarEventosAlumno(id);
+        alumnos=alumnos.filter(x=>x.id!==id);
+        await guardarEnSheets();
+        toast('Alumno eliminado');
+        showPage('alumnos',null);
+        renderTablaAlumnos();renderDashboard();
+      }catch(e){
+        toast('Error al eliminar el alumno');
+      }
+    }
+  };
+  const fechaHoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  const asistenciaBtn=document.getElementById('perfil-btn-asistencia');
+  // Retrocompatible: filas sin columna 'tipo' cuentan como 'asistencia'
+  const yaAsistenciaHoy = asistencias.some(r=>r[0]===id && r[1]===fechaHoy && (!r[2]||r[2]==='asistencia'));
+  asistenciaBtn.disabled = yaAsistenciaHoy;
+  asistenciaBtn.textContent = yaAsistenciaHoy ? '💪 Ya registrado hoy' : '💪 Asistencia';
+  asistenciaBtn.onclick=()=>registrarAsistencia(id, asistenciaBtn, 'asistencia');
+
+  const recuperacionBtn=document.getElementById('perfil-btn-recuperacion');
+  const yaRecuperacionHoy = asistencias.some(r=>r[0]===id && r[1]===fechaHoy && r[2]==='recuperacion');
+  recuperacionBtn.disabled = yaRecuperacionHoy;
+  recuperacionBtn.textContent = yaRecuperacionHoy ? '🧘 Ya registrado hoy' : '🧘 Recuperación';
+  recuperacionBtn.onclick=()=>registrarAsistencia(id, recuperacionBtn, 'recuperacion');
+
+  // Stats row
+  const edad=calcularEdad(a.fechaNac);
+  const imc=calcularIMC(a.pesoActual||a.pesoInicial, a.estatura);
+  const imcCat=imc_categoria(imc);
+  const pesoDiff=a.pesoInicial&&a.pesoActual?(parseFloat(a.pesoActual)-parseFloat(a.pesoInicial)):null;
+  document.getElementById('perfil-stats-row').innerHTML=`
+    <div class="pd-stat">
+      <div class="pd-stat-label">Edad</div>
+      <div class="pd-stat-val"> ${edad!==null?edad:'—'}</div>
+      <div class="pd-stat-sub">años</div>
+    </div>
+    <div class="pd-stat">
+      <div class="pd-stat-label">Altura</div>
+      <div class="pd-stat-val">${a.estatura||'—'}</div>
+      <div class="pd-stat-sub">cm</div>
+    </div>
+    <div class="pd-stat">
+      <div class="pd-stat-label">Peso inicial</div>
+      <div class="pd-stat-val">${a.pesoInicial||'—'}</div>
+      <div class="pd-stat-sub">kg</div>
+    </div>
+    <div class="pd-stat">
+      <div class="pd-stat-label">Peso actual</div>
+      <div class="pd-stat-val verde">${a.pesoActual||'—'}</div>
+      <div class="pd-stat-sub">${pesoDiff!==null?(pesoDiff<=0?'':'+')+pesoDiff+' kg':'kg'}</div>
+    </div>
+    <div class="pd-stat">
+      <div class="pd-stat-label">IMC</div>
+      <div class="pd-stat-val ${imc?(parseFloat(imc)<25?'verde':'amber'):''}"> ${imc||'—'}</div>
+      <div class="pd-stat-sub">${imcCat||'sin datos'}</div>
+    </div>
+    ${a.tieneNutri==='si'
+      ? `<div class="pd-stat${a.nutriDrive?' pd-stat-nutri-link':''}" ${a.nutriDrive?`onclick="window.open('${escaparHTML(a.nutriDrive.trim())}','_blank','noopener')"`:''}>
+           <div class="pd-stat-label">Nutrición</div>
+           <div class="pd-stat-val verde">Activo</div>
+           <div class="pd-stat-sub">${a.nutriDrive?'Ver sheet →':'sin link'}</div>
+         </div>`
+      : `<div class="pd-stat">
+           <div class="pd-stat-label">Nutrición</div>
+           <div class="pd-stat-val" style="font-size:0.85rem;color:var(--pd-text3)">Sin seguimiento</div>
+           <div class="pd-stat-sub"> </div>
+         </div>`
+    }
+  `;
+
+  // Seguimiento
+  document.getElementById('perfil-nueva-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('perfil-nueva-entrada').value='';
+  renderHistorial(id);
+  document.getElementById('perfil-btn-guardar-entrada').onclick=()=>agregarEntradaPerfil(id);
+
+  // Cobros
+  renderCobrosAlumno(id);
+
+  // Objetivos
+  renderObjetivos(id);
+  document.getElementById('perfil-btn-agregar-objetivo').onclick=()=>agregarObjetivo(id);
+  document.getElementById('perfil-nuevo-objetivo').onkeydown=(e)=>{if(e.key==='Enter') agregarObjetivo(id);};
+
+  // Molestias
+  renderMolestias(id);
+  document.getElementById('perfil-btn-agregar-molestia').onclick=()=>agregarMolestia(id);
+  document.getElementById('perfil-nueva-molestia').onkeydown=(e)=>{if(e.key==='Enter') agregarMolestia(id);};
+
+  // Historial físico
+  document.getElementById('perfil-historial-fis').innerHTML=`
+    <textarea id="perfil-historial-fis-txt" class="pd-textarea" style="min-height:80px">${a.historialFis||''}</textarea>
+    <button class="pd-btn pd-btn-primary" style="margin-top:0.5rem;font-size:0.75rem" onclick="guardarCampoAlumno('${id}','historialFis','perfil-historial-fis-txt')">Guardar</button>
+  `;
+
+  // Nutrición
+  renderNutriPerfil(id);
+
+  showPage('perfil',null);
+}
+
+async function registrarAsistencia(id, btn, tipo){
+  const textoOriginal = tipo === 'recuperacion' ? '🧘 Recuperación' : '💪 Asistencia';
+  btn.disabled=true;
+  btn.textContent='Registrando...';
+  try{
+    const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    await sheetsAppend(RANGO.ASISTENCIAS_START,[[id, fecha, tipo]]);
+    asistencias.push([id, fecha, tipo]);
+    toast(tipo === 'recuperacion' ? 'Recuperación registrada 🧘' : 'Asistencia registrada 💪');
+    btn.textContent = tipo === 'recuperacion' ? '🧘 Ya registrado hoy' : '💪 Ya registrado hoy';
+  }catch(e){
+    toast('Error al registrar');
+    btn.disabled=false;
+    btn.textContent=textoOriginal;
+  }
+}
+
+async function guardarCampoAlumno(id, campo, inputId){
+  const valor=document.getElementById(inputId).value.trim();
+  const i=alumnos.findIndex(x=>x.id===id);
+  if(i===-1) return;
+  alumnos[i][campo]=valor;
+  try{
+    await guardarFilaAlumno(alumnos[i]);
+    toast('Guardado ✓');
+  }catch(e){toast('Error al guardar');}
+}
+
+function renderHistorial(id){
+  const lista=document.getElementById('perfil-historial');
+  const entradas=seguimiento[id]||[];
+  document.getElementById('perfil-contador-sesiones').textContent=entradas.length?`${entradas.length} entrada${entradas.length!==1?'s':''}`:'' ;
+  if(entradas.length===0){
+    lista.innerHTML='<p style="color:var(--pd-text2);font-size:0.82rem">Sin entradas todavía. Anotá lo de hoy.</p>';
+    return;
+  }
+  lista.innerHTML=entradas.map((e,idx)=>`
+    <div class="pd-entrada" id="entrada-${id}-${idx}">
+      <div class="pd-entrada-top">
+        <span class="pd-entrada-fecha">${escaparHTML(e.fecha)}</span>
+        <div class="pd-entrada-acciones">
+          <button class="pd-entrada-accion" onclick="editarEntrada('${id}',${idx})">Editar</button>
+          <button class="pd-entrada-accion danger" onclick="eliminarEntrada('${id}',${idx})">×</button>
+        </div>
+      </div>
+      <p class="pd-entrada-texto">${escaparHTML(e.texto)}</p>
+    </div>
+  `).join('');
+}
+
+function editarEntrada(id, idx){
+  const e=seguimiento[id][idx];
+  const contenedor=document.getElementById(`entrada-${id}-${idx}`);
+  const partes=e.fecha.split('/');
+  const fechaISO=partes.length===3?`${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`:'';
+  contenedor.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:0.5rem">
+      <input type="date" id="edit-fecha-${idx}" value="${fechaISO}" class="pd-input"/>
+      <textarea id="edit-texto-${idx}" class="pd-textarea" style="min-height:70px">${escaparHTML(e.texto)}</textarea>
+      <div style="display:flex;gap:0.5rem">
+        <button class="pd-btn pd-btn-primary" onclick="guardarEdicionEntrada('${id}',${idx})">Guardar</button>
+        <button class="pd-btn pd-btn-secondary" onclick="renderHistorial('${id}')">Cancelar</button>
+      </div>
+    </div>
+  `;
+}
+
+async function guardarEdicionEntrada(id, idx){
+  const fechaInput=document.getElementById(`edit-fecha-${idx}`).value;
+  const texto=document.getElementById(`edit-texto-${idx}`).value.trim();
+  if(!texto){toast('El texto no puede estar vacío');return;}
+  const fecha=fechaInput
+    ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR')
+    :seguimiento[id][idx].fecha;
+  seguimiento[id][idx]={fecha,texto};
+  // Reordenar por fecha
+  seguimiento[id].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
+  try{
+    // Reescribir toda la hoja Seguimiento
+    await guardarSeguimientoCompleto();
+    renderHistorial(id);
+    toast('Entrada actualizada ✓');
+  }catch(e){toast('Error al guardar');}
+}
+
+async function eliminarEntrada(id,idx){
+  if(!confirm('¿Eliminar esta entrada?')) return;
+  seguimiento[id].splice(idx,1);
+  try{
+    await guardarSeguimientoCompleto();
+    renderHistorial(id);
+    toast('Entrada eliminada');
+  }catch(e){toast('Error al eliminar');}
+}
+
+async function guardarSeguimientoCompleto(){
+  const values=[];
+  Object.entries(seguimiento).forEach(([aid,entradas])=>{
+    entradas.forEach(e=>values.push([aid,e.fecha,e.texto]));
+  });
+  await sheetsReplaceRange(RANGO.SEGUIMIENTO_WRITE, values);
+}
+
+async function agregarEntradaPerfil(id){
+  const textarea=document.getElementById('perfil-nueva-entrada');
+  const fechaInput=document.getElementById('perfil-nueva-fecha');
+  const texto=textarea.value.trim();
+  if(!texto){toast('Escribí algo primero');return;}
+  try{
+    await agregarEntradaSeguimiento(id, texto, fechaInput.value);
+    textarea.value='';
+    fechaInput.value=new Date().toISOString().slice(0,10);
+    renderHistorial(id);
+    toast('Entrada guardada ✓');
+  }catch(e){toast('Error al guardar');}
+}
+
+// ── OBJETIVOS ──
+function getObjetivos(id){
+  const a=alumnos.find(x=>x.id===id);
+  if(!a||!a.objetivos) return [];
+  return a.objetivos.split('\n').filter(o=>o.trim());
+}
+function setObjetivos(id, lista){
+  const i=alumnos.findIndex(x=>x.id===id);
+  if(i===-1) return;
+  alumnos[i].objetivos=lista.join('\n');
+}
+function renderObjetivos(id){
+  const lista=getObjetivos(id);
+  const el=document.getElementById('perfil-objetivos');
+  el.innerHTML=lista.length===0
+    ?'<p style="color:var(--pd-text2);font-size:0.82rem">Sin objetivos cargados.</p>'
+    :`<div style="display:flex;flex-direction:column;gap:0.1rem">
+        ${lista.map((o,idx)=>`
+          <div class="pd-item" id="objetivo-${id}-${idx}">
+            <div class="pd-dot"></div>
+            <span style="flex:1">${escaparHTML(o)}</span>
+            <div class="pd-item-acciones">
+              <button class="pd-entrada-accion" onclick="editarObjetivo('${id}',${idx})">Editar</button>
+              <button class="pd-entrada-accion danger" onclick="eliminarObjetivo('${id}',${idx})">×</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+}
+function editarObjetivo(id,idx){
+  const lista=getObjetivos(id);
+  const contenedor=document.getElementById(`objetivo-${id}-${idx}`);
+  contenedor.innerHTML=`
+    <input type="text" id="edit-objetivo-${idx}" value="${escaparHTML(lista[idx])}" class="pd-input" style="flex:1;height:32px"/>
+    <button class="pd-btn pd-btn-primary" style="font-size:0.72rem" onclick="guardarEdicionObjetivo('${id}',${idx})">Guardar</button>
+    <button class="pd-btn pd-btn-secondary" style="font-size:0.72rem" onclick="renderObjetivos('${id}')">×</button>
+  `;
+  document.getElementById(`edit-objetivo-${idx}`).onkeydown=(e)=>{if(e.key==='Enter') guardarEdicionObjetivo(id,idx);};
+}
+async function guardarEdicionObjetivo(id,idx){
+  const valor=document.getElementById(`edit-objetivo-${idx}`).value.trim();
+  if(!valor){toast('No puede estar vacío');return;}
+  const lista=getObjetivos(id);
+  lista[idx]=valor;
+  setObjetivos(id,lista);
+  try{
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
+    renderObjetivos(id);
+    toast('Actualizado ✓');
+  }catch(e){toast('Error al guardar');}
+}
+async function agregarObjetivo(id){
+  const input=document.getElementById('perfil-nuevo-objetivo');
+  const texto=input.value.trim();
+  if(!texto) return;
+  const lista=getObjetivos(id);
+  lista.push(texto);
+  setObjetivos(id,lista);
+  input.value='';
+  try{
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
+    renderObjetivos(id);
+    toast('Objetivo agregado ✓');
+  }catch(e){toast('Error al guardar');}
+}
+async function eliminarObjetivo(id,idx){
+  const lista=getObjetivos(id);
+  lista.splice(idx,1);
+  setObjetivos(id,lista);
+  try{
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
+    renderObjetivos(id);
+    toast('Objetivo eliminado');
+  }catch(e){toast('Error al guardar');}
+}
+
+// ── MOLESTIAS ──
+function getMolestias(id){
+  const a=alumnos.find(x=>x.id===id);
+  if(!a||!a.notas) return [];
+  return a.notas.split('\n').filter(o=>o.trim());
+}
+function setMolestias(id,lista){
+  const i=alumnos.findIndex(x=>x.id===id);
+  if(i===-1) return;
+  alumnos[i].notas=lista.join('\n');
+}
+function renderMolestias(id){
+  const lista=getMolestias(id);
+  const el=document.getElementById('perfil-molestias');
+  el.innerHTML=lista.length===0
+    ?'<p style="color:var(--pd-text2);font-size:0.82rem">Sin molestias registradas.</p>'
+    :`<div style="display:flex;flex-direction:column;gap:0.1rem">
+        ${lista.map((o,idx)=>`
+          <div class="pd-item" id="molestia-${id}-${idx}">
+            <div class="pd-dot marron"></div>
+            <span style="flex:1">${escaparHTML(o)}</span>
+            <div class="pd-item-acciones">
+              <button class="pd-entrada-accion" onclick="editarMolestia('${id}',${idx})">Editar</button>
+              <button class="pd-entrada-accion danger" onclick="eliminarMolestia('${id}',${idx})">×</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+}
+function editarMolestia(id,idx){
+  const lista=getMolestias(id);
+  const contenedor=document.getElementById(`molestia-${id}-${idx}`);
+  contenedor.innerHTML=`
+    <input type="text" id="edit-molestia-${idx}" value="${escaparHTML(lista[idx])}" class="pd-input" style="flex:1;height:32px"/>
+    <button class="pd-btn pd-btn-primary" style="font-size:0.72rem" onclick="guardarEdicionMolestia('${id}',${idx})">Guardar</button>
+    <button class="pd-btn pd-btn-secondary" style="font-size:0.72rem" onclick="renderMolestias('${id}')">×</button>
+  `;
+  document.getElementById(`edit-molestia-${idx}`).onkeydown=(e)=>{if(e.key==='Enter') guardarEdicionMolestia(id,idx);};
+}
+async function guardarEdicionMolestia(id,idx){
+  const valor=document.getElementById(`edit-molestia-${idx}`).value.trim();
+  if(!valor){toast('No puede estar vacío');return;}
+  const lista=getMolestias(id);
+  lista[idx]=valor;
+  setMolestias(id,lista);
+  try{
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
+    renderMolestias(id);
+    toast('Actualizado ✓');
+  }catch(e){toast('Error al guardar');}
+}
+async function agregarMolestia(id){
+  const input=document.getElementById('perfil-nueva-molestia');
+  const texto=input.value.trim();
+  if(!texto) return;
+  const lista=getMolestias(id);
+  lista.push(texto);
+  setMolestias(id,lista);
+  input.value='';
+  try{
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
+    renderMolestias(id);
+    toast('Molestia agregada ✓');
+  }catch(e){toast('Error al guardar');}
+}
+async function eliminarMolestia(id,idx){
+  const lista=getMolestias(id);
+  lista.splice(idx,1);
+  setMolestias(id,lista);
+  try{
+    await guardarFilaAlumno(alumnos.find(x=>x.id===id));
+    renderMolestias(id);
+    toast('Eliminado');
+  }catch(e){toast('Error al guardar');}
+}
+
+async function sincronizarTodosCalendar(){
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  if(!activos.length){toast('No hay alumnos activos');return;}
+  toast('Sincronizando con Calendar...');
+  let ok=0;let err=0;
+  for(const a of activos){
+    try{
+      await sincronizarAlumnoCalendar(a);
+      ok++;
+    }catch(e){err++;console.error('Error con',a.nombre,e);}
+  }
+  toast(`${ok} alumno${ok!==1?'s':''} sincronizado${ok!==1?'s':''} en Calendar${err?` (${err} error${err!==1?'s':''})`:' ✓'}`);
+}
+
+// ── FINANZAS ──
+async function guardarGastosEnSheets(){
+  const values=gastos.map(g=>[g.id,g.fecha,g.desc,g.monto]);
+  await sheetsReplaceRange(RANGO.GASTOS_WRITE, values);
+}
+async function guardarAhorrosEnSheets(){
+  const values=Object.entries(ahorros).map(([mk,v])=>[mk,v]);
+  await sheetsReplaceRange(RANGO.AHORROS_WRITE, values);
+}
+
+function initFinAnios(){
+  const sel=document.getElementById('fin-anio-select');
+  const anioActual=new Date().getFullYear();
+  sel.innerHTML='';
+  for(let y=anioActual;y>=anioActual-2;y--){
+    sel.innerHTML+=`<option value="${y}"${y===anioActual?' selected':''}>${y}</option>`;
+  }
+}
+
+function getIngresosMes(mk){
+  // Cuotas
+  let cuotas=0;
+  const cm=cobros[mk]||{};
+  alumnos.filter(a=>a.estado==='activo').forEach(a=>{
+    const c=cm[a.id];
+    if(c&&c.estado==='pagado') cuotas+=montoCobro(a,c);
+  });
+  // Bonos
+  let bonos=0;
+  Object.values(cm).forEach(c=>{if(c.bono) bonos+=parseFloat(c.bono||0);});
+  // Nutri
+  let nutri=0;
+  const nm=cobrosNutri[mk]||{};
+  Object.values(nm).forEach(p=>{if(p.monto) nutri+=parseFloat(p.monto||0);});
+  return {cuotas,bonos,nutri};
+}
+
+function renderFinanzas(){
+  const anio=parseInt(document.getElementById('fin-anio-select').value);
+  const mk=mesKey();
+
+  // Tabla mensual
+  let totalCuotas=0,totalBonos=0,totalNutri=0,totalGastos=0,totalAhorros=0;
+  const totalesPorMes=[];
+  const filas=MESES.map((mes,idx)=>{
+    const m=String(idx+1).padStart(2,'0');
+    const mkey=`${anio}-${m}`;
+    const {cuotas,bonos,nutri}=getIngresosMes(mkey);
+    const gastosMes=gastos.filter(g=>g.fecha&&g.fecha.startsWith(mkey)).reduce((s,g)=>s+parseFloat(g.monto||0),0);
+    const ahorro=ahorros[mkey]||0;
+    const total=cuotas+bonos+nutri;
+    const neto=total-gastosMes;
+    totalCuotas+=cuotas;totalBonos+=bonos;totalNutri+=nutri;totalGastos+=gastosMes;totalAhorros+=ahorro;
+    const esActual=mkey===mk;
+    totalesPorMes.push({mes,total,neto,esActual});
+    return `<tr class="${esActual?'actual':''}">
+      <td>${mes}</td>
+      <td>${cuotas?'$'+cuotas.toLocaleString('es-AR'):'—'}</td>
+      <td>${bonos?'$'+bonos.toLocaleString('es-AR'):'—'}</td>
+      <td>${nutri?'$'+nutri.toLocaleString('es-AR'):'—'}</td>
+      <td class="cell-verde">${total?'$'+total.toLocaleString('es-AR'):'—'}</td>
+      <td class="cell-rojo">${gastosMes?'$'+gastosMes.toLocaleString('es-AR'):'—'}</td>
+      <td>${neto?'$'+neto.toLocaleString('es-AR'):'—'}</td>
+      <td>
+        <input type="number" id="ahorro-${mkey}" value="${ahorro||''}" placeholder="0" class="ahorro-input"
+          onkeydown="if(event.key==='Enter') actualizarAhorro('${mkey}',this.value)"/>
+      </td>
+    </tr>`;
+  });
+
+  document.getElementById('fin-tabla').innerHTML=filas.join('')+`
+    <tr class="total">
+      <td>Total ${anio}</td>
+      <td>$${totalCuotas.toLocaleString('es-AR')}</td>
+      <td>$${totalBonos.toLocaleString('es-AR')}</td>
+      <td>$${totalNutri.toLocaleString('es-AR')}</td>
+      <td>$${(totalCuotas+totalBonos+totalNutri).toLocaleString('es-AR')}</td>
+      <td>$${totalGastos.toLocaleString('es-AR')}</td>
+      <td>$${(totalCuotas+totalBonos+totalNutri-totalGastos).toLocaleString('es-AR')}</td>
+      <td>$${totalAhorros.toLocaleString('es-AR')}</td>
+    </tr>
+  `;
+
+  // Stats anuales
+  const totalIngresos=totalCuotas+totalBonos+totalNutri;
+  const totalNeto=totalIngresos-totalGastos;
+  document.getElementById('fin-stats').innerHTML=`
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Ingresos ${anio}</div><div class="kpi-val-fin">$${totalIngresos.toLocaleString('es-AR')}</div><div class="kpi-sub">cuotas + bonos + nutri</div></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Gastos ${anio}</div><div class="kpi-val-fin rojo">$${totalGastos.toLocaleString('es-AR')}</div><div class="kpi-sub">entrenamiento</div></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Neto ${anio}</div><div class="kpi-val-fin verde">$${totalNeto.toLocaleString('es-AR')}</div><div class="kpi-sub">ingresos − gastos</div></div>
+    <div class="kpi-card-fin"><div class="kpi-label-fin">Ahorros ${anio}</div><div class="kpi-val-fin verde">$${totalAhorros.toLocaleString('es-AR')}</div><div class="kpi-sub">acumulado del año</div></div>
+  `;
+
+  // Tendencia mensual — deriva de totalesPorMes, ya calculado arriba en el mismo .map()
+  const hoyDate=new Date();
+  const anioActual=hoyDate.getFullYear();
+  const mesActualIdx=hoyDate.getMonth();
+  const mesesAMostrar=(anio===anioActual)?totalesPorMes.slice(0,mesActualIdx+1):totalesPorMes;
+  const maxTotal=Math.max(...mesesAMostrar.map(x=>x.total),1);
+  document.getElementById('fin-tendencia-rango').textContent=(anio===anioActual)
+    ?`${MESES[0]} a ${MESES[mesActualIdx]} ${anio}`
+    :`${MESES[0]} a ${MESES[11]} ${anio}`;
+  document.getElementById('fin-tendencia-bars').innerHTML=mesesAMostrar.map(x=>{
+    const pct=Math.max(4,Math.round((x.total/maxTotal)*100));
+    const clases=['tbar',x.esActual?'actual':'',x.neto<0?'negativo':''].filter(Boolean).join(' ');
+    return `<div class="tbar-col"><div class="${clases}" style="height:${pct}%"></div><span class="tbar-mes">${x.mes.slice(0,3)}</span></div>`;
+  }).join('');
+
+  // Lista gastos del año
+  const gastosAnio=gastos.filter(g=>g.fecha&&g.fecha.startsWith(String(anio))).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const listaGastos=document.getElementById('fin-gastos-lista');
+  if(!gastosAnio.length){
+    listaGastos.innerHTML='<p style="color:var(--suave);font-size:0.85rem;padding:1rem 1.25rem">Sin gastos registrados.</p>';
+  } else {
+    listaGastos.innerHTML=gastosAnio.map(g=>`
+      <div class="gasto-row">
+        <div><div class="gasto-desc">${escaparHTML(g.desc)}</div><div class="gasto-fecha">${g.fecha}</div></div>
+        <div style="display:flex;align-items:center;gap:0.7rem"><span class="gasto-monto">$${parseFloat(g.monto).toLocaleString('es-AR')}</span><button class="btn btn-danger btn-sm" onclick="eliminarGasto('${g.id}')">×</button></div>
+      </div>
+    `).join('');
+  }
+
+  // Lista ahorros del año
+  const listaAhorros=document.getElementById('fin-ahorros-lista');
+  const ahorrosMeses=MESES.map((mes,idx)=>{
+    const m=String(idx+1).padStart(2,'0');
+    const mkey=`${anio}-${m}`;
+    const v=ahorros[mkey]||0;
+    return {mes,mkey,v};
+  }).filter(x=>x.v>0);
+  if(!ahorrosMeses.length){
+    listaAhorros.innerHTML='<p style="color:var(--suave);font-size:0.85rem;padding:1rem 1.25rem">Sin ahorros registrados. Completá la columna Ahorro en la tabla.</p>';
+  } else {
+    listaAhorros.innerHTML=ahorrosMeses.map(({mes,v})=>`
+      <div class="ahorro-row"><span class="ahorro-mes">${mes} ${anio}</span><span class="ahorro-monto">$${v.toLocaleString('es-AR')}</span></div>
+    `).join('');
+  }
+}
+
+async function actualizarAhorro(mk, valor){
+  const v=parseFloat(valor)||0;
+  ahorros[mk]=v;
+  try{
+    await guardarAhorrosEnSheets();
+    toast('Ahorro guardado ✓');
+    // Solo actualizar stats y lista de ahorros, no la tabla completa
+    renderFinanzas();
+  }catch(e){toast('Error al guardar');}
+}
+
+function abrirModalGasto(){
+  document.getElementById('g-fecha').value=new Date().toISOString().slice(0,7)+'-01';
+  document.getElementById('g-monto').value='';
+  document.getElementById('g-desc').value='';
+  document.getElementById('modal-gasto').classList.add('open');
+}
+
+async function guardarGasto(){
+  const fecha=document.getElementById('g-fecha').value;
+  const monto=document.getElementById('g-monto').value;
+  const desc=document.getElementById('g-desc').value.trim();
+  if(!monto||!desc){toast('Completá todos los campos');return;}
+  gastos.push({id:crypto.randomUUID(),fecha:fecha.slice(0,7),desc,monto});
+  try{
+    await guardarGastosEnSheets();
+    toast('Gasto registrado ✓');
+    cerrarModal('modal-gasto');
+    renderFinanzas();
+  }catch(e){toast('Error al guardar');}
+}
+
+async function eliminarGasto(id){
+  if(!confirm('¿Eliminar este gasto?')) return;
+  gastos=gastos.filter(g=>g.id!==id);
+  try{await guardarGastosEnSheets();renderFinanzas();toast('Gasto eliminado');}
+  catch(e){toast('Error al eliminar');}
+}
+
+// ── NUTRICIÓN SHEETS ──
+async function guardarClientesNutriEnSheets(){
+  const values=clientesNutri.map(c=>[c.id,c.nombre,c.telefono||'',c.estado,c.notas||'']);
+  await sheetsReplaceRange(RANGO.NUTRICION_WRITE, values);
+}
+async function guardarCobrosNutriEnSheets(){
+  const values=[];
+  Object.entries(cobrosNutri).forEach(([mk,mes])=>{
+    Object.entries(mes).forEach(([cid,p])=>{
+      values.push([mk,cid,p.monto||'',p.fecha||'']);
+    });
+  });
+  await sheetsReplaceRange(RANGO.NUTRI_COBROS_WRITE, values);
+}
+
+// ── NUTRICIÓN RENDER ──
+function initNutriMeses(){
+  const sel=document.getElementById('nutri-mes-select');
+  const d=new Date(); sel.innerHTML='';
+  for(let i=0;i<6;i++){
+    const m=new Date(d.getFullYear(),d.getMonth()-i,1);
+    const key=`${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,'0')}`;
+    sel.innerHTML+=`<option value="${key}"${i===0?' selected':''}>${MESES[m.getMonth()]} ${m.getFullYear()}</option>`;
+  }
+}
+
+function renderNutri(){
+  const mk=document.getElementById('nutri-mes-select').value;
+  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
+
+  // Combinar clientes nutri dedicados + alumnos con tieneNutri=si
+  const alumnosNutri=alumnos.filter(a=>a.tieneNutri==='si'&&a.estado==='activo');
+  const todosClientes=[
+    ...clientesNutri.filter(c=>c.estado==='activo'),
+    ...alumnosNutri.filter(a=>!clientesNutri.find(c=>c.id===a.id)) // evitar duplicados
+  ];
+
+  // Resumen
+  let totalMes=0;
+  todosClientes.forEach(c=>{const p=cobrosNutri[mk][c.id]; if(p&&p.monto) totalMes+=parseFloat(p.monto);});
+  document.getElementById('nutri-resumen').innerHTML=`
+    <div style="display:flex;gap:1rem;flex-wrap:wrap">
+      <div class="stat" style="flex:1;min-width:150px">
+        <span class="stat-label">Clientes activos</span>
+        <span class="stat-val">${todosClientes.length}</span>
+        <span class="stat-sub">seguimiento nutricional</span>
+      </div>
+      <div class="stat" style="flex:1;min-width:150px">
+        <span class="stat-label">Cobrado este mes</span>
+        <span class="stat-val" style="color:var(--marron)">$${totalMes.toLocaleString('es-AR')}</span>
+        <span class="stat-sub">nutrición</span>
+      </div>
+    </div>
+  `;
+
+  const lista=document.getElementById('nutri-lista');
+  if(!todosClientes.length){
+    lista.innerHTML='<div class="table-wrap" style="padding:2rem;text-align:center;color:var(--suave)">No hay clientes. Agregá el primero o activá nutrición en un alumno.</div>';
+    return;
+  }
+
+  lista.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.75rem">
+    ${todosClientes.map(c=>{
+      const p=cobrosNutri[mk][c.id]||{monto:'',fecha:''};
+      const esAlumno=alumnos.find(a=>a.id===c.id);
+      const waBtn=c.telefono
+        ?`<a href="https://wa.me/54${c.telefono.replace(/\D/g,'')}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none">WhatsApp</a>`:'';
+      return `<div class="cobro-row" style="flex-wrap:wrap;gap:0.75rem">
+        <div class="cobro-info">
+          <div class="cobro-nombre">${escaparHTML(c.nombre)} ${esAlumno?'<span class="badge badge-verde" style="font-size:0.65rem">Alumno</span>':badgeEstado(c.estado)}</div>
+          ${c.telefono?`<div class="cobro-detalle">${c.telefono}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          ${waBtn}
+          ${!esAlumno?`<button class="btn btn-secondary btn-sm" onclick="editarClienteNutri('${c.id}')">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="eliminarClienteNutri('${c.id}')">×</button>`:''}
+          ${esAlumno?`<button class="btn btn-secondary btn-sm" onclick="verAlumno('${c.id}')">Ver perfil</button>`:''}
+        </div>
+        <div style="width:100%;padding-top:0.75rem;border-top:1px solid var(--borde);display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+          <span style="font-size:0.78rem;color:var(--suave);font-weight:500">Pago ${MESES[parseInt(mk.split('-')[1])-1]}:</span>
+          ${p.monto
+            ?`<span style="font-weight:600;color:var(--marron)">$${parseFloat(p.monto).toLocaleString('es-AR')}</span>
+               <span style="font-size:0.72rem;color:var(--suave)">${p.fecha}</span>
+               <button class="btn btn-secondary btn-sm" onclick="editarPagoNutri('${mk}','${c.id}','${p.monto}')">Editar</button>
+               <button class="btn btn-danger btn-sm" onclick="eliminarPagoNutri('${mk}','${c.id}')">×</button>`
+            :`<div style="display:flex;gap:0.4rem;align-items:center">
+                <input type="number" id="nutri-pago-${c.id}" placeholder="Monto cobrado" style="width:130px;padding:0.35rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:var(--blanco)"/>
+                <button class="btn btn-primary btn-sm" onclick="registrarPagoNutri('${mk}','${c.id}')">Registrar</button>
+              </div>`
+          }
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function abrirModalNutri(id=null){
+  editandoNutriId=id;
+  document.getElementById('nutri-modal-titulo').textContent=id?'Editar cliente':'Nuevo cliente nutricional';
+  ['nc-nombre','nc-telefono','nc-notas'].forEach(f=>document.getElementById(f).value='');
+  document.getElementById('nc-estado').value='activo';
+  if(id){
+    const c=clientesNutri.find(x=>x.id===id); if(!c) return;
+    document.getElementById('nc-nombre').value=c.nombre;
+    document.getElementById('nc-telefono').value=c.telefono||'';
+    document.getElementById('nc-estado').value=c.estado;
+    document.getElementById('nc-notas').value=c.notas||'';
+  }
+  document.getElementById('modal-nutri').classList.add('open');
+}
+
+async function guardarClienteNutri(){
+  const nombre=document.getElementById('nc-nombre').value.trim();
+  if(!nombre){toast('El nombre es obligatorio');return;}
+  const cliente={
+    id:editandoNutriId||crypto.randomUUID(),
+    nombre,
+    telefono:document.getElementById('nc-telefono').value.trim(),
+    estado:document.getElementById('nc-estado').value,
+    notas:document.getElementById('nc-notas').value.trim()
+  };
+  const btn=document.getElementById('btn-guardar-nutri');
+  btn.disabled=true;btn.textContent='Guardando...';
+  try{
+    if(editandoNutriId){const i=clientesNutri.findIndex(x=>x.id===editandoNutriId);clientesNutri[i]=cliente;}
+    else clientesNutri.push(cliente);
+    await guardarClientesNutriEnSheets();
+    toast('Cliente guardado ✓');
+    cerrarModal('modal-nutri');
+    renderNutri();
+  }catch(e){toast('Error al guardar');}
+  btn.disabled=false;btn.textContent='Guardar';
+}
+
+function editarClienteNutri(id){abrirModalNutri(id);}
+
+async function eliminarClienteNutri(id){
+  const c=clientesNutri.find(x=>x.id===id);
+  if(!confirm('¿Eliminar a '+c.nombre+'?')) return;
+  clientesNutri=clientesNutri.filter(x=>x.id!==id);
+  try{await guardarClientesNutriEnSheets();toast('Cliente eliminado');renderNutri();}
+  catch(e){toast('Error al eliminar');}
+}
+
+async function _registrarPagoNutriBase(mk,id,monto,renderFn){
+  if(!monto||isNaN(monto)){toast('Ingresá un monto válido');return;}
+  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
+  cobrosNutri[mk][id]={monto,fecha:new Date().toLocaleDateString('es-AR')};
+  try{await guardarCobrosNutriEnSheets();toast('Pago registrado ✓');renderFn();}
+  catch(e){toast('Error al guardar');}
+}
+async function registrarPagoNutri(mk,id){
+  const input=document.getElementById(`nutri-pago-${id}`);
+  const monto=input?input.value.trim():'';
+  return _registrarPagoNutriBase(mk,id,monto,renderNutri);
+}
+
+async function _editarPagoNutriBase(mk,id,valorActual,renderFn){
+  const nuevo=prompt('Nuevo monto:',valorActual);
+  // SEG-03: rechazar cancelación, no numérico y negativos
+  if(nuevo===null) return;
+  if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
+  cobrosNutri[mk][id]={monto:nuevo,fecha:new Date().toLocaleDateString('es-AR')};
+  try{await guardarCobrosNutriEnSheets();toast('Pago actualizado ✓');renderFn();}
+  catch(e){toast('Error al guardar');}
+}
+async function editarPagoNutri(mk,id,valorActual){
+  return _editarPagoNutriBase(mk,id,valorActual,renderNutri);
+}
+
+async function _eliminarPagoNutriBase(mk,id,mensaje,renderFn){
+  if(!confirm('¿Eliminar este pago?')) return;
+  if(cobrosNutri[mk]) delete cobrosNutri[mk][id];
+  try{await guardarCobrosNutriEnSheets();toast(mensaje);renderFn();}
+  catch(e){toast('Error al guardar');}
+}
+async function eliminarPagoNutri(mk,id){
+  return _eliminarPagoNutriBase(mk,id,'Pago eliminado',renderNutri);
+}
+
+// ── GOOGLE CALENDAR API ──
+function normalizarDia(d){
+  // Normaliza tildes para evitar mismatches
+  return d.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+const DIA_A_NUM_NORM = {'Lunes':1,'Martes':2,'Miercoles':3,'Jueves':4,'Viernes':5,'Sabado':6,'Domingo':0};
+const RRULE_DIA_NORM = {'Lunes':'MO','Martes':'TU','Miercoles':'WE','Jueves':'TH','Viernes':'FR'};
+
+function proximaFechaDia(diaNombre){
+  const hoy=new Date();
+  const diaNorm=normalizarDia(diaNombre);
+  const diaTarget=DIA_A_NUM_NORM[diaNorm];
+  if(diaTarget===undefined) return hoy;
+  // Si es hoy o en el futuro esta semana, usar esa fecha; si ya pasó, ir a la siguiente semana
+  let diasHasta=(diaTarget - hoy.getDay() + 7) % 7;
+  if(diasHasta===0) diasHasta=0; // hoy mismo está bien
+  const fecha=new Date(hoy);
+  fecha.setDate(hoy.getDate()+diasHasta);
+  return fecha;
+}
+
+function getRruleDia(diaNombre){
+  const diaNorm=normalizarDia(diaNombre);
+  return RRULE_DIA_NORM[diaNorm]||null;
+}
+
+function parseHora(horarioStr){
+  // "8:00 - 9:00" → {inicio:"08:00", fin:"09:00"}
+  if(!horarioStr) return {inicio:'08:00',fin:'09:00'};
+  const partes=horarioStr.split('-').map(s=>s.trim());
+  const padH=h=>h.includes(':')?(h.split(':')[0].padStart(2,'0')+':'+h.split(':')[1].padStart(2,'0')):h.padStart(2,'0')+':00';
+  return {inicio:padH(partes[0]||'08:00'), fin:padH(partes[1]||'09:00')};
+}
+
+async function crearEventoCalendar(alumno, dia, horario){
+  const fecha=proximaFechaDia(dia);
+  const {inicio,fin}=parseHora(horario);
+  const fechaStr=fecha.toISOString().slice(0,10);
+  const rruleDia=getRruleDia(dia);
+  const rrule=rruleDia?`RRULE:FREQ=WEEKLY;BYDAY=${rruleDia}`:'';
+  const evento={
+    summary:`${alumno.nombre}`,
+    description:`Entrenamiento personal · ${alumno.frecuencia}x/semana`,
+    start:{dateTime:`${fechaStr}T${inicio}:00`,timeZone:'America/Argentina/Buenos_Aires'},
+    end:{dateTime:`${fechaStr}T${fin}:00`,timeZone:'America/Argentina/Buenos_Aires'},
+    recurrence:rrule?[rrule]:[],
+    extendedProperties:{private:{agendaLucaId:alumno.id, agendaLucaDia:dia}}
+  };
+  const r=await fetchConRenovacion(
+    `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`,
+    {method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify(evento)}
+  );
+  if(!r.ok) throw new Error('Error creando evento');
+  return (await r.json()).id;
+}
+
+async function eliminarEventosAlumno(alumnoId){
+  // Buscar eventos del alumno por propiedad privada
+  const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?privateExtendedProperty=agendaLucaId%3D${alumnoId}&maxResults=20`;
+  const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!r.ok) return;
+  const data=await r.json();
+  const eventos=data.items||[];
+  await Promise.all(eventos.map(async ev=>{
+    await fetchConRenovacion(
+      `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${ev.id}`,
+      {method:'DELETE',headers:{Authorization:'Bearer '+accessToken}}
+    );
+  }));
+}
+
+async function sincronizarAlumnoCalendar(alumno){
+  // Eliminar eventos existentes y recrear
+  try{
+    await eliminarEventosAlumno(alumno.id);
+    const hpd=stringToHorariosPorDia(alumno.horario);
+    await Promise.all(alumno.dias.map(dia=>crearEventoCalendar(alumno,dia,hpd[dia]||'')));
+  }catch(e){
+    console.error('Error sincronizando Calendar:',e);
+    toast('Guardado en Sheets. Error al sincronizar Calendar.');
+  }
+}
+
+// ── DATOS PERSONALES ──
+function calcularEdad(fechaNac){
+  if(!fechaNac) return null;
+  const partes=fechaNac.split('/');
+  if(partes.length!==3) return null;
+  const nac=new Date(`${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`);
+  const hoy=new Date();
+  let edad=hoy.getFullYear()-nac.getFullYear();
+  const m=hoy.getMonth()-nac.getMonth();
+  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) edad--;
+  return isNaN(edad)?null:edad;
+}
+function calcularIMC(peso,estatura){
+  if(!peso||!estatura) return null;
+  const p=parseFloat(peso);
+  const e=parseFloat(estatura)/100; // cm a metros
+  if(!p||!e) return null;
+  return (p/(e*e)).toFixed(1);
+}
+function imc_categoria(imc){
+  if(!imc) return '';
+  const v=parseFloat(imc);
+  if(v<18.5) return 'Bajo peso';
+  if(v<25) return 'Normal';
+  if(v<30) return 'Sobrepeso';
+  return 'Obesidad';
+}
+
+// ── NUTRICIÓN EN PERFIL ──
+function renderNutriPerfil(id){
+  const a=alumnos.find(x=>x.id===id); if(!a) return;
+  const el=document.getElementById('perfil-nutri');
+  const tieneNutri=a.tieneNutri==='si';
+
+  el.innerHTML=`
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:${tieneNutri?'1rem':'0'}">
+      <label style="font-size:0.82rem;color:var(--pd-text2);display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+        <input type="checkbox" ${tieneNutri?'checked':''} onchange="toggleNutriAlumno('${id}',this.checked)"
+          style="width:15px;height:15px;cursor:pointer;accent-color:#4AB870"/>
+        Seguimiento nutricional activo
+      </label>
+    </div>
+    ${tieneNutri?renderNutriCobrosPerfil(id):''}
+  `;
+}
+
+function renderNutriCobrosPerfil(id){
+  const mk=mesKey();
+  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
+  const p=cobrosNutri[mk][id]||{monto:'',fecha:''};
+  return `
+    <div style="border-top:1px solid rgba(74,184,112,0.15);padding-top:0.75rem">
+      <p style="font-size:0.65rem;color:var(--pd-text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">Pago nutri ${MESES[parseInt(mk.split('-')[1])-1]}</p>
+      ${p.monto
+        ?`<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
+            <span style="font-weight:600;color:var(--marron)">$${parseFloat(p.monto).toLocaleString('es-AR')}</span>
+            <span style="font-size:0.72rem;color:var(--suave)">${p.fecha}</span>
+            <button class="btn btn-secondary btn-sm" onclick="editarPagoNutriPerfil('${id}','${mk}','${p.monto}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="eliminarPagoNutriPerfil('${id}','${mk}')">×</button>
+          </div>`
+        :`<div style="display:flex;gap:0.4rem">
+            <input type="number" id="nutri-perfil-monto" placeholder="Monto cobrado"
+              style="flex:1;padding:0.35rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:var(--blanco)"/>
+            <button class="btn btn-primary btn-sm" onclick="registrarPagoNutriPerfil('${id}','${mk}')">Registrar</button>
+          </div>`
+      }
+    </div>
+  `;
+}
+
+async function toggleNutriAlumno(id, activo){
+  const i=alumnos.findIndex(x=>x.id===id); if(i===-1) return;
+  alumnos[i].tieneNutri=activo?'si':'no';
+  try{await guardarFilaAlumno(alumnos[i]);renderNutriPerfil(id);}
+  catch(e){toast('Error al guardar');}
+}
+
+async function registrarPagoNutriPerfil(id,mk){
+  const input=document.getElementById('nutri-perfil-monto');
+  const monto=input?input.value.trim():'';
+  return _registrarPagoNutriBase(mk,id,monto,()=>renderNutriPerfil(id));
+}
+
+async function editarPagoNutriPerfil(id,mk,valorActual){
+  return _editarPagoNutriBase(mk,id,valorActual,()=>renderNutriPerfil(id));
+}
+
+async function eliminarPagoNutriPerfil(id,mk){
+  return _eliminarPagoNutriBase(mk,id,'Eliminado',()=>renderNutriPerfil(id));
+}
+
+// ── COBROS POR ALUMNO ──
+function renderCobrosAlumno(id){
+  const a=alumnos.find(x=>x.id===id); if(!a) return;
+  const el=document.getElementById('perfil-cobros');
+  const monto=parseFloat(a.monto||0);
+  const mk=mesKey();
+  if(!cobros[mk]) cobros[mk]={};
+  const mesesConDatos=new Set(Object.keys(cobros));
+  mesesConDatos.add(mk);
+  const historial=[...mesesConDatos]
+    .map(m=>({
+      mes:m,
+      label:MESES[parseInt(m.split('-')[1])-1]+' '+m.split('-')[0],
+      estado:(cobros[m]&&cobros[m][id])?cobros[m][id].estado:'pendiente',
+      fecha:(cobros[m]&&cobros[m][id])?cobros[m][id].fecha:'',
+      bono:(cobros[m]&&cobros[m][id])?cobros[m][id].bono||'':'',
+      monto:(cobros[m]&&cobros[m][id])?cobros[m][id].monto||'':'',
+    }))
+    .sort((a,b)=>b.mes.localeCompare(a.mes));
+  const pagados=historial.filter(m=>m.estado==='pagado').length;
+  const pendientes=historial.filter(m=>m.estado==='pendiente').length;
+  // B6: suma el monto real congelado de cada pago (fallback al precio actual
+  // solo para pagos históricos previos a este cambio, que no lo tienen guardado)
+  // + los bonos, en vez de "meses pagados × precio actual".
+  const totalCobrado=historial
+    .filter(m=>m.estado==='pagado')
+    .reduce((acc,m)=>acc+((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto)+(parseFloat(m.bono)||0),0);
+  const ultimoPago=historial.find(m=>m.estado==='pagado');
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem">
+      <div style="background:rgba(74,184,112,0.1);padding:0.6rem 0.75rem;border-radius:6px;text-align:center">
+        <p style="font-size:1.2rem;font-weight:700;color:var(--pd-verde)">${pagados}</p>
+        <p style="font-size:0.65rem;color:var(--pd-verde)">Pagados</p>
+      </div>
+      <div style="background:rgba(232,168,74,0.1);padding:0.6rem 0.75rem;border-radius:6px;text-align:center">
+        <p style="font-size:1.2rem;font-weight:700;color:var(--pd-amber)">${pendientes}</p>
+        <p style="font-size:0.65rem;color:var(--pd-amber)">Pendientes</p>
+      </div>
+    </div>
+    ${ultimoPago?`<p style="font-size:0.72rem;color:var(--pd-text2);margin-bottom:0.5rem">Último pago: <strong style="color:var(--pd-text)">${ultimoPago.label}</strong></p>`:''}
+    <p style="font-size:0.72rem;color:var(--pd-text2);margin-bottom:0.75rem">Total: <strong style="color:var(--pd-crema)">$${totalCobrado.toLocaleString('es-AR')}</strong></p>
+    <div style="display:flex;flex-direction:column;gap:0.35rem">
+      ${historial.map(m=>`
+        <div class="pd-cobro-row">
+          <div>
+            <span class="pd-cobro-label">${m.label}</span>
+            ${m.fecha?`<span style="font-size:0.65rem;color:var(--pd-text3);margin-left:0.35rem">${m.fecha}</span>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:0.35rem">
+            ${m.estado==='pagado'
+              ?`<span class="pd-cobro-pagado">✓ $${((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto).toLocaleString('es-AR')}</span>
+                <button class="pd-cobro-btn undo" onclick="marcarPendientePerfil('${id}','${m.mes}')">↩</button>`
+              :`<span class="pd-cobro-pendiente">Pendiente</span>
+                <button class="pd-cobro-btn" onclick="marcarPagadoPerfil('${id}','${m.mes}')">✓</button>`
+            }
+          </div>
+        </div>
+        ${m.bono?`<div class="pd-cobro-row" style="margin-top:-0.3rem;opacity:0.8">
+          <span class="pd-cobro-label" style="font-size:0.68rem">Bono ${m.label}</span>
+          <span class="pd-cobro-pagado" style="color:var(--pd-crema)">$${parseFloat(m.bono).toLocaleString('es-AR')}</span>
+        </div>`:''}
+      `).join('')}
+    </div>
+  `;
+}
+
+// Base compartida: cambia el estado de un cobro (pagado/pendiente) y re-renderiza
+// la vista que corresponda. Los 4 wrappers de abajo mantienen exactamente las
+// mismas firmas que ya usa el HTML (onclick), solo delegan acá.
+async function _marcarCobroEstado(mk, id, estado, renderFn){
+  if(!cobros[mk]) cobros[mk]={};
+  const prev=cobros[mk][id]||{};
+  if(estado==='pagado'){
+    const alumno=alumnos.find(x=>x.id===id);
+    cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR'),monto:alumno?alumno.monto:''};
+  } else {
+    cobros[mk][id]={...prev,estado:'pendiente',fecha:'',monto:''};
+  }
+  try{
+    await guardarCobrosEnSheets();
+    toast(estado==='pagado' ? 'Pago registrado ✓' : 'Marcado como pendiente');
+    renderFn();
+    renderDashboard();
+  }catch(e){toast('Error al guardar');}
+}
+
+async function marcarPagadoPerfil(alumnoId, mk){
+  return _marcarCobroEstado(mk, alumnoId, 'pagado', ()=>renderCobrosAlumno(alumnoId));
+}
+
+async function marcarPendientePerfil(alumnoId, mk){
+  return _marcarCobroEstado(mk, alumnoId, 'pendiente', ()=>renderCobrosAlumno(alumnoId));
+}
+
+// ── COBROS SECCIÓN ──
+async function marcarPagado(mk, id){
+  return _marcarCobroEstado(mk, id, 'pagado', renderCobros);
+}
+
+async function marcarPendiente(mk, id){
+  return _marcarCobroEstado(mk, id, 'pendiente', renderCobros);
+}
+
+// ── AGENDA ──
+function getSemanaActual(){
+  const hoy=new Date();
+  const diaSemana=hoy.getDay()===0?7:hoy.getDay();
+  const lunes=new Date(hoy);
+  lunes.setDate(hoy.getDate()-(diaSemana-1));
+  return DIAS.map((nombre,idx)=>{
+    const fecha=new Date(lunes);
+    fecha.setDate(lunes.getDate()+idx);
+    return {nombre, fechaStr:fecha.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'})};
+  });
+}
+
+function renderAgenda(){
+  const grid=document.getElementById('semana-grid');
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  const semana=getSemanaActual();
+  const hoyStr=new Date().toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
+
+  // PERF-03: parsear horarios una sola vez por alumno, reutilizar en sort y render
+  const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
+
+  grid.innerHTML=semana.map(({nombre,fechaStr})=>{
+    const turnos=activos.filter(a=>a.dias.includes(nombre)).sort((a,b)=>{
+      const hpdA=hpdCache.get(a.id);
+      const hpdB=hpdCache.get(b.id);
+      const horaA=(hpdA[nombre]||'99:99').split(':')[0].padStart(2,'0')+(hpdA[nombre]||'99:99').split(':')[1];
+      const horaB=(hpdB[nombre]||'99:99').split(':')[0].padStart(2,'0')+(hpdB[nombre]||'99:99').split(':')[1];
+      return horaA.localeCompare(horaB);
+    });
+    const esHoy=fechaStr===hoyStr;
+    return `<div class="dia-col" ${esHoy?'style="background:var(--crema)"':''}>
+      <div class="dia-header" ${esHoy?'style="background:var(--verde);color:#fff"':''}>
+        <div class="dia-nombre" ${esHoy?'style="color:rgba(255,255,255,0.8)"':''}>${nombre}</div>
+        <div class="dia-count" ${esHoy?'style="color:#fff;font-size:0.9rem"':''}>${fechaStr}</div>
+      </div>
+      <div class="dia-body" data-dia="${nombre}"
+        ondragover="dragOver(event)"
+        ondragleave="dragLeave(event)"
+        ondrop="drop(event,'${nombre}')">
+        ${turnos.length===0?'<p style="color:var(--suave);font-size:0.78rem;margin-top:0.5rem">Libre</p>':
+          turnos.map(a=>{
+            const hpd=hpdCache.get(a.id);
+            const hora=hpd[nombre]||'Sin horario';
+            const freq=parseInt(a.frecuencia, 10)||2;
+            return `<div class="turno-card freq-${freq}"
+              draggable="true"
+              data-id="${a.id}"
+              data-dia-origen="${nombre}"
+              onclick="abrirQuickAgenda('${a.id}','${nombre}')"
+              ondragstart="dragStart(event,'${a.id}','${nombre}')"
+              ondragend="dragEnd(event)">
+              <div class="turno-hora">${escaparHTML(hora)}</div>
+              <div class="turno-nombre">${escaparHTML(a.nombre)}</div>
+              <div class="turno-freq">${freq}x/sem</div>
+            </div>`;
+          }).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── POPUP RÁPIDO AGENDA ──
+let aqAlumnoId=null;
+
+function abrirQuickAgenda(id, dia){
+  if(isDragging) return;
+  const a=alumnos.find(x=>x.id===id); if(!a) return;
+  aqAlumnoId=id;
+  const mk=mesKey();
+  const c=(cobros[mk]||{})[id];
+  const estadoCobro=c&&c.estado==='pagado'
+    ?'<span class="badge badge-verde">Pagado</span>'
+    :'<span class="badge badge-amarillo">Pendiente</span>';
+
+  document.getElementById('aq-nombre').textContent=a.nombre;
+  document.getElementById('aq-cuota').innerHTML=estadoCobro;
+  document.getElementById('aq-freq').textContent=a.frecuencia+'x por semana';
+
+  // Días checkboxes
+  const diasContainer=document.getElementById('aq-dias');
+  diasContainer.innerHTML=DIAS.map(d=>`
+    <span class="dia-check-label ${a.dias.includes(d)?'checked':''}"
+      onclick="toggleDiaQuick(this)" data-dia="${d}">${d}</span>
+  `).join('');
+
+  // Horarios por día seleccionado
+  renderHorariosQuick(stringToHorariosPorDia(a.horario), a.dias);
+
+  document.getElementById('modal-agenda-quick').classList.add('open');
+}
+
+function toggleDiaQuick(el){
+  el.classList.toggle('checked');
+  const diasSeleccionados=[...document.querySelectorAll('#aq-dias .dia-check-label.checked')].map(l=>l.dataset.dia);
+  const a=alumnos.find(x=>x.id===aqAlumnoId);
+  const hpd=stringToHorariosPorDia(a?a.horario:'');
+  renderHorariosQuick(hpd, diasSeleccionados);
+}
+
+function renderHorariosQuick(hpd, dias){
+  const container=document.getElementById('aq-horarios');
+  if(!dias||!dias.length){container.innerHTML='';return;}
+  container.innerHTML=dias.map(dia=>`
+    <div class="dia-horario-row">
+      <label>${dia}</label>
+      <input type="text" id="aq-h-${dia}" placeholder="ej: 8:00 - 9:00" value="${escaparHTML(hpd[dia]||'')}"/>
+    </div>
+  `).join('');
+}
+
+async function guardarQuickAgenda(){
+  const i=alumnos.findIndex(x=>x.id===aqAlumnoId); if(i===-1) return;
+  const diasSeleccionados=[...document.querySelectorAll('#aq-dias .dia-check-label.checked')].map(l=>l.dataset.dia);
+  const hpd={};
+  diasSeleccionados.forEach(dia=>{
+    const inp=document.getElementById(`aq-h-${dia}`);
+    if(inp) hpd[dia]=inp.value.trim().replace(/\|/g,'');
+  });
+  alumnos[i].dias=diasSeleccionados;
+  alumnos[i].horario=horariosPorDiaToString(hpd);
+  try{
+    await guardarFilaAlumno(alumnos[i]);
+    await sincronizarAlumnoCalendar(alumnos[i]);
+    toast('Guardado y sincronizado ✓');
+    cerrarModal('modal-agenda-quick');
+    renderAgenda();
+    renderDashboard();
+  }catch(e){toast('Error al guardar');}
+}
+
+function verAlumnoDesdeAgenda(){
+  cerrarModal('modal-agenda-quick');
+  verAlumno(aqAlumnoId);
+}
+
+// ── DRAG & DROP AGENDA ──
+let dragAlumnoId=null;
+let dragDiaOrigen=null;
+let isDragging=false;
+
+function dragStart(e, alumnoId, diaOrigen){
+  isDragging=true;
+  dragAlumnoId=alumnoId;
+  dragDiaOrigen=diaOrigen;
+  e.currentTarget.classList.add('dragging');
+  e.dataTransfer.effectAllowed='move';
+}
+function dragEnd(e){
+  e.currentTarget.classList.remove('dragging');
+  setTimeout(()=>isDragging=false, 100);
+}
+function dragOver(e){
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+function dragLeave(e){
+  e.currentTarget.classList.remove('drag-over');
+}
+async function drop(e, diaDestino){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if(!dragAlumnoId||diaDestino===dragDiaOrigen) return;
+  const i=alumnos.findIndex(a=>a.id===dragAlumnoId);
+  if(i===-1) return;
+  // Reemplazar día origen por día destino
+  const dias=alumnos[i].dias.filter(d=>d!==dragDiaOrigen);
+  if(!dias.includes(diaDestino)) dias.push(diaDestino);
+  alumnos[i].dias=dias;
+  // Mover horario también
+  const hpd=stringToHorariosPorDia(alumnos[i].horario);
+  if(hpd[dragDiaOrigen]){
+    hpd[diaDestino]=hpd[dragDiaOrigen];
+    delete hpd[dragDiaOrigen];
+    alumnos[i].horario=horariosPorDiaToString(hpd);
+  }
+  try{
+    await guardarFilaAlumno(alumnos[i]);
+    toast(`${alumnos[i].nombre} movido a ${diaDestino} ✓`);
+    renderAgenda();
+    renderDashboard();
+  }catch(err){toast('Error al guardar');}
+  dragAlumnoId=null;
+  dragDiaOrigen=null;
+}
+
+// ── COBROS ──
+function initMeses(){
+  const sel=document.getElementById('mes-select');
+  const d=new Date(); sel.innerHTML='';
+  for(let i=0;i<6;i++){
+    const m=new Date(d.getFullYear(),d.getMonth()-i,1);
+    const key=`${m.getFullYear()}-${String(m.getMonth()+1).padStart(2,'0')}`;
+    sel.innerHTML+=`<option value="${key}"${i===0?' selected':''}>${MESES[m.getMonth()]} ${m.getFullYear()}</option>`;
+  }
+}
+function renderCobros(){
+  const mk=document.getElementById('mes-select').value;
+  if(!cobros[mk]) cobros[mk]={};
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  const lista=document.getElementById('cobros-lista');
+  if(!activos.length){lista.innerHTML='<p style="color:var(--suave)">No hay alumnos activos.</p>';return;}
+
+  let totalCuotas=0, totalBonos=0, totalEsperado=0;
+  const pendientes=[], pagados=[];
+  activos.forEach(a=>{
+    const c=cobros[mk][a.id]||{estado:'pendiente',fecha:'',bono:'',fechaBono:''};
+    totalEsperado+=parseFloat(a.monto||0);
+    if(c.estado==='pagado') totalCuotas+=montoCobro(a,c);
+    if(c.bono) totalBonos+=parseFloat(c.bono||0);
+    (c.estado==='pagado'?pagados:pendientes).push({a,c});
+  });
+  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  const iconoReloj='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const iconoCheck='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
+
+  function tarjetaCobro({a,c}){
+    const esPagado=c.estado==='pagado';
+    const bonoHtml=c.bono
+      ?`<span class="bono-existente">🎁 $${parseFloat(c.bono).toLocaleString('es-AR')} · ${c.fechaBono||''}</span>
+        <button class="btn btn-secondary btn-sm" onclick="editarBono('${mk}','${a.id}','${c.bono}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarBono('${mk}','${a.id}')">×</button>`
+      :`<span class="bono-chip" onclick="toggleBono(this)">+ Agregar bono</span>
+        <div class="bono-input-wrap">
+          <input type="number" id="bono-${a.id}" placeholder="Monto"/>
+          <button class="btn btn-primary btn-sm" onclick="registrarBono('${mk}','${a.id}')">Registrar</button>
+        </div>`;
+    return `<div class="cobro-card">
+      <div class="cobro-main">
+        <div class="cobro-avatar${esPagado?'':' pendiente'}">${escaparHTML(a.nombre.charAt(0).toUpperCase())}</div>
+        <div class="cobro-info">
+          <div class="cobro-nombre">${escaparHTML(a.nombre)}</div>
+          <div class="cobro-detalle">${esPagado?iconoCheck:iconoReloj}${a.frecuencia}x semana${esPagado?` · Pagado ${c.fecha||''}`:' · Pendiente'}</div>
+        </div>
+        <div class="cobro-right">
+          <div class="cobro-monto">$${montoCobro(a,c).toLocaleString('es-AR')}</div>
+          ${esPagado
+            ?`<button class="btn btn-secondary btn-sm" onclick="marcarPendiente('${mk}','${a.id}')">Deshacer</button>`
+            :`<button class="btn btn-primary btn-sm" onclick="marcarPagado('${mk}','${a.id}')">Marcar pagado</button>`}
+        </div>
+      </div>
+      <div class="bono-toggle">${bonoHtml}</div>
+    </div>`;
+  }
+
+  lista.innerHTML=`
+    <div class="resumen-card">
+      <div class="resumen-progreso">
+        <div class="resumen-top"><div class="resumen-total">$${totalCuotas.toLocaleString('es-AR')} <span>/ $${totalEsperado.toLocaleString('es-AR')}</span></div><div class="resumen-pct">${pct}%</div></div>
+        <div class="barra"><div class="barra-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="resumen-mini">
+        <div class="resumen-mini-item"><span class="resumen-mini-label"><span class="dot dot-bono"></span>Bonos</span><span class="resumen-mini-val">$${totalBonos.toLocaleString('es-AR')}</span></div>
+        <div class="resumen-mini-item"><span class="resumen-mini-label"><span class="dot dot-pendiente"></span>Pendiente</span><span class="resumen-mini-val">$${(totalEsperado-totalCuotas).toLocaleString('es-AR')}</span></div>
+      </div>
+    </div>
+    <div class="cols">
+      <div>
+        <div class="seccion-label">Pendientes <span class="seccion-count">${pendientes.length}</span></div>
+        ${pendientes.length?pendientes.map(tarjetaCobro).join(''):'<p style="color:var(--suave);font-size:0.82rem">No hay pendientes 🎉</p>'}
+      </div>
+      <div>
+        <div class="seccion-label">Pagados <span class="seccion-count ok">${pagados.length}</span></div>
+        ${pagados.length?pagados.map(tarjetaCobro).join(''):'<p style="color:var(--suave);font-size:0.82rem">Todavía no hay pagos este mes.</p>'}
+      </div>
+    </div>
+  `;
+}
+
+function toggleBono(el){
+  const wrap=el.closest('.bono-toggle');
+  const input=wrap?wrap.querySelector('.bono-input-wrap'):null;
+  if(!input) return;
+  input.style.display=input.style.display==='flex'?'none':'flex';
+}
+
+function toggleFinAlerta(){
+  const alerta=document.getElementById('fin-alerta');
+  const chips=document.getElementById('fin-chips');
+  chips.style.display=chips.style.display==='flex'?'none':'flex';
+  alerta.classList.toggle('open');
+}
+
+async function registrarBono(mk,id){
+  const input=document.getElementById(`bono-${id}`);
+  const monto=input?input.value.trim():'';
+  if(!monto||isNaN(monto)){toast('Ingresá un monto válido');return;}
+  if(!cobros[mk]) cobros[mk]={};
+  if(!cobros[mk][id]) cobros[mk][id]={estado:'pendiente',fecha:''};
+  cobros[mk][id].bono=monto;
+  cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
+  try{
+    await guardarCobrosEnSheets();
+    toast('Bono registrado ✓');
+    renderCobros();renderDashboard();
+  }catch(e){
+    toast('Error al guardar el bono');
+  }
+}
+
+async function editarBono(mk,id,valorActual){
+  const nuevo=prompt('Nuevo monto del bono:',valorActual);
+  // SEG-03: rechazar cancelación, no numérico y negativos
+  if(nuevo===null) return;
+  if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
+  cobros[mk][id].bono=nuevo;
+  cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
+  try{
+    await guardarCobrosEnSheets();
+    toast('Bono actualizado ✓');
+    renderCobros();renderDashboard();
+  }catch(e){
+    toast('Error al actualizar el bono');
+  }
+}
+
+async function eliminarBono(mk,id){
+  if(!confirm('¿Eliminar el bono registrado?')) return;
+  cobros[mk][id].bono='';
+  cobros[mk][id].fechaBono='';
+  try{
+    await guardarCobrosEnSheets();
+    toast('Bono eliminado');
+    renderCobros();renderDashboard();
+  }catch(e){
+    toast('Error al eliminar el bono');
+  }
+}
+
+// ── MODAL ──
+function cerrarModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('open')}));
+function toggleDia(el){
+  el.classList.toggle('checked');
+  const horariosActuales=getDiaHorarios();
+  renderDiaHorarios(horariosActuales);
+}
+function renderDiaHorarios(horariosPorDia={}){
+  const lista=document.getElementById('dia-horario-lista');
+  const seleccionados=[...document.querySelectorAll('.dia-check-label.checked')].map(l=>l.dataset.dia);
+  if(!seleccionados.length){lista.innerHTML='';return;}
+  lista.innerHTML=seleccionados.map(dia=>`
+    <div class="dia-horario-row">
+      <label>${dia}</label>
+      <input type="text" id="horario-${dia}" placeholder="ej: 8:00 - 9:00" value="${escaparHTML(horariosPorDia[dia]||'')}"/>
+    </div>
+  `).join('');
+}
+function getDiaHorarios(){
+  const result={};
+  document.querySelectorAll('.dia-horario-row').forEach(row=>{
+    const label=row.querySelector('label').textContent;
+    // B9: '|' es el separador interno de horariosPorDiaToString — si el texto
+    // libre lo contiene, corrompe el parseo. Se remueve por las dudas.
+    const val=row.querySelector('input').value.trim().replace(/\|/g,'');
+    result[label]=val;
+  });
+  return result;
+}
+function horariosPorDiaToString(obj){
+  return Object.entries(obj).map(([d,h])=>`${d}:${h}`).join('|');
+}
+function stringToHorariosPorDia(str){
+  if(!str) return {};
+  const result={};
+  str.split('|').forEach(part=>{
+    const idx=part.indexOf(':');
+    if(idx>0){
+      const dia=part.slice(0,idx);
+      const hora=part.slice(idx+1);
+      result[dia]=hora;
+    }
+  });
+  return result;
+}
+
+// ── TOAST ──
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
