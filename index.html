@@ -1311,8 +1311,8 @@ async function cargarPortalAlumno(id){
         <div class="portal-card">
           <div class="portal-card-title">Tus materiales</div>
           <div class="portal-btns">
-            ${a.carpetaDrive ? `<button class="portal-btn portal-btn-drive" onclick="window.open('${escaparHTML(a.carpetaDrive)}','_blank','noopener')">📁 Mi plan de entrenamiento</button>` : ''}
-            ${a.nutriDrive ? `<button class="portal-btn portal-btn-nutri" onclick="window.open('${escaparHTML(a.nutriDrive)}','_blank','noopener')">🥗 Mi plan nutricional</button>` : ''}
+            ${a.carpetaDrive ? `<button class="portal-btn portal-btn-drive" data-open-url="${escaparHTML(a.carpetaDrive)}">📁 Mi plan de entrenamiento</button>` : ''}
+            ${a.nutriDrive ? `<button class="portal-btn portal-btn-nutri" data-open-url="${escaparHTML(a.nutriDrive)}">🥗 Mi plan nutricional</button>` : ''}
           </div>
         </div>` : ''}
 
@@ -1347,6 +1347,9 @@ async function cargarPortalAlumno(id){
         <p class="portal-footer">Tu entrenador personal · Mente Consciente</p>
       </div>
     `;
+    el.querySelectorAll('[data-open-url]').forEach(btn=>{
+      btn.addEventListener('click', ()=>window.open(btn.dataset.openUrl, '_blank', 'noopener'));
+    });
     // Gradiente dinámico racha
     const rachaEl = document.getElementById('portal-racha-num');
     if(rachaEl){
@@ -2105,7 +2108,7 @@ function verAlumno(id){
       <div class="pd-stat-sub">${imcCat||'sin datos'}</div>
     </div>
     ${a.tieneNutri==='si'
-      ? `<div class="pd-stat${a.nutriDrive?' pd-stat-nutri-link':''}" ${a.nutriDrive?`onclick="window.open('${escaparHTML(a.nutriDrive.trim())}','_blank','noopener')"`:''}>
+      ? `<div class="pd-stat${a.nutriDrive?' pd-stat-nutri-link':''}" ${a.nutriDrive?`data-open-url="${escaparHTML(a.nutriDrive.trim())}"`:''}>
            <div class="pd-stat-label">Nutrición</div>
            <div class="pd-stat-val verde">Activo</div>
            <div class="pd-stat-sub">${a.nutriDrive?'Ver sheet →':'sin link'}</div>
@@ -2117,6 +2120,10 @@ function verAlumno(id){
          </div>`
     }
   `;
+  const nutriStatLink = document.getElementById('perfil-stats-row').querySelector('[data-open-url]');
+  if(nutriStatLink){
+    nutriStatLink.addEventListener('click', ()=>window.open(nutriStatLink.dataset.openUrl, '_blank', 'noopener'));
+  }
 
   // Seguimiento
   document.getElementById('perfil-nueva-fecha').value=new Date().toISOString().slice(0,10);
