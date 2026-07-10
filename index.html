@@ -279,13 +279,27 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 @media (min-width: 769px){
   #page-perfil{
     position: relative;
-    min-height: 100vh;
+    isolation: isolate;
+  }
+  /* Fondo en un pseudo-elemento fixed a pantalla completa (inset:0), en vez
+     de directo en #page-perfil: así background-size:cover se calcula contra
+     el viewport, no contra la altura real del contenido (mucho mas alta,
+     con todas las cards) — evita el recorte extremo que dejaba franjas
+     planas sin textura detras del panel lateral. z-index:-1 lo manda detras
+     de todo el contenido normal (sidebar lo tapa solo con su propio fondo).
+     isolation:isolate en #page-perfil es necesario: sin eso, este z-index:-1
+     escapa al stacking context raiz y el background solido de <body> lo tapa
+     por completo (bug real, encontrado al verificar). */
+  #page-perfil::before{
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
     background-image:
       linear-gradient(180deg, rgba(10,19,14,0.55), rgba(10,19,14,0.78)),
       url('assets/fondo-perfil.webp');
     background-size: cover;
     background-position: center;
-    background-attachment: fixed;
     background-repeat: no-repeat;
   }
   #page-perfil .pd-header-main,
