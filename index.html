@@ -1064,7 +1064,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
         </div>
         <div class="field" style="grid-column:1/-1">
           <label>Días de entrenamiento</label>
-          <div class="dias-check">
+          <div class="dias-check" id="a-dias-check">
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Lunes">Lunes</span>
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Martes">Martes</span>
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Miércoles">Miércoles</span>
@@ -1516,6 +1516,7 @@ async function fetchConRenovacion(url, opciones={}){
 function cerrarSesion(){
   if(accessToken) google.accounts.oauth2.revoke(accessToken);
   accessToken=null;alumnos=[];cobros={};seguimiento={};
+  asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];ahorros={};
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
@@ -1738,8 +1739,8 @@ async function guardarFilaAlumno(alumno){
 async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
   if(!seguimiento[alumnoId]) seguimiento[alumnoId]=[];
   const fecha=fechaISO
-    ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR')
-    : new Date().toLocaleDateString('es-AR');
+    ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
+    : new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
   const entrada={fecha, texto};
   seguimiento[alumnoId].unshift(entrada);
   seguimiento[alumnoId].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
@@ -1877,7 +1878,7 @@ function renderTablaAlumnos(){
   }
   tbody.innerHTML=lista.map(a=>`<tr>
     <td style="font-weight:500">${escaparHTML(a.nombre)}</td>
-    <td style="font-size:0.8rem">${a.dias.join(', ')}</td>
+    <td style="font-size:0.8rem">${escaparHTML(a.dias.join(', '))}</td>
     <td>${a.frecuencia}x/sem</td>
     <td style="font-weight:600;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</td>
     <td>${badgeEstado(a.estado)}</td>
@@ -1889,7 +1890,7 @@ function renderTablaAlumnos(){
         <div class="alumno-card-avatar">${a.nombre.charAt(0).toUpperCase()}</div>
         <div class="alumno-card-info">
           <div class="alumno-card-nombre">${escaparHTML(a.nombre)}</div>
-          <div class="alumno-card-dias">${a.dias.join(', ')}</div>
+          <div class="alumno-card-dias">${escaparHTML(a.dias.join(', '))}</div>
         </div>
         ${badgeEstado(a.estado)}
       </div>
@@ -1907,7 +1908,7 @@ function abrirModalAlumno(id=null){
   ['a-nombre','a-telefono','a-monto','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('a-frecuencia').value='2';
   document.getElementById('a-estado').value='activo';
-  document.querySelectorAll('.dia-check-label').forEach(l=>l.classList.remove('checked'));
+  document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>l.classList.remove('checked'));
   document.getElementById('dia-horario-lista').innerHTML='';
   if(id){
     const a=alumnos.find(x=>x.id===id);
@@ -1926,7 +1927,7 @@ function abrirModalAlumno(id=null){
     document.getElementById('a-carpetaDrive').value=a.carpetaDrive||'';
     document.getElementById('a-nutriDrive').value=a.nutriDrive||'';
     const hpd=stringToHorariosPorDia(a.horario);
-    document.querySelectorAll('.dia-check-label').forEach(l=>{
+    document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>{
       if(a.dias.includes(l.dataset.dia)) l.classList.add('checked');
     });
     renderDiaHorarios(hpd);
@@ -1947,7 +1948,7 @@ function abrirModalAlumno(id=null){
 async function guardarAlumno(){
   const nombre=document.getElementById('a-nombre').value.trim();
   if(!nombre){toast('El nombre es obligatorio');return;}
-  const dias=[...document.querySelectorAll('.dia-check-label.checked')].map(l=>l.dataset.dia);
+  const dias=[...document.querySelectorAll('#a-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
   const hpd=getDiaHorarios();
   const alumno={
     id: editandoId||crypto.randomUUID(),
@@ -2258,7 +2259,7 @@ async function guardarEdicionEntrada(id, idx){
   const texto=document.getElementById(`edit-texto-${idx}`).value.trim();
   if(!texto){toast('El texto no puede estar vacío');return;}
   const fecha=fechaInput
-    ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR')
+    ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
     :seguimiento[id][idx].fecha;
   seguimiento[id][idx]={fecha,texto};
   // Reordenar por fecha
@@ -2675,7 +2676,6 @@ function initNutriMeses(){
 
 function renderNutri(){
   const mk=document.getElementById('nutri-mes-select').value;
-  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
 
   // Combinar clientes nutri dedicados + alumnos con tieneNutri=si
   const alumnosNutri=alumnos.filter(a=>a.tieneNutri==='si'&&a.estado==='activo');
@@ -2686,7 +2686,7 @@ function renderNutri(){
 
   // Resumen
   let totalMes=0;
-  todosClientes.forEach(c=>{const p=cobrosNutri[mk][c.id]; if(p&&p.monto) totalMes+=parseFloat(p.monto);});
+  todosClientes.forEach(c=>{const p=cobrosNutri[mk]&&cobrosNutri[mk][c.id]; if(p&&p.monto) totalMes+=parseFloat(p.monto);});
   document.getElementById('nutri-resumen').innerHTML=`
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       <div class="stat" style="flex:1;min-width:150px">
@@ -2710,7 +2710,7 @@ function renderNutri(){
 
   lista.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.75rem">
     ${todosClientes.map(c=>{
-      const p=cobrosNutri[mk][c.id]||{monto:'',fecha:''};
+      const p=(cobrosNutri[mk]&&cobrosNutri[mk][c.id])||{monto:'',fecha:''};
       const esAlumno=alumnos.find(a=>a.id===c.id);
       const waBtn=c.telefono
         ?`<a href="https://wa.me/54${c.telefono.replace(/\D/g,'')}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none">WhatsApp</a>`:'';
@@ -2841,8 +2841,7 @@ function proximaFechaDia(diaNombre){
   const diaTarget=DIA_A_NUM_NORM[diaNorm];
   if(diaTarget===undefined) return hoy;
   // Si es hoy o en el futuro esta semana, usar esa fecha; si ya pasó, ir a la siguiente semana
-  let diasHasta=(diaTarget - hoy.getDay() + 7) % 7;
-  if(diasHasta===0) diasHasta=0; // hoy mismo está bien
+  let diasHasta=(diaTarget - hoy.getDay() + 7) % 7; // 0 = hoy mismo, está bien
   const fecha=new Date(hoy);
   fecha.setDate(hoy.getDate()+diasHasta);
   return fecha;
@@ -2958,8 +2957,7 @@ function renderNutriPerfil(id){
 
 function renderNutriCobrosPerfil(id){
   const mk=mesKey();
-  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
-  const p=cobrosNutri[mk][id]||{monto:'',fecha:''};
+  const p=(cobrosNutri[mk]&&cobrosNutri[mk][id])||{monto:'',fecha:''};
   return `
     <div style="border-top:1px solid rgba(74,184,112,0.15);padding-top:0.75rem">
       <p style="font-size:0.65rem;color:var(--pd-text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">Pago nutri ${MESES[parseInt(mk.split('-')[1])-1]}</p>
@@ -3022,11 +3020,14 @@ function renderCobrosAlumno(id){
   const pagados=historial.filter(m=>m.estado==='pagado').length;
   const pendientes=historial.filter(m=>m.estado==='pendiente').length;
   // B6: suma el monto real congelado de cada pago (fallback al precio actual
-  // solo para pagos históricos previos a este cambio, que no lo tienen guardado)
-  // + los bonos, en vez de "meses pagados × precio actual".
-  const totalCobrado=historial
+  // solo para pagos históricos previos a este cambio) en vez de
+  // "meses pagados × precio actual". Los bonos se suman aparte y siempre,
+  // sin importar si el mes está pagado/pendiente (el bono ya ingresó apenas se carga).
+  const totalCuotasPerfil=historial
     .filter(m=>m.estado==='pagado')
-    .reduce((acc,m)=>acc+((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto)+(parseFloat(m.bono)||0),0);
+    .reduce((acc,m)=>acc+((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto),0);
+  const totalBonosPerfil=historial.reduce((acc,m)=>acc+(parseFloat(m.bono)||0),0);
+  const totalCobrado=totalCuotasPerfil+totalBonosPerfil;
   const ultimoPago=historial.find(m=>m.estado==='pagado');
   el.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem">
@@ -3281,6 +3282,7 @@ async function drop(e, diaDestino){
   }
   try{
     await guardarFilaAlumno(alumnos[i]);
+    await sincronizarAlumnoCalendar(alumnos[i]);
     toast(`${alumnos[i].nombre} movido a ${diaDestino} ✓`);
     renderAgenda();
     renderDashboard();
@@ -3311,9 +3313,11 @@ function renderCobros(){
     const c=(cobros[mk]&&cobros[mk][a.id])||{estado:'pendiente',fecha:'',bono:'',fechaBono:''};
     totalEsperado+=parseFloat(a.monto||0);
     if(c.estado==='pagado') totalCuotas+=montoCobro(a,c);
-    if(c.bono) totalBonos+=parseFloat(c.bono||0);
     (c.estado==='pagado'?pagados:pendientes).push({a,c});
   });
+  // Bonos: cuentan apenas se cargan, sin importar si el alumno sigue activo
+  // o si el mes está pagado/pendiente (decisión de Luca: el bono ya ingresó).
+  Object.values(cobros[mk]||{}).forEach(c=>{if(c.bono) totalBonos+=parseFloat(c.bono||0);});
   const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
   const iconoReloj='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   const iconoCheck='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
@@ -3441,7 +3445,7 @@ function toggleDia(el){
 }
 function renderDiaHorarios(horariosPorDia={}){
   const lista=document.getElementById('dia-horario-lista');
-  const seleccionados=[...document.querySelectorAll('.dia-check-label.checked')].map(l=>l.dataset.dia);
+  const seleccionados=[...document.querySelectorAll('#a-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
   if(!seleccionados.length){lista.innerHTML='';return;}
   lista.innerHTML=seleccionados.map(dia=>`
     <div class="dia-horario-row">
@@ -3452,7 +3456,7 @@ function renderDiaHorarios(horariosPorDia={}){
 }
 function getDiaHorarios(){
   const result={};
-  document.querySelectorAll('.dia-horario-row').forEach(row=>{
+  document.querySelectorAll('#dia-horario-lista .dia-horario-row').forEach(row=>{
     const label=row.querySelector('label').textContent;
     // B9: '|' es el separador interno de horariosPorDiaToString — si el texto
     // libre lo contiene, corrompe el parseo. Se remueve por las dudas.
