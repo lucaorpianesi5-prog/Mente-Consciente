@@ -933,6 +933,14 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
             <div class="pd-card-header"><span class="pd-card-title">Nutrición</span></div>
             <div class="pd-card-body" id="perfil-nutri"></div>
           </div>
+          <!-- Progresión -->
+          <div class="pd-card pd-card-progresion">
+            <div class="pd-card-header"><span class="pd-card-title">Progresión</span></div>
+            <div class="pd-card-body">
+              <p style="color:var(--pd-text2);font-size:0.82rem;margin-bottom:0.75rem">Consultá y cargá la progresión de este alumno contra toda la Biblioteca de ejercicios.</p>
+              <button class="pd-btn pd-btn-primary" id="perfil-btn-abrir-biblioteca" style="width:100%">📚 Ver Biblioteca</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1040,6 +1048,50 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="cerrarModal('modal-nutri')">Cancelar</button>
       <button class="btn btn-primary" id="btn-guardar-nutri" onclick="guardarClienteNutri()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BIBLIOTECA -->
+<div class="overlay" id="modal-biblioteca">
+  <div class="modal" style="width:min(900px,95vw)">
+    <div class="modal-header">
+      <h3>Biblioteca — <span id="bib-modal-alumno-nombre"></span></h3>
+      <button class="modal-close" onclick="cerrarModal('modal-biblioteca')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(74,184,112,0.15)">
+        <input type="text" id="bib-prog-buscador" list="bib-prog-datalist" placeholder="Buscar ejercicio para cargar progresión..." class="pd-input"/>
+        <datalist id="bib-prog-datalist"></datalist>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <input type="number" id="bib-prog-reps" placeholder="Reps" min="0" class="pd-input" style="flex:1;min-width:70px"/>
+          <input type="number" id="bib-prog-series" placeholder="Series" min="0" class="pd-input" style="flex:1;min-width:70px"/>
+          <input type="number" id="bib-prog-kg" placeholder="KG" min="0" step="0.5" class="pd-input" style="flex:1;min-width:70px"/>
+          <select id="bib-prog-rir" class="pd-input" style="flex:1;min-width:90px">
+            <option value="">RIR</option>
+            <option value="0">RIR 0</option>
+            <option value="1">RIR 1</option>
+            <option value="2">RIR 2</option>
+            <option value="3">RIR 3</option>
+            <option value="4">RIR 4</option>
+            <option value="5">RIR 5</option>
+          </select>
+          <button class="pd-btn pd-btn-primary" id="bib-btn-guardar-progresion" onclick="guardarProgresionBiblioteca()">Guardar</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">
+        <input type="text" id="bib-filtro-texto" placeholder="Buscar ejercicio..." class="pd-input" style="flex:2;min-width:140px" oninput="renderTablaBiblioteca()"/>
+        <select id="bib-filtro-patron" class="pd-input" style="flex:1;min-width:110px" onchange="renderTablaBiblioteca()"><option value="">Todos los patrones</option></select>
+        <select id="bib-filtro-enfoque" class="pd-input" style="flex:1;min-width:110px" onchange="renderTablaBiblioteca()"><option value="">Todos los enfoques</option></select>
+      </div>
+
+      <div class="table-wrap" style="max-height:50vh;overflow-y:auto">
+        <table>
+          <thead><tr><th>Patrón</th><th>Enfoque</th><th>Ejercicio</th><th>Reps</th><th>RIR</th><th>KG</th></tr></thead>
+          <tbody id="bib-tabla-body"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
@@ -1153,6 +1205,12 @@ const RANGO = {
   AHORROS_START:       'Ahorros!A2',
   ASISTENCIAS_READ:    'Asistencias!A2:C1000',
   ASISTENCIAS_START:   'Asistencias!A2',
+  BIBLIOTECA_READ:     'Biblioteca!A2:D1000',
+  BIBLIOTECA_START:    'Biblioteca!A2',
+  PROGRESION_ACTUAL_READ: 'Progresion_Actual!A2:G10000',
+  PROGRESION_ACTUAL_KEYS: 'Progresion_Actual!A2:B10000',
+  PROGRESION_ACTUAL_START: 'Progresion_Actual!A2',
+  PROGRESION_HISTORIAL_START: 'Progresion_Historial!A2',
 };
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
@@ -1184,6 +1242,8 @@ let clientesNutri = [];
 let cobrosNutri = {};
 let gastos = [];
 let ahorros = {};
+let biblioteca = [];
+let progresionActual = [];
 let editandoNutriId = null;
 let editandoId = null;
 
@@ -1222,6 +1282,7 @@ async function cargarPortalAlumno(id){
     const rowsS  = data.seguimiento  || [];
     const rowsAs = data.asistencias  || [];
     const rowsFr = data.frases       || [];
+    const rowsProg = data.progresion || [];
 
     // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
     // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
@@ -1240,6 +1301,10 @@ async function cargarPortalAlumno(id){
         const toDate = s => { const [d,m,y]=s.split('/'); return new Date(`${y}-${m}-${d}`); };
         return toDate(b.fecha) - toDate(a.fecha);
       });
+
+    const progresionList = rowsProg
+      .map(r => ({ ejercicio: r[0], patron: r[1], fecha: r[2], reps: r[3], series: r[4], kg: r[5], rir: r[6] }))
+      .sort((a,b) => a.ejercicio.localeCompare(b.ejercicio, 'es'));
 
     // Racha de clases (se corta si pasa una semana sin asistencia) + recuperaciones
     // Retrocompatible: filas viejas sin columna 'tipo' cuentan como 'asistencia'
@@ -1355,6 +1420,24 @@ async function cargarPortalAlumno(id){
           <span class="portal-frase-comilla">&ldquo;</span>
           <p class="portal-frase-texto">${frase}</p>
         </div>
+
+        <!-- Progresión -->
+        ${progresionList.length > 0 ? `
+        <div class="portal-card">
+          <div class="portal-card-title">Tu progresión</div>
+          ${progresionList.map(p => {
+            const partes = [
+              p.reps && `${escaparHTML(p.reps)} reps`,
+              p.series && `${escaparHTML(p.series)} series`,
+              p.kg && `${escaparHTML(p.kg)} kg`,
+              p.rir !== '' && `RIR ${escaparHTML(p.rir)}`,
+            ].filter(Boolean).join(' · ');
+            return `<div class="portal-entrada">
+              <span class="portal-entrada-fecha">${escaparHTML(p.fecha)}</span>
+              <p class="portal-entrada-texto"><strong>${escaparHTML(p.ejercicio)}</strong><br/>${partes || 'sin datos'}</p>
+            </div>`;
+          }).join('')}
+        </div>` : ''}
 
         <!-- Seguimiento -->
         <div class="portal-card">
@@ -1517,6 +1600,7 @@ function cerrarSesion(){
   if(accessToken) google.accounts.oauth2.revoke(accessToken);
   accessToken=null;alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];ahorros={};
+  biblioteca=[];progresionActual=[];
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
@@ -1688,6 +1772,25 @@ async function cargarDatos(){
         try{
           asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
         }catch(e){console.warn('Error cargando Asistencias:',e);asistencias=[];}
+      })(),
+
+      // Biblioteca de ejercicios
+      (async()=>{
+        try{
+          const rowsB = await sheetsGet(RANGO.BIBLIOTECA_READ);
+          biblioteca = rowsB.map(r=>({id:r[0]||'',ejercicio:r[1]||'',patron:r[2]||'',enfoque:r[3]||''})).filter(e=>e.id);
+        }catch(e){console.warn('Error cargando Biblioteca:',e);biblioteca=[];}
+      })(),
+
+      // Progresión actual (última carga por alumno+ejercicio; el historial completo no se lee acá)
+      (async()=>{
+        try{
+          const rowsP = await sheetsGet(RANGO.PROGRESION_ACTUAL_READ);
+          progresionActual = rowsP.map(r=>({
+            alumnoId:r[0]||'',ejercicioId:r[1]||'',fecha:r[2]||'',
+            reps:r[3]||'',series:r[4]||'',kg:r[5]||'',rir:r[6]||''
+          })).filter(p=>p.alumnoId&&p.ejercicioId);
+        }catch(e){console.warn('Error cargando Progresion_Actual:',e);progresionActual=[];}
       })(),
     ]);
 
@@ -2184,6 +2287,9 @@ function verAlumno(id){
   // Nutrición
   renderNutriPerfil(id);
 
+  // Progresión (abre el modal de Biblioteca)
+  document.getElementById('perfil-btn-abrir-biblioteca').onclick=()=>abrirModalBiblioteca(id);
+
   showPage('perfil',null);
 }
 
@@ -2454,6 +2560,144 @@ async function eliminarMolestia(id,idx){
     renderMolestias(id);
     toast('Eliminado');
   }catch(e){toast('Error al guardar');}
+}
+
+// ── BIBLIOTECA / PROGRESIÓN ──
+let bibliotecaModalAlumnoId=null;
+
+function abrirModalBiblioteca(alumnoId){
+  bibliotecaModalAlumnoId=alumnoId;
+  const a=alumnos.find(x=>x.id===alumnoId);
+  document.getElementById('bib-modal-alumno-nombre').textContent=a?a.nombre:'';
+
+  document.getElementById('bib-prog-datalist').innerHTML=biblioteca.map(e=>
+    `<option value="${escaparHTML(e.ejercicio)} (${escaparHTML(e.patron)})"></option>`
+  ).join('');
+  document.getElementById('bib-prog-buscador').value='';
+  document.getElementById('bib-prog-reps').value='';
+  document.getElementById('bib-prog-series').value='';
+  document.getElementById('bib-prog-kg').value='';
+  document.getElementById('bib-prog-rir').value='';
+
+  // Filtros poblados dinámicamente con los valores que haya en la Biblioteca
+  // (no hardcodeados) — así si Luca agrega un Patrón o Enfoque nuevo en el
+  // Sheet, aparece solo acá sin tocar código.
+  const patrones=[...new Set(biblioteca.map(e=>e.patron).filter(Boolean))].sort((x,y)=>x.localeCompare(y,'es'));
+  const enfoques=[...new Set(biblioteca.map(e=>e.enfoque).filter(Boolean))].sort((x,y)=>x.localeCompare(y,'es'));
+  document.getElementById('bib-filtro-patron').innerHTML='<option value="">Todos los patrones</option>'+
+    patrones.map(p=>`<option value="${escaparHTML(p)}">${escaparHTML(p)}</option>`).join('');
+  document.getElementById('bib-filtro-enfoque').innerHTML='<option value="">Todos los enfoques</option>'+
+    enfoques.map(e=>`<option value="${escaparHTML(e)}">${escaparHTML(e)}</option>`).join('');
+  document.getElementById('bib-filtro-texto').value='';
+
+  renderTablaBiblioteca();
+  document.getElementById('modal-biblioteca').classList.add('open');
+}
+
+function renderTablaBiblioteca(){
+  const alumnoId=bibliotecaModalAlumnoId;
+  const texto=document.getElementById('bib-filtro-texto').value.trim().toLowerCase();
+  const patronF=document.getElementById('bib-filtro-patron').value;
+  const enfoqueF=document.getElementById('bib-filtro-enfoque').value;
+
+  const filas=biblioteca
+    .filter(e=>!patronF||e.patron===patronF)
+    .filter(e=>!enfoqueF||e.enfoque===enfoqueF)
+    .filter(e=>!texto||e.ejercicio.toLowerCase().includes(texto))
+    .sort((a,b)=>a.ejercicio.localeCompare(b.ejercicio,'es'));
+
+  const tbody=document.getElementById('bib-tabla-body');
+  if(filas.length===0){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--suave)">Sin resultados</td></tr>';
+    return;
+  }
+  tbody.innerHTML=filas.map(e=>{
+    const p=progresionActual.find(x=>x.alumnoId===alumnoId&&x.ejercicioId===e.id);
+    return `<tr>
+      <td>${escaparHTML(e.patron)}</td>
+      <td>${escaparHTML(e.enfoque)}</td>
+      <td>${escaparHTML(e.ejercicio)}</td>
+      <td>${p&&p.reps?escaparHTML(p.reps):'—'}</td>
+      <td>${p&&p.rir!==''?escaparHTML(p.rir):'—'}</td>
+      <td>${p&&p.kg?escaparHTML(p.kg):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Exige que el texto del buscador matchee EXACTO una opción de la Biblioteca
+// (mismo formato "Ejercicio (Patrón)" que genera el datalist). Evita guardar
+// texto libre no ligado a un ejercicio real — a propósito, no un bug.
+function _resolverEjercicioBiblioteca(){
+  const texto=document.getElementById('bib-prog-buscador').value.trim();
+  if(!texto) return null;
+  const match=biblioteca.find(e=>`${e.ejercicio} (${e.patron})`===texto);
+  return match?match.id:null;
+}
+
+// Reintenta UNA vez solo el paso que falló (no todo el flujo), según lo
+// pedido en el handoff. Nota: sheetsAppend no es idempotente — si el primer
+// intento en realidad escribió en el Sheet pero la respuesta se perdió por
+// red, el reintento puede duplicar la fila en Progresion_Historial. Se acepta
+// ese riesgo porque Historial es de solo consulta futura (no se lee todavía)
+// y perder el dato es peor que una fila duplicada ocasional.
+async function _intentarConReintento(fn){
+  try{ await fn(); return true; }
+  catch(e){
+    console.warn('Progresión: primer intento falló, reintentando...', e);
+    try{ await fn(); return true; }
+    catch(e2){ console.error('Progresión: reintento también falló', e2); return false; }
+  }
+}
+
+// Progresion_Actual: 1 fila por AlumnoId+EjercicioId. Busca la fila existente
+// por esas dos columnas (lookup server-side, mismo patrón que
+// guardarFilaAlumno) y actualiza; si no existe, la crea.
+async function _guardarProgresionActual(alumnoId, ejercicioId, fila){
+  const keys=await sheetsGet(RANGO.PROGRESION_ACTUAL_KEYS);
+  const idx=keys.findIndex(r=>r[0]===alumnoId&&r[1]===ejercicioId);
+  if(idx===-1){
+    await sheetsAppend(RANGO.PROGRESION_ACTUAL_START,[fila]);
+  }else{
+    const filaSheet=idx+2;
+    await sheetsUpdate(`Progresion_Actual!A${filaSheet}:G${filaSheet}`,[fila]);
+  }
+}
+
+async function guardarProgresionBiblioteca(){
+  const alumnoId=bibliotecaModalAlumnoId;
+  if(!alumnoId) return;
+  const ejercicioId=_resolverEjercicioBiblioteca();
+  if(!ejercicioId){toast('Elegí un ejercicio de la Biblioteca');return;}
+  const reps=document.getElementById('bib-prog-reps').value.trim();
+  const series=document.getElementById('bib-prog-series').value.trim();
+  const kg=document.getElementById('bib-prog-kg').value.trim();
+  const rir=document.getElementById('bib-prog-rir').value;
+  if(!reps&&!series&&!kg&&!rir){toast('Cargá al menos un dato (reps, series, kg o RIR)');return;}
+  const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const fila=[alumnoId,ejercicioId,fecha,reps,series,kg,rir];
+
+  const btn=document.getElementById('bib-btn-guardar-progresion');
+  btn.disabled=true;btn.textContent='Guardando...';
+  const okHistorial=await _intentarConReintento(()=>sheetsAppend(RANGO.PROGRESION_HISTORIAL_START,[fila]));
+  const okActual=await _intentarConReintento(()=>_guardarProgresionActual(alumnoId,ejercicioId,fila));
+  btn.disabled=false;btn.textContent='Guardar';
+
+  if(!okHistorial||!okActual){
+    toast('Error al guardar la progresión — probá de nuevo');
+    return;
+  }
+
+  const i=progresionActual.findIndex(p=>p.alumnoId===alumnoId&&p.ejercicioId===ejercicioId);
+  const registro={alumnoId,ejercicioId,fecha,reps,series,kg,rir};
+  if(i===-1) progresionActual.push(registro); else progresionActual[i]=registro;
+
+  document.getElementById('bib-prog-buscador').value='';
+  document.getElementById('bib-prog-reps').value='';
+  document.getElementById('bib-prog-series').value='';
+  document.getElementById('bib-prog-kg').value='';
+  document.getElementById('bib-prog-rir').value='';
+  renderTablaBiblioteca();
+  toast('Progresión guardada ✓');
 }
 
 async function sincronizarTodosCalendar(){
