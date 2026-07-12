@@ -1192,9 +1192,10 @@ const RANGO = {
   COBROS_WRITE:        'Cobros!A2:G1000',
   COBROS_START:        'Cobros!A2',
   COBROS_KEYS:         'Cobros!A2:B1000',
-  SEGUIMIENTO_READ:    'Seguimiento!A2:C10000',
-  SEGUIMIENTO_WRITE:   'Seguimiento!A2:C10000',
+  SEGUIMIENTO_READ:    'Seguimiento!A2:D10000',
+  SEGUIMIENTO_WRITE:   'Seguimiento!A2:D10000',
   SEGUIMIENTO_START:   'Seguimiento!A2',
+  SEGUIMIENTO_KEYS:    'Seguimiento!D2:D10000',
   NUTRICION_READ:      'Nutricion!A2:E1000',
   NUTRICION_WRITE:     'Nutricion!A2:E1000',
   NUTRICION_START:     'Nutricion!A2',
@@ -1737,7 +1738,7 @@ async function cargarDatos(){
           rowsS.forEach(r=>{
             if(!r[0]) return;
             if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
-            seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||''});
+            seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||'',id:r[3]||null});
           });
         }catch(e){console.warn('Error cargando Seguimiento:',e);seguimiento={};}
       })(),
@@ -1859,10 +1860,11 @@ async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
   const fecha=fechaISO
     ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
     : new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const entrada={fecha, texto};
+  const id=crypto.randomUUID();
+  const entrada={fecha, texto, id};
   seguimiento[alumnoId].unshift(entrada);
   seguimiento[alumnoId].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
-  await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto]]);
+  await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto, id]]);
 }
 
 // Actualiza (o agrega) solo la fila de este mes+alumno, en vez de reescribir
@@ -2387,12 +2389,12 @@ async function guardarEdicionEntrada(id, idx){
   const fecha=fechaInput
     ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
     :seguimiento[id][idx].fecha;
-  seguimiento[id][idx]={fecha,texto};
+  const entrada=seguimiento[id][idx];
+  entrada.fecha=fecha; entrada.texto=texto; // mutar in-place: conserva el id (o su ausencia)
   // Reordenar por fecha
   seguimiento[id].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
   try{
-    // Reescribir toda la hoja Seguimiento
-    await guardarSeguimientoCompleto();
+    await guardarEntradaSeguimientoFila(id, entrada);
     renderHistorial(id);
     toast('Entrada actualizada ✓');
   }catch(e){toast('Error al guardar');}
@@ -2400,9 +2402,10 @@ async function guardarEdicionEntrada(id, idx){
 
 async function eliminarEntrada(id,idx){
   if(!confirm('¿Eliminar esta entrada?')) return;
+  const entrada=seguimiento[id][idx];
   seguimiento[id].splice(idx,1);
   try{
-    await guardarSeguimientoCompleto();
+    await eliminarEntradaSeguimientoFila(id, entrada);
     renderHistorial(id);
     toast('Entrada eliminada');
   }catch(e){toast('Error al eliminar');}
@@ -2411,9 +2414,41 @@ async function eliminarEntrada(id,idx){
 async function guardarSeguimientoCompleto(){
   const values=[];
   Object.entries(seguimiento).forEach(([aid,entradas])=>{
-    entradas.forEach(e=>values.push([aid,e.fecha,e.texto]));
+    entradas.forEach(e=>values.push([aid,e.fecha,e.texto,e.id||'']));
   });
   await sheetsReplaceRange(RANGO.SEGUIMIENTO_WRITE, values);
+}
+
+// Actualiza (o agrega) solo la fila de esta entrada, ubicándola por su Id
+// (columna D) -- en vez de reescribir todo Seguimiento. Si la entrada es
+// legacy (sin Id, cargada antes de esta migración), se le asigna uno ahora
+// y se hace, por única vez, la reescritura completa de arriba -- sin Id no
+// hay forma confiable de ubicar su fila real. De ahí en más esa misma
+// entrada ya queda con Id y usa el camino rápido.
+async function guardarEntradaSeguimientoFila(alumnoId, entrada){
+  if(!entrada.id){
+    entrada.id=crypto.randomUUID();
+    await guardarSeguimientoCompleto();
+    return;
+  }
+  const fila=[alumnoId, entrada.fecha, entrada.texto, entrada.id];
+  const keys=await sheetsGet(RANGO.SEGUIMIENTO_KEYS);
+  const idx=keys.findIndex(r=>r[0]===entrada.id);
+  if(idx===-1) await sheetsAppend(RANGO.SEGUIMIENTO_START,[fila]);
+  else await sheetsUpdate(`Seguimiento!A${idx+2}:D${idx+2}`,[fila]);
+}
+
+// Vacía la fila de esta entrada (no la borra, ver misma técnica en
+// guardarGastoFila -- cargarDatos() ya filtra filas sin AlumnoId).
+// Legacy sin Id: única opción segura es la reescritura completa existente.
+async function eliminarEntradaSeguimientoFila(alumnoId, entrada){
+  if(!entrada.id){
+    await guardarSeguimientoCompleto();
+    return;
+  }
+  const keys=await sheetsGet(RANGO.SEGUIMIENTO_KEYS);
+  const idx=keys.findIndex(r=>r[0]===entrada.id);
+  if(idx!==-1) await sheetsUpdate(`Seguimiento!A${idx+2}:D${idx+2}`,[['','','','']]);
 }
 
 async function agregarEntradaPerfil(id){
