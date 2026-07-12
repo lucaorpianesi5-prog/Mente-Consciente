@@ -6,21 +6,15 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Bugs activos
 
-- [ ] Sin allowlist de emails post-login — cualquier cuenta Google logueada se trata como "el entrenador", la seguridad depende 100% de permisos de Drive — `iniciarSesion()` (index.html:1536) — auditoría del 09/07 (SEGURIDAD/CRÍTICO)
-- [ ] `bono`/`monto` interpolados sin `escaparHTML()` en `onclick` — `editarPagoNutri`/`editarPagoNutriPerfil`/`editarBono` (index.html:2977, 3212, 3573) — auditoría del 09/07 (SEGURIDAD/MEDIO)
-- [ ] Reescritura completa del rango en cada micro-edición en vez de solo la fila afectada — `guardarCobrosEnSheets` (1853), `guardarSeguimientoCompleto` (2391) y análogas de Nutrición/Gastos/Ahorros — auditoría del 09/07 (RENDIMIENTO/ALTO)
-- [ ] `cargarDatos()` sin caché ni carga incremental — ahora son 10 lecturas completas por login/sync (se sumaron Biblioteca y Progresion_Actual hoy) — auditoría del 09/07 (RENDIMIENTO/ALTO)
-- [ ] Paginación no manejada al eliminar eventos de Calendar (`maxResults=20` sin seguir `nextPageToken`) — `eliminarEventosAlumno` (index.html:3129) — auditoría del 09/07 (BUG/MODERADO)
-- [ ] Pausar/desactivar un alumno no detiene sus eventos recurrentes de Calendar — `sincronizarAlumnoCalendar` (index.html:3144) — auditoría del 09/07 (BUG/MODERADO)
-- [ ] Historial de cobros del alumno mezcla meses de otros alumnos — `renderCobrosAlumno` (index.html:3252) toma `Object.keys(cobros)` global en vez de filtrar por alumno — auditoría del 09/07 (BUG/MODERADO)
-- [ ] Inconsistencia de parseo de fechas: `calcularEdad` (3157) hace zero-padding del día/mes, `portalCalcEdad` (1520) no — auditoría del 09/07 (BUG/MODERADO)
-- [ ] Hint de edad obsoleto al reabrir el modal de alumno — no se limpia en el reset de campos de `abrirModalAlumno` (index.html:2011) — auditoría del 09/07 (BUG/MENOR)
-- [ ] Porcentaje de cobro sin clamp, puede superar 100% con montos congelados — `renderDashboard` (index.html:1913) y análoga en `renderCobros` — auditoría del 09/07 (BUG/MENOR)
+- [ ] Sin allowlist de emails post-login — cualquier cuenta Google logueada se trata como "el entrenador", la seguridad depende 100% de permisos de Drive — `iniciarSesion()` (index.html:1536) — auditoría del 09/07 (SEGURIDAD/CRÍTICO) — decisión pendiente, ver Decisiones pendientes
+- [ ] Pausar/desactivar un alumno no detiene sus eventos recurrentes de Calendar — `sincronizarAlumnoCalendar` (index.html:3144) — auditoría del 09/07 (BUG/MODERADO) — decisión pendiente, ver Decisiones pendientes
 - [ ] IDs de Google (`CLIENT_ID`/`SHEET_ID`/`CALENDAR_ID`) hardcodeados sin forma de rotar sin redeploy — auditoría del 09/07 (SEGURIDAD/MEDIO, riesgo aceptado por ahora)
-- [ ] Lógica de fechas y horarios duplicada entre app y portal (`portalCalcEdad`/`calcularEdad`, `stringToHorariosPorDia`/`portalStringToHorarios`) — auditoría del 09/07 (MANTENIBILIDAD)
-- [ ] Estado global disperso sin encapsulamiento (variables `let` a nivel de script, crecieron con Biblioteca/Progresión) — auditoría del 09/07 (MANTENIBILIDAD)
-- [ ] Patrón de `onclick` inline pervasivo en vez de `addEventListener` (creció con el modal de Biblioteca) — auditoría del 09/07 (MANTENIBILIDAD)
-- [ ] Re-render completo vía `innerHTML` en cada actualización de estado (`renderCobros`, `renderNutri`, `renderFinanzas`) — auditoría del 09/07 (RENDIMIENTO/BAJO)
+- [ ] Reescritura completa del rango en cada micro-edición en vez de solo la fila afectada — `guardarCobrosEnSheets` (1853), `guardarSeguimientoCompleto` (2391) y análogas de Nutrición/Gastos/Ahorros — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande)
+- [ ] `cargarDatos()` sin caché ni carga incremental — 10 lecturas completas por login/sync — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande)
+- [ ] Estado global disperso sin encapsulamiento (variables `let` a nivel de script) — auditoría del 09/07 (MANTENIBILIDAD, refactor grande)
+- [ ] Patrón de `onclick` inline pervasivo en vez de `addEventListener` — auditoría del 09/07 (MANTENIBILIDAD, refactor grande)
+- [ ] Re-render completo vía `innerHTML` en cada actualización de estado (`renderCobros`, `renderNutri`, `renderFinanzas`) — auditoría del 09/07 (RENDIMIENTO/BAJO, refactor grande)
+- [ ] Lógica de fechas y horarios duplicada entre app y portal (`portalCalcEdad`/`calcularEdad`, `stringToHorariosPorDia`/`portalStringToHorarios`) — auditoría del 09/07 (MANTENIBILIDAD, refactor grande)
 
 ---
 
@@ -45,6 +39,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 - *(fecha no registrada)* — 7 fixes de auditoría: scoping de selectores `.dia-check-label`/`.dia-horario-row`, sync de Calendar en `drop()`, zero-padding de fechas, conteo de bonos alineado entre Cobros/Finanzas/Perfil, `escaparHTML()` en `dias.join`, reset de estado en `cerrarSesion` completo, limpieza de mutaciones residuales de `cobrosNutri`.
 - 2026-07-09 — XSS vía `onclick`/`escaparHTML` insuficiente en links de Drive/Nutrición — cambiado a `data-*` + listener — commit `54dce8b`.
 - 2026-07-12 — al revisar la auditoría del 09/07 contra el código actual, 2 hallazgos ya estaban corregidos (no se sabe en qué commit, no están en este changelog por separado): race condition en `guardarFilaAlumno` (ya hace lookup server-side por ID en vez de índice local) y `getDiaHorarios()` sin scope (ya está acotado a `#dia-horario-lista`).
+- 2026-07-12 — 6 fixes directos de la auditoría del 09/07: `bono`/`monto` ya no se interpolan como string JS en `onclick` (se leen de `data-*` en runtime); `renderCobrosAlumno` ya no mezcla meses de otros alumnos; `portalCalcEdad` con zero-padding igual que `calcularEdad`; hint de edad se limpia al abrir el modal de alumno; porcentaje de cobros clampeado a 100%; `eliminarEventosAlumno` sigue `nextPageToken` completo — commit `6ebab50`.
 - 2026-07-12 — **Biblioteca de ejercicios + Progresión por ejercicio** — implementado como modal en la ficha de alumno (no como tabs separadas, a diferencia del plan original) con búsqueda, filtros por patrón/enfoque y carga de reps/series/kg/RIR; lee/escribe contra `Biblioteca`, `Progresion_Actual` y `Progresion_Historial` en el Sheet; el alumno ve su progresión en el portal — commit `01a579f`. La decisión de matching quedó resuelta por la implementación: usa el ID estable de `Biblioteca` (no texto libre) una vez seleccionado del buscador.
 
 ---
