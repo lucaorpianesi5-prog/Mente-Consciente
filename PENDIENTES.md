@@ -6,7 +6,6 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Bugs activos
 
-- [ ] Sin allowlist de emails post-login — cualquier cuenta Google logueada se trata como "el entrenador", la seguridad depende 100% de permisos de Drive — `iniciarSesion()` (index.html:1536) — auditoría del 09/07 (SEGURIDAD/CRÍTICO) — decisión pendiente, ver Decisiones pendientes
 - [ ] Pausar/desactivar un alumno no detiene sus eventos recurrentes de Calendar — `sincronizarAlumnoCalendar` (index.html:3144) — auditoría del 09/07 (BUG/MODERADO) — decisión pendiente, ver Decisiones pendientes
 - [ ] IDs de Google (`CLIENT_ID`/`SHEET_ID`/`CALENDAR_ID`) hardcodeados sin forma de rotar sin redeploy — auditoría del 09/07 (SEGURIDAD/MEDIO, riesgo aceptado por ahora)
 - [ ] Reescritura completa del rango en cada micro-edición en vez de solo la fila afectada — `guardarCobrosEnSheets` (1853), `guardarSeguimientoCompleto` (2391) y análogas de Nutrición/Gastos/Ahorros — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande)
@@ -22,6 +21,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 - [ ] **Resistencia** (cronómetro con récord personal y últimos 3 registros) — mockup: `mockup_resistencia_real.html` — estado: mockup construido, todavía no integrado al `index.html`
 - [ ] **Bienestar** (Movimiento, Alimentación, Descanso, Estrés) — mockup: `mockup_bienestar.html` — estado: mockup construido, todavía no integrado al `index.html`
+- [ ] **Login de alumno por email en el portal** — reemplazar (o complementar) el acceso actual por link con token por un login real donde cada alumno entra con su propio mail — estado: idea a futuro, no priorizada todavía. Explícitamente **no** se implementa hasta terminar las funciones principales de la app. No confundir con el allowlist del entrenador (ya resuelto, son sistemas separados).
 
 ---
 
@@ -40,6 +40,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 - 2026-07-09 — XSS vía `onclick`/`escaparHTML` insuficiente en links de Drive/Nutrición — cambiado a `data-*` + listener — commit `54dce8b`.
 - 2026-07-12 — al revisar la auditoría del 09/07 contra el código actual, 2 hallazgos ya estaban corregidos (no se sabe en qué commit, no están en este changelog por separado): race condition en `guardarFilaAlumno` (ya hace lookup server-side por ID en vez de índice local) y `getDiaHorarios()` sin scope (ya está acotado a `#dia-horario-lista`).
 - 2026-07-12 — 6 fixes directos de la auditoría del 09/07: `bono`/`monto` ya no se interpolan como string JS en `onclick` (se leen de `data-*` en runtime); `renderCobrosAlumno` ya no mezcla meses de otros alumnos; `portalCalcEdad` con zero-padding igual que `calcularEdad`; hint de edad se limpia al abrir el modal de alumno; porcentaje de cobros clampeado a 100%; `eliminarEventosAlumno` sigue `nextPageToken` completo — commit `6ebab50`.
+- 2026-07-12 — Allowlist de email para el login del entrenador — `iniciarSesion()` rechaza cualquier cuenta Google que no esté en `ALLOWED_EMAILS` — commit `0a650ef`. Decisión de Luca: no bloquea ni se relaciona con la idea futura de login de alumno por email (sistemas separados, ver Features planificadas).
 - 2026-07-12 — **Biblioteca de ejercicios + Progresión por ejercicio** — implementado como modal en la ficha de alumno (no como tabs separadas, a diferencia del plan original) con búsqueda, filtros por patrón/enfoque y carga de reps/series/kg/RIR; lee/escribe contra `Biblioteca`, `Progresion_Actual` y `Progresion_Historial` en el Sheet; el alumno ve su progresión en el portal — commit `01a579f`. La decisión de matching quedó resuelta por la implementación: usa el ID estable de `Biblioteca` (no texto libre) una vez seleccionado del buscador.
 
 ---
