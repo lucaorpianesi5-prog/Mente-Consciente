@@ -1175,6 +1175,9 @@ const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleus
 const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
 const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar';
+// Único email autorizado a operar el panel del entrenador — cualquier otra
+// cuenta de Google que complete el login de OAuth queda rechazada en iniciarSesion().
+const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
 // Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
 const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
@@ -1548,13 +1551,21 @@ function iniciarSesion(){
       // Renovar automáticamente 5 min antes de que expire (55 min)
       setTimeout(renovarToken, 55 * 60 * 1000);
       if(document.getElementById('login-screen').style.display!=='none'){
+        let email='';
         try {
           const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {headers:{Authorization:'Bearer '+accessToken}});
           if(r.ok){
             const u = await r.json();
-            document.getElementById('user-email').textContent = u.email||'';
+            email = u.email||'';
           }
         } catch(e){}
+        if(!ALLOWED_EMAILS.includes(email)){
+          google.accounts.oauth2.revoke(accessToken);
+          accessToken=null;
+          toast('Esta cuenta no está autorizada para acceder al panel');
+          return;
+        }
+        document.getElementById('user-email').textContent = email;
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app').style.display='block';
         await cargarDatos();
