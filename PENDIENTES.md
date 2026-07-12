@@ -6,7 +6,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Bugs activos
 
-- [ ] IDs de Google (`CLIENT_ID`/`SHEET_ID`/`CALENDAR_ID`) hardcodeados sin forma de rotar sin redeploy — auditoría del 09/07 (SEGURIDAD/MEDIO, riesgo aceptado por ahora)
+- [ ] IDs de Google (`CLIENT_ID`/`SHEET_ID`/`CALENDAR_ID`) hardcodeados sin forma de rotar sin redeploy — auditoría del 09/07 (SEGURIDAD/MEDIO, riesgo aceptado por ahora) — no requiere backend propio hoy; se resuelve solo si/cuando se migre a uno (ver nota en "Login de alumno por email", Features planificadas)
 - [ ] Reescritura completa del rango en cada micro-edición en vez de solo la fila afectada — `guardarCobrosEnSheets` (1853), `guardarSeguimientoCompleto` (2391) y análogas de Nutrición/Gastos/Ahorros — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande)
 - [ ] `cargarDatos()` sin caché ni carga incremental — 10 lecturas completas por login/sync — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande)
 - [ ] Estado global disperso sin encapsulamiento (variables `let` a nivel de script) — auditoría del 09/07 (MANTENIBILIDAD, refactor grande)
@@ -20,7 +20,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 - [ ] **Resistencia** (cronómetro con récord personal y últimos 3 registros) — mockup: `mockup_resistencia_real.html` — estado: mockup construido, todavía no integrado al `index.html`
 - [ ] **Bienestar** (Movimiento, Alimentación, Descanso, Estrés) — mockup: `mockup_bienestar.html` — estado: mockup construido, todavía no integrado al `index.html`
-- [ ] **Login de alumno por email en el portal** — reemplazar (o complementar) el acceso actual por link con token por un login real donde cada alumno entra con su propio mail — estado: idea a futuro, no priorizada todavía. Explícitamente **no** se implementa hasta terminar las funciones principales de la app. No confundir con el allowlist del entrenador (ya resuelto, son sistemas separados).
+- [ ] **Login de alumno por email en el portal** — reemplazar (o complementar) el acceso actual por link con token por un login real donde cada alumno entra con su propio mail — estado: idea a futuro, no priorizada todavía. Explícitamente **no** se implementa hasta terminar las funciones principales de la app. No confundir con el allowlist del entrenador (ya resuelto, son sistemas separados). **Nota de arquitectura:** validar la identidad real de cada alumno de forma segura no se puede hacer solo con código client-side — cuando se implemente esta feature, evaluar migrar a un backend propio (hoy la app es un archivo estático sin servidor). El otro disparador para esa migración sería que el volumen de datos crezca lo suficiente como para que los bugs de performance ya conocidos (reescritura completa de rangos, `cargarDatos()` sin caché) empiecen a doler de verdad.
 
 ---
 
