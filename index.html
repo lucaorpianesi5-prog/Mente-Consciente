@@ -3161,6 +3161,15 @@ async function eliminarEventosAlumno(alumnoId){
 }
 
 async function sincronizarAlumnoCalendar(alumno){
+  // Si el alumno no está activo (pausado/inactivo), solo se eliminan sus
+  // eventos recurrentes — no se recrean. Antes esto solo pasaba al eliminar
+  // al alumno definitivamente, dejando recordatorios semanales corriendo
+  // indefinidamente mientras estaba pausado.
+  if(alumno.estado!=='activo'){
+    try{ await eliminarEventosAlumno(alumno.id); }
+    catch(e){ console.error('Error eliminando eventos de Calendar:',e); toast('Guardado en Sheets. Error al limpiar Calendar.'); }
+    return;
+  }
   // Eliminar eventos existentes y recrear
   try{
     await eliminarEventosAlumno(alumno.id);
