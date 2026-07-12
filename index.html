@@ -273,24 +273,25 @@ tr:hover td{background:rgba(74,184,112,0.04)}
   .pd-asistencia-row .pd-btn{flex:1}
 }
 
-/* Fondo atmosférico + efecto vidrio — solo escritorio, solo ficha de alumno.
+/* Fondo atmosférico + efecto vidrio — todo el escritorio, todas las páginas.
    Imagen como archivo aparte (no base64): así el navegador no la descarga
    en mobile, donde este media query no matchea. */
 @media (min-width: 769px){
-  #page-perfil{
+  .shell{
     position: relative;
     isolation: isolate;
   }
   /* Fondo en un pseudo-elemento fixed a pantalla completa (inset:0), en vez
-     de directo en #page-perfil: así background-size:cover se calcula contra
+     de directo en .shell: así background-size:cover se calcula contra
      el viewport, no contra la altura real del contenido (mucho mas alta,
      con todas las cards) — evita el recorte extremo que dejaba franjas
      planas sin textura detras del panel lateral. z-index:-1 lo manda detras
-     de todo el contenido normal (sidebar lo tapa solo con su propio fondo).
-     isolation:isolate en #page-perfil es necesario: sin eso, este z-index:-1
+     de todo el contenido normal (antes solo estaba en #page-perfil; ahora
+     vive en .shell para cubrir las 7 páginas de la app).
+     isolation:isolate en .shell es necesario: sin eso, este z-index:-1
      escapa al stacking context raiz y el background solido de <body> lo tapa
-     por completo (bug real, encontrado al verificar). */
-  #page-perfil::before{
+     por completo (bug real, encontrado al verificar en el rediseño de Perfil). */
+  .shell::before{
     content: '';
     position: fixed;
     inset: 0;
@@ -302,17 +303,35 @@ tr:hover td{background:rgba(74,184,112,0.04)}
     background-position: center;
     background-repeat: no-repeat;
   }
-  #page-perfil .pd-header-main,
-  #page-perfil .pd-card,
-  #page-perfil .table-wrap{
+
+  /* Contenedores base transparentes para que se vea el fondo fijo detrás */
+  main{ background: transparent; }
+  aside{
+    background: rgba(17,27,22,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-right-color: rgba(74,184,112,0.18);
+  }
+
+  /* Cards de todas las páginas — mismo tratamiento vidrio que ya tenía Perfil */
+  .stat, .table-wrap, .dia-col, .alumno-card, .cobro-row, .resumen-card,
+  .cobro-card, .kpi-card, .fin-card, .kpi-card-fin, .tendencia-card,
+  .lista-card, #page-perfil .pd-header-main, #page-perfil .pd-card{
     background: rgba(28,43,32,0.55);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-color: rgba(74,184,112,0.18);
   }
+
+  /* Headers de tabla / columna resaltada — misma familia, tono base --crema */
+  th, .dia-header, tr.total td{
+    background: rgba(34,53,39,0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }
 
-/* ── FIN PERFIL DARK ── */
+/* ── FIN FONDO ATMOSFÉRICO DESKTOP ── */
 
 /* ALUMNOS CARDS MOBILE */
 #alumnos-cards{display:none;flex-direction:column;gap:0.6rem}
@@ -573,6 +592,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .portal-hero-racha{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 .portal-racha-num{font-size:2.8rem;font-weight:800;line-height:1}
 .portal-racha-label{font-size:0.65rem;color:var(--suave);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;text-align:center}
+.portal-recup-label{font-size:0.62rem;color:var(--suave);margin-top:0.3rem;text-align:center;opacity:0.85}
 .portal-datos-grid{display:flex;flex-direction:column}
 .portal-dato-row{display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0}
 .portal-dato-row + .portal-dato-row{border-top:1px solid rgba(74,184,112,0.08)}
@@ -1044,7 +1064,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
         </div>
         <div class="field" style="grid-column:1/-1">
           <label>Días de entrenamiento</label>
-          <div class="dias-check">
+          <div class="dias-check" id="a-dias-check">
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Lunes">Lunes</span>
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Martes">Martes</span>
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Miércoles">Miércoles</span>
@@ -1112,6 +1132,7 @@ const RANGO = {
   ALUMNOS_READ:        'Alumnos!A2:S1000',
   ALUMNOS_WRITE:       'Alumnos!A2:S1000',
   ALUMNOS_START:       'Alumnos!A2',
+  ALUMNOS_ID_COL:      'Alumnos!A2:A1000',
   COBROS_READ:         'Cobros!A2:G1000',
   COBROS_WRITE:        'Cobros!A2:G1000',
   COBROS_START:        'Cobros!A2',
@@ -1204,10 +1225,13 @@ async function cargarPortalAlumno(id){
 
     // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
     // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
-    // está vacía.
+    // está vacía. Los saltos de línea reales de la celda (Enter en Sheets)
+    // se convierten en <br> DESPUÉS de escapar, así un salto de línea real
+    // se ve como corte de línea, pero un "<br>" tipeado como texto se
+    // muestra literal (no se reabre el vector de HTML sin sanitizar).
     const fraseDefault = 'Pequeños pasos hoy,<br>una versión más fuerte de vos mañana.';
     const frase = rowsFr.length
-      ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)])
+      ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)]).replace(/\n/g,'<br>')
       : fraseDefault;
 
     const entradas = rowsS
@@ -1289,6 +1313,7 @@ async function cargarPortalAlumno(id){
             <div class="portal-hero-racha">
               <div class="portal-racha-num" id="portal-racha-num">${racha}</div>
               <div class="portal-racha-label">clase${racha !== 1 ? 's' : ''} seguida${racha !== 1 ? 's' : ''}</div>
+              ${recuperaciones > 0 ? `<div class="portal-recup-label">${recuperaciones} recuperaci${recuperaciones !== 1 ? 'ones' : 'ón'}</div>` : ''}
             </div>
           </div>
         </div>
@@ -1491,6 +1516,7 @@ async function fetchConRenovacion(url, opciones={}){
 function cerrarSesion(){
   if(accessToken) google.accounts.oauth2.revoke(accessToken);
   accessToken=null;alumnos=[];cobros={};seguimiento={};
+  asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];ahorros={};
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
@@ -1694,23 +1720,27 @@ async function guardarEnSheets(){
   await sheetsReplaceRange(RANGO.ALUMNOS_WRITE, values);
 }
 
-// P1: escribe solo la fila de UN alumno, en vez de reescribir las ~999 filas
+// B-2: escribe solo la fila de UN alumno, en vez de reescribir las ~999 filas
 // del rango completo. Válido para altas al final (usar sheetsAppend) y para
-// ediciones de un alumno que ya existe en el Sheet (esta función). El índice
-// en el array local `alumnos` siempre coincide con la fila real porque nunca
-// se reordena el array y las bajas usan guardarEnSheets (reescritura completa).
+// ediciones de un alumno que ya existe en el Sheet (esta función).
+// La fila real se localiza buscando el ID en la columna A del Sheet (lookup
+// server-side), en vez de asumir que el índice del array local `alumnos`
+// coincide con la fila física. Esto tolera huecos/filas en blanco insertadas
+// manualmente en la hoja. Costo: una llamada de lectura extra (columna A)
+// antes de cada escritura de fila única.
 async function guardarFilaAlumno(alumno){
-  const i = alumnos.findIndex(x=>x.id===alumno.id);
-  if(i===-1) throw new Error('Alumno no encontrado en el array local');
-  const fila = i + 2; // fila 1 = encabezados, los datos arrancan en fila 2
+  const colA = await sheetsGet(RANGO.ALUMNOS_ID_COL);
+  const idx = colA.findIndex(row=>row[0]===alumno.id);
+  if(idx===-1) throw new Error('No se encontró al alumno en la hoja (ID no coincide con ninguna fila) — no se guardó nada');
+  const fila = idx + 2; // fila 1 = encabezados, los datos arrancan en fila 2
   await sheetsUpdate(`Alumnos!A${fila}:S${fila}`, [_alumnoAFila(alumno)]);
 }
 
 async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
   if(!seguimiento[alumnoId]) seguimiento[alumnoId]=[];
   const fecha=fechaISO
-    ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR')
-    : new Date().toLocaleDateString('es-AR');
+    ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
+    : new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
   const entrada={fecha, texto};
   seguimiento[alumnoId].unshift(entrada);
   seguimiento[alumnoId].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
@@ -1848,7 +1878,7 @@ function renderTablaAlumnos(){
   }
   tbody.innerHTML=lista.map(a=>`<tr>
     <td style="font-weight:500">${escaparHTML(a.nombre)}</td>
-    <td style="font-size:0.8rem">${a.dias.join(', ')}</td>
+    <td style="font-size:0.8rem">${escaparHTML(a.dias.join(', '))}</td>
     <td>${a.frecuencia}x/sem</td>
     <td style="font-weight:600;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</td>
     <td>${badgeEstado(a.estado)}</td>
@@ -1860,7 +1890,7 @@ function renderTablaAlumnos(){
         <div class="alumno-card-avatar">${a.nombre.charAt(0).toUpperCase()}</div>
         <div class="alumno-card-info">
           <div class="alumno-card-nombre">${escaparHTML(a.nombre)}</div>
-          <div class="alumno-card-dias">${a.dias.join(', ')}</div>
+          <div class="alumno-card-dias">${escaparHTML(a.dias.join(', '))}</div>
         </div>
         ${badgeEstado(a.estado)}
       </div>
@@ -1878,7 +1908,7 @@ function abrirModalAlumno(id=null){
   ['a-nombre','a-telefono','a-monto','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('a-frecuencia').value='2';
   document.getElementById('a-estado').value='activo';
-  document.querySelectorAll('.dia-check-label').forEach(l=>l.classList.remove('checked'));
+  document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>l.classList.remove('checked'));
   document.getElementById('dia-horario-lista').innerHTML='';
   if(id){
     const a=alumnos.find(x=>x.id===id);
@@ -1897,7 +1927,7 @@ function abrirModalAlumno(id=null){
     document.getElementById('a-carpetaDrive').value=a.carpetaDrive||'';
     document.getElementById('a-nutriDrive').value=a.nutriDrive||'';
     const hpd=stringToHorariosPorDia(a.horario);
-    document.querySelectorAll('.dia-check-label').forEach(l=>{
+    document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>{
       if(a.dias.includes(l.dataset.dia)) l.classList.add('checked');
     });
     renderDiaHorarios(hpd);
@@ -1918,7 +1948,7 @@ function abrirModalAlumno(id=null){
 async function guardarAlumno(){
   const nombre=document.getElementById('a-nombre').value.trim();
   if(!nombre){toast('El nombre es obligatorio');return;}
-  const dias=[...document.querySelectorAll('.dia-check-label.checked')].map(l=>l.dataset.dia);
+  const dias=[...document.querySelectorAll('#a-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
   const hpd=getDiaHorarios();
   const alumno={
     id: editandoId||crypto.randomUUID(),
@@ -1937,6 +1967,7 @@ async function guardarAlumno(){
     pesoActual: document.getElementById('a-pesoActual').value.trim(),
     historialFis: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).historialFis||'':'',
     tieneNutri: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).tieneNutri||'no':'no',
+    portalToken: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).portalToken||'':'',
     carpetaDrive: document.getElementById('a-carpetaDrive').value.trim(),
     nutriDrive:   document.getElementById('a-nutriDrive').value.trim(),
   };
@@ -2228,7 +2259,7 @@ async function guardarEdicionEntrada(id, idx){
   const texto=document.getElementById(`edit-texto-${idx}`).value.trim();
   if(!texto){toast('El texto no puede estar vacío');return;}
   const fecha=fechaInput
-    ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR')
+    ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
     :seguimiento[id][idx].fecha;
   seguimiento[id][idx]={fecha,texto};
   // Reordenar por fecha
@@ -2645,7 +2676,6 @@ function initNutriMeses(){
 
 function renderNutri(){
   const mk=document.getElementById('nutri-mes-select').value;
-  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
 
   // Combinar clientes nutri dedicados + alumnos con tieneNutri=si
   const alumnosNutri=alumnos.filter(a=>a.tieneNutri==='si'&&a.estado==='activo');
@@ -2656,7 +2686,7 @@ function renderNutri(){
 
   // Resumen
   let totalMes=0;
-  todosClientes.forEach(c=>{const p=cobrosNutri[mk][c.id]; if(p&&p.monto) totalMes+=parseFloat(p.monto);});
+  todosClientes.forEach(c=>{const p=cobrosNutri[mk]&&cobrosNutri[mk][c.id]; if(p&&p.monto) totalMes+=parseFloat(p.monto);});
   document.getElementById('nutri-resumen').innerHTML=`
     <div style="display:flex;gap:1rem;flex-wrap:wrap">
       <div class="stat" style="flex:1;min-width:150px">
@@ -2680,7 +2710,7 @@ function renderNutri(){
 
   lista.innerHTML=`<div style="display:flex;flex-direction:column;gap:0.75rem">
     ${todosClientes.map(c=>{
-      const p=cobrosNutri[mk][c.id]||{monto:'',fecha:''};
+      const p=(cobrosNutri[mk]&&cobrosNutri[mk][c.id])||{monto:'',fecha:''};
       const esAlumno=alumnos.find(a=>a.id===c.id);
       const waBtn=c.telefono
         ?`<a href="https://wa.me/54${c.telefono.replace(/\D/g,'')}" target="_blank" class="btn btn-primary btn-sm" style="text-decoration:none">WhatsApp</a>`:'';
@@ -2811,8 +2841,7 @@ function proximaFechaDia(diaNombre){
   const diaTarget=DIA_A_NUM_NORM[diaNorm];
   if(diaTarget===undefined) return hoy;
   // Si es hoy o en el futuro esta semana, usar esa fecha; si ya pasó, ir a la siguiente semana
-  let diasHasta=(diaTarget - hoy.getDay() + 7) % 7;
-  if(diasHasta===0) diasHasta=0; // hoy mismo está bien
+  let diasHasta=(diaTarget - hoy.getDay() + 7) % 7; // 0 = hoy mismo, está bien
   const fecha=new Date(hoy);
   fecha.setDate(hoy.getDate()+diasHasta);
   return fecha;
@@ -2834,7 +2863,7 @@ function parseHora(horarioStr){
 async function crearEventoCalendar(alumno, dia, horario){
   const fecha=proximaFechaDia(dia);
   const {inicio,fin}=parseHora(horario);
-  const fechaStr=fecha.toISOString().slice(0,10);
+  const fechaStr=`${fecha.getFullYear()}-${String(fecha.getMonth()+1).padStart(2,'0')}-${String(fecha.getDate()).padStart(2,'0')}`;
   const rruleDia=getRruleDia(dia);
   const rrule=rruleDia?`RRULE:FREQ=WEEKLY;BYDAY=${rruleDia}`:'';
   const evento={
@@ -2928,8 +2957,7 @@ function renderNutriPerfil(id){
 
 function renderNutriCobrosPerfil(id){
   const mk=mesKey();
-  if(!cobrosNutri[mk]) cobrosNutri[mk]={};
-  const p=cobrosNutri[mk][id]||{monto:'',fecha:''};
+  const p=(cobrosNutri[mk]&&cobrosNutri[mk][id])||{monto:'',fecha:''};
   return `
     <div style="border-top:1px solid rgba(74,184,112,0.15);padding-top:0.75rem">
       <p style="font-size:0.65rem;color:var(--pd-text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.5rem">Pago nutri ${MESES[parseInt(mk.split('-')[1])-1]}</p>
@@ -2977,7 +3005,6 @@ function renderCobrosAlumno(id){
   const el=document.getElementById('perfil-cobros');
   const monto=parseFloat(a.monto||0);
   const mk=mesKey();
-  if(!cobros[mk]) cobros[mk]={};
   const mesesConDatos=new Set(Object.keys(cobros));
   mesesConDatos.add(mk);
   const historial=[...mesesConDatos]
@@ -2993,11 +3020,14 @@ function renderCobrosAlumno(id){
   const pagados=historial.filter(m=>m.estado==='pagado').length;
   const pendientes=historial.filter(m=>m.estado==='pendiente').length;
   // B6: suma el monto real congelado de cada pago (fallback al precio actual
-  // solo para pagos históricos previos a este cambio, que no lo tienen guardado)
-  // + los bonos, en vez de "meses pagados × precio actual".
-  const totalCobrado=historial
+  // solo para pagos históricos previos a este cambio) en vez de
+  // "meses pagados × precio actual". Los bonos se suman aparte y siempre,
+  // sin importar si el mes está pagado/pendiente (el bono ya ingresó apenas se carga).
+  const totalCuotasPerfil=historial
     .filter(m=>m.estado==='pagado')
-    .reduce((acc,m)=>acc+((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto)+(parseFloat(m.bono)||0),0);
+    .reduce((acc,m)=>acc+((m.monto!==''&&m.monto!=null)?parseFloat(m.monto):monto),0);
+  const totalBonosPerfil=historial.reduce((acc,m)=>acc+(parseFloat(m.bono)||0),0);
+  const totalCobrado=totalCuotasPerfil+totalBonosPerfil;
   const ultimoPago=historial.find(m=>m.estado==='pagado');
   el.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:0.75rem">
@@ -3252,6 +3282,7 @@ async function drop(e, diaDestino){
   }
   try{
     await guardarFilaAlumno(alumnos[i]);
+    await sincronizarAlumnoCalendar(alumnos[i]);
     toast(`${alumnos[i].nombre} movido a ${diaDestino} ✓`);
     renderAgenda();
     renderDashboard();
@@ -3272,7 +3303,6 @@ function initMeses(){
 }
 function renderCobros(){
   const mk=document.getElementById('mes-select').value;
-  if(!cobros[mk]) cobros[mk]={};
   const activos=alumnos.filter(a=>a.estado==='activo');
   const lista=document.getElementById('cobros-lista');
   if(!activos.length){lista.innerHTML='<p style="color:var(--suave)">No hay alumnos activos.</p>';return;}
@@ -3280,12 +3310,14 @@ function renderCobros(){
   let totalCuotas=0, totalBonos=0, totalEsperado=0;
   const pendientes=[], pagados=[];
   activos.forEach(a=>{
-    const c=cobros[mk][a.id]||{estado:'pendiente',fecha:'',bono:'',fechaBono:''};
+    const c=(cobros[mk]&&cobros[mk][a.id])||{estado:'pendiente',fecha:'',bono:'',fechaBono:''};
     totalEsperado+=parseFloat(a.monto||0);
     if(c.estado==='pagado') totalCuotas+=montoCobro(a,c);
-    if(c.bono) totalBonos+=parseFloat(c.bono||0);
     (c.estado==='pagado'?pagados:pendientes).push({a,c});
   });
+  // Bonos: cuentan apenas se cargan, sin importar si el alumno sigue activo
+  // o si el mes está pagado/pendiente (decisión de Luca: el bono ya ingresó).
+  Object.values(cobros[mk]||{}).forEach(c=>{if(c.bono) totalBonos+=parseFloat(c.bono||0);});
   const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
   const iconoReloj='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   const iconoCheck='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
@@ -3360,7 +3392,7 @@ function toggleFinAlerta(){
 async function registrarBono(mk,id){
   const input=document.getElementById(`bono-${id}`);
   const monto=input?input.value.trim():'';
-  if(!monto||isNaN(monto)){toast('Ingresá un monto válido');return;}
+  if(isNaN(monto)||monto===''||parseFloat(monto)<=0){toast('Ingresá un monto válido mayor a cero');return;}
   if(!cobros[mk]) cobros[mk]={};
   if(!cobros[mk][id]) cobros[mk][id]={estado:'pendiente',fecha:''};
   cobros[mk][id].bono=monto;
@@ -3413,7 +3445,7 @@ function toggleDia(el){
 }
 function renderDiaHorarios(horariosPorDia={}){
   const lista=document.getElementById('dia-horario-lista');
-  const seleccionados=[...document.querySelectorAll('.dia-check-label.checked')].map(l=>l.dataset.dia);
+  const seleccionados=[...document.querySelectorAll('#a-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
   if(!seleccionados.length){lista.innerHTML='';return;}
   lista.innerHTML=seleccionados.map(dia=>`
     <div class="dia-horario-row">
@@ -3424,7 +3456,7 @@ function renderDiaHorarios(horariosPorDia={}){
 }
 function getDiaHorarios(){
   const result={};
-  document.querySelectorAll('.dia-horario-row').forEach(row=>{
+  document.querySelectorAll('#dia-horario-lista .dia-horario-row').forEach(row=>{
     const label=row.querySelector('label').textContent;
     // B9: '|' es el separador interno de horariosPorDiaToString — si el texto
     // libre lo contiene, corrompe el parseo. Se remueve por las dudas.
