@@ -1191,6 +1191,7 @@ const RANGO = {
   COBROS_READ:         'Cobros!A2:G1000',
   COBROS_WRITE:        'Cobros!A2:G1000',
   COBROS_START:        'Cobros!A2',
+  COBROS_KEYS:         'Cobros!A2:B1000',
   SEGUIMIENTO_READ:    'Seguimiento!A2:C10000',
   SEGUIMIENTO_WRITE:   'Seguimiento!A2:C10000',
   SEGUIMIENTO_START:   'Seguimiento!A2',
@@ -1200,12 +1201,15 @@ const RANGO = {
   NUTRI_COBROS_READ:   'NutricionCobros!A2:D1000',
   NUTRI_COBROS_WRITE:  'NutricionCobros!A2:D1000',
   NUTRI_COBROS_START:  'NutricionCobros!A2',
+  NUTRI_COBROS_KEYS:   'NutricionCobros!A2:B1000',
   GASTOS_READ:         'Gastos!A2:D1000',
   GASTOS_WRITE:        'Gastos!A2:D1000',
   GASTOS_START:        'Gastos!A2',
+  GASTOS_KEYS:         'Gastos!A2:A1000',
   AHORROS_READ:        'Ahorros!A2:B1000',
   AHORROS_WRITE:       'Ahorros!A2:B1000',
   AHORROS_START:       'Ahorros!A2',
+  AHORROS_KEYS:        'Ahorros!A2:A1000',
   ASISTENCIAS_READ:    'Asistencias!A2:C1000',
   ASISTENCIAS_START:   'Asistencias!A2',
   BIBLIOTECA_READ:     'Biblioteca!A2:D1000',
@@ -1861,14 +1865,17 @@ async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
   await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto]]);
 }
 
-async function guardarCobrosEnSheets(){
-  const values=[];
-  Object.entries(cobros).forEach(([mk,mes])=>{
-    Object.entries(mes).forEach(([aid,c])=>{
-      values.push([mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'',c.monto||'']);
-    });
-  });
-  await sheetsReplaceRange(RANGO.COBROS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este mes+alumno, en vez de reescribir
+// todo Cobros — lookup server-side por las columnas clave, mismo patrón que
+// guardarFilaAlumno/_guardarProgresionActual. No hay "borrado" real de fila acá:
+// eliminarBono solo vacía sus campos dentro de la misma fila.
+async function guardarCobroFila(mk, aid){
+  const c=cobros[mk][aid];
+  const fila=[mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'',c.monto||''];
+  const keys=await sheetsGet(RANGO.COBROS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===mk&&r[1]===aid);
+  if(idx===-1) await sheetsAppend(RANGO.COBROS_START,[fila]);
+  else await sheetsUpdate(`Cobros!A${idx+2}:G${idx+2}`,[fila]);
 }
 
 // ── NAVEGACIÓN ──
@@ -2728,13 +2735,27 @@ async function sincronizarTodosCalendar(){
 }
 
 // ── FINANZAS ──
-async function guardarGastosEnSheets(){
-  const values=gastos.map(g=>[g.id,g.fecha,g.desc,g.monto]);
-  await sheetsReplaceRange(RANGO.GASTOS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este gasto. Si ya no está en memoria
+// (se eliminó del array antes de llamar acá), vacía la fila en vez de
+// borrarla — la carga la ignora igual (filtra por id, ver cargarDatos()).
+async function guardarGastoFila(id){
+  const g=gastos.find(x=>x.id===id);
+  const keys=await sheetsGet(RANGO.GASTOS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===id);
+  if(idx===-1){
+    if(g) await sheetsAppend(RANGO.GASTOS_START,[[g.id,g.fecha,g.desc,g.monto]]);
+  }else{
+    const fila=g?[g.id,g.fecha,g.desc,g.monto]:['','','',''];
+    await sheetsUpdate(`Gastos!A${idx+2}:D${idx+2}`,[fila]);
+  }
 }
-async function guardarAhorrosEnSheets(){
-  const values=Object.entries(ahorros).map(([mk,v])=>[mk,v]);
-  await sheetsReplaceRange(RANGO.AHORROS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este mes.
+async function guardarAhorroFila(mk){
+  const v=ahorros[mk]||0;
+  const keys=await sheetsGet(RANGO.AHORROS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===mk);
+  if(idx===-1) await sheetsAppend(RANGO.AHORROS_START,[[mk,v]]);
+  else await sheetsUpdate(`Ahorros!A${idx+2}:B${idx+2}`,[[mk,v]]);
 }
 
 function initFinAnios(){
@@ -2870,7 +2891,7 @@ async function actualizarAhorro(mk, valor){
   const v=parseFloat(valor)||0;
   ahorros[mk]=v;
   try{
-    await guardarAhorrosEnSheets();
+    await guardarAhorroFila(mk);
     toast('Ahorro guardado ✓');
     // Solo actualizar stats y lista de ahorros, no la tabla completa
     renderFinanzas();
@@ -2889,9 +2910,10 @@ async function guardarGasto(){
   const monto=document.getElementById('g-monto').value;
   const desc=document.getElementById('g-desc').value.trim();
   if(!monto||!desc){toast('Completá todos los campos');return;}
-  gastos.push({id:crypto.randomUUID(),fecha:fecha.slice(0,7),desc,monto});
+  const nuevoId=crypto.randomUUID();
+  gastos.push({id:nuevoId,fecha:fecha.slice(0,7),desc,monto});
   try{
-    await guardarGastosEnSheets();
+    await guardarGastoFila(nuevoId);
     toast('Gasto registrado ✓');
     cerrarModal('modal-gasto');
     renderFinanzas();
@@ -2901,7 +2923,7 @@ async function guardarGasto(){
 async function eliminarGasto(id){
   if(!confirm('¿Eliminar este gasto?')) return;
   gastos=gastos.filter(g=>g.id!==id);
-  try{await guardarGastosEnSheets();renderFinanzas();toast('Gasto eliminado');}
+  try{await guardarGastoFila(id);renderFinanzas();toast('Gasto eliminado');}
   catch(e){toast('Error al eliminar');}
 }
 
@@ -2910,14 +2932,19 @@ async function guardarClientesNutriEnSheets(){
   const values=clientesNutri.map(c=>[c.id,c.nombre,c.telefono||'',c.estado,c.notas||'']);
   await sheetsReplaceRange(RANGO.NUTRICION_WRITE, values);
 }
-async function guardarCobrosNutriEnSheets(){
-  const values=[];
-  Object.entries(cobrosNutri).forEach(([mk,mes])=>{
-    Object.entries(mes).forEach(([cid,p])=>{
-      values.push([mk,cid,p.monto||'',p.fecha||'']);
-    });
-  });
-  await sheetsReplaceRange(RANGO.NUTRI_COBROS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este mes+cliente. Si el registro ya
+// no existe en memoria (se eliminó), vacía la fila en vez de borrarla —
+// la carga la ignora igual (filtra filas sin mes/id, ver cargarDatos()).
+async function guardarCobroNutriFila(mk, cid){
+  const p=(cobrosNutri[mk]&&cobrosNutri[mk][cid])||null;
+  const keys=await sheetsGet(RANGO.NUTRI_COBROS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===mk&&r[1]===cid);
+  if(idx===-1){
+    if(p) await sheetsAppend(RANGO.NUTRI_COBROS_START,[[mk,cid,p.monto||'',p.fecha||'']]);
+  }else{
+    const fila=p?[mk,cid,p.monto||'',p.fecha||'']:['','','',''];
+    await sheetsUpdate(`NutricionCobros!A${idx+2}:D${idx+2}`,[fila]);
+  }
 }
 
 // ── NUTRICIÓN RENDER ──
@@ -3052,7 +3079,7 @@ async function _registrarPagoNutriBase(mk,id,monto,renderFn){
   if(!monto||isNaN(monto)){toast('Ingresá un monto válido');return;}
   if(!cobrosNutri[mk]) cobrosNutri[mk]={};
   cobrosNutri[mk][id]={monto,fecha:new Date().toLocaleDateString('es-AR')};
-  try{await guardarCobrosNutriEnSheets();toast('Pago registrado ✓');renderFn();}
+  try{await guardarCobroNutriFila(mk,id);toast('Pago registrado ✓');renderFn();}
   catch(e){toast('Error al guardar');}
 }
 async function registrarPagoNutri(mk,id){
@@ -3067,7 +3094,7 @@ async function _editarPagoNutriBase(mk,id,valorActual,renderFn){
   if(nuevo===null) return;
   if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
   cobrosNutri[mk][id]={monto:nuevo,fecha:new Date().toLocaleDateString('es-AR')};
-  try{await guardarCobrosNutriEnSheets();toast('Pago actualizado ✓');renderFn();}
+  try{await guardarCobroNutriFila(mk,id);toast('Pago actualizado ✓');renderFn();}
   catch(e){toast('Error al guardar');}
 }
 async function editarPagoNutri(mk,id,valorActual){
@@ -3077,7 +3104,7 @@ async function editarPagoNutri(mk,id,valorActual){
 async function _eliminarPagoNutriBase(mk,id,mensaje,renderFn){
   if(!confirm('¿Eliminar este pago?')) return;
   if(cobrosNutri[mk]) delete cobrosNutri[mk][id];
-  try{await guardarCobrosNutriEnSheets();toast(mensaje);renderFn();}
+  try{await guardarCobroNutriFila(mk,id);toast(mensaje);renderFn();}
   catch(e){toast('Error al guardar');}
 }
 async function eliminarPagoNutri(mk,id){
@@ -3352,7 +3379,7 @@ async function _marcarCobroEstado(mk, id, estado, renderFn){
     cobros[mk][id]={...prev,estado:'pendiente',fecha:'',monto:''};
   }
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast(estado==='pagado' ? 'Pago registrado ✓' : 'Marcado como pendiente');
     renderFn();
     renderDashboard();
@@ -3670,7 +3697,7 @@ async function registrarBono(mk,id){
   cobros[mk][id].bono=monto;
   cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast('Bono registrado ✓');
     renderCobros();renderDashboard();
   }catch(e){
@@ -3686,7 +3713,7 @@ async function editarBono(mk,id,valorActual){
   cobros[mk][id].bono=nuevo;
   cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast('Bono actualizado ✓');
     renderCobros();renderDashboard();
   }catch(e){
@@ -3699,7 +3726,7 @@ async function eliminarBono(mk,id){
   cobros[mk][id].bono='';
   cobros[mk][id].fechaBono='';
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast('Bono eliminado');
     renderCobros();renderDashboard();
   }catch(e){
