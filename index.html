@@ -1320,7 +1320,7 @@ async function cargarPortalAlumno(id){
     const racha = portalCalcularRachaSemanal(registrosAlumno);
     const recuperaciones = registrosAlumno.filter(r => r[1] === 'recuperacion').length;
 
-    const hpd = portalStringToHorarios(a.horario);
+    const hpd = stringToHorariosPorDia(a.horario);
     const diasStr = a.dias.map(d => hpd[d] ? `${d} ${hpd[d]}` : d).join(' · ') || 'Sin días asignados';
     const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
@@ -1357,7 +1357,7 @@ async function cargarPortalAlumno(id){
     const objetivosList = a.objetivos ? a.objetivos.split('\n').map(o=>o.trim()).filter(Boolean) : [];
 
     // Datos personales
-    const edad = portalCalcEdad(a.fechaNac);
+    const edad = calcularEdad(a.fechaNac);
     const imc  = (a.pesoActual && a.estatura) ? (parseFloat(a.pesoActual) / Math.pow(parseFloat(a.estatura)/100, 2)).toFixed(1) : null;
 
     el.innerHTML = `
@@ -1485,16 +1485,6 @@ async function cargarPortalAlumno(id){
   }
 }
 
-function portalStringToHorarios(str){
-  if(!str) return {};
-  const result={};
-  str.split('|').forEach(part=>{
-    const idx=part.indexOf(':');
-    if(idx>0){ result[part.slice(0,idx)]=part.slice(idx+1); }
-  });
-  return result;
-}
-
 // B4: racha real — se corta sola si pasa una semana (7+ días) sin registrar
 // asistencia. Las recuperaciones son neutras: no suman a la racha ni la
 // cortan, simplemente se ignoran para este cálculo. Retrocompatible: filas
@@ -1523,19 +1513,6 @@ function portalCalcularRachaSemanal(registros){
     racha++;
   }
   return racha;
-}
-
-function portalCalcEdad(fechaStr){
-  if(!fechaStr) return null;
-  const parts = fechaStr.split('/');
-  if(parts.length!==3) return null;
-  const nac = new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
-  if(isNaN(nac)) return null;
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - nac.getFullYear();
-  const m = hoy.getMonth() - nac.getMonth();
-  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) edad--;
-  return edad;
 }
 
 
