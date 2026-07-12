@@ -1521,7 +1521,7 @@ function portalCalcEdad(fechaStr){
   if(!fechaStr) return null;
   const parts = fechaStr.split('/');
   if(parts.length!==3) return null;
-  const nac = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
+  const nac = new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`);
   if(isNaN(nac)) return null;
   const hoy = new Date();
   let edad = hoy.getFullYear() - nac.getFullYear();
@@ -1910,7 +1910,7 @@ function renderDashboard(){
     totalEsperado+=parseFloat(a.monto||0);
     if(c&&c.estado==='pagado') totalCuotas+=montoCobro(a,c);
   });
-  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  const pct=totalEsperado>0?Math.min(100,Math.round((totalCuotas/totalEsperado)*100)):0;
   document.getElementById('fin-total').innerHTML=`$${totalCuotas.toLocaleString('es-AR')} <span>/ $${totalEsperado.toLocaleString('es-AR')}</span>`;
   document.getElementById('fin-pct').textContent=pct+'%';
   document.getElementById('fin-barra-fill').style.width=pct+'%';
@@ -2013,6 +2013,8 @@ function abrirModalAlumno(id=null){
   document.getElementById('a-estado').value='activo';
   document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>l.classList.remove('checked'));
   document.getElementById('dia-horario-lista').innerHTML='';
+  const fnHintReset=document.getElementById('a-fechaNac-hint');
+  if(fnHintReset) fnHintReset.textContent='';
   if(id){
     const a=alumnos.find(x=>x.id===id);
     if(!a) return;
@@ -2974,7 +2976,7 @@ function renderNutri(){
           ${p.monto
             ?`<span style="font-weight:600;color:var(--marron)">$${parseFloat(p.monto).toLocaleString('es-AR')}</span>
                <span style="font-size:0.72rem;color:var(--suave)">${p.fecha}</span>
-               <button class="btn btn-secondary btn-sm" onclick="editarPagoNutri('${mk}','${c.id}','${p.monto}')">Editar</button>
+               <button class="btn btn-secondary btn-sm" data-monto="${escaparHTML(String(p.monto))}" onclick="editarPagoNutri('${mk}','${c.id}',this.dataset.monto)">Editar</button>
                <button class="btn btn-danger btn-sm" onclick="eliminarPagoNutri('${mk}','${c.id}')">×</button>`
             :`<div style="display:flex;gap:0.4rem;align-items:center">
                 <input type="number" id="nutri-pago-${c.id}" placeholder="Monto cobrado" style="width:130px;padding:0.35rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:var(--blanco)"/>
@@ -3127,12 +3129,18 @@ async function crearEventoCalendar(alumno, dia, horario){
 }
 
 async function eliminarEventosAlumno(alumnoId){
-  // Buscar eventos del alumno por propiedad privada
-  const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?privateExtendedProperty=agendaLucaId%3D${alumnoId}&maxResults=20`;
-  const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
-  if(!r.ok) return;
-  const data=await r.json();
-  const eventos=data.items||[];
+  // Buscar eventos del alumno por propiedad privada, siguiendo nextPageToken
+  // completo (un alumno con historial largo puede superar una sola página)
+  const eventos=[];
+  let pageToken='';
+  do{
+    const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?privateExtendedProperty=agendaLucaId%3D${alumnoId}&maxResults=250${pageToken?`&pageToken=${pageToken}`:''}`;
+    const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok) break;
+    const data=await r.json();
+    eventos.push(...(data.items||[]));
+    pageToken=data.nextPageToken||'';
+  }while(pageToken);
   await Promise.all(eventos.map(async ev=>{
     await fetchConRenovacion(
       `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${ev.id}`,
@@ -3209,7 +3217,7 @@ function renderNutriCobrosPerfil(id){
         ?`<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
             <span style="font-weight:600;color:var(--marron)">$${parseFloat(p.monto).toLocaleString('es-AR')}</span>
             <span style="font-size:0.72rem;color:var(--suave)">${p.fecha}</span>
-            <button class="btn btn-secondary btn-sm" onclick="editarPagoNutriPerfil('${id}','${mk}','${p.monto}')">Editar</button>
+            <button class="btn btn-secondary btn-sm" data-monto="${escaparHTML(String(p.monto))}" onclick="editarPagoNutriPerfil('${id}','${mk}',this.dataset.monto)">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="eliminarPagoNutriPerfil('${id}','${mk}')">×</button>
           </div>`
         :`<div style="display:flex;gap:0.4rem">
@@ -3249,7 +3257,7 @@ function renderCobrosAlumno(id){
   const el=document.getElementById('perfil-cobros');
   const monto=parseFloat(a.monto||0);
   const mk=mesKey();
-  const mesesConDatos=new Set(Object.keys(cobros));
+  const mesesConDatos=new Set(Object.keys(cobros).filter(m=>cobros[m]&&cobros[m][id]));
   mesesConDatos.add(mk);
   const historial=[...mesesConDatos]
     .map(m=>({
@@ -3562,7 +3570,7 @@ function renderCobros(){
   // Bonos: cuentan apenas se cargan, sin importar si el alumno sigue activo
   // o si el mes está pagado/pendiente (decisión de Luca: el bono ya ingresó).
   Object.values(cobros[mk]||{}).forEach(c=>{if(c.bono) totalBonos+=parseFloat(c.bono||0);});
-  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  const pct=totalEsperado>0?Math.min(100,Math.round((totalCuotas/totalEsperado)*100)):0;
   const iconoReloj='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   const iconoCheck='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
 
@@ -3570,7 +3578,7 @@ function renderCobros(){
     const esPagado=c.estado==='pagado';
     const bonoHtml=c.bono
       ?`<span class="bono-existente">🎁 $${parseFloat(c.bono).toLocaleString('es-AR')} · ${c.fechaBono||''}</span>
-        <button class="btn btn-secondary btn-sm" onclick="editarBono('${mk}','${a.id}','${c.bono}')">Editar</button>
+        <button class="btn btn-secondary btn-sm" data-bono="${escaparHTML(String(c.bono))}" onclick="editarBono('${mk}','${a.id}',this.dataset.bono)">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="eliminarBono('${mk}','${a.id}')">×</button>`
       :`<span class="bono-chip" onclick="toggleBono(this)">+ Agregar bono</span>
         <div class="bono-input-wrap">
