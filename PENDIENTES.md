@@ -12,8 +12,6 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Features planificadas
 
-- [ ] **Progresión por ejercicio** — handoff: `handoff-progresion-ejercicios.md` — estado: handoff listo, pendiente pasar a chat de Programación
-- [ ] **Biblioteca de ejercicios** (tabs `Biblioteca`, `Progresion_Historial`, `Progresion_Actual`) — plan de 4 pasos ya entregado a Claude Code — estado: diseño de arquitectura completo, pendiente que apruebes la hoja de revisión de normalización antes de crear la tab `Biblioteca`
 - [ ] **Resistencia** (cronómetro con récord personal y últimos 3 registros) — mockup: `mockup_resistencia_real.html` — estado: mockup construido, todavía no integrado al `index.html`
 - [ ] **Bienestar** (Movimiento, Alimentación, Descanso, Estrés) — mockup: `mockup_bienestar.html` — estado: mockup construido, todavía no integrado al `index.html`
 
@@ -21,7 +19,6 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
-- **Progresión — matching de ejercicio**: ¿arrancar ya con matching por nombre de texto, o esperar la migración de Biblioteca para usar ID estable? — a resolver en chat de Programación antes de implementar la Progresión.
 - **Resistencia — UX del cronómetro**: ¿el campo de carga manual de tiempo se autocompleta al frenar el cronómetro, o el alumno/entrenador lo tipea siempre a mano? — a resolver en chat de Diseño o Programación.
 - **Bienestar — fuente del contenido**: ¿el contenido de los 4 pilares queda hardcodeado en el HTML, o se carga desde una Google Sheet editable? — a resolver en chat de Programación.
 - **Verificación de seguridad del proxy** (`portal-proxy.gs`): confirmar que está seguro antes de sumarle más responsabilidades (recordatorios automáticos, lectura de Progresión desde el portal, etc.) — a resolver antes de tocar el proxy de nuevo.
@@ -32,6 +29,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 - *(fecha no registrada)* — Fondo atmosférico de perfil (`fondo-perfil.webp`) — checklist de contraste, performance y descarga en mobile confirmado, sin cambios de código necesarios.
 - *(fecha no registrada)* — 7 fixes de auditoría: scoping de selectores `.dia-check-label`/`.dia-horario-row`, sync de Calendar en `drop()`, zero-padding de fechas, conteo de bonos alineado entre Cobros/Finanzas/Perfil, `escaparHTML()` en `dias.join`, reset de estado en `cerrarSesion` completo, limpieza de mutaciones residuales de `cobrosNutri`.
+- 2026-07-12 — **Biblioteca de ejercicios + Progresión por ejercicio** — implementado como modal en la ficha de alumno (no como tabs separadas, a diferencia del plan original) con búsqueda, filtros por patrón/enfoque y carga de reps/series/kg/RIR; lee/escribe contra `Biblioteca`, `Progresion_Actual` y `Progresion_Historial` en el Sheet; el alumno ve su progresión en el portal — commit `01a579f`. La decisión de matching quedó resuelta por la implementación: usa el ID estable de `Biblioteca` (no texto libre) una vez seleccionado del buscador.
 
 ---
 
