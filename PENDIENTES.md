@@ -7,7 +7,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 ## Bugs activos
 
 - [ ] IDs de Google (`CLIENT_ID`/`SHEET_ID`/`CALENDAR_ID`) hardcodeados sin forma de rotar sin redeploy — auditoría del 09/07 (SEGURIDAD/MEDIO, riesgo aceptado por ahora) — no requiere backend propio hoy; se resuelve solo si/cuando se migre a uno (ver nota en "Login de alumno por email", Features planificadas)
-- [ ] `cargarDatos()` sin caché ni carga incremental — 10 lecturas completas por login/sync — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande)
+- [ ] `cargarDatos()` sin caché ni carga incremental — 10 lecturas completas por login/sync — auditoría del 09/07 (RENDIMIENTO/ALTO, refactor grande) — decisión de Luca: no duele hoy con 9 alumnos, dejar pendiente hasta que sincronizar se sienta lento de verdad. La única solución real (caché en `localStorage` + refresco en silencio) tiene trade-off de mostrar datos de cobros levemente desactualizados por unos segundos al entrar — evaluar ese trade-off cuando se retome.
 - [ ] Estado global disperso sin encapsulamiento (variables `let` a nivel de script) — auditoría del 09/07 (MANTENIBILIDAD, refactor grande)
 - [ ] Patrón de `onclick` inline pervasivo en vez de `addEventListener` — auditoría del 09/07 (MANTENIBILIDAD, refactor grande)
 - [ ] Re-render completo vía `innerHTML` en cada actualización de estado (`renderCobros`, `renderNutri`, `renderFinanzas`) — auditoría del 09/07 (RENDIMIENTO/BAJO, refactor grande)
