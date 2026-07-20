@@ -1533,8 +1533,9 @@ function encodeRange(range){
   if(parts.length===2) return encodeURIComponent(parts[0])+'!'+parts[1];
   return encodeURIComponent(range);
 }
-async function sheetsGet(range){
-  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}`;
+async function sheetsGet(range, unformatted=false){
+  const qs=unformatted?'?valueRenderOption=UNFORMATTED_VALUE':'';
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}${qs}`;
   const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
   if(!r.ok) throw new Error('Error leyendo Sheets');
   return (await r.json()).values||[];
@@ -1683,7 +1684,7 @@ async function cargarDatos(){
       // Config Finanzas (saldo inicial de ahorro — B7, ver handoff ahorros-finanzas)
       (async()=>{
         try{
-          const rowsA2 = await sheetsGet(RANGO.CONFIG_FINANZAS_READ);
+          const rowsA2 = await sheetsGet(RANGO.CONFIG_FINANZAS_READ, true);
           const fila=rowsA2[0]||[];
           configFinanzas={saldoInicial:parseFloat(fila[0]||0),fechaReferencia:fila[1]||''};
         }catch(e){console.warn('Error cargando config de Finanzas:',e);configFinanzas={saldoInicial:0,fechaReferencia:''};}
