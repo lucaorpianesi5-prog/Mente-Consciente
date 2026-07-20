@@ -2288,7 +2288,7 @@ function verAlumno(id){
 
   // Historial físico
   document.getElementById('perfil-historial-fis').innerHTML=`
-    <textarea id="perfil-historial-fis-txt" class="pd-textarea" style="min-height:80px">${a.historialFis||''}</textarea>
+    <textarea id="perfil-historial-fis-txt" class="pd-textarea" style="min-height:80px">${escaparHTML(a.historialFis)}</textarea>
     <button class="pd-btn pd-btn-primary" style="margin-top:0.5rem;font-size:0.75rem" onclick="guardarCampoAlumno('${id}','historialFis','perfil-historial-fis-txt')">Guardar</button>
   `;
 
@@ -2810,14 +2810,13 @@ function renderDisponible(){
       <button class="btn btn-sm" onclick="toggleEditSaldoInicial()">Editar saldo inicial</button>
     </div>
     <div class="disp-desglose">
-      <div class="disp-row"><span>Saldo inicial${configFinanzas.fechaReferencia?' ('+escaparHTML(configFinanzas.fechaReferencia)+')':''}</span><span>$${saldoInicial.toLocaleString('es-AR')}</span></div>
+      <div class="disp-row"><span>Saldo inicial (al empezar a usar la app, antes del primer cobro registrado)</span><span>$${saldoInicial.toLocaleString('es-AR')}</span></div>
       <div class="disp-row"><span>+ Cobrado a alumnos</span><span>$${totalCobrado.toLocaleString('es-AR')}</span></div>
       <div class="disp-row"><span>− Gastado en el espacio</span><span>$${totalGastado.toLocaleString('es-AR')}</span></div>
       <div class="disp-row disp-total"><span>= Disponible</span><span>$${disponible.toLocaleString('es-AR')}</span></div>
     </div>
     <div class="disp-edit" id="disp-edit-form" style="display:none">
       <input type="number" id="disp-saldo-input" placeholder="Saldo inicial" value="${saldoInicial||''}"/>
-      <input type="date" id="disp-fecha-input" value="${configFinanzas.fechaReferencia||''}"/>
       <button class="btn btn-primary btn-sm" onclick="guardarSaldoInicial()">Guardar</button>
     </div>
   `;
@@ -2828,8 +2827,7 @@ function toggleEditSaldoInicial(){
 }
 async function guardarSaldoInicial(){
   const v=parseFloat(document.getElementById('disp-saldo-input').value)||0;
-  const f=document.getElementById('disp-fecha-input').value||'';
-  configFinanzas={saldoInicial:v,fechaReferencia:f};
+  configFinanzas={saldoInicial:v,fechaReferencia:''};
   try{
     await guardarConfigFinanzas();
     toast('Saldo inicial guardado ✓');
