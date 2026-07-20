@@ -454,7 +454,6 @@ tr.actual td{background:var(--verde-bg);font-weight:600}
 tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--borde);border-bottom:none}
 .cell-verde{color:var(--verde);font-weight:600}
 .cell-rojo{color:var(--rojo)}
-
 /* Lista Gastos */
 .lista-card{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;overflow:hidden}
 .lista-header{padding:0.9rem 1.2rem;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center}
@@ -937,6 +936,14 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
             <div class="pd-card-header"><span class="pd-card-title">Nutrición</span></div>
             <div class="pd-card-body" id="perfil-nutri"></div>
           </div>
+          <!-- Progresión -->
+          <div class="pd-card pd-card-progresion">
+            <div class="pd-card-header"><span class="pd-card-title">Progresión</span></div>
+            <div class="pd-card-body">
+              <p style="color:var(--pd-text2);font-size:0.82rem;margin-bottom:0.75rem">Consultá y cargá la progresión de este alumno contra toda la Biblioteca de ejercicios.</p>
+              <button class="pd-btn pd-btn-primary" id="perfil-btn-abrir-biblioteca" style="width:100%">📚 Ver Biblioteca</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1048,6 +1055,50 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   </div>
 </div>
 
+<!-- MODAL BIBLIOTECA -->
+<div class="overlay" id="modal-biblioteca">
+  <div class="modal" style="width:min(900px,95vw)">
+    <div class="modal-header">
+      <h3>Biblioteca — <span id="bib-modal-alumno-nombre"></span></h3>
+      <button class="modal-close" onclick="cerrarModal('modal-biblioteca')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(74,184,112,0.15)">
+        <input type="text" id="bib-prog-buscador" list="bib-prog-datalist" placeholder="Buscar ejercicio para cargar progresión..." class="pd-input"/>
+        <datalist id="bib-prog-datalist"></datalist>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap">
+          <input type="number" id="bib-prog-reps" placeholder="Reps" min="0" class="pd-input" style="flex:1;min-width:70px"/>
+          <input type="number" id="bib-prog-series" placeholder="Series" min="0" class="pd-input" style="flex:1;min-width:70px"/>
+          <input type="number" id="bib-prog-kg" placeholder="KG" min="0" step="0.5" class="pd-input" style="flex:1;min-width:70px"/>
+          <select id="bib-prog-rir" class="pd-input" style="flex:1;min-width:90px">
+            <option value="">RIR</option>
+            <option value="0">RIR 0</option>
+            <option value="1">RIR 1</option>
+            <option value="2">RIR 2</option>
+            <option value="3">RIR 3</option>
+            <option value="4">RIR 4</option>
+            <option value="5">RIR 5</option>
+          </select>
+          <button class="pd-btn pd-btn-primary" id="bib-btn-guardar-progresion" onclick="guardarProgresionBiblioteca()">Guardar</button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem">
+        <input type="text" id="bib-filtro-texto" placeholder="Buscar ejercicio..." class="pd-input" style="flex:2;min-width:140px" oninput="renderTablaBiblioteca()"/>
+        <select id="bib-filtro-patron" class="pd-input" style="flex:1;min-width:110px" onchange="renderTablaBiblioteca()"><option value="">Todos los patrones</option></select>
+        <select id="bib-filtro-enfoque" class="pd-input" style="flex:1;min-width:110px" onchange="renderTablaBiblioteca()"><option value="">Todos los enfoques</option></select>
+      </div>
+
+      <div class="table-wrap" style="max-height:50vh;overflow-y:auto">
+        <table>
+          <thead><tr><th>Patrón</th><th>Enfoque</th><th>Ejercicio</th><th>Reps</th><th>RIR</th><th>KG</th></tr></thead>
+          <tbody id="bib-tabla-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL ALUMNO -->
 <div class="overlay" id="modal-alumno">
   <div class="modal">
@@ -1126,7 +1177,10 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleusercontent.com';
 const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
-const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar';
+const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email';
+// Único email autorizado a operar el panel del entrenador — cualquier otra
+// cuenta de Google que complete el login de OAuth queda rechazada en iniciarSesion().
+const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
 // Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
 const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
@@ -1140,18 +1194,22 @@ const RANGO = {
   COBROS_READ:         'Cobros!A2:G1000',
   COBROS_WRITE:        'Cobros!A2:G1000',
   COBROS_START:        'Cobros!A2',
-  SEGUIMIENTO_READ:    'Seguimiento!A2:C10000',
-  SEGUIMIENTO_WRITE:   'Seguimiento!A2:C10000',
+  COBROS_KEYS:         'Cobros!A2:B1000',
+  SEGUIMIENTO_READ:    'Seguimiento!A2:D10000',
+  SEGUIMIENTO_WRITE:   'Seguimiento!A2:D10000',
   SEGUIMIENTO_START:   'Seguimiento!A2',
+  SEGUIMIENTO_KEYS:    'Seguimiento!D2:D10000',
   NUTRICION_READ:      'Nutricion!A2:E1000',
   NUTRICION_WRITE:     'Nutricion!A2:E1000',
   NUTRICION_START:     'Nutricion!A2',
   NUTRI_COBROS_READ:   'NutricionCobros!A2:D1000',
   NUTRI_COBROS_WRITE:  'NutricionCobros!A2:D1000',
   NUTRI_COBROS_START:  'NutricionCobros!A2',
+  NUTRI_COBROS_KEYS:   'NutricionCobros!A2:B1000',
   GASTOS_READ:         'Gastos!A2:D1000',
   GASTOS_WRITE:        'Gastos!A2:D1000',
   GASTOS_START:        'Gastos!A2',
+  GASTOS_KEYS:         'Gastos!A2:A1000',
   // B7 (handoff ahorros-finanzas): repurposed. Antes era un log mensual
   // (mes,valor) que Luca tipeaba a mano; ahora es una única fila de
   // configuración: [SaldoInicialAhorro, FechaReferenciaSaldoInicial].
@@ -1159,6 +1217,12 @@ const RANGO = {
   CONFIG_FINANZAS_WRITE: 'Ahorros!A2:B2',
   ASISTENCIAS_READ:    'Asistencias!A2:C1000',
   ASISTENCIAS_START:   'Asistencias!A2',
+  BIBLIOTECA_READ:     'Biblioteca!A2:D1000',
+  BIBLIOTECA_START:    'Biblioteca!A2',
+  PROGRESION_ACTUAL_READ: 'Progresion_Actual!A2:G10000',
+  PROGRESION_ACTUAL_KEYS: 'Progresion_Actual!A2:B10000',
+  PROGRESION_ACTUAL_START: 'Progresion_Actual!A2',
+  PROGRESION_HISTORIAL_START: 'Progresion_Historial!A2',
 };
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
@@ -1190,6 +1254,8 @@ let clientesNutri = [];
 let cobrosNutri = {};
 let gastos = [];
 let configFinanzas = {saldoInicial:0, fechaReferencia:''};
+let biblioteca = [];
+let progresionActual = [];
 let editandoNutriId = null;
 let editandoId = null;
 
@@ -1228,6 +1294,7 @@ async function cargarPortalAlumno(id){
     const rowsS  = data.seguimiento  || [];
     const rowsAs = data.asistencias  || [];
     const rowsFr = data.frases       || [];
+    const rowsProg = data.progresion || [];
 
     // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
     // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
@@ -1247,13 +1314,17 @@ async function cargarPortalAlumno(id){
         return toDate(b.fecha) - toDate(a.fecha);
       });
 
+    const progresionList = rowsProg
+      .map(r => ({ ejercicio: r[0], patron: r[1], fecha: r[2], reps: r[3], series: r[4], kg: r[5], rir: r[6] }))
+      .sort((a,b) => a.ejercicio.localeCompare(b.ejercicio, 'es'));
+
     // Racha de clases (se corta si pasa una semana sin asistencia) + recuperaciones
     // Retrocompatible: filas viejas sin columna 'tipo' cuentan como 'asistencia'
     const registrosAlumno = rowsAs;
     const racha = portalCalcularRachaSemanal(registrosAlumno);
     const recuperaciones = registrosAlumno.filter(r => r[1] === 'recuperacion').length;
 
-    const hpd = portalStringToHorarios(a.horario);
+    const hpd = stringToHorariosPorDia(a.horario);
     const diasStr = a.dias.map(d => hpd[d] ? `${d} ${hpd[d]}` : d).join(' · ') || 'Sin días asignados';
     const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
@@ -1290,7 +1361,7 @@ async function cargarPortalAlumno(id){
     const objetivosList = a.objetivos ? a.objetivos.split('\n').map(o=>o.trim()).filter(Boolean) : [];
 
     // Datos personales
-    const edad = portalCalcEdad(a.fechaNac);
+    const edad = calcularEdad(a.fechaNac);
     const imc  = (a.pesoActual && a.estatura) ? (parseFloat(a.pesoActual) / Math.pow(parseFloat(a.estatura)/100, 2)).toFixed(1) : null;
 
     el.innerHTML = `
@@ -1362,6 +1433,24 @@ async function cargarPortalAlumno(id){
           <p class="portal-frase-texto">${frase}</p>
         </div>
 
+        <!-- Progresión -->
+        ${progresionList.length > 0 ? `
+        <div class="portal-card">
+          <div class="portal-card-title">Tu progresión</div>
+          ${progresionList.map(p => {
+            const partes = [
+              p.reps && `${escaparHTML(p.reps)} reps`,
+              p.series && `${escaparHTML(p.series)} series`,
+              p.kg && `${escaparHTML(p.kg)} kg`,
+              p.rir !== '' && `RIR ${escaparHTML(p.rir)}`,
+            ].filter(Boolean).join(' · ');
+            return `<div class="portal-entrada">
+              <span class="portal-entrada-fecha">${escaparHTML(p.fecha)}</span>
+              <p class="portal-entrada-texto"><strong>${escaparHTML(p.ejercicio)}</strong><br/>${partes || 'sin datos'}</p>
+            </div>`;
+          }).join('')}
+        </div>` : ''}
+
         <!-- Seguimiento -->
         <div class="portal-card">
           <div class="portal-card-title">Seguimiento</div>
@@ -1400,16 +1489,6 @@ async function cargarPortalAlumno(id){
   }
 }
 
-function portalStringToHorarios(str){
-  if(!str) return {};
-  const result={};
-  str.split('|').forEach(part=>{
-    const idx=part.indexOf(':');
-    if(idx>0){ result[part.slice(0,idx)]=part.slice(idx+1); }
-  });
-  return result;
-}
-
 // B4: racha real — se corta sola si pasa una semana (7+ días) sin registrar
 // asistencia. Las recuperaciones son neutras: no suman a la racha ni la
 // cortan, simplemente se ignoran para este cálculo. Retrocompatible: filas
@@ -1440,19 +1519,6 @@ function portalCalcularRachaSemanal(registros){
   return racha;
 }
 
-function portalCalcEdad(fechaStr){
-  if(!fechaStr) return null;
-  const parts = fechaStr.split('/');
-  if(parts.length!==3) return null;
-  const nac = new Date(`${parts[2]}-${parts[1]}-${parts[0]}`);
-  if(isNaN(nac)) return null;
-  const hoy = new Date();
-  let edad = hoy.getFullYear() - nac.getFullYear();
-  const m = hoy.getMonth() - nac.getMonth();
-  if(m<0||(m===0&&hoy.getDate()<nac.getDate())) edad--;
-  return edad;
-}
-
 
 let tokenClient = null;
 
@@ -1471,13 +1537,21 @@ function iniciarSesion(){
       // Renovar automáticamente 5 min antes de que expire (55 min)
       setTimeout(renovarToken, 55 * 60 * 1000);
       if(document.getElementById('login-screen').style.display!=='none'){
+        let email='';
         try {
           const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {headers:{Authorization:'Bearer '+accessToken}});
           if(r.ok){
             const u = await r.json();
-            document.getElementById('user-email').textContent = u.email||'';
+            email = u.email||'';
           }
         } catch(e){}
+        if(!ALLOWED_EMAILS.includes(email)){
+          google.accounts.oauth2.revoke(accessToken);
+          accessToken=null;
+          toast('Esta cuenta no está autorizada para acceder al panel');
+          return;
+        }
+        document.getElementById('user-email').textContent = email;
         document.getElementById('login-screen').style.display='none';
         document.getElementById('app').style.display='block';
         await cargarDatos();
@@ -1523,6 +1597,7 @@ function cerrarSesion(){
   if(accessToken) google.accounts.oauth2.revoke(accessToken);
   accessToken=null;alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];configFinanzas={saldoInicial:0,fechaReferencia:''};
+  biblioteca=[];progresionActual=[];
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
 }
@@ -1645,7 +1720,7 @@ async function cargarDatos(){
           rowsS.forEach(r=>{
             if(!r[0]) return;
             if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
-            seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||''});
+            seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||'',id:r[3]||null});
           });
         }catch(e){console.warn('Error cargando Seguimiento:',e);seguimiento={};}
       })(),
@@ -1700,6 +1775,25 @@ async function cargarDatos(){
           asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
         }catch(e){console.warn('Error cargando Asistencias:',e);asistencias=[];}
       })(),
+
+      // Biblioteca de ejercicios
+      (async()=>{
+        try{
+          const rowsB = await sheetsGet(RANGO.BIBLIOTECA_READ);
+          biblioteca = rowsB.map(r=>({id:r[0]||'',ejercicio:r[1]||'',patron:r[2]||'',enfoque:r[3]||''})).filter(e=>e.id);
+        }catch(e){console.warn('Error cargando Biblioteca:',e);biblioteca=[];}
+      })(),
+
+      // Progresión actual (última carga por alumno+ejercicio; el historial completo no se lee acá)
+      (async()=>{
+        try{
+          const rowsP = await sheetsGet(RANGO.PROGRESION_ACTUAL_READ);
+          progresionActual = rowsP.map(r=>({
+            alumnoId:r[0]||'',ejercicioId:r[1]||'',fecha:r[2]||'',
+            reps:r[3]||'',series:r[4]||'',kg:r[5]||'',rir:r[6]||''
+          })).filter(p=>p.alumnoId&&p.ejercicioId);
+        }catch(e){console.warn('Error cargando Progresion_Actual:',e);progresionActual=[];}
+      })(),
     ]);
 
     toast('Datos sincronizados ✓');
@@ -1752,20 +1846,24 @@ async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO){
   const fecha=fechaISO
     ? new Date(fechaISO+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
     : new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const entrada={fecha, texto};
+  const id=crypto.randomUUID();
+  const entrada={fecha, texto, id};
   seguimiento[alumnoId].unshift(entrada);
   seguimiento[alumnoId].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
-  await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto]]);
+  await sheetsAppend(RANGO.SEGUIMIENTO_START,[[alumnoId, fecha, texto, id]]);
 }
 
-async function guardarCobrosEnSheets(){
-  const values=[];
-  Object.entries(cobros).forEach(([mk,mes])=>{
-    Object.entries(mes).forEach(([aid,c])=>{
-      values.push([mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'',c.monto||'']);
-    });
-  });
-  await sheetsReplaceRange(RANGO.COBROS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este mes+alumno, en vez de reescribir
+// todo Cobros — lookup server-side por las columnas clave, mismo patrón que
+// guardarFilaAlumno/_guardarProgresionActual. No hay "borrado" real de fila acá:
+// eliminarBono solo vacía sus campos dentro de la misma fila.
+async function guardarCobroFila(mk, aid){
+  const c=cobros[mk][aid];
+  const fila=[mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'',c.monto||''];
+  const keys=await sheetsGet(RANGO.COBROS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===mk&&r[1]===aid);
+  if(idx===-1) await sheetsAppend(RANGO.COBROS_START,[fila]);
+  else await sheetsUpdate(`Cobros!A${idx+2}:G${idx+2}`,[fila]);
 }
 
 // ── NAVEGACIÓN ──
@@ -1818,7 +1916,7 @@ function renderDashboard(){
     totalEsperado+=parseFloat(a.monto||0);
     if(c&&c.estado==='pagado') totalCuotas+=montoCobro(a,c);
   });
-  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  const pct=totalEsperado>0?Math.min(100,Math.round((totalCuotas/totalEsperado)*100)):0;
   document.getElementById('fin-total').innerHTML=`$${totalCuotas.toLocaleString('es-AR')} <span>/ $${totalEsperado.toLocaleString('es-AR')}</span>`;
   document.getElementById('fin-pct').textContent=pct+'%';
   document.getElementById('fin-barra-fill').style.width=pct+'%';
@@ -1921,6 +2019,8 @@ function abrirModalAlumno(id=null){
   document.getElementById('a-estado').value='activo';
   document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>l.classList.remove('checked'));
   document.getElementById('dia-horario-lista').innerHTML='';
+  const fnHintReset=document.getElementById('a-fechaNac-hint');
+  if(fnHintReset) fnHintReset.textContent='';
   if(id){
     const a=alumnos.find(x=>x.id===id);
     if(!a) return;
@@ -2195,6 +2295,9 @@ function verAlumno(id){
   // Nutrición
   renderNutriPerfil(id);
 
+  // Progresión (abre el modal de Biblioteca)
+  document.getElementById('perfil-btn-abrir-biblioteca').onclick=()=>abrirModalBiblioteca(id);
+
   showPage('perfil',null);
 }
 
@@ -2272,12 +2375,12 @@ async function guardarEdicionEntrada(id, idx){
   const fecha=fechaInput
     ?new Date(fechaInput+'T00:00:00').toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'})
     :seguimiento[id][idx].fecha;
-  seguimiento[id][idx]={fecha,texto};
+  const entrada=seguimiento[id][idx];
+  entrada.fecha=fecha; entrada.texto=texto; // mutar in-place: conserva el id (o su ausencia)
   // Reordenar por fecha
   seguimiento[id].sort((a,b)=>new Date(b.fecha.split('/').reverse().join('-'))-new Date(a.fecha.split('/').reverse().join('-')));
   try{
-    // Reescribir toda la hoja Seguimiento
-    await guardarSeguimientoCompleto();
+    await guardarEntradaSeguimientoFila(id, entrada);
     renderHistorial(id);
     toast('Entrada actualizada ✓');
   }catch(e){toast('Error al guardar');}
@@ -2285,9 +2388,10 @@ async function guardarEdicionEntrada(id, idx){
 
 async function eliminarEntrada(id,idx){
   if(!confirm('¿Eliminar esta entrada?')) return;
+  const entrada=seguimiento[id][idx];
   seguimiento[id].splice(idx,1);
   try{
-    await guardarSeguimientoCompleto();
+    await eliminarEntradaSeguimientoFila(id, entrada);
     renderHistorial(id);
     toast('Entrada eliminada');
   }catch(e){toast('Error al eliminar');}
@@ -2296,9 +2400,41 @@ async function eliminarEntrada(id,idx){
 async function guardarSeguimientoCompleto(){
   const values=[];
   Object.entries(seguimiento).forEach(([aid,entradas])=>{
-    entradas.forEach(e=>values.push([aid,e.fecha,e.texto]));
+    entradas.forEach(e=>values.push([aid,e.fecha,e.texto,e.id||'']));
   });
   await sheetsReplaceRange(RANGO.SEGUIMIENTO_WRITE, values);
+}
+
+// Actualiza (o agrega) solo la fila de esta entrada, ubicándola por su Id
+// (columna D) -- en vez de reescribir todo Seguimiento. Si la entrada es
+// legacy (sin Id, cargada antes de esta migración), se le asigna uno ahora
+// y se hace, por única vez, la reescritura completa de arriba -- sin Id no
+// hay forma confiable de ubicar su fila real. De ahí en más esa misma
+// entrada ya queda con Id y usa el camino rápido.
+async function guardarEntradaSeguimientoFila(alumnoId, entrada){
+  if(!entrada.id){
+    entrada.id=crypto.randomUUID();
+    await guardarSeguimientoCompleto();
+    return;
+  }
+  const fila=[alumnoId, entrada.fecha, entrada.texto, entrada.id];
+  const keys=await sheetsGet(RANGO.SEGUIMIENTO_KEYS);
+  const idx=keys.findIndex(r=>r[0]===entrada.id);
+  if(idx===-1) await sheetsAppend(RANGO.SEGUIMIENTO_START,[fila]);
+  else await sheetsUpdate(`Seguimiento!A${idx+2}:D${idx+2}`,[fila]);
+}
+
+// Vacía la fila de esta entrada (no la borra, ver misma técnica en
+// guardarGastoFila -- cargarDatos() ya filtra filas sin AlumnoId).
+// Legacy sin Id: única opción segura es la reescritura completa existente.
+async function eliminarEntradaSeguimientoFila(alumnoId, entrada){
+  if(!entrada.id){
+    await guardarSeguimientoCompleto();
+    return;
+  }
+  const keys=await sheetsGet(RANGO.SEGUIMIENTO_KEYS);
+  const idx=keys.findIndex(r=>r[0]===entrada.id);
+  if(idx!==-1) await sheetsUpdate(`Seguimiento!A${idx+2}:D${idx+2}`,[['','','','']]);
 }
 
 async function agregarEntradaPerfil(id){
@@ -2467,6 +2603,144 @@ async function eliminarMolestia(id,idx){
   }catch(e){toast('Error al guardar');}
 }
 
+// ── BIBLIOTECA / PROGRESIÓN ──
+let bibliotecaModalAlumnoId=null;
+
+function abrirModalBiblioteca(alumnoId){
+  bibliotecaModalAlumnoId=alumnoId;
+  const a=alumnos.find(x=>x.id===alumnoId);
+  document.getElementById('bib-modal-alumno-nombre').textContent=a?a.nombre:'';
+
+  document.getElementById('bib-prog-datalist').innerHTML=biblioteca.map(e=>
+    `<option value="${escaparHTML(e.ejercicio)} (${escaparHTML(e.patron)})"></option>`
+  ).join('');
+  document.getElementById('bib-prog-buscador').value='';
+  document.getElementById('bib-prog-reps').value='';
+  document.getElementById('bib-prog-series').value='';
+  document.getElementById('bib-prog-kg').value='';
+  document.getElementById('bib-prog-rir').value='';
+
+  // Filtros poblados dinámicamente con los valores que haya en la Biblioteca
+  // (no hardcodeados) — así si Luca agrega un Patrón o Enfoque nuevo en el
+  // Sheet, aparece solo acá sin tocar código.
+  const patrones=[...new Set(biblioteca.map(e=>e.patron).filter(Boolean))].sort((x,y)=>x.localeCompare(y,'es'));
+  const enfoques=[...new Set(biblioteca.map(e=>e.enfoque).filter(Boolean))].sort((x,y)=>x.localeCompare(y,'es'));
+  document.getElementById('bib-filtro-patron').innerHTML='<option value="">Todos los patrones</option>'+
+    patrones.map(p=>`<option value="${escaparHTML(p)}">${escaparHTML(p)}</option>`).join('');
+  document.getElementById('bib-filtro-enfoque').innerHTML='<option value="">Todos los enfoques</option>'+
+    enfoques.map(e=>`<option value="${escaparHTML(e)}">${escaparHTML(e)}</option>`).join('');
+  document.getElementById('bib-filtro-texto').value='';
+
+  renderTablaBiblioteca();
+  document.getElementById('modal-biblioteca').classList.add('open');
+}
+
+function renderTablaBiblioteca(){
+  const alumnoId=bibliotecaModalAlumnoId;
+  const texto=document.getElementById('bib-filtro-texto').value.trim().toLowerCase();
+  const patronF=document.getElementById('bib-filtro-patron').value;
+  const enfoqueF=document.getElementById('bib-filtro-enfoque').value;
+
+  const filas=biblioteca
+    .filter(e=>!patronF||e.patron===patronF)
+    .filter(e=>!enfoqueF||e.enfoque===enfoqueF)
+    .filter(e=>!texto||e.ejercicio.toLowerCase().includes(texto))
+    .sort((a,b)=>a.ejercicio.localeCompare(b.ejercicio,'es'));
+
+  const tbody=document.getElementById('bib-tabla-body');
+  if(filas.length===0){
+    tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--suave)">Sin resultados</td></tr>';
+    return;
+  }
+  tbody.innerHTML=filas.map(e=>{
+    const p=progresionActual.find(x=>x.alumnoId===alumnoId&&x.ejercicioId===e.id);
+    return `<tr>
+      <td>${escaparHTML(e.patron)}</td>
+      <td>${escaparHTML(e.enfoque)}</td>
+      <td>${escaparHTML(e.ejercicio)}</td>
+      <td>${p&&p.reps?escaparHTML(p.reps):'—'}</td>
+      <td>${p&&p.rir!==''?escaparHTML(p.rir):'—'}</td>
+      <td>${p&&p.kg?escaparHTML(p.kg):'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Exige que el texto del buscador matchee EXACTO una opción de la Biblioteca
+// (mismo formato "Ejercicio (Patrón)" que genera el datalist). Evita guardar
+// texto libre no ligado a un ejercicio real — a propósito, no un bug.
+function _resolverEjercicioBiblioteca(){
+  const texto=document.getElementById('bib-prog-buscador').value.trim();
+  if(!texto) return null;
+  const match=biblioteca.find(e=>`${e.ejercicio} (${e.patron})`===texto);
+  return match?match.id:null;
+}
+
+// Reintenta UNA vez solo el paso que falló (no todo el flujo), según lo
+// pedido en el handoff. Nota: sheetsAppend no es idempotente — si el primer
+// intento en realidad escribió en el Sheet pero la respuesta se perdió por
+// red, el reintento puede duplicar la fila en Progresion_Historial. Se acepta
+// ese riesgo porque Historial es de solo consulta futura (no se lee todavía)
+// y perder el dato es peor que una fila duplicada ocasional.
+async function _intentarConReintento(fn){
+  try{ await fn(); return true; }
+  catch(e){
+    console.warn('Progresión: primer intento falló, reintentando...', e);
+    try{ await fn(); return true; }
+    catch(e2){ console.error('Progresión: reintento también falló', e2); return false; }
+  }
+}
+
+// Progresion_Actual: 1 fila por AlumnoId+EjercicioId. Busca la fila existente
+// por esas dos columnas (lookup server-side, mismo patrón que
+// guardarFilaAlumno) y actualiza; si no existe, la crea.
+async function _guardarProgresionActual(alumnoId, ejercicioId, fila){
+  const keys=await sheetsGet(RANGO.PROGRESION_ACTUAL_KEYS);
+  const idx=keys.findIndex(r=>r[0]===alumnoId&&r[1]===ejercicioId);
+  if(idx===-1){
+    await sheetsAppend(RANGO.PROGRESION_ACTUAL_START,[fila]);
+  }else{
+    const filaSheet=idx+2;
+    await sheetsUpdate(`Progresion_Actual!A${filaSheet}:G${filaSheet}`,[fila]);
+  }
+}
+
+async function guardarProgresionBiblioteca(){
+  const alumnoId=bibliotecaModalAlumnoId;
+  if(!alumnoId) return;
+  const ejercicioId=_resolverEjercicioBiblioteca();
+  if(!ejercicioId){toast('Elegí un ejercicio de la Biblioteca');return;}
+  const reps=document.getElementById('bib-prog-reps').value.trim();
+  const series=document.getElementById('bib-prog-series').value.trim();
+  const kg=document.getElementById('bib-prog-kg').value.trim();
+  const rir=document.getElementById('bib-prog-rir').value;
+  if(!reps&&!series&&!kg&&!rir){toast('Cargá al menos un dato (reps, series, kg o RIR)');return;}
+  const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const fila=[alumnoId,ejercicioId,fecha,reps,series,kg,rir];
+
+  const btn=document.getElementById('bib-btn-guardar-progresion');
+  btn.disabled=true;btn.textContent='Guardando...';
+  const okHistorial=await _intentarConReintento(()=>sheetsAppend(RANGO.PROGRESION_HISTORIAL_START,[fila]));
+  const okActual=await _intentarConReintento(()=>_guardarProgresionActual(alumnoId,ejercicioId,fila));
+  btn.disabled=false;btn.textContent='Guardar';
+
+  if(!okHistorial||!okActual){
+    toast('Error al guardar la progresión — probá de nuevo');
+    return;
+  }
+
+  const i=progresionActual.findIndex(p=>p.alumnoId===alumnoId&&p.ejercicioId===ejercicioId);
+  const registro={alumnoId,ejercicioId,fecha,reps,series,kg,rir};
+  if(i===-1) progresionActual.push(registro); else progresionActual[i]=registro;
+
+  document.getElementById('bib-prog-buscador').value='';
+  document.getElementById('bib-prog-reps').value='';
+  document.getElementById('bib-prog-series').value='';
+  document.getElementById('bib-prog-kg').value='';
+  document.getElementById('bib-prog-rir').value='';
+  renderTablaBiblioteca();
+  toast('Progresión guardada ✓');
+}
+
 async function sincronizarTodosCalendar(){
   const activos=alumnos.filter(a=>a.estado==='activo');
   if(!activos.length){toast('No hay alumnos activos');return;}
@@ -2482,9 +2756,19 @@ async function sincronizarTodosCalendar(){
 }
 
 // ── FINANZAS ──
-async function guardarGastosEnSheets(){
-  const values=gastos.map(g=>[g.id,g.fecha,g.desc,g.monto]);
-  await sheetsReplaceRange(RANGO.GASTOS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este gasto. Si ya no está en memoria
+// (se eliminó del array antes de llamar acá), vacía la fila en vez de
+// borrarla — la carga la ignora igual (filtra por id, ver cargarDatos()).
+async function guardarGastoFila(id){
+  const g=gastos.find(x=>x.id===id);
+  const keys=await sheetsGet(RANGO.GASTOS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===id);
+  if(idx===-1){
+    if(g) await sheetsAppend(RANGO.GASTOS_START,[[g.id,g.fecha,g.desc,g.monto]]);
+  }else{
+    const fila=g?[g.id,g.fecha,g.desc,g.monto]:['','','',''];
+    await sheetsUpdate(`Gastos!A${idx+2}:D${idx+2}`,[fila]);
+  }
 }
 async function guardarConfigFinanzas(){
   await sheetsReplaceRange(RANGO.CONFIG_FINANZAS_WRITE, [[configFinanzas.saldoInicial, configFinanzas.fechaReferencia]]);
@@ -2674,9 +2958,10 @@ async function guardarGasto(){
   const monto=document.getElementById('g-monto').value;
   const desc=document.getElementById('g-desc').value.trim();
   if(!monto||!desc){toast('Completá todos los campos');return;}
-  gastos.push({id:crypto.randomUUID(),fecha:fecha.slice(0,7),desc,monto});
+  const nuevoId=crypto.randomUUID();
+  gastos.push({id:nuevoId,fecha:fecha.slice(0,7),desc,monto});
   try{
-    await guardarGastosEnSheets();
+    await guardarGastoFila(nuevoId);
     toast('Gasto registrado ✓');
     cerrarModal('modal-gasto');
     renderFinanzas();
@@ -2686,7 +2971,7 @@ async function guardarGasto(){
 async function eliminarGasto(id){
   if(!confirm('¿Eliminar este gasto?')) return;
   gastos=gastos.filter(g=>g.id!==id);
-  try{await guardarGastosEnSheets();renderFinanzas();toast('Gasto eliminado');}
+  try{await guardarGastoFila(id);renderFinanzas();toast('Gasto eliminado');}
   catch(e){toast('Error al eliminar');}
 }
 
@@ -2695,14 +2980,19 @@ async function guardarClientesNutriEnSheets(){
   const values=clientesNutri.map(c=>[c.id,c.nombre,c.telefono||'',c.estado,c.notas||'']);
   await sheetsReplaceRange(RANGO.NUTRICION_WRITE, values);
 }
-async function guardarCobrosNutriEnSheets(){
-  const values=[];
-  Object.entries(cobrosNutri).forEach(([mk,mes])=>{
-    Object.entries(mes).forEach(([cid,p])=>{
-      values.push([mk,cid,p.monto||'',p.fecha||'']);
-    });
-  });
-  await sheetsReplaceRange(RANGO.NUTRI_COBROS_WRITE, values);
+// Actualiza (o agrega) solo la fila de este mes+cliente. Si el registro ya
+// no existe en memoria (se eliminó), vacía la fila en vez de borrarla —
+// la carga la ignora igual (filtra filas sin mes/id, ver cargarDatos()).
+async function guardarCobroNutriFila(mk, cid){
+  const p=(cobrosNutri[mk]&&cobrosNutri[mk][cid])||null;
+  const keys=await sheetsGet(RANGO.NUTRI_COBROS_KEYS);
+  const idx=keys.findIndex(r=>r[0]===mk&&r[1]===cid);
+  if(idx===-1){
+    if(p) await sheetsAppend(RANGO.NUTRI_COBROS_START,[[mk,cid,p.monto||'',p.fecha||'']]);
+  }else{
+    const fila=p?[mk,cid,p.monto||'',p.fecha||'']:['','','',''];
+    await sheetsUpdate(`NutricionCobros!A${idx+2}:D${idx+2}`,[fila]);
+  }
 }
 
 // ── NUTRICIÓN RENDER ──
@@ -2772,7 +3062,7 @@ function renderNutri(){
           ${p.monto
             ?`<span style="font-weight:600;color:var(--marron)">$${parseFloat(p.monto).toLocaleString('es-AR')}</span>
                <span style="font-size:0.72rem;color:var(--suave)">${p.fecha}</span>
-               <button class="btn btn-secondary btn-sm" onclick="editarPagoNutri('${mk}','${c.id}','${p.monto}')">Editar</button>
+               <button class="btn btn-secondary btn-sm" data-monto="${escaparHTML(String(p.monto))}" onclick="editarPagoNutri('${mk}','${c.id}',this.dataset.monto)">Editar</button>
                <button class="btn btn-danger btn-sm" onclick="eliminarPagoNutri('${mk}','${c.id}')">×</button>`
             :`<div style="display:flex;gap:0.4rem;align-items:center">
                 <input type="number" id="nutri-pago-${c.id}" placeholder="Monto cobrado" style="width:130px;padding:0.35rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:var(--blanco)"/>
@@ -2837,7 +3127,7 @@ async function _registrarPagoNutriBase(mk,id,monto,renderFn){
   if(!monto||isNaN(monto)){toast('Ingresá un monto válido');return;}
   if(!cobrosNutri[mk]) cobrosNutri[mk]={};
   cobrosNutri[mk][id]={monto,fecha:new Date().toLocaleDateString('es-AR')};
-  try{await guardarCobrosNutriEnSheets();toast('Pago registrado ✓');renderFn();}
+  try{await guardarCobroNutriFila(mk,id);toast('Pago registrado ✓');renderFn();}
   catch(e){toast('Error al guardar');}
 }
 async function registrarPagoNutri(mk,id){
@@ -2852,7 +3142,7 @@ async function _editarPagoNutriBase(mk,id,valorActual,renderFn){
   if(nuevo===null) return;
   if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
   cobrosNutri[mk][id]={monto:nuevo,fecha:new Date().toLocaleDateString('es-AR')};
-  try{await guardarCobrosNutriEnSheets();toast('Pago actualizado ✓');renderFn();}
+  try{await guardarCobroNutriFila(mk,id);toast('Pago actualizado ✓');renderFn();}
   catch(e){toast('Error al guardar');}
 }
 async function editarPagoNutri(mk,id,valorActual){
@@ -2862,7 +3152,7 @@ async function editarPagoNutri(mk,id,valorActual){
 async function _eliminarPagoNutriBase(mk,id,mensaje,renderFn){
   if(!confirm('¿Eliminar este pago?')) return;
   if(cobrosNutri[mk]) delete cobrosNutri[mk][id];
-  try{await guardarCobrosNutriEnSheets();toast(mensaje);renderFn();}
+  try{await guardarCobroNutriFila(mk,id);toast(mensaje);renderFn();}
   catch(e){toast('Error al guardar');}
 }
 async function eliminarPagoNutri(mk,id){
@@ -2925,12 +3215,18 @@ async function crearEventoCalendar(alumno, dia, horario){
 }
 
 async function eliminarEventosAlumno(alumnoId){
-  // Buscar eventos del alumno por propiedad privada
-  const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?privateExtendedProperty=agendaLucaId%3D${alumnoId}&maxResults=20`;
-  const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
-  if(!r.ok) return;
-  const data=await r.json();
-  const eventos=data.items||[];
+  // Buscar eventos del alumno por propiedad privada, siguiendo nextPageToken
+  // completo (un alumno con historial largo puede superar una sola página)
+  const eventos=[];
+  let pageToken='';
+  do{
+    const url=`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?privateExtendedProperty=agendaLucaId%3D${alumnoId}&maxResults=250${pageToken?`&pageToken=${pageToken}`:''}`;
+    const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!r.ok) break;
+    const data=await r.json();
+    eventos.push(...(data.items||[]));
+    pageToken=data.nextPageToken||'';
+  }while(pageToken);
   await Promise.all(eventos.map(async ev=>{
     await fetchConRenovacion(
       `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${ev.id}`,
@@ -2940,6 +3236,15 @@ async function eliminarEventosAlumno(alumnoId){
 }
 
 async function sincronizarAlumnoCalendar(alumno){
+  // Si el alumno no está activo (pausado/inactivo), solo se eliminan sus
+  // eventos recurrentes — no se recrean. Antes esto solo pasaba al eliminar
+  // al alumno definitivamente, dejando recordatorios semanales corriendo
+  // indefinidamente mientras estaba pausado.
+  if(alumno.estado!=='activo'){
+    try{ await eliminarEventosAlumno(alumno.id); }
+    catch(e){ console.error('Error eliminando eventos de Calendar:',e); toast('Guardado en Sheets. Error al limpiar Calendar.'); }
+    return;
+  }
   // Eliminar eventos existentes y recrear
   try{
     await eliminarEventosAlumno(alumno.id);
@@ -3007,7 +3312,7 @@ function renderNutriCobrosPerfil(id){
         ?`<div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap">
             <span style="font-weight:600;color:var(--marron)">$${parseFloat(p.monto).toLocaleString('es-AR')}</span>
             <span style="font-size:0.72rem;color:var(--suave)">${p.fecha}</span>
-            <button class="btn btn-secondary btn-sm" onclick="editarPagoNutriPerfil('${id}','${mk}','${p.monto}')">Editar</button>
+            <button class="btn btn-secondary btn-sm" data-monto="${escaparHTML(String(p.monto))}" onclick="editarPagoNutriPerfil('${id}','${mk}',this.dataset.monto)">Editar</button>
             <button class="btn btn-danger btn-sm" onclick="eliminarPagoNutriPerfil('${id}','${mk}')">×</button>
           </div>`
         :`<div style="display:flex;gap:0.4rem">
@@ -3047,7 +3352,7 @@ function renderCobrosAlumno(id){
   const el=document.getElementById('perfil-cobros');
   const monto=parseFloat(a.monto||0);
   const mk=mesKey();
-  const mesesConDatos=new Set(Object.keys(cobros));
+  const mesesConDatos=new Set(Object.keys(cobros).filter(m=>cobros[m]&&cobros[m][id]));
   mesesConDatos.add(mk);
   const historial=[...mesesConDatos]
     .map(m=>({
@@ -3122,7 +3427,7 @@ async function _marcarCobroEstado(mk, id, estado, renderFn){
     cobros[mk][id]={...prev,estado:'pendiente',fecha:'',monto:''};
   }
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast(estado==='pagado' ? 'Pago registrado ✓' : 'Marcado como pendiente');
     renderFn();
     renderDashboard();
@@ -3360,7 +3665,7 @@ function renderCobros(){
   // Bonos: cuentan apenas se cargan, sin importar si el alumno sigue activo
   // o si el mes está pagado/pendiente (decisión de Luca: el bono ya ingresó).
   Object.values(cobros[mk]||{}).forEach(c=>{if(c.bono) totalBonos+=parseFloat(c.bono||0);});
-  const pct=totalEsperado>0?Math.round((totalCuotas/totalEsperado)*100):0;
+  const pct=totalEsperado>0?Math.min(100,Math.round((totalCuotas/totalEsperado)*100)):0;
   const iconoReloj='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   const iconoCheck='<svg class="status-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>';
 
@@ -3368,7 +3673,7 @@ function renderCobros(){
     const esPagado=c.estado==='pagado';
     const bonoHtml=c.bono
       ?`<span class="bono-existente">🎁 $${parseFloat(c.bono).toLocaleString('es-AR')} · ${c.fechaBono||''}</span>
-        <button class="btn btn-secondary btn-sm" onclick="editarBono('${mk}','${a.id}','${c.bono}')">Editar</button>
+        <button class="btn btn-secondary btn-sm" data-bono="${escaparHTML(String(c.bono))}" onclick="editarBono('${mk}','${a.id}',this.dataset.bono)">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="eliminarBono('${mk}','${a.id}')">×</button>`
       :`<span class="bono-chip" onclick="toggleBono(this)">+ Agregar bono</span>
         <div class="bono-input-wrap">
@@ -3440,7 +3745,7 @@ async function registrarBono(mk,id){
   cobros[mk][id].bono=monto;
   cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast('Bono registrado ✓');
     renderCobros();renderDashboard();
   }catch(e){
@@ -3456,7 +3761,7 @@ async function editarBono(mk,id,valorActual){
   cobros[mk][id].bono=nuevo;
   cobros[mk][id].fechaBono=new Date().toLocaleDateString('es-AR');
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast('Bono actualizado ✓');
     renderCobros();renderDashboard();
   }catch(e){
@@ -3469,7 +3774,7 @@ async function eliminarBono(mk,id){
   cobros[mk][id].bono='';
   cobros[mk][id].fechaBono='';
   try{
-    await guardarCobrosEnSheets();
+    await guardarCobroFila(mk, id);
     toast('Bono eliminado');
     renderCobros();renderDashboard();
   }catch(e){
