@@ -1686,8 +1686,13 @@ async function cargarDatos(){
         try{
           const rowsA2 = await sheetsGet(RANGO.CONFIG_FINANZAS_READ, true);
           const fila=rowsA2[0]||[];
+          if(!fila.length) console.warn('Config Finanzas: la lectura vino vacía (fila:',fila,')');
           configFinanzas={saldoInicial:parseFloat(fila[0]||0),fechaReferencia:fila[1]||''};
-        }catch(e){console.warn('Error cargando config de Finanzas:',e);configFinanzas={saldoInicial:0,fechaReferencia:''};}
+        }catch(e){
+          console.warn('Error cargando config de Finanzas:',e);
+          configFinanzas={saldoInicial:0,fechaReferencia:''};
+          toast('⚠️ No se pudo leer el saldo inicial: '+e.message);
+        }
       })(),
 
       // Asistencias (B1: necesario para chequear duplicados del mismo día)
