@@ -243,6 +243,9 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .separador-zona span{font-size:0.75rem;opacity:0.6}
 
 .wa-contacto{width:34px;height:34px;border-radius:50%;background:var(--pd-verde-dim);border:1px solid rgba(74,184,112,0.3);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;flex-shrink:0}
+.header-top-actions{display:flex;gap:0.5rem;flex-shrink:0}
+.cobro-contacto{width:34px;height:34px;border-radius:50%;background:var(--pd-bg3);border:1px solid var(--pd-border2);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;position:relative;flex-shrink:0}
+.cobro-contacto .dot-adeudado{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--pd-amber);border:1.5px solid var(--pd-bg)}
 
 .dias-pilares{display:flex;gap:0.35rem;margin-top:0.5rem}
 .dia-pilar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;color:var(--pd-text3);border:1px solid var(--pd-border)}
@@ -262,14 +265,22 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .racha-siguiente{font-size:0.68rem;color:var(--pd-text2);margin-top:0.1rem}
 .racha-check{width:26px;height:26px;border-radius:50%;border:1.5px solid rgba(74,184,112,0.4);display:flex;align-items:center;justify-content:center;font-size:0.85rem;color:var(--pd-verde);flex-shrink:0;transition:all 0.2s}
 .racha-check.on{background:var(--pd-verde);color:#0D1A12;border-color:var(--pd-verde)}
-.recuperacion-link{background:none;border:none;color:var(--pd-text2);font-size:0.7rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;margin-top:0.5rem;text-decoration:underline}
-.recuperacion-link:disabled{opacity:0.5;cursor:not-allowed;text-decoration:none}
+/* racha + recuperación en una fila: la racha ocupa el ancho y el chip de
+   recuperación queda al lado (ambos responden al estado de "hoy") */
+.racha-row{display:flex;gap:0.55rem;align-items:stretch;margin-top:0.7rem}
+.racha-row .racha-accion{flex:1;margin-top:0;min-width:0}
+.recup-chip{flex-shrink:0;width:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;background:var(--pd-bg3);border:1px solid var(--pd-border2);border-radius:10px;padding:0.5rem 0.4rem;cursor:pointer;font-family:inherit;text-align:center;transition:background 0.2s}
+.recup-chip:hover{background:var(--pd-card)}
+.recup-chip:disabled{opacity:0.55;cursor:default}
+.recup-chip .recup-icono{font-size:1.15rem}
+.recup-chip .recup-label{font-size:0.6rem;font-weight:600;color:var(--pd-text2);line-height:1.2}
 
 .acciones-dinamicas{display:flex;justify-content:space-around;margin-top:0.9rem;padding-top:0.85rem;border-top:0.5px solid var(--pd-border)}
 .accion-circular{display:flex;flex-direction:column;align-items:center;gap:0.35rem;background:none;border:none;cursor:pointer;font-family:inherit}
 .accion-circulo{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.15rem;transition:transform 0.15s}
 .accion-circular:active .accion-circulo{transform:scale(0.92)}
 .accion-circulo.drive{background:rgba(66,133,244,0.12);border:1px solid rgba(66,133,244,0.28)}
+.accion-circulo.biblio{background:rgba(200,168,122,0.14);border:1px solid rgba(200,168,122,0.32)}
 .accion-circulo.nutri{background:rgba(74,184,112,0.12);border:1px solid rgba(74,184,112,0.28);position:relative}
 .accion-circulo .dot-activo{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--pd-verde);border:1.5px solid var(--pd-bg)}
 .accion-label{font-size:0.66rem;color:var(--pd-text2);font-weight:600}
@@ -664,9 +675,13 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   .pd-stat-val{font-size:1rem}
 }
 
-/* ── PORTAL PÚBLICO ── */
-#portal-alumno{min-height:100vh;background:var(--bg);position:relative}
-.portal-wrap{position:relative;z-index:1}
+/* ── PORTAL PÚBLICO ── (adopta la estética de la ficha del entrenador:
+   reutiliza .pd-header-main, .pd-avatar, .dias-pilares, .proxima-linea,
+   .racha-accion, .acciones-dinamicas, .accion-circular, .stats-* y
+   .separador-zona ya definidas arriba. Solo se definen acá las clases
+   propias del portal.) */
+#portal-alumno{min-height:100vh;background:var(--pd-bg);position:relative;color:var(--pd-text)}
+.portal-wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:1.1rem 1rem 3rem;display:flex;flex-direction:column;gap:0.9rem}
 @media(max-width:768px){
   #portal-alumno::before{
     content:'';
@@ -677,66 +692,23 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
     pointer-events:none;
   }
 }
-.portal-wrap{max-width:560px;margin:0 auto;padding:1.25rem 1rem 3rem;display:flex;flex-direction:column;gap:1rem}
-.portal-header{display:flex;flex-direction:column;align-items:flex-start;gap:0.15rem;padding:0.25rem 0 0.5rem}
-.portal-header-brand{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem}
-.portal-logo-img{width:26px;height:26px;border-radius:7px;object-fit:cover}
-.portal-logo-txt{font-size:0.78rem;font-weight:600;color:var(--suave);letter-spacing:0.02em}
-.portal-saludo{font-size:0.95rem;color:var(--suave);font-weight:400}
-.portal-saludo-nombre{font-size:1.7rem;font-weight:700;color:var(--texto);line-height:1.15}
-.portal-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:1.25rem}
-.portal-card-title{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--suave);font-weight:600;margin-bottom:0.85rem}
-.portal-hero{display:flex;flex-direction:column;gap:0.85rem}
-.portal-hero-top{display:flex;align-items:center;gap:1rem}
-.portal-avatar{width:56px;height:56px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:1.2rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--verde)}
-.portal-hero-info{flex:1;min-width:0}
-.portal-freq{font-size:0.78rem;color:var(--verde);font-weight:500;margin-top:0.15rem}
-.portal-hero-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;border-top:1px solid rgba(74,184,112,0.1);padding-top:0.85rem}
-.portal-dias{font-size:0.8rem;color:var(--suave);line-height:1.6;flex:1}
-.portal-hero-racha{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.portal-racha-num{font-size:2.8rem;font-weight:800;line-height:1}
-.portal-racha-label{font-size:0.65rem;color:var(--suave);text-transform:uppercase;letter-spacing:0.06em;margin-top:0.2rem;text-align:center}
-.portal-recup-label{font-size:0.62rem;color:var(--suave);margin-top:0.3rem;text-align:center;opacity:0.85}
-.portal-datos-grid{display:flex;flex-direction:column}
-.portal-dato-row{display:flex;align-items:center;gap:0.75rem;padding:0.55rem 0}
-.portal-dato-row + .portal-dato-row{border-top:1px solid rgba(74,184,112,0.08)}
-.portal-dato-icon{width:34px;height:34px;border-radius:9px;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.portal-dato-icon svg{width:17px;height:17px;stroke:var(--verde)}
-.portal-dato-txt{flex:1;min-width:0}
-.portal-dato-label{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--suave)}
-.portal-dato-val{font-size:1rem;font-weight:700;color:var(--texto)}
-.portal-dato-verde{color:var(--verde)}
-.portal-btns{display:flex;flex-direction:column;gap:0.6rem}
-.portal-btn{width:100%;padding:0.75rem 1rem;border-radius:7px;font-size:0.88rem;font-weight:600;cursor:pointer;border:none;display:flex;align-items:center;gap:0.6rem;transition:transform 0.12s,background 0.15s;font-family:inherit;-webkit-tap-highlight-color:transparent}
-.portal-btn:hover{opacity:0.9}
-.portal-btn:active{transform:scale(0.97)}
-.portal-btn-drive{background:rgba(66,133,244,0.12);color:#6BA3F5;border:1px solid rgba(66,133,244,0.25)}
-.portal-btn-drive:active{background:rgba(66,133,244,0.22)}
-.portal-btn-nutri{background:rgba(74,184,112,0.12);color:var(--verde);border:1px solid var(--borde)}
-.portal-btn-nutri:active{background:rgba(74,184,112,0.22)}
-.portal-entrada{border-left:2px solid var(--verde-s);padding:0.6rem 0.75rem;margin-bottom:0.6rem;background:#223527;border-radius:0 6px 6px 0}
-.portal-entrada:last-child{margin-bottom:0}
-.portal-entrada-fecha{font-size:0.68rem;color:var(--suave);display:block;margin-bottom:0.25rem}
-.portal-entrada-texto{font-size:0.85rem;color:var(--texto);line-height:1.55}
-.portal-proxima{display:inline-block;font-size:0.75rem;font-weight:600;margin-top:0.4rem;padding:0.25rem 0.65rem;border-radius:20px}
-.portal-proxima-hoy{background:rgba(74,184,112,0.15);color:var(--verde);border:1px solid rgba(74,184,112,0.3)}
-.portal-proxima-manana{background:rgba(232,168,74,0.12);color:var(--amarillo);border:1px solid rgba(232,168,74,0.3)}
-.portal-proxima-pronto{background:rgba(110,158,128,0.1);color:var(--suave);border:1px solid rgba(110,158,128,0.2)}
-.portal-objetivos{list-style:none;display:flex;flex-direction:column;gap:0.5rem}
-.portal-objetivo{font-size:0.85rem;color:var(--texto);padding:0.5rem 0.75rem;background:#223527;border-radius:6px;border-left:2px solid var(--verde-s);line-height:1.45}
-.portal-objetivo::before{content:'→ ';color:var(--verde-s);font-weight:600}
-
-.portal-frase-card{background:linear-gradient(135deg, var(--blanco) 0%, var(--crema) 100%);border:1px solid var(--borde);border-radius:14px;padding:1.4rem 1.25rem;display:flex;gap:0.85rem;align-items:flex-start}
-.portal-frase-comilla{font-family:Georgia,serif;font-size:2.4rem;color:#C8A87A;line-height:0.6;flex-shrink:0;margin-top:0.4rem}
-.portal-frase-texto{font-size:0.98rem;color:var(--texto);font-style:italic;line-height:1.5;margin:0}
-
-.portal-empty{font-size:0.85rem;color:var(--suave);text-align:center;padding:0.5rem 0}
-.portal-footer{text-align:center;font-size:0.75rem;color:var(--suave);margin-top:0.5rem}
-.portal-loading{text-align:center;padding:3rem;color:var(--suave);font-size:0.9rem}
-.portal-error{text-align:center;padding:3rem;color:var(--rojo);font-size:0.9rem}
-@media(max-width:480px){
-  .portal-hero{gap:0.75rem}
-}
+/* header simple: marca + saludo (vista propia del alumno, sin volver/kebab) */
+.portal-top{display:flex;flex-direction:column;gap:0.15rem;padding:0.2rem 0 0.3rem}
+.portal-brand{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem}
+.portal-brand img{height:22px;width:auto}
+.portal-brand span{font-size:0.78rem;font-weight:700;color:var(--pd-text2);letter-spacing:0.02em}
+.portal-saludo{font-size:0.8rem;color:var(--pd-text2)}
+.portal-saludo-nombre{font-size:1.5rem;font-weight:700;color:var(--pd-text);font-family:Georgia,'Times New Roman',serif;font-style:italic}
+.portal-freq{font-size:0.76rem;color:var(--pd-text2)}
+/* la racha en el portal es informativa: el alumno no marca su propia asistencia */
+.portal-wrap .racha-accion{cursor:default}
+/* frase motivacional (gradiente crema/verde, mismo criterio que la ficha) */
+.portal-frase-card{background:linear-gradient(135deg, var(--pd-card) 0%, #2A2318 100%);border:1px solid var(--pd-border2);border-radius:14px;padding:1.4rem 1.25rem;display:flex;gap:0.85rem;align-items:flex-start}
+.portal-frase-comilla{font-family:Georgia,serif;font-size:2.4rem;color:var(--pd-crema);line-height:0.6;flex-shrink:0;margin-top:0.4rem}
+.portal-frase-texto{font-size:0.98rem;color:var(--pd-text);font-style:italic;line-height:1.5;margin:0}
+.portal-footer{text-align:center;font-size:0.68rem;color:var(--pd-text3);padding-top:0.5rem}
+.portal-loading{text-align:center;padding:3rem;color:var(--pd-text2);font-size:0.9rem}
+.portal-error{text-align:center;padding:3rem;color:var(--pd-red);font-size:0.9rem}
 </style>
 </head>
 <body>
@@ -965,18 +937,28 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
                 <div id="perfil-gestion" class="pd-gestion-row"></div>
               </div>
             </div>
-            <button id="perfil-btn-whatsapp" class="wa-contacto" style="display:none" title="Escribir por WhatsApp">💬</button>
+            <div class="header-top-actions">
+              <button id="perfil-btn-cobro" class="cobro-contacto" title="Cobros">💰<span class="dot-adeudado" id="perfil-cobro-dot" style="display:none"></span></button>
+              <button id="perfil-btn-whatsapp" class="wa-contacto" style="display:none" title="Escribir por WhatsApp">💬</button>
+            </div>
           </div>
 
           <div class="dias-pilares" id="perfil-dias-pilares"></div>
           <div class="proxima-linea" id="perfil-proxima-sesion"></div>
 
-          <div id="perfil-racha-card"></div>
-          <button class="recuperacion-link" id="perfil-btn-recuperacion">🧘 Marcar recuperación de hoy</button>
+          <div class="racha-row">
+            <div id="perfil-racha-card" style="flex:1;min-width:0"></div>
+            <button class="recup-chip" id="perfil-btn-recuperacion" title="Marcar recuperación de hoy">
+              <span class="recup-icono">🧘</span><span class="recup-label">Recuperación</span>
+            </button>
+          </div>
 
           <div class="acciones-dinamicas">
             <button class="accion-circular" id="perfil-btn-drive" style="display:none">
-              <div class="accion-circulo drive">📁</div><span class="accion-label">Fuerza</span>
+              <div class="accion-circulo drive">🏋️‍♀️</div><span class="accion-label">Fuerza</span>
+            </button>
+            <button class="accion-circular" id="perfil-accion-biblioteca">
+              <div class="accion-circulo biblio">📚</div><span class="accion-label">Biblioteca</span>
             </button>
             <button class="accion-circular" id="perfil-accion-nutri" onclick="showPage('nutricion',document.getElementById('bn-nutricion'));syncBottomNav('nutricion')">
               <div class="accion-circulo nutri">🥗<span class="dot-activo" id="perfil-nutri-dot" style="display:none"></span></div><span class="accion-label">Nutri</span>
@@ -1068,16 +1050,8 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 
       <div class="separador-zona"><span>🌾</span></div>
 
-      <!-- COBROS: navegación, no interrumpe el perfil -->
-      <div class="nav-row" id="perfil-cobros-navrow" style="margin-bottom:0.6rem">
-        <div class="nav-row-left">
-          <span class="nav-row-title">💰 Cobros</span>
-          <span class="nav-row-sub" id="perfil-cobros-sub"></span>
-        </div>
-        <span class="nav-row-arrow">→</span>
-      </div>
-
-      <!-- PROGRESIÓN: navegación, abre el modal de Biblioteca -->
+      <!-- PROGRESIÓN: navegación, abre el modal de Biblioteca (Cobros ahora
+           vive como ícono en el header, junto a WhatsApp) -->
       <div class="nav-row" id="perfil-btn-abrir-biblioteca">
         <div class="nav-row-left">
           <span class="nav-row-title">📚 Progresión</span>
@@ -1435,10 +1409,11 @@ async function cargarPortalAlumno(id){
       dias: data.alumno.dias ? data.alumno.dias.split('|') : [],
     };
 
-    const rowsS  = data.seguimiento  || [];
     const rowsAs = data.asistencias  || [];
     const rowsFr = data.frases       || [];
-    const rowsProg = data.progresion || [];
+    // data.seguimiento / data.progresion / a.objetivos: el proxy los sigue
+    // devolviendo, pero esta vista no los muestra (handoff visual 2026-07-22).
+    // No se borra el dato ni el backend; reincorporarlos sería decisión nueva.
 
     // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
     // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
@@ -1451,33 +1426,18 @@ async function cargarPortalAlumno(id){
       ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)]).replace(/\n/g,'<br>')
       : fraseDefault;
 
-    const entradas = rowsS
-      .map(r => ({ fecha: r[0], texto: r[1] }))
-      .sort((a,b) => {
-        const toDate = s => { const [d,m,y]=s.split('/'); return new Date(`${y}-${m}-${d}`); };
-        return toDate(b.fecha) - toDate(a.fecha);
-      });
-
-    const progresionList = rowsProg
-      .map(r => ({ ejercicio: r[0], patron: r[1], fecha: r[2], reps: r[3], series: r[4], kg: r[5], rir: r[6] }))
-      .sort((a,b) => a.ejercicio.localeCompare(b.ejercicio, 'es'));
-
-    // Racha de clases (se corta si pasa una semana sin asistencia) + recuperaciones
-    // Retrocompatible: filas viejas sin columna 'tipo' cuentan como 'asistencia'
-    const registrosAlumno = rowsAs;
-    const racha = calcularRachaSemanal(registrosAlumno);
-    const recuperaciones = registrosAlumno.filter(r => r[1] === 'recuperacion').length;
+    // Racha de clases (se corta si pasa una semana sin asistencia).
+    // Retrocompatible: filas viejas sin columna 'tipo' cuentan como 'asistencia'.
+    const racha = calcularRachaSemanal(rowsAs);
 
     const hpd = stringToHorariosPorDia(a.horario);
-    const diasStr = a.dias.map(d => hpd[d] ? `${d} ${hpd[d]}` : d).join(' · ') || 'Sin días asignados';
     const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
-    // Próxima sesión
+    // Próxima sesión — frase corta para la línea .proxima-linea (estética ficha)
     const DIAS_SEMANA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
     const hoy = new Date();
-    const diaHoyNombre = DIAS_SEMANA[hoy.getDay()];
-    let proximaSesionStr = '';
-    let proximaSesionClase = '';
+    const hoyNum = hoy.getDay();
+    let proximaLineaStr = '';
     if(a.dias.length > 0){
       // Buscar el próximo día de entrenamiento (hoy inclusive)
       for(let offset = 0; offset < 7; offset++){
@@ -1486,90 +1446,90 @@ async function cargarPortalAlumno(id){
         const nombre = DIAS_SEMANA[d.getDay()];
         if(a.dias.includes(nombre)){
           const hora = hpd[nombre] || '';
-          if(offset === 0){
-            proximaSesionStr = `Hoy entrenás${hora ? ' · ' + hora : ''}`;
-            proximaSesionClase = 'portal-proxima-hoy';
-          } else if(offset === 1){
-            proximaSesionStr = `Mañana · ${nombre}${hora ? ' ' + hora : ''}`;
-            proximaSesionClase = 'portal-proxima-manana';
-          } else {
-            proximaSesionStr = `${nombre}${hora ? ' · ' + hora : ''}`;
-            proximaSesionClase = 'portal-proxima-pronto';
-          }
+          if(offset === 0)      proximaLineaStr = `hoy${hora ? ' ' + hora : ''}`;
+          else if(offset === 1) proximaLineaStr = `mañana ${nombre.toLowerCase()}${hora ? ' ' + hora : ''}`;
+          else                  proximaLineaStr = `${nombre.toLowerCase()}${hora ? ' ' + hora : ''}`;
           break;
         }
       }
     }
 
-    // Objetivos — solo los activos; un objetivo ya cumplido no es algo que
-    // el alumno necesite ver en su lista de "a dónde voy" del portal.
-    const objetivosList = _parseObjetivosLineas(a.objetivos).filter(o=>o.estado!=='cumplido').map(o=>o.texto);
+    // Días como pilares (D L M X J V S), igual que en la ficha del entrenador
+    const LETRAS = ['D','L','M','X','J','V','S'];
+    const pilaresHTML = LETRAS.map((l,i)=>{
+      const activo = a.dias.includes(DIAS_SEMANA[i]);
+      const cls = ['dia-pilar', activo?'activo':'', i===hoyNum?'hoy':''].filter(Boolean).join(' ');
+      return `<div class="${cls}">${l}</div>`;
+    }).join('');
 
-    // Datos personales
+    // Racha como componente informativo (el alumno no marca su propia asistencia)
+    const rachaIcono = racha>=30 ? '🌳' : racha>=7 ? '🌿' : '🌱';
+    const rachaTitulo = racha>=1 ? `${racha} día${racha!==1?'s':''} de constancia` : 'Sin racha activa';
+    const rachaSiguiente = racha>=30
+      ? 'Constancia sostenida — ¡nivel máximo! 🌳'
+      : racha>=7 ? `${30-racha} días más para 🌳`
+      : racha>=1 ? `${7-racha} días más para 🌿`
+      : 'Tu próxima clase la reactiva 🌱';
+
+    // Vitales
     const edad = calcularEdad(a.fechaNac);
     const imc  = (a.pesoActual && a.estatura) ? (parseFloat(a.pesoActual) / Math.pow(parseFloat(a.estatura)/100, 2)).toFixed(1) : null;
+    const pesoDiff = (a.pesoInicial && a.pesoActual) ? +(parseFloat(a.pesoActual) - parseFloat(a.pesoInicial)).toFixed(1) : null;
+    const hayVitales = a.pesoActual || imc || edad || a.estatura || a.pesoInicial;
 
     el.innerHTML = `
       <div class="portal-wrap">
-        <!-- Header -->
-        <div class="portal-header">
-          <div class="portal-header-brand">
-            <img src="Logo_App.png" alt="Mente Consciente" class="portal-logo-img"/>
-            <span class="portal-logo-txt">Mente Consciente</span>
-          </div>
+        <!-- Header: marca + saludo (vista propia del alumno) -->
+        <div class="portal-top">
+          <div class="portal-brand"><img src="Logo_App.png" alt="Mente Consciente"/><span>Mente Consciente</span></div>
           <span class="portal-saludo">Hola de nuevo,</span>
           <span class="portal-saludo-nombre">${escaparHTML(a.nombre)}</span>
         </div>
 
-        <!-- Perfil card -->
-        <div class="portal-card portal-hero">
-          <div class="portal-hero-top">
-            <div class="portal-avatar">${escaparHTML(iniciales)}</div>
-            <div class="portal-hero-info">
-              <p class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</p>
-              ${proximaSesionStr ? `<span class="portal-proxima ${escaparHTML(proximaSesionClase)}">📅 ${escaparHTML(proximaSesionStr)}</span>` : ''}
+        <!-- Card principal (mismo patrón que pd-header-main de la ficha) -->
+        <div class="pd-header-main">
+          <div style="display:flex;align-items:center;gap:0.75rem">
+            <div class="pd-avatar">${escaparHTML(iniciales)}</div>
+            <div class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</div>
+          </div>
+
+          <div class="dias-pilares">${pilaresHTML}</div>
+          ${proximaLineaStr ? `<div class="proxima-linea">📅 Próxima sesión: ${escaparHTML(proximaLineaStr)}</div>` : ''}
+
+          <div class="racha-accion">
+            <span class="racha-icono">${rachaIcono}</span>
+            <div class="racha-info">
+              <div class="racha-dias">${rachaTitulo}</div>
+              <div class="racha-siguiente">${rachaSiguiente}</div>
             </div>
           </div>
-          <div class="portal-hero-bottom">
-            <p class="portal-dias">${escaparHTML(diasStr)}</p>
-            <div class="portal-hero-racha">
-              <div class="portal-racha-num" id="portal-racha-num">${racha}</div>
-              <div class="portal-racha-label">clase${racha !== 1 ? 's' : ''} seguida${racha !== 1 ? 's' : ''}</div>
-              ${recuperaciones > 0 ? `<div class="portal-recup-label">${recuperaciones} recuperaci${recuperaciones !== 1 ? 'ones' : 'ón'}</div>` : ''}
-            </div>
-          </div>
+
+          <!-- Materiales: botones circulares (Fuerza · Nutri) -->
+          ${(a.carpetaDrive || a.nutriDrive) ? `
+          <div class="acciones-dinamicas">
+            ${a.carpetaDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.carpetaDrive)}"><div class="accion-circulo drive">🏋️‍♀️</div><span class="accion-label">Fuerza</span></button>` : ''}
+            ${a.nutriDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.nutriDrive)}"><div class="accion-circulo nutri">🥗</div><span class="accion-label">Nutri</span></button>` : ''}
+          </div>` : ''}
         </div>
 
-        <!-- Datos personales -->
-        ${(edad||a.estatura||a.pesoInicial||a.pesoActual) ? `
-        <div class="portal-card">
-          <div class="portal-card-title">Datos personales</div>
-          <div class="portal-datos-grid">
-            ${edad ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.5-6 8-6s8 2 8 6"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Edad</span><span class="portal-dato-val">${edad} años</span></div></div>` : ''}
-            ${a.estatura ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Altura</span><span class="portal-dato-val">${escaparHTML(a.estatura)} cm</span></div></div>` : ''}
-            ${a.pesoInicial ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Peso inicial</span><span class="portal-dato-val">${escaparHTML(a.pesoInicial)} kg</span></div></div>` : ''}
-            ${a.pesoActual ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">Peso actual</span><span class="portal-dato-val portal-dato-verde">${escaparHTML(a.pesoActual)} kg</span></div></div>` : ''}
-            ${imc ? `<div class="portal-dato-row"><div class="portal-dato-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg></div><div class="portal-dato-txt"><span class="portal-dato-label">IMC</span><span class="portal-dato-val">${imc}</span></div></div>` : ''}
+        <!-- Vitales: principales (peso con tendencia + IMC) + secundarios -->
+        ${hayVitales ? `
+        <div class="separador-zona"><span>🌱</span></div>
+        <div class="stats-principales">
+          <div class="stat-principal">
+            <div class="stat-principal-label">Peso actual</div>
+            <div class="stat-principal-val">${a.pesoActual ? escaparHTML(a.pesoActual)+' kg' : '—'}${pesoDiff!==null ? ` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>` : ''}</div>
+            <div class="stat-principal-sub">${pesoDiff!==null ? 'desde el inicio' : '&nbsp;'}</div>
           </div>
-        </div>` : ''}
-
-        <!-- Materiales -->
-        ${(a.carpetaDrive || a.nutriDrive) ? `
-        <div class="portal-card">
-          <div class="portal-card-title">Tus materiales</div>
-          <div class="portal-btns">
-            ${a.carpetaDrive ? `<button class="portal-btn portal-btn-drive" data-open-url="${escaparHTML(a.carpetaDrive)}">📁 Mi plan de entrenamiento</button>` : ''}
-            ${a.nutriDrive ? `<button class="portal-btn portal-btn-nutri" data-open-url="${escaparHTML(a.nutriDrive)}">🥗 Mi plan nutricional</button>` : ''}
+          <div class="stat-principal">
+            <div class="stat-principal-label">IMC</div>
+            <div class="stat-principal-val">${imc || '—'}</div>
           </div>
-        </div>` : ''}
-
-        <!-- Objetivos -->
-        ${objetivosList.length > 0 ? `
-        <div class="portal-card">
-          <div class="portal-card-title">Tus objetivos</div>
-          <ul class="portal-objetivos">
-            ${objetivosList.map(o => `<li class="portal-objetivo">${escaparHTML(o)}</li>`).join('')}
-          </ul>
+        </div>
+        <div class="stats-secundarios">
+          <div class="stat-secundario"><div class="stat-secundario-label">Edad</div><div class="stat-secundario-val">${edad ? edad+' años' : '—'}</div></div>
+          <div class="stat-secundario"><div class="stat-secundario-label">Altura</div><div class="stat-secundario-val">${a.estatura ? escaparHTML(a.estatura)+' cm' : '—'}</div></div>
+          <div class="stat-secundario"><div class="stat-secundario-label">Peso inicial</div><div class="stat-secundario-val">${a.pesoInicial ? escaparHTML(a.pesoInicial)+' kg' : '—'}</div></div>
         </div>` : ''}
 
         <!-- Frase motivacional -->
@@ -1578,56 +1538,12 @@ async function cargarPortalAlumno(id){
           <p class="portal-frase-texto">${frase}</p>
         </div>
 
-        <!-- Progresión -->
-        ${progresionList.length > 0 ? `
-        <div class="portal-card">
-          <div class="portal-card-title">Tu progresión</div>
-          ${progresionList.map(p => {
-            const partes = [
-              p.reps && `${escaparHTML(p.reps)} reps`,
-              p.series && `${escaparHTML(p.series)} series`,
-              p.kg && `${escaparHTML(p.kg)} kg`,
-              p.rir !== '' && `RIR ${escaparHTML(p.rir)}`,
-            ].filter(Boolean).join(' · ');
-            return `<div class="portal-entrada">
-              <span class="portal-entrada-fecha">${escaparHTML(p.fecha)}</span>
-              <p class="portal-entrada-texto"><strong>${escaparHTML(p.ejercicio)}</strong><br/>${partes || 'sin datos'}</p>
-            </div>`;
-          }).join('')}
-        </div>` : ''}
-
-        <!-- Seguimiento -->
-        <div class="portal-card">
-          <div class="portal-card-title">Seguimiento</div>
-          ${entradas.length === 0
-            ? '<p class="portal-empty">Aún no hay entradas de seguimiento.</p>'
-            : entradas.map(e => `
-              <div class="portal-entrada">
-                <span class="portal-entrada-fecha">${escaparHTML(e.fecha)}</span>
-                <p class="portal-entrada-texto">${escaparHTML(e.texto)}</p>
-              </div>`).join('')
-          }
-        </div>
-
         <p class="portal-footer">Tu entrenador personal · Mente Consciente</p>
       </div>
     `;
     el.querySelectorAll('[data-open-url]').forEach(btn=>{
       btn.addEventListener('click', ()=>window.open(btn.dataset.openUrl, '_blank', 'noopener'));
     });
-    // Gradiente dinámico racha
-    const rachaEl = document.getElementById('portal-racha-num');
-    if(rachaEl){
-      const t = Math.max(0, Math.min((racha - 1) / 14, 1));
-      const r = Math.round(0x4A + (0xC8 - 0x4A) * t);
-      const g = Math.round(0xB8 + (0xA8 - 0xB8) * t);
-      const b = Math.round(0x70 + (0x7A - 0x70) * t);
-      const end = '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
-      rachaEl.style.background = `linear-gradient(135deg, #4AB870, ${end})`;
-      rachaEl.style.webkitBackgroundClip = 'text';
-      rachaEl.style.webkitTextFillColor = 'transparent';
-      rachaEl.style.backgroundClip = 'text';
-    }
   } catch(e) {
     el.innerHTML = '<div class="portal-error">No se pudo cargar el perfil. Intentá de nuevo más tarde.</div>';
     console.error(e);
@@ -2315,11 +2231,10 @@ function verAlumno(id){
   _badgeEl.className=`pd-cobro-mes-badge ${_estadoBadge}`;
   _badgeEl.textContent=_estadoBadge==='pagado'?'✓ Cuota al día':'Cuota pendiente';
 
-  // Gestión inline
+  // Gestión inline (el teléfono es redundante con el botón de WhatsApp del header)
   document.getElementById('perfil-gestion').innerHTML=`
     <div class="pd-gestion-item"><p>Frecuencia</p><p>${escaparHTML(a.frecuencia)}x por semana</p></div>
     <div class="pd-gestion-item"><p>Monto</p><p style="color:var(--pd-crema)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</p></div>
-    ${a.telefono?`<div class="pd-gestion-item"><p>Teléfono</p><p>${escaparHTML(a.telefono)}</p></div>`:''}
   `;
 
   // Días como pilares + próxima sesión
@@ -2368,12 +2283,14 @@ function verAlumno(id){
   // Racha + marcar asistencia (componente fusionado)
   renderRachaAccion(id);
 
-  // Recuperación — acción secundaria chica, separada del botón principal
+  // Recuperación — chip compacto al lado de la racha (mismo par "estado de hoy")
   const recuperacionBtn=document.getElementById('perfil-btn-recuperacion');
   const yaRecuperacionHoy = asistencias.some(r=>r[0]===id && r[1]===fechaHoy && r[2]==='recuperacion');
   recuperacionBtn.disabled = yaRecuperacionHoy;
-  recuperacionBtn.textContent = yaRecuperacionHoy ? '🧘 Ya registrado hoy' : '🧘 Marcar recuperación de hoy';
-  recuperacionBtn.onclick=()=>registrarAsistencia(id, recuperacionBtn, 'recuperacion');
+  recuperacionBtn.innerHTML = yaRecuperacionHoy
+    ? '<span class="recup-icono">✓</span><span class="recup-label">Recuperado</span>'
+    : '<span class="recup-icono">🧘</span><span class="recup-label">Recuperación</span>';
+  recuperacionBtn.onclick=()=>marcarRecuperacionFicha(id);
 
   // Vitales: Peso/IMC protagonistas, Edad/Altura/Peso inicial secundarios
   const edad=calcularEdad(a.fechaNac);
@@ -2424,13 +2341,17 @@ function verAlumno(id){
     <button class="pd-btn pd-btn-primary" style="margin-top:0.5rem;font-size:0.75rem" onclick="guardarCampoAlumno('${id}','historialFis','perfil-historial-fis-txt')">Guardar</button>
   `;
 
-  // Cobros — fila de navegación, no interrumpe el perfil
+  // Cobros — ícono en el header (junto a WhatsApp), con punto ámbar solo
+  // cuando el mes está adeudado (mismo criterio de "atención" que el dot de Nutri)
   const _mesNombre=MESES[parseInt(_mkBadge.split('-')[1],10)-1];
-  document.getElementById('perfil-cobros-sub').textContent=`${_mesNombre} ${_estadoBadge==='pagado'?'pagado':'pendiente'}`;
-  document.getElementById('perfil-cobros-navrow').onclick=()=>irACobrosAlumno(id);
+  const cobroBtn=document.getElementById('perfil-btn-cobro');
+  cobroBtn.title=`${_mesNombre}: ${_estadoBadge==='pagado'?'pagado':'pendiente'}`;
+  document.getElementById('perfil-cobro-dot').style.display=_estadoBadge==='pagado'?'none':'block';
+  cobroBtn.onclick=()=>irACobrosAlumno(id);
 
-  // Progresión (abre el modal de Biblioteca)
+  // Progresión (abre el modal de Biblioteca) — nav-row del body + botón circular del header
   document.getElementById('perfil-btn-abrir-biblioteca').onclick=()=>abrirModalBiblioteca(id);
+  document.getElementById('perfil-accion-biblioteca').onclick=()=>abrirModalBiblioteca(id);
 
   showPage('perfil',null);
 }
@@ -2522,19 +2443,23 @@ async function _appendAsistencia(id, fecha, tipo){
   await sheetsAppend(RANGO.ASISTENCIAS_START,[[id, fecha, tipo]]);
   asistencias.push([id, fecha, tipo]);
 }
-async function registrarAsistencia(id, btn, tipo){
-  const textoOriginal = tipo === 'recuperacion' ? '🧘 Marcar recuperación de hoy' : '💪 Asistencia';
+// Recuperación desde el chip del header — actualiza el propio chip (icono+label)
+// sin aplastar su estructura, a diferencia de un textContent plano.
+async function marcarRecuperacionFicha(id){
+  const btn=document.getElementById('perfil-btn-recuperacion');
+  if(!btn||btn.disabled) return;
+  const prev=btn.innerHTML;
   btn.disabled=true;
-  btn.textContent='Registrando...';
+  btn.innerHTML='<span class="recup-icono">⏳</span><span class="recup-label">...</span>';
   try{
     const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
-    await _appendAsistencia(id, fecha, tipo);
-    toast(tipo === 'recuperacion' ? 'Recuperación registrada 🧘' : 'Asistencia registrada 💪');
-    btn.textContent = tipo === 'recuperacion' ? '🧘 Ya registrado hoy' : '💪 Ya registrado hoy';
+    await _appendAsistencia(id, fecha, 'recuperacion');
+    toast('Recuperación registrada 🧘');
+    btn.innerHTML='<span class="recup-icono">✓</span><span class="recup-label">Recuperado</span>';
   }catch(e){
     toast('Error al registrar');
     btn.disabled=false;
-    btn.textContent=textoOriginal;
+    btn.innerHTML=prev;
   }
 }
 
