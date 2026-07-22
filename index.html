@@ -141,8 +141,11 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .dia-horario-row input{padding:0.4rem 0.6rem;border:1px solid var(--borde);border-radius:4px;font-size:0.85rem;background:#111B16;color:var(--texto);outline:none;font-family:inherit}
 .dia-horario-row input:focus{border-color:var(--verde)}
 
-/* ── PERFIL DARK ── */
-#perfil-dark{
+/* ── PERFIL DARK ── (estas variables también las usa el portal del alumno,
+   que reutiliza las clases pd-* / dias-pilares / racha-accion / stats-*; sin
+   esto los var(--pd-...) del portal resolverían a vacío y quedarían fondos y
+   bordes sin color) */
+#perfil-dark, #portal-alumno{
   --pd-bg:       #111B16;
   --pd-bg2:       #1C2B20;
   --pd-bg3:       #223527;
