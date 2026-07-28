@@ -486,6 +486,47 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .seccion-count{background:var(--amarillo-bg);color:var(--amarillo);font-size:0.68rem;font-weight:700;padding:0.08rem 0.45rem;border-radius:20px}
 .seccion-count.ok{background:var(--verde-bg);color:var(--verde)}
 
+/* ── COBROS: vista "Vencimientos" (handoff vencimientos-cobros) — nombres
+   propios (venc-*) para no chocar con .resumen-*/.seccion-count de la vista
+   "Por mes" de arriba, aunque reutiliza la misma paleta --rojo/--amarillo/--verde ── */
+.venc-toggle-row{display:flex;gap:0.5rem;background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:0.3rem;margin-bottom:1.25rem}
+.venc-toggle-btn{flex:1;text-align:center;padding:0.5rem;border-radius:7px;font-size:0.82rem;font-weight:700;border:none;cursor:pointer;font-family:inherit;background:transparent;color:var(--suave)}
+.venc-toggle-btn.active{background:var(--verde);color:#0D1A12}
+
+.venc-resumen{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.25rem;display:flex;gap:1.5rem;margin-bottom:1.25rem}
+.venc-resumen-item{flex:1;text-align:center}
+.venc-resumen-num{font-size:1.5rem;font-weight:800}
+.venc-resumen-num.rojo{color:var(--rojo)}
+.venc-resumen-num.amarillo{color:var(--amarillo)}
+.venc-resumen-num.verde{color:var(--verde)}
+.venc-resumen-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--suave);margin-top:0.2rem}
+
+.venc-count{font-size:0.68rem;font-weight:700;padding:0.08rem 0.5rem;border-radius:20px}
+.venc-count.rojo{background:var(--rojo-bg);color:var(--rojo)}
+.venc-count.amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
+.venc-count.verde{background:var(--verde-bg);color:var(--verde)}
+.venc-count.gris{background:rgba(110,158,128,0.12);color:var(--suave)}
+
+.venc-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:0.75rem 0.9rem;display:flex;align-items:center;gap:0.7rem;margin-bottom:0.55rem}
+.venc-card:last-child{margin-bottom:0}
+.venc-avatar{width:36px;height:36px;border-radius:50%;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.venc-avatar.rojo{background:var(--rojo-bg);color:var(--rojo)}
+.venc-avatar.amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
+.venc-avatar.verde{background:var(--verde-bg);color:var(--verde)}
+.venc-avatar.gris{background:rgba(110,158,128,0.12);color:var(--suave)}
+.venc-info{flex:1;min-width:0}
+.venc-nombre{font-weight:600;font-size:0.85rem;color:var(--texto)}
+.venc-detalle{font-size:0.72rem;color:var(--suave);margin-top:0.1rem}
+.venc-badge{font-size:0.7rem;font-weight:700;padding:0.3rem 0.6rem;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.venc-badge.rojo{background:var(--rojo-bg);color:var(--rojo)}
+.venc-badge.amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
+.venc-badge.verde{background:var(--verde-bg);color:var(--verde)}
+.venc-badge.gris{background:rgba(110,158,128,0.12);color:var(--suave)}
+@media(max-width:640px){
+  .venc-resumen{flex-wrap:wrap;gap:1rem 1.5rem}
+  .venc-resumen-item{flex:1 1 40%}
+}
+
 .cobro-card{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:0.7rem 0.9rem;margin-bottom:0.55rem;transition:background 0.15s}
 .cobro-card:hover{background:rgba(74,184,112,0.05)}
 .cobro-main{flex:1;min-width:0;display:flex;align-items:center;gap:0.75rem}
@@ -851,13 +892,23 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   <!-- COBROS -->
   <div class="page" id="page-cobros">
     <div class="page-header"><h2>Cobros</h2><p>Seguimiento de pagos mensuales</p></div>
-    <div class="mes-selector">
-      <label style="font-size:0.82rem;font-weight:500">Mes:</label>
-      <select id="mes-select" onchange="renderCobros()"></select>
-      <label style="font-size:0.82rem;font-weight:500;margin-left:0.5rem">Alumno:</label>
-      <select id="cobros-alumno-select" onchange="renderCobros()"></select>
+
+    <div class="venc-toggle-row">
+      <button class="venc-toggle-btn active" id="cobros-tab-vencimientos" onclick="cambiarVistaCobros('vencimientos')">Vencimientos</button>
+      <button class="venc-toggle-btn" id="cobros-tab-pormes" onclick="cambiarVistaCobros('pormes')">Por mes (historial)</button>
     </div>
-    <div class="cobros-lista" id="cobros-lista"></div>
+
+    <div id="vencimientos-lista"></div>
+
+    <div id="cobros-pormes-wrap" style="display:none">
+      <div class="mes-selector">
+        <label style="font-size:0.82rem;font-weight:500">Mes:</label>
+        <select id="mes-select" onchange="renderCobros()"></select>
+        <label style="font-size:0.82rem;font-weight:500;margin-left:0.5rem">Alumno:</label>
+        <select id="cobros-alumno-select" onchange="renderCobros()"></select>
+      </div>
+      <div class="cobros-lista" id="cobros-lista"></div>
+    </div>
   </div>
 
   <!-- NUTRICIÓN -->
@@ -1252,6 +1303,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
           </select>
         </div>
         <div class="field"><label>Monto mensual ($)</label><input type="number" id="a-monto" placeholder="0"/></div>
+        <div class="field"><label>Día de pago (1-31)</label><input type="number" id="a-diaPago" placeholder="se completa solo con el primer pago" min="1" max="31"/></div>
         <div class="field" style="grid-column:1/-1" id="a-objetivos-wrap">
           <label>Objetivos</label>
           <p style="font-size:0.75rem;color:var(--suave);margin-bottom:0.4rem">Separados por línea. Cada línea es un objetivo. Solo para carga inicial — una vez creado el alumno, los objetivos se editan desde su ficha.</p>
@@ -1307,8 +1359,10 @@ const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcB
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
 const RANGO = {
-  ALUMNOS_READ:        'Alumnos!A2:S1000',
-  ALUMNOS_WRITE:       'Alumnos!A2:S1000',
+  // T=diaPago (handoff vencimientos-cobros): día 1-31 del ciclo de cobro del
+  // alumno, autocompletado con el día de su primer pago registrado.
+  ALUMNOS_READ:        'Alumnos!A2:T1000',
+  ALUMNOS_WRITE:       'Alumnos!A2:T1000',
   ALUMNOS_START:       'Alumnos!A2',
   ALUMNOS_ID_COL:      'Alumnos!A2:A1000',
   COBROS_READ:         'Cobros!A2:G1000',
@@ -1761,6 +1815,7 @@ async function cargarDatos(){
             carpetaDrive: r[16]||'',
             nutriDrive:   r[17]||'',
             portalToken:  r[18]||'',
+            diaPago:      r[19]||'',
           })).filter(a=>a.id);
         }catch(e){console.warn('Error cargando Alumnos:',e);alumnos=[];}
       })(),
@@ -1865,7 +1920,7 @@ async function cargarDatos(){
     toast('Datos sincronizados ✓');
     renderTablaAlumnos();
     renderDashboard();
-    if(document.getElementById('page-cobros').classList.contains('active')) renderCobros();
+    if(document.getElementById('page-cobros').classList.contains('active')) renderCobrosPage();
     if(document.getElementById('page-agenda').classList.contains('active')) renderAgenda();
     if(document.getElementById('page-nutricion').classList.contains('active')) renderNutri();
     if(document.getElementById('page-finanzas').classList.contains('active')) renderFinanzas();
@@ -1882,7 +1937,7 @@ function _alumnoAFila(a){
     a.objetivos,a.notas,a.estado,a.telefono||'',
     a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
     a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||'',
-    a.portalToken||''
+    a.portalToken||'',a.diaPago||''
   ];
 }
 
@@ -1904,7 +1959,7 @@ async function guardarFilaAlumno(alumno){
   const idx = colA.findIndex(row=>row[0]===alumno.id);
   if(idx===-1) throw new Error('No se encontró al alumno en la hoja (ID no coincide con ninguna fila) — no se guardó nada');
   const fila = idx + 2; // fila 1 = encabezados, los datos arrancan en fila 2
-  await sheetsUpdate(`Alumnos!A${fila}:S${fila}`, [_alumnoAFila(alumno)]);
+  await sheetsUpdate(`Alumnos!A${fila}:T${fila}`, [_alumnoAFila(alumno)]);
 }
 
 async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO, chips=[], origen='manual'){
@@ -1950,7 +2005,7 @@ function showPage(id,el){
   if(id==='dashboard') renderDashboard();
   if(id==='agenda')    renderAgenda();
   if(id==='alumnos')   renderTablaAlumnos();
-  if(id==='cobros')    renderCobros();
+  if(id==='cobros')    renderCobrosPage();
   if(id==='nutricion') renderNutri();
   if(id==='finanzas')  renderFinanzas();
 }function syncBottomNav(id){
@@ -2089,7 +2144,7 @@ function renderTablaAlumnos(){
 function abrirModalAlumno(id=null){
   editandoId=id;
   document.getElementById('modal-titulo').textContent=id?'Editar alumno':'Nuevo alumno';
-  ['a-nombre','a-telefono','a-monto','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive'].forEach(f=>document.getElementById(f).value='');
+  ['a-nombre','a-telefono','a-monto','a-diaPago','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('a-frecuencia').value='2';
   document.getElementById('a-estado').value='activo';
   document.getElementById('a-tieneNutri').checked=false;
@@ -2109,6 +2164,7 @@ function abrirModalAlumno(id=null){
     document.getElementById('a-nombre').value=a.nombre;
     document.getElementById('a-telefono').value=a.telefono||'';
     document.getElementById('a-monto').value=a.monto||'';
+    document.getElementById('a-diaPago').value=a.diaPago||'';
     document.getElementById('a-frecuencia').value=a.frecuencia||'2';
     document.getElementById('a-estado').value=a.estado||'activo';
     document.getElementById('a-fechaNac').value=a.fechaNac||'';
@@ -2149,6 +2205,7 @@ async function guardarAlumno(){
     dias,
     frecuencia: document.getElementById('a-frecuencia').value,
     monto: document.getElementById('a-monto').value,
+    diaPago: document.getElementById('a-diaPago').value.trim(),
     // Objetivos/Molestias: al editar un alumno existente, este modal no toca
     // estos campos (textareas ocultos, ver abrirModalAlumno) — se preserva lo
     // que ya haya, que puede tener estructura {texto,categoria/zona,estado,fecha}
@@ -3598,7 +3655,9 @@ async function marcarPagado(mk, id){
   const monto=prompt('Monto de la cuota cobrada:', sugerido);
   if(monto===null) return;
   if(isNaN(monto)||monto.trim()===''||parseFloat(monto)<0){toast('Ingresá un monto válido');return;}
-  return _marcarCobroEstado(mk, id, 'pagado', renderCobros, monto.trim());
+  await _marcarCobroEstado(mk, id, 'pagado', renderCobros, monto.trim());
+  // Si es el primer pago de este alumno, fija su día de cobro (handoff vencimientos-cobros)
+  if(alumno) await asegurarDiaPago(alumno);
 }
 
 async function marcarPendiente(mk, id){
@@ -3807,8 +3866,180 @@ function initMeses(){
 let cobrosFiltroAlumno='';
 function irACobrosAlumno(id){
   cobrosFiltroAlumno=id;
+  vistaCobros='pormes'; // viene a ver el estado de un mes puntual de este alumno
   showPage('cobros', document.getElementById('bn-cobros'));
   syncBottomNav('cobros');
+}
+
+// ── COBROS: toggle "Vencimientos" (default) / "Por mes" (handoff vencimientos-cobros) ──
+let vistaCobros='vencimientos';
+function _syncToggleCobrosDOM(){
+  document.getElementById('cobros-tab-vencimientos').classList.toggle('active', vistaCobros==='vencimientos');
+  document.getElementById('cobros-tab-pormes').classList.toggle('active', vistaCobros==='pormes');
+  document.getElementById('vencimientos-lista').style.display = vistaCobros==='vencimientos'?'':'none';
+  document.getElementById('cobros-pormes-wrap').style.display = vistaCobros==='pormes'?'':'none';
+}
+function cambiarVistaCobros(vista){
+  vistaCobros=vista;
+  renderCobrosPage();
+}
+function renderCobrosPage(){
+  _syncToggleCobrosDOM();
+  if(vistaCobros==='vencimientos') renderVencimientos();
+  else renderCobros();
+}
+
+// ── VENCIMIENTOS (handoff-vencimientos-cobros.md) ──
+// Todo se deriva de cobros[*][alumnoId] ya cargado en memoria; no cambia el
+// registro por mes calendario que usa Finanzas, solo lo lee distinto para
+// decidir "¿está al día ahora mismo?" según el diaPago propio de cada alumno.
+
+// Todas las fechas 'pagado' de un alumno, recorriendo TODOS los meses (no
+// solo el mes seleccionado) — mismo formato/parseo que ya usa Seguimiento
+// para fechas d/m/yyyy (toLocaleDateString('es-AR') sin opciones).
+function _pagosDeAlumno(alumnoId){
+  const fechas=[];
+  Object.values(cobros).forEach(cm=>{
+    const c=cm[alumnoId];
+    if(c && c.estado==='pagado' && c.fecha){
+      const f=new Date(c.fecha.split('/').reverse().join('-'));
+      if(!isNaN(f)) fechas.push(f);
+    }
+  });
+  return fechas.sort((a,b)=>a-b);
+}
+
+// Autocompleta diaPago con el día del pago más antiguo registrado (decisión
+// de Luca: no se carga a mano). No pisa un valor ya cargado (a mano o por
+// una corrida previa de esta misma función).
+async function asegurarDiaPago(alumno){
+  if(alumno.diaPago) return alumno;
+  const pagos=_pagosDeAlumno(alumno.id);
+  if(!pagos.length) return alumno;
+  alumno.diaPago=String(pagos[0].getDate());
+  try{ await guardarFilaAlumno(alumno); }
+  catch(e){ console.warn('No se pudo guardar diaPago autocompletado de '+alumno.nombre+':', e); }
+  return alumno;
+}
+
+function _diasEnMes(anio, mesIdx0){ return new Date(anio, mesIdx0+1, 0).getDate(); }
+// Fecha del ciclo para un mes dado; diaPago 29/30/31 en un mes corto cae al
+// último día real de ese mes (recomendación del handoff, más predecible que
+// correrlo al mes siguiente).
+function _fechaCiclo(anio, mesIdx0, diaPago){
+  const dia=Math.min(diaPago, _diasEnMes(anio, mesIdx0));
+  return new Date(anio, mesIdx0, dia);
+}
+// Ocurrencia de diaPago más reciente que sea <= fecha (ambas a medianoche)
+function _boundaryHasta(fecha, diaPago){
+  let anio=fecha.getFullYear(), mes=fecha.getMonth();
+  let b=_fechaCiclo(anio, mes, diaPago);
+  if(b>fecha){ mes--; if(mes<0){mes=11;anio--;} b=_fechaCiclo(anio, mes, diaPago); }
+  return b;
+}
+// Ocurrencia de diaPago inmediatamente posterior a una fecha-boundary dada
+function _boundarySiguiente(boundary, diaPago){
+  let anio=boundary.getFullYear(), mes=boundary.getMonth()+1;
+  if(mes>11){mes=0;anio++;}
+  return _fechaCiclo(anio, mes, diaPago);
+}
+
+// Umbral de "vence pronto": menos de N días para el próximo vencimiento,
+// estando al día. El handoff sugería ≤5 días, ajustado a <5 para que un
+// alumno a exactamente 5 días (como el ejemplo del mockup) siga en "al día".
+const VENCE_PRONTO_DIAS=4;
+
+// Estado de vencimiento de un alumno según su diaPago + todo su historial de
+// cobros. No escribe nada (salvo el autocompletado de diaPago, aparte).
+function calcularVencimiento(alumno, hoy){
+  if(!alumno.diaPago) return {alumno, categoria:'sinFecha'};
+  const diaPago=parseInt(alumno.diaPago,10);
+  const pagos=_pagosDeAlumno(alumno.id);
+  if(!pagos.length) return {alumno, categoria:'sinFecha'};
+  const fechaUltimoPago=pagos[pagos.length-1];
+
+  const inicioCubierto=_boundaryHasta(fechaUltimoPago, diaPago);
+  const inicioActual=_boundaryHasta(hoy, diaPago);
+
+  let ciclosAdeudados=0, enMoraDesde=null, cursor=_boundarySiguiente(inicioCubierto, diaPago);
+  while(cursor<=inicioActual){
+    if(!enMoraDesde) enMoraDesde=cursor;
+    ciclosAdeudados++;
+    cursor=_boundarySiguiente(cursor, diaPago);
+  }
+
+  if(ciclosAdeudados>0){
+    return {alumno, categoria:'vencido', diaPago, fechaUltimoPago, ciclosAdeudados, enMoraDesde};
+  }
+  const proximoVencimiento=_boundarySiguiente(inicioActual, diaPago);
+  const diasParaVencer=Math.round((proximoVencimiento-hoy)/86400000);
+  if(diasParaVencer<=VENCE_PRONTO_DIAS){
+    return {alumno, categoria:'vencePronto', diaPago, fechaUltimoPago, proximoVencimiento, diasParaVencer};
+  }
+  return {alumno, categoria:'alDia', diaPago, fechaUltimoPago, proximoVencimiento};
+}
+
+async function renderVencimientos(){
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  // Retrofit: alumnos con pagos previos ya cargados pero sin diaPago (columna
+  // nueva) — se completa solo la primera vez que se abre esta vista.
+  await Promise.all(activos.filter(a=>!a.diaPago).map(a=>asegurarDiaPago(a)));
+
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const resultados=activos.map(a=>calcularVencimiento(a, hoy));
+
+  const vencidos=resultados.filter(r=>r.categoria==='vencido').sort((a,b)=>b.ciclosAdeudados-a.ciclosAdeudados);
+  const vencenPronto=resultados.filter(r=>r.categoria==='vencePronto').sort((a,b)=>a.diasParaVencer-b.diasParaVencer);
+  const alDia=resultados.filter(r=>r.categoria==='alDia').sort((a,b)=>a.proximoVencimiento-b.proximoVencimiento);
+  const sinFecha=resultados.filter(r=>r.categoria==='sinFecha').sort((a,b)=>a.alumno.nombre.localeCompare(b.alumno.nombre,'es'));
+
+  const ciclosTotal=vencidos.reduce((s,r)=>s+r.ciclosAdeudados,0);
+  const fmtFecha=d=>d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+
+  function tarjetaVencimiento(r, color){
+    const a=r.alumno;
+    const inicial=(a.nombre.trim().charAt(0)||'?').toUpperCase();
+    let detalle, badge;
+    if(r.categoria==='vencido'){
+      detalle=`Día de pago: ${r.diaPago} · último pago ${fmtFecha(r.fechaUltimoPago)} · en mora desde ${fmtFecha(r.enMoraDesde)}`;
+      badge=`Debe ${r.ciclosAdeudados} ciclo${r.ciclosAdeudados!==1?'s':''}`;
+    } else if(r.categoria==='vencePronto'){
+      detalle=`Día de pago: ${r.diaPago} · último pago ${fmtFecha(r.fechaUltimoPago)}`;
+      badge=r.diasParaVencer<=0?'Vence hoy':(r.diasParaVencer===1?'Vence mañana':`Vence en ${r.diasParaVencer} días`);
+    } else if(r.categoria==='alDia'){
+      detalle=`Día de pago: ${r.diaPago} · último pago ${fmtFecha(r.fechaUltimoPago)}`;
+      badge=`Al día hasta el ${fmtFecha(r.proximoVencimiento)}`;
+    } else {
+      detalle='Sin pagos registrados todavía';
+      badge='Nuevo';
+    }
+    return `<div class="venc-card">
+      <div class="venc-avatar ${color}">${escaparHTML(inicial)}</div>
+      <div class="venc-info">
+        <div class="venc-nombre">${escaparHTML(a.nombre)}</div>
+        <div class="venc-detalle">${escaparHTML(detalle)}</div>
+      </div>
+      <span class="venc-badge ${color}">${escaparHTML(badge)}</span>
+    </div>`;
+  }
+
+  const seccion=(titulo,emoji,color,lista)=>`
+    <div class="seccion-label">${emoji} ${titulo} <span class="venc-count ${color}">${lista.length}</span></div>
+    ${lista.length?lista.map(r=>tarjetaVencimiento(r,color)).join(''):'<p style="color:var(--suave);font-size:0.82rem;margin-bottom:0.5rem">Ninguno.</p>'}
+  `;
+
+  document.getElementById('vencimientos-lista').innerHTML=`
+    <div class="venc-resumen">
+      <div class="venc-resumen-item"><div class="venc-resumen-num rojo">${vencidos.length}</div><div class="venc-resumen-label">Alumnos vencidos</div></div>
+      <div class="venc-resumen-item"><div class="venc-resumen-num rojo">${ciclosTotal}</div><div class="venc-resumen-label">Ciclos adeudados</div></div>
+      <div class="venc-resumen-item"><div class="venc-resumen-num amarillo">${vencenPronto.length}</div><div class="venc-resumen-label">Vencen pronto</div></div>
+      <div class="venc-resumen-item"><div class="venc-resumen-num verde">${alDia.length}</div><div class="venc-resumen-label">Al día</div></div>
+    </div>
+    ${seccion('Vencidos','🔴','rojo',vencidos)}
+    ${seccion('Vencen pronto','🟡','amarillo',vencenPronto)}
+    ${seccion('Al día','🟢','verde',alDia)}
+    ${sinFecha.length?seccion('Nuevos, sin fecha de cobro fijada','🆕','gris',sinFecha):''}
+  `;
 }
 
 function renderCobros(){
