@@ -517,6 +517,8 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .venc-info{flex:1;min-width:0}
 .venc-nombre{font-weight:600;font-size:0.85rem;color:var(--texto)}
 .venc-detalle{font-size:0.72rem;color:var(--suave);margin-top:0.1rem}
+.venc-edit-dia{background:none;border:none;cursor:pointer;font-size:0.68rem;padding:0;margin-left:0.3rem;opacity:0.55;vertical-align:middle;line-height:1}
+.venc-edit-dia:hover{opacity:1}
 .venc-badge{font-size:0.7rem;font-weight:700;padding:0.3rem 0.6rem;border-radius:20px;white-space:nowrap;flex-shrink:0}
 .venc-badge.rojo{background:var(--rojo-bg);color:var(--rojo)}
 .venc-badge.amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
@@ -4024,28 +4026,33 @@ async function renderVencimientos(){
   const ciclosTotal=vencidos.reduce((s,r)=>s+r.ciclosAdeudados,0);
   const fmtFecha=d=>d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
 
+  // El "Día de pago" siempre es editable inline (✏️): el autocompletado toma
+  // el día del PRIMER pago digitalizado, que puede no reflejar el ciclo real
+  // si ese primer pago fue atípico (alta tardía, corrección puntual, etc.) —
+  // solo Luca sabe cuál es el día correcto de cada alumno.
   function tarjetaVencimiento(r, color){
     const a=r.alumno;
     const inicial=(a.nombre.trim().charAt(0)||'?').toUpperCase();
-    let detalle, badge;
+    const diaPagoTxt=r.categoria==='sinFecha' ? 'sin definir' : escaparHTML(String(r.diaPago));
+    let resto, badge;
     if(r.categoria==='vencido'){
-      detalle=`Día de pago: ${r.diaPago} · último pago ${fmtFecha(r.fechaUltimoPago)} · en mora desde ${fmtFecha(r.enMoraDesde)}`;
+      resto=`último pago ${fmtFecha(r.fechaUltimoPago)} · en mora desde ${fmtFecha(r.enMoraDesde)}`;
       badge=`Debe ${r.ciclosAdeudados} ciclo${r.ciclosAdeudados!==1?'s':''}`;
     } else if(r.categoria==='vencePronto'){
-      detalle=`Día de pago: ${r.diaPago} · último pago ${fmtFecha(r.fechaUltimoPago)}`;
+      resto=`último pago ${fmtFecha(r.fechaUltimoPago)}`;
       badge=r.diasParaVencer<=0?'Vence hoy':(r.diasParaVencer===1?'Vence mañana':`Vence en ${r.diasParaVencer} días`);
     } else if(r.categoria==='alDia'){
-      detalle=`Día de pago: ${r.diaPago} · último pago ${fmtFecha(r.fechaUltimoPago)}`;
+      resto=`último pago ${fmtFecha(r.fechaUltimoPago)}`;
       badge=`Al día hasta el ${fmtFecha(r.proximoVencimiento)}`;
     } else {
-      detalle='Sin pagos registrados todavía';
+      resto='sin pagos registrados todavía';
       badge='Nuevo';
     }
     return `<div class="venc-card">
       <div class="venc-avatar ${color}">${escaparHTML(inicial)}</div>
       <div class="venc-info">
         <div class="venc-nombre">${escaparHTML(a.nombre)}</div>
-        <div class="venc-detalle">${escaparHTML(detalle)}</div>
+        <div class="venc-detalle">Día de pago: ${diaPagoTxt}<button type="button" class="venc-edit-dia" data-alumno-id="${escaparHTML(a.id)}" title="Corregir día de pago">✏️</button> · ${escaparHTML(resto)}</div>
       </div>
       <span class="venc-badge ${color}">${escaparHTML(badge)}</span>
     </div>`;
@@ -4068,6 +4075,28 @@ async function renderVencimientos(){
     ${seccion('Al día','🟢','verde',alDia)}
     ${sinFecha.length?seccion('Nuevos, sin fecha de cobro fijada','🆕','gris',sinFecha):''}
   `;
+  document.getElementById('vencimientos-lista').querySelectorAll('.venc-edit-dia').forEach(btn=>{
+    btn.addEventListener('click', ()=>editarDiaPagoVencimiento(btn.dataset.alumnoId));
+  });
+}
+
+// Corrección manual del día de pago desde la propia tarjeta de Vencimientos
+// (sin pasar por el modal completo de "Editar datos") — necesario porque el
+// autocompletado puede quedar mal si el primer pago digitalizado de ese
+// alumno fue atípico; solo Luca sabe cuál es el día real.
+async function editarDiaPagoVencimiento(alumnoId){
+  const alumno=alumnos.find(x=>x.id===alumnoId);
+  if(!alumno) return;
+  const nuevo=prompt(`Día de pago de ${alumno.nombre} (1-31):`, alumno.diaPago||'');
+  if(nuevo===null) return;
+  const n=parseInt(nuevo,10);
+  if(isNaN(n)||n<1||n>31){toast('Ingresá un día válido entre 1 y 31');return;}
+  alumno.diaPago=String(n);
+  try{
+    await guardarFilaAlumno(alumno);
+    toast('Día de pago actualizado ✓');
+    await renderVencimientos();
+  }catch(e){toast('Error al guardar');}
 }
 
 function renderCobros(){
