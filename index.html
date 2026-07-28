@@ -3565,14 +3565,16 @@ function imc_categoria(imc){
 
 // Base compartida: cambia el estado de un cobro (pagado/pendiente) y re-renderiza
 // la vista que corresponda.
-async function _marcarCobroEstado(mk, id, estado, renderFn){
+async function _marcarCobroEstado(mk, id, estado, renderFn, montoOverride){
   if(!cobros[mk]) cobros[mk]={};
   const prev=cobros[mk][id]||{};
-  // El monto no se toca acá: si ya está congelado (prev.monto) se preserva tal
-  // cual con el spread; si no, guardarCobroFila() lo congela al precio vigente
-  // en este momento. Ni marcar pagado ni deshacer (pendiente) deben pisarlo.
+  // El monto no se toca acá salvo que venga un override explícito (monto real
+  // cobrado, puede diferir del precio vigente del alumno): si ya está
+  // congelado (prev.monto) se preserva tal cual con el spread; si no,
+  // guardarCobroFila() lo congela al precio vigente en este momento. Ni
+  // marcar pagado ni deshacer (pendiente) deben pisarlo sin querer.
   if(estado==='pagado'){
-    cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR')};
+    cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR'),...(montoOverride!=null?{monto:montoOverride}:{})};
   } else {
     cobros[mk][id]={...prev,estado:'pendiente',fecha:''};
   }
@@ -3585,8 +3587,18 @@ async function _marcarCobroEstado(mk, id, estado, renderFn){
 }
 
 // ── COBROS SECCIÓN ──
+// Pide el monto real cobrado, sugiriendo el ya congelado (si este mes ya se
+// había tocado) o si no el precio vigente del alumno — pero permite escribir
+// otro valor: cubre precios negociados o correcciones de meses donde el
+// precio del alumno cambió después de ese mes.
 async function marcarPagado(mk, id){
-  return _marcarCobroEstado(mk, id, 'pagado', renderCobros);
+  const alumno=alumnos.find(x=>x.id===id);
+  const prev=(cobros[mk]&&cobros[mk][id])||{};
+  const sugerido=(prev.monto!==''&&prev.monto!=null) ? prev.monto : (alumno?alumno.monto:'');
+  const monto=prompt('Monto de la cuota cobrada:', sugerido);
+  if(monto===null) return;
+  if(isNaN(monto)||monto.trim()===''||parseFloat(monto)<0){toast('Ingresá un monto válido');return;}
+  return _marcarCobroEstado(mk, id, 'pagado', renderCobros, monto.trim());
 }
 
 async function marcarPendiente(mk, id){
