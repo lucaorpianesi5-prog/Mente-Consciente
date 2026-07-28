@@ -1359,8 +1359,10 @@ function escaparHTML(str){
     .replace(/'/g,'&#39;');
 }
 
-// Precio real de una cuota: si el cobro ya tiene monto congelado (se fija al marcar pagado), se usa ese;
-// si no (pendiente, o pago histórico previo al fix de montos congelados), se usa el precio actual del alumno.
+// Precio real de una cuota: si el cobro ya tiene monto congelado (se fija en
+// guardarCobroFila() la primera vez que ese mes+alumno se toca — bono, pagado
+// o pendiente), se usa ese; si no (mes nunca tocado, o pago histórico previo
+// al fix de montos congelados), se usa el precio actual del alumno.
 // Usado por getIngresosMes() y renderCobros() para que el número coincida en ambos lados.
 function montoCobro(a,c){
   return (c && c.monto!==''&&c.monto!=null) ? parseFloat(c.monto) : parseFloat(a.monto||0);
@@ -1924,6 +1926,14 @@ async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO, chips=[], or
 // eliminarBono solo vacía sus campos dentro de la misma fila.
 async function guardarCobroFila(mk, aid){
   const c=cobros[mk][aid];
+  // Congela el monto la primera vez que este mes+alumno se toca (bono, pagado
+  // o pendiente) — así, si el precio del alumno cambia más adelante, ese
+  // cambio no se propaga a meses que ya existen (bug: el monto de meses
+  // pendientes viejos cambiaba retroactivamente al editar el precio).
+  if(c.monto===''||c.monto==null){
+    const alumno=alumnos.find(x=>x.id===aid);
+    c.monto=alumno?alumno.monto:'';
+  }
   const fila=[mk,aid,c.estado,c.fecha||'',c.bono||'',c.fechaBono||'',c.monto||''];
   const keys=await sheetsGet(RANGO.COBROS_KEYS);
   const idx=keys.findIndex(r=>r[0]===mk&&r[1]===aid);
@@ -3558,11 +3568,13 @@ function imc_categoria(imc){
 async function _marcarCobroEstado(mk, id, estado, renderFn){
   if(!cobros[mk]) cobros[mk]={};
   const prev=cobros[mk][id]||{};
+  // El monto no se toca acá: si ya está congelado (prev.monto) se preserva tal
+  // cual con el spread; si no, guardarCobroFila() lo congela al precio vigente
+  // en este momento. Ni marcar pagado ni deshacer (pendiente) deben pisarlo.
   if(estado==='pagado'){
-    const alumno=alumnos.find(x=>x.id===id);
-    cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR'),monto:alumno?alumno.monto:''};
+    cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR')};
   } else {
-    cobros[mk][id]={...prev,estado:'pendiente',fecha:'',monto:''};
+    cobros[mk][id]={...prev,estado:'pendiente',fecha:''};
   }
   try{
     await guardarCobroFila(mk, id);
