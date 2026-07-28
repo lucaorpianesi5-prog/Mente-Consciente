@@ -3631,7 +3631,13 @@ async function _marcarCobroEstado(mk, id, estado, renderFn, montoOverride){
   // guardarCobroFila() lo congela al precio vigente en este momento. Ni
   // marcar pagado ni deshacer (pendiente) deben pisarlo sin querer.
   if(estado==='pagado'){
-    cobros[mk][id]={...prev,estado:'pagado',fecha:new Date().toLocaleDateString('es-AR'),...(montoOverride!=null?{monto:montoOverride}:{})};
+    // La fecha del pago real solo se fija en la PRIMERA confirmación (transición
+    // pendiente->pagado). Re-confirmar un mes ya pagado (ej. para corregir el
+    // monto tras un cambio de precio) no es un pago nuevo: pisar la fecha acá
+    // rompía Vencimientos (un alumno que ya estaba al día volvía a figurar
+    // "vencido" porque la fecha de hoy quedaba un día antes de su ciclo real).
+    const fecha = (prev.estado==='pagado' && prev.fecha) ? prev.fecha : new Date().toLocaleDateString('es-AR');
+    cobros[mk][id]={...prev,estado:'pagado',fecha,...(montoOverride!=null?{monto:montoOverride}:{})};
   } else {
     cobros[mk][id]={...prev,estado:'pendiente',fecha:''};
   }
@@ -3943,6 +3949,24 @@ function _boundarySiguiente(boundary, diaPago){
   if(mes>11){mes=0;anio++;}
   return _fechaCiclo(anio, mes, diaPago);
 }
+// Ocurrencia de diaPago más próxima a "fecha" que sea >= fecha (techo)
+function _finCicloDe(fecha, diaPago){
+  let anio=fecha.getFullYear(), mes=fecha.getMonth();
+  let b=_fechaCiclo(anio, mes, diaPago);
+  if(b<fecha){ mes++; if(mes>11){mes=0;anio++;} b=_fechaCiclo(anio, mes, diaPago); }
+  return b;
+}
+// El boundary de diaPago MÁS CERCANO a "fecha" (antes o después) — nadie paga
+// siempre justo el día exacto: pagar unos días antes cubre el ciclo en curso
+// (no el anterior), y pagar unos días tarde satisface el ciclo que acaba de
+// vencer (no salta de más al siguiente). Solo cuando la fecha de pago queda
+// más cerca del PRÓXIMO boundary que del que acaba de pasar (atraso de más de
+// medio ciclo) se corre al siguiente, igual que antes.
+function _boundaryMasCercano(fecha, diaPago){
+  const antes=_boundaryHasta(fecha, diaPago), despues=_finCicloDe(fecha, diaPago);
+  if(antes.getTime()===despues.getTime()) return antes;
+  return (despues-fecha) < (fecha-antes) ? despues : antes;
+}
 
 // Umbral de "vence pronto": menos de N días para el próximo vencimiento,
 // estando al día. El handoff sugería ≤5 días, ajustado a <5 para que un
@@ -3958,7 +3982,11 @@ function calcularVencimiento(alumno, hoy){
   if(!pagos.length) return {alumno, categoria:'sinFecha'};
   const fechaUltimoPago=pagos[pagos.length-1];
 
-  const inicioCubierto=_boundaryHasta(fechaUltimoPago, diaPago);
+  // El pago se asigna al boundary de diaPago más CERCANO (antes o después) —
+  // pagar unos días antes cubre el ciclo en curso, no el anterior; pagar unos
+  // días tarde satisface el que acaba de vencer, no salta de más al
+  // siguiente. "Hoy" en cambio usa piso: solo importa qué ciclo ya arrancó.
+  const inicioCubierto=_boundaryMasCercano(fechaUltimoPago, diaPago);
   const inicioActual=_boundaryHasta(hoy, diaPago);
 
   let ciclosAdeudados=0, enMoraDesde=null, cursor=_boundarySiguiente(inicioCubierto, diaPago);
@@ -3971,7 +3999,7 @@ function calcularVencimiento(alumno, hoy){
   if(ciclosAdeudados>0){
     return {alumno, categoria:'vencido', diaPago, fechaUltimoPago, ciclosAdeudados, enMoraDesde};
   }
-  const proximoVencimiento=_boundarySiguiente(inicioActual, diaPago);
+  const proximoVencimiento=_boundarySiguiente(inicioCubierto, diaPago);
   const diasParaVencer=Math.round((proximoVencimiento-hoy)/86400000);
   if(diasParaVencer<=VENCE_PRONTO_DIAS){
     return {alumno, categoria:'vencePronto', diaPago, fechaUltimoPago, proximoVencimiento, diasParaVencer};
