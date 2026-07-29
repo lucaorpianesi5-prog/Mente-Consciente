@@ -1421,7 +1421,10 @@ function escaparHTML(str){
 // al fix de montos congelados), se usa el precio actual del alumno.
 // Usado por getIngresosMes() y renderCobros() para que el número coincida en ambos lados.
 function montoCobro(a,c){
-  return (c && c.monto!==''&&c.monto!=null) ? parseFloat(c.monto) : parseFloat(a.monto||0);
+  // `a` puede venir undefined si el alumno fue eliminado del todo (no solo
+  // pausado) — tolerado acá en vez de en cada llamador, ya que c.monto va a
+  // estar guardado siempre que ese mes se haya marcado pagado alguna vez.
+  return (c && c.monto!==''&&c.monto!=null) ? parseFloat(c.monto) : parseFloat((a&&a.monto)||0);
 }
 
 let accessToken = null;
@@ -3185,12 +3188,16 @@ function initFinAnios(){
 }
 
 function getIngresosMes(mk){
-  // Cuotas
+  // Cuotas — recorre los cobros YA REGISTRADOS de ese mes (no los alumnos
+  // activos hoy): un alumno pausado o eliminado después de pagar no debe
+  // perder ese ingreso histórico. Mismo patrón que totalCobradoHistorico().
   let cuotas=0;
   const cm=cobros[mk]||{};
-  alumnos.filter(a=>a.estado==='activo').forEach(a=>{
-    const c=cm[a.id];
-    if(c&&c.estado==='pagado') cuotas+=montoCobro(a,c);
+  Object.entries(cm).forEach(([alumnoId,c])=>{
+    if(c.estado==='pagado'){
+      const a=alumnos.find(x=>x.id===alumnoId);
+      cuotas+=montoCobro(a,c);
+    }
   });
   // Bonos
   let bonos=0;
