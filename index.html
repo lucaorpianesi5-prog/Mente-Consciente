@@ -114,6 +114,33 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .turno-nombre{font-size:0.82rem;font-weight:500;color:var(--texto);margin-top:0.1rem}
 .turno-freq{font-size:0.7rem;color:var(--suave)}
 
+/* ── RESUMEN: mini agenda semanal (handoff mini-agenda-resumen) — misma
+   info que Agenda pero solo lectura, sin drag ni modal de edición ── */
+.resumen-semana-wrap{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;overflow:hidden;padding:1rem 1.25rem}
+.resumen-semana-wrap .seccion-label{margin-bottom:0.85rem}
+.resumen-semana-wrap .seccion-label a{font-size:0.68rem;color:var(--verde);text-decoration:none;font-weight:600;margin-left:auto;text-transform:none;letter-spacing:0;cursor:pointer}
+.mini-semana{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--borde);border:1px solid var(--borde);border-radius:10px;overflow:hidden}
+.mini-dia{background:var(--blanco);min-height:150px;padding:0.6rem 0.5rem}
+.mini-dia.hoy{background:rgba(74,184,112,0.08)}
+.mini-dia-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;padding-bottom:0.4rem;border-bottom:1px solid var(--borde)}
+.mini-dia-nombre{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:var(--suave)}
+.mini-dia.hoy .mini-dia-nombre{color:var(--verde)}
+.mini-dia-fecha{font-size:0.66rem;color:var(--suave)}
+.mini-turno{display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.15rem;border-radius:5px;cursor:pointer;transition:background 0.15s}
+.mini-turno:hover{background:var(--crema)}
+.mini-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.mini-dot.freq-1{background:#4A9CC7}
+.mini-dot.freq-2{background:#9B7FD4}
+.mini-dot.freq-3{background:#E8A84A}
+.mini-turno-txt{min-width:0}
+.mini-hora{font-size:0.66rem;color:var(--suave);font-variant-numeric:tabular-nums}
+.mini-nombre{font-size:0.76rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini-libre{font-size:0.7rem;color:var(--suave);padding:0.3rem 0.15rem}
+@media(max-width:640px){
+  .mini-semana{grid-template-columns:1fr;gap:0.6rem;background:transparent;border:none}
+  .mini-dia{border:1px solid var(--borde);border-radius:8px;min-height:0}
+}
+
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center}
 .overlay.open{display:flex}
@@ -427,7 +454,7 @@ tr:hover td{background:rgba(74,184,112,0.04)}
   /* Cards de todas las páginas — mismo tratamiento vidrio que ya tenía Perfil */
   .stat, .table-wrap, .dia-col, .alumno-card, .cobro-row, .resumen-card,
   .cobro-card, .kpi-card, .fin-card, .kpi-card-fin, .tendencia-card,
-  .lista-card, #page-perfil .pd-header-main, #page-perfil .pd-card{
+  .lista-card, .resumen-semana-wrap, #page-perfil .pd-header-main, #page-perfil .pd-card{
     background: rgba(28,43,32,0.55);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -643,10 +670,10 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   #alumnos-table-wrap{display:none}
   #alumnos-cards{display:flex}
 
-  /* ── Dashboard: "Hoy" primero ── */
+  /* ── Dashboard: "Esta semana" primero ── */
   #page-dashboard.active{display:flex;flex-direction:column}
   #page-dashboard .top-row{order:2}
-  #page-dashboard .table-wrap{order:1;margin-bottom:1rem}
+  #page-dashboard .resumen-semana-wrap{order:1;margin-bottom:1rem}
   #page-dashboard .page-header{order:0}
 
   /* ── Resumen: KPIs + financiero apilados, en una columna ── */
@@ -856,9 +883,9 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
         </div>
       </div>
     </div>
-    <div class="table-wrap">
-      <div class="table-header"><h3>Hoy</h3></div>
-      <div id="hoy-lista" style="padding:1rem 1.25rem;color:var(--suave);font-size:0.85rem">Cargando...</div>
+    <div class="resumen-semana-wrap">
+      <div class="seccion-label">Esta semana <a onclick="showPage('agenda',document.getElementById('bn-agenda'));syncBottomNav('agenda')">Ver agenda completa →</a></div>
+      <div class="mini-semana" id="resumen-semana"></div>
     </div>
   </div>
 
@@ -2029,9 +2056,6 @@ function _syncBottomNavFromPerfil(){
 function fechaHoy(){
   return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 }
-function diaHoy(){
-  return ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
-}
 function mesKey(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -2071,33 +2095,7 @@ function renderDashboard(){
     document.getElementById('fin-alerta-count').textContent=`${alumnosPendientes.length} alumno${alumnosPendientes.length>1?'s':''} sin cobrar este mes`;
     chipsEl.innerHTML=alumnosPendientes.map(a=>`<span class="fin-chip" onclick="verAlumno('${a.id}')">${escaparHTML(a.nombre)}</span>`).join('');
   }
-  const dia=diaHoy();
-  const hoy=activos.filter(a=>a.dias.includes(dia));
-  const el=document.getElementById('hoy-lista');
-  el.innerHTML=hoy.length===0
-    ?'<p style="color:var(--suave)">Sin turnos hoy.</p>'
-    :hoy.map(a=>{
-      const hpd=stringToHorariosPorDia(a.horario);
-      const hora=hpd[dia]||'';
-      // PERF-04: reusar mk ya calculado arriba, sin llamar mesKey() de nuevo
-      const cobrado=(cobros[mk]||{})[a.id];
-      const estadoCobro=cobrado&&cobrado.estado==='pagado'
-        ?'<span class="badge badge-verde">Pagado</span>'
-        :'<span class="badge badge-amarillo">Pendiente</span>';
-      return `<div onclick="verAlumno('${a.id}')" style="display:flex;align-items:center;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid var(--borde);cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='var(--crema)'" onmouseout="this.style.background=''">
-        <div style="display:flex;align-items:center;gap:1rem">
-          <div style="width:36px;height:36px;border-radius:50%;background:var(--verde-bg);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--verde);font-size:0.9rem;flex-shrink:0">${a.nombre.charAt(0).toUpperCase()}</div>
-          <div>
-            <p style="font-weight:600;font-size:0.92rem">${escaparHTML(a.nombre)}</p>
-            <p style="color:var(--suave);font-size:0.78rem;margin-top:0.1rem">${hora||'Sin horario'}</p>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:0.75rem">
-          ${estadoCobro}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--suave)" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        </div>
-      </div>`;
-    }).join('');
+  renderResumenSemana();
 }
 
 // ── ALUMNOS ──
@@ -3699,6 +3697,59 @@ function getSemanaActual(){
     fecha.setDate(lunes.getDate()+idx);
     return {nombre, fechaStr:fecha.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'})};
   });
+}
+
+// Mini agenda semanal de Resumen (handoff mini-agenda-resumen): mismos 5 días
+// y datos que renderAgenda(), pero de solo lectura — sin drag ni modal de
+// edición. El click en un turno navega directo a verAlumno(id).
+function renderResumenSemana(){
+  const grid=document.getElementById('resumen-semana');
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  const semana=getSemanaActual();
+  const ahora=new Date();
+  const hoyStr=ahora.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
+  const nombresCortos={Lunes:'Lun',Martes:'Mar',Miércoles:'Mié',Jueves:'Jue',Viernes:'Vie'};
+
+  // Mismo cache que renderAgenda(): parsear horarios una sola vez por alumno
+  const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
+
+  grid.innerHTML=semana.map(({nombre,fechaStr})=>{
+    const esHoy=fechaStr===hoyStr;
+    const turnos=activos.filter(a=>a.dias.includes(nombre)).sort((a,b)=>{
+      const horaA=hpdCache.get(a.id)[nombre]||'99:99';
+      const horaB=hpdCache.get(b.id)[nombre]||'99:99';
+      return horaA.localeCompare(horaB);
+    });
+
+    let cuerpo;
+    if(turnos.length===0){
+      cuerpo='<div class="mini-libre">Libre</div>';
+    } else if(esHoy && turnos.every(a=>{
+      // Un turno sin horario cargado no se puede saber si ya pasó — no cuenta
+      // como "pasado" para no ocultar de más.
+      const hora=hpdCache.get(a.id)[nombre];
+      if(!hora) return false;
+      const [h,m]=hora.split(':').map(Number);
+      const finTurno=new Date(ahora); finTurno.setHours(h,m,0,0);
+      return ahora>finTurno;
+    })){
+      cuerpo='<div class="mini-libre">Resto libre</div>';
+    } else {
+      cuerpo=turnos.map(a=>{
+        const hora=hpdCache.get(a.id)[nombre]||'Sin horario';
+        const freq=parseInt(a.frecuencia,10)||2;
+        return `<div class="mini-turno" onclick="verAlumno('${a.id}')">
+          <span class="mini-dot freq-${freq}"></span>
+          <div class="mini-turno-txt"><div class="mini-hora">${escaparHTML(hora)}</div><div class="mini-nombre">${escaparHTML(a.nombre)}</div></div>
+        </div>`;
+      }).join('');
+    }
+
+    return `<div class="mini-dia${esHoy?' hoy':''}">
+      <div class="mini-dia-header"><span class="mini-dia-nombre">${nombresCortos[nombre]}</span><span class="mini-dia-fecha">${fechaStr}</span></div>
+      ${cuerpo}
+    </div>`;
+  }).join('');
 }
 
 function renderAgenda(){
