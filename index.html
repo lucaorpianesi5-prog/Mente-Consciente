@@ -967,7 +967,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
       <div class="pd-header">
         <!-- Barra superior: Volver + menú kebab -->
         <div class="pd-header-top">
-          <button class="pd-back" onclick="showPage('alumnos',null);_syncBottomNavFromPerfil()">
+          <button class="pd-back" onclick="showPage(perfilOrigen,null);_syncBottomNavFromPerfil()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             Volver
           </button>
@@ -2021,8 +2021,8 @@ function showPage(id,el){
 
 // Sincroniza la barra inferior cuando se navega al perfil desde cualquier sección
 function _syncBottomNavFromPerfil(){
-  // El perfil no tiene su propio ítem en la barra; dejamos activo el de Alumnos
-  syncBottomNav('alumnos');
+  // El perfil no tiene su propio ítem en la barra; resalta la sección de origen
+  syncBottomNav(perfilOrigen);
 }
 
 // ── FECHA ──
@@ -2282,8 +2282,17 @@ async function copiarLinkPortal(){
   }
 }
 
+// Página de origen al entrar a la ficha — "Volver" y la barra inferior
+// respetan de dónde vino el usuario en vez de ir siempre a Alumnos.
+let perfilOrigen = 'alumnos'; // default, mismo comportamiento de hoy si no hay contexto
 function verAlumno(id){
   const a=alumnos.find(x=>x.id===id); if(!a) return;
+  const paginaActual=document.querySelector('.page.active');
+  // Guard: si ya estás en la ficha (ej. algún link futuro perfil->perfil), no
+  // pisar el origen real con 'perfil' — se perdería el rastro de dónde venías.
+  if(paginaActual && paginaActual.id!=='page-perfil'){
+    perfilOrigen=paginaActual.id.replace('page-','');
+  }
   document.getElementById('page-perfil').dataset.alumnoId = id;
   const iniciales=a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
