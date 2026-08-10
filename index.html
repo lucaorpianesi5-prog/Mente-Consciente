@@ -4,6 +4,13 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Mente Consciente</title>
+<!-- Resource hints: adelantan el handshake TLS con los hosts de Google (login
+     GSI, APIs de Sheets/Calendar, proxy del portal) y la descarga de la fuente,
+     para acortar el login y el primer render. -->
+<link rel="preconnect" href="https://accounts.google.com"/>
+<link rel="preconnect" href="https://www.googleapis.com" crossorigin/>
+<link rel="preconnect" href="https://script.google.com"/>
+<link rel="preload" href="Sora-Variable.woff2" as="font" type="font/woff2" crossorigin/>
 <link rel="icon" type="image/png" href="Logo_App.png"/>
 <link rel="apple-touch-icon" href="Logo_App.png"/>
 <script>
@@ -1318,18 +1325,24 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- Config por entorno (dev/prod): se carga desde config.js, que NO se commitea
+     (ver .gitignore y config.example.js). Si el archivo falta, el bloque CONFIG
+     de abajo usa los valores por defecto (mismo comportamiento de siempre). -->
+<script src="config.js"></script>
 <script>
 // ── CONFIG ──
-const CLIENT_ID   = '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleusercontent.com';
-const SHEET_ID    = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
-const CALENDAR_ID = '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
-const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email';
-// Único email autorizado a operar el panel del entrenador — cualquier otra
-// cuenta de Google que complete el login de OAuth queda rechazada en iniciarSesion().
-const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
-// S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
-// Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
-const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
+// Se lee de window.APP_CONFIG (definido en config.js) con fallback a los valores
+// por defecto. Así cada entorno tiene su config sin editar este archivo.
+const _CFG = (typeof window !== 'undefined' && window.APP_CONFIG) || {};
+const CLIENT_ID   = _CFG.CLIENT_ID   || '349654954450-p8rua8o64semm4nd934dbl5mq29hcu3l.apps.googleusercontent.com';
+const SHEET_ID    = _CFG.SHEET_ID    || '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
+const CALENDAR_ID = _CFG.CALENDAR_ID || '15630b30e4c24d0bc4266512653a57d019dfdeade6d10e5cc2aa59f963f68ac3@group.calendar.google.com';
+const SCOPES      = _CFG.SCOPES      || 'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/userinfo.email';
+// Emails autorizados a operar el panel del entrenador — cualquier otra cuenta
+// que complete el login de OAuth queda rechazada en iniciarSesion().
+const ALLOWED_EMAILS = _CFG.ALLOWED_EMAILS || ['lucaorpianesi5@gmail.com'];
+// URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
+const PORTAL_API_URL = _CFG.PORTAL_API_URL || 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
 const RANGO = {
@@ -1715,6 +1728,21 @@ async function sheetsGet(range, unformatted=false){
   return (await r.json()).values||[];
 }
 
+// Colapsa varias lecturas en un solo request (values:batchGet). Devuelve un
+// array de "values" en el MISMO orden que `ranges` (un rango sin datos → []).
+// Lo usa cargarDatos() para bajar el sync de ~10 requests HTTP a 2. El render
+// (formateado vs unformatted) aplica a todo el batch, por eso el saldo inicial,
+// que necesita UNFORMATTED_VALUE, se lee aparte y no entra en este batch.
+async function sheetsBatchGet(ranges, unformatted=false){
+  const qs=ranges.map(r=>'ranges='+encodeRange(r)).join('&');
+  const vr=unformatted?'&valueRenderOption=UNFORMATTED_VALUE':'';
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchGet?${qs}${vr}`;
+  const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(!r.ok) throw new Error('Error leyendo Sheets (batch)');
+  const vrs=(await r.json()).valueRanges||[];
+  return ranges.map((_,i)=>(vrs[i]&&vrs[i].values)||[]);
+}
+
 async function sheetsUpdate(range, values){
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}?valueInputOption=RAW`;
   const r=await fetchConRenovacion(url,{
@@ -1769,11 +1797,26 @@ async function cargarDatos(){
   try {
     toast('Sincronizando...');
 
+    // Una sola llamada batchGet para los 7 rangos con formato normal. Junto
+    // con la lectura unformatted del saldo inicial (más abajo), baja el sync
+    // de ~10 requests HTTP a 2. Las lecturas de Biblioteca/Progresion se
+    // quitaron (feature deshabilitada; handoff biblioteca-a-mapeo-externo) —
+    // sus globals quedan en [] (ver declaración en 1413-1414).
+    const _batch = await sheetsBatchGet([
+      RANGO.ALUMNOS_READ,      // _batch[0]
+      RANGO.COBROS_READ,       // _batch[1]
+      RANGO.SEGUIMIENTO_READ,  // _batch[2]
+      RANGO.NUTRICION_READ,    // _batch[3]
+      RANGO.NUTRI_COBROS_READ, // _batch[4]
+      RANGO.GASTOS_READ,       // _batch[5]
+      RANGO.ASISTENCIAS_READ,  // _batch[6]
+    ]);
+
     await Promise.all([
       // Alumnos
       (async()=>{
         try{
-          const rowsA = await sheetsGet(RANGO.ALUMNOS_READ);
+          const rowsA = _batch[0];
           alumnos = rowsA.map(r=>({
             id:           r[0]||'',
             nombre:       r[1]||'',
@@ -1803,7 +1846,7 @@ async function cargarDatos(){
       // Cobros
       (async()=>{
         try{
-          const rowsC = await sheetsGet(RANGO.COBROS_READ);
+          const rowsC = _batch[1];
           cobros={};
           rowsC.forEach(r=>{
             if(!r[0]||!r[1]) return;
@@ -1816,7 +1859,7 @@ async function cargarDatos(){
       // Seguimiento
       (async()=>{
         try{
-          const rowsS = await sheetsGet(RANGO.SEGUIMIENTO_READ);
+          const rowsS = _batch[2];
           seguimiento={};
           rowsS.forEach(r=>{
             if(!r[0]) return;
@@ -1829,7 +1872,7 @@ async function cargarDatos(){
       // Nutrición - Clientes
       (async()=>{
         try{
-          const rowsNC = await sheetsGet(RANGO.NUTRICION_READ);
+          const rowsNC = _batch[3];
           clientesNutri=rowsNC.map(r=>({
             id:r[0]||'',nombre:r[1]||'',telefono:r[2]||'',estado:r[3]||'activo',notas:r[4]||''
           })).filter(c=>c.id);
@@ -1839,7 +1882,7 @@ async function cargarDatos(){
       // Nutrición - Cobros
       (async()=>{
         try{
-          const rowsNP = await sheetsGet(RANGO.NUTRI_COBROS_READ);
+          const rowsNP = _batch[4];
           cobrosNutri={};
           rowsNP.forEach(r=>{
             if(!r[0]||!r[1]) return;
@@ -1852,7 +1895,7 @@ async function cargarDatos(){
       // Gastos
       (async()=>{
         try{
-          const rowsG = await sheetsGet(RANGO.GASTOS_READ);
+          const rowsG = _batch[5];
           gastos=rowsG.map(r=>({id:r[0]||'',fecha:r[1]||'',desc:r[2]||'',monto:r[3]||'0'})).filter(g=>g.id);
         }catch(e){console.warn('Error cargando Gastos:',e);gastos=[];}
       })(),
@@ -1873,27 +1916,8 @@ async function cargarDatos(){
       // Asistencias (B1: necesario para chequear duplicados del mismo día)
       (async()=>{
         try{
-          asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
+          asistencias = _batch[6];
         }catch(e){console.warn('Error cargando Asistencias:',e);asistencias=[];}
-      })(),
-
-      // Biblioteca de ejercicios
-      (async()=>{
-        try{
-          const rowsB = await sheetsGet(RANGO.BIBLIOTECA_READ);
-          biblioteca = rowsB.map(r=>({id:r[0]||'',ejercicio:r[1]||'',patron:r[2]||'',enfoque:r[3]||''})).filter(e=>e.id);
-        }catch(e){console.warn('Error cargando Biblioteca:',e);biblioteca=[];}
-      })(),
-
-      // Progresión actual (última carga por alumno+ejercicio; el historial completo no se lee acá)
-      (async()=>{
-        try{
-          const rowsP = await sheetsGet(RANGO.PROGRESION_ACTUAL_READ);
-          progresionActual = rowsP.map(r=>({
-            alumnoId:r[0]||'',ejercicioId:r[1]||'',fecha:r[2]||'',
-            reps:r[3]||'',series:r[4]||'',kg:r[5]||'',rir:r[6]||''
-          })).filter(p=>p.alumnoId&&p.ejercicioId);
-        }catch(e){console.warn('Error cargando Progresion_Actual:',e);progresionActual=[];}
       })(),
     ]);
 
