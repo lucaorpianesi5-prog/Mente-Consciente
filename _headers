@@ -1,0 +1,28 @@
+# Cache-Control para Cloudflare Pages / Netlify (ambos leen este archivo con
+# la misma sintaxis). GitHub Pages NO lo soporta (tope de ~10 min sin control).
+#
+# Criterio: la app es un único index.html SIN hash de contenido, así que el HTML
+# se sirve siempre fresco (para que un deploy se vea al instante), mientras que
+# los assets estáticos se cachean fuerte para acelerar las visitas repetidas
+# (el entrenador entra a diario; los alumnos también). Como no hay cache-busting
+# por nombre, los assets que podrían cambiar usan una ventana moderada (7 días)
+# en vez de "immutable"; la fuente, que no cambia, va a 1 año.
+
+# Fuente: prácticamente nunca cambia.
+/Sora-Variable.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+# Imágenes (logo + fondos): ventana moderada; si se reemplazan, propagan en ≤7 días.
+/Logo_App.png
+  Cache-Control: public, max-age=604800
+/portal-fondo.webp
+  Cache-Control: public, max-age=604800
+/assets/*
+  Cache-Control: public, max-age=604800
+
+# HTML = "índice" de la app (un solo archivo, sin hash): siempre revalidar,
+# así cada deploy se ve de inmediato.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate

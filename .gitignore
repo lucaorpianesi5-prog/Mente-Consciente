@@ -1,1 +1,9 @@
 .claude/settings.local.json
+.vscode/
+
+# Config por entorno: valores propios de cada dev/prod. Nunca se commitea.
+# La plantilla versionada es config.example.js.
+config.js
+
+# Helpers de dev (bootstrap de la Sheet, etc.) — no van al repo de Luca.
+dev/
