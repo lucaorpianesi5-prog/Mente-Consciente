@@ -202,6 +202,16 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .pd-gestion-row{display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:0.6rem}
 .pd-gestion-item p:first-child{font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3)}
 .pd-gestion-item p:last-child{font-size:0.88rem;font-weight:600;color:var(--pd-text);margin-top:0.1rem}
+/* Ítem "Cuota" (handoff vencimiento-cuota-portal-y-ficha). El selector de
+   color necesita el prefijo .pd-gestion-item .cuota-valor.<estado> (0,3,0):
+   .pd-gestion-item p:last-child (0,2,1) le gana a un .cuota-valor.<estado>
+   suelto (0,2,0), y los 4 estados terminan viéndose del mismo color. */
+.pd-gestion-item.cuota p.cuota-valor{font-size:0.88rem;font-weight:600;margin-top:0.1rem;line-height:1.25}
+.pd-gestion-item.cuota .cuota-detalle{display:block;font-size:0.68rem;font-weight:500;color:var(--pd-text2);margin-top:0.05rem}
+.pd-gestion-item .cuota-valor.alDia{color:var(--pd-verde)}
+.pd-gestion-item .cuota-valor.vencePronto{color:var(--pd-amber)}
+.pd-gestion-item .cuota-valor.vencido{color:var(--pd-red)}
+.pd-gestion-item .cuota-valor.sinFecha{color:var(--pd-text3)}
 .pd-header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem}
 .pd-btn{padding:0.4rem 0.9rem;border-radius:6px;font-size:0.78rem;cursor:pointer;border:0.5px solid;transition:all 0.2s;font-family:inherit}
 .pd-btn-primary{background:var(--pd-verde);color:#0D1A12;border-color:var(--pd-verde);font-weight:600}
@@ -276,6 +286,8 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .header-top-actions{display:flex;gap:0.5rem;flex-shrink:0}
 .cobro-contacto{width:34px;height:34px;border-radius:50%;background:var(--pd-bg3);border:1px solid var(--pd-border2);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;position:relative;flex-shrink:0}
 .cobro-contacto .dot-adeudado{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--pd-amber);border:1.5px solid var(--pd-bg)}
+/* Vencido (rojo) vs vence pronto (ámbar) — mismo cálculo que el ítem "Cuota" */
+.cobro-contacto .dot-adeudado.vencido{background:var(--pd-red)}
 
 .dias-pilares{display:flex;gap:0.35rem;margin-top:0.5rem}
 .dia-pilar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.62rem;font-weight:700;color:var(--pd-text3);border:1px solid var(--pd-border)}
@@ -655,8 +667,6 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 /* MOBILE */
 .bottom-nav{display:none}
 .fab{display:none}
-/* Badge de cobro en el header del perfil — solo mobile */
-.pd-cobro-mes-badge{display:none}
 @media(max-width:768px){
   /* ── Layout base ── */
   .shell{grid-template-columns:1fr}
@@ -717,11 +727,6 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   .toast{bottom:5.5rem}
 
   /* ── Perfil mobile ── */
-  /* Badge cobro mes visible en header */
-  .pd-cobro-mes-badge{display:inline-flex;align-items:center;gap:0.35rem;padding:0.2rem 0.65rem;border-radius:20px;font-size:0.7rem;font-weight:600;margin-top:0.4rem}
-  .pd-cobro-mes-badge.pagado{background:rgba(74,184,112,0.12);color:#4AB870;border:0.5px solid rgba(74,184,112,0.25)}
-  .pd-cobro-mes-badge.pendiente{background:rgba(232,168,74,0.12);color:#E8A84A;border:0.5px solid rgba(232,168,74,0.25)}
-
   /* Reordenar secciones del perfil en mobile via order */
   #perfil-dark .pd-back{margin-bottom:0.75rem}
   .pd-stats{grid-template-columns:repeat(3,1fr)}
@@ -782,6 +787,25 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .portal-footer{text-align:center;font-size:0.68rem;color:var(--pd-text3);padding-top:0.5rem}
 .portal-loading{text-align:center;padding:3rem;color:var(--pd-text2);font-size:0.9rem}
 .portal-error{text-align:center;padding:3rem;color:var(--pd-red);font-size:0.9rem}
+
+/* "Tu cuota" (handoff vencimiento-cuota-portal-y-ficha) */
+.portal-cuota{background:var(--pd-card);border:0.5px solid var(--pd-border2);border-radius:10px;padding:1rem 1.1rem}
+.portal-cuota.atencion{border-color:rgba(232,168,74,0.45);background:linear-gradient(135deg,var(--pd-card) 0%,#2A2318 100%)}
+.cuota-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem}
+.cuota-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3)}
+.cuota-estado{font-size:1.05rem;font-weight:700;margin-top:0.15rem;line-height:1.3}
+.cuota-estado.alDia{color:var(--pd-verde)}
+.cuota-estado.atencion{color:var(--pd-amber)}
+.cuota-estado.neutro{color:var(--pd-text)}
+.cuota-sub{font-size:0.72rem;color:var(--pd-text2);margin-top:0.15rem}
+.cuota-monto{text-align:right;flex-shrink:0}
+.cuota-monto-val{font-size:1.05rem;font-weight:700;color:var(--pd-crema);margin-top:0.15rem}
+.cuota-pago{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-top:0.85rem;padding-top:0.8rem;border-top:1px solid var(--pd-border)}
+.cuota-alias-label{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3)}
+.cuota-alias{font-size:0.88rem;font-weight:600;color:var(--pd-text);margin-top:0.1rem;word-break:break-all}
+.cuota-copiar{background:var(--pd-verde-dim);border:1px solid rgba(74,184,112,0.3);color:var(--pd-verde);font-family:inherit;font-size:0.72rem;font-weight:600;padding:0.4rem 0.75rem;border-radius:20px;cursor:pointer;flex-shrink:0}
+.cuota-copiar.copiado{background:rgba(74,184,112,0.24);border-color:var(--pd-verde)}
+.cuota-aviso{font-size:0.66rem;color:var(--pd-text2);margin-top:0.6rem;line-height:1.4}
 </style>
 </head>
 <body>
@@ -1330,6 +1354,10 @@ const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
 // Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
 const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
+// Alias fijo para transferir, mostrado en la card "Tu cuota" del portal
+// (handoff vencimiento-cuota-portal-y-ficha, confirmado por Luca 28/09). Vacío
+// oculta la fila del alias sin romper nada.
+const ALIAS_PAGO = 'lucaorpianesi.mp';
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
 const RANGO = {
@@ -1515,6 +1543,57 @@ async function cargarPortalAlumno(id){
     const pesoDiff = (a.pesoInicial && a.pesoActual) ? +(parseFloat(a.pesoActual) - parseFloat(a.pesoInicial)).toFixed(1) : null;
     const hayVitales = a.pesoActual || imc || edad || a.estatura || a.pesoInicial;
 
+    // Card "Tu cuota" (handoff vencimiento-cuota-portal-y-ficha): solo si está
+    // activo (pausados/inactivos no ven la card, igual que Vencimientos no los
+    // lista) y si el proxy ya manda `pagos` — compatibilidad con el proxy
+    // viejo: si `data.pagos` no vino, no se renderiza nada en vez de mostrar a
+    // todos como "sin pagos".
+    let cuotaHTML = '';
+    if(a.estado==='activo' && data.pagos!==undefined){
+      const pagos=(data.pagos||[]).map(_parseFechaPago).filter(Boolean).sort((x,y)=>x-y);
+      const hoyV=new Date(); hoyV.setHours(0,0,0,0);
+      const venc=calcularVencimiento(a, hoyV, pagos);
+      const montoTxt = (a.monto && parseFloat(a.monto)>0) ? `$${parseFloat(a.monto).toLocaleString('es-AR')}` : '';
+      let estadoCls='neutro', estadoTxt='', subTxt='', mostrarAviso=false;
+      if(venc.categoria==='alDia'){
+        estadoCls='alDia'; estadoTxt='Al día ✓';
+        subTxt=`Próximo vencimiento: ${fmtFecha(venc.proximoVencimiento)} · último pago ${fmtFecha(venc.fechaUltimoPago)}`;
+      } else if(venc.categoria==='vencePronto'){
+        estadoCls='atencion'; mostrarAviso=true;
+        estadoTxt=venc.diasParaVencer<=0?'Vence hoy':(venc.diasParaVencer===1?'Vence mañana':`Vence en ${venc.diasParaVencer} días`);
+        subTxt=`El ${fmtFecha(venc.proximoVencimiento)} · último pago ${fmtFecha(venc.fechaUltimoPago)}`;
+      } else if(venc.categoria==='vencido'){
+        estadoCls='atencion'; mostrarAviso=true;
+        estadoTxt=`Venció el ${fmtFecha(venc.enMoraDesde)}`;
+        subTxt=`${venc.ciclosAdeudados} cuota${venc.ciclosAdeudados!==1?'s':''} pendiente${venc.ciclosAdeudados!==1?'s':''} · último pago ${fmtFecha(venc.fechaUltimoPago)}`;
+      } else {
+        estadoTxt='Mensual';
+        subTxt='Tu fecha de vencimiento se fija con tu primer pago';
+      }
+      cuotaHTML = `
+        <div class="portal-cuota ${estadoCls==='atencion'?'atencion':''}">
+          <div class="cuota-top">
+            <div>
+              <div class="cuota-label">Tu cuota</div>
+              <div class="cuota-estado ${estadoCls}">${escaparHTML(estadoTxt)}</div>
+              <div class="cuota-sub">${escaparHTML(subTxt)}</div>
+            </div>
+            ${montoTxt ? `<div class="cuota-monto">
+              <div class="cuota-label">Mensual</div>
+              <div class="cuota-monto-val">${escaparHTML(montoTxt)}</div>
+            </div>` : ''}
+          </div>
+          ${ALIAS_PAGO ? `<div class="cuota-pago">
+            <div style="min-width:0">
+              <div class="cuota-alias-label">Alias para transferir</div>
+              <div class="cuota-alias">${escaparHTML(ALIAS_PAGO)}</div>
+            </div>
+            <button type="button" class="cuota-copiar" id="portal-copiar-alias">Copiar</button>
+          </div>` : ''}
+          ${mostrarAviso ? `<p class="cuota-aviso">Si ya pagaste, puede tardar en verse hasta que se registre.</p>` : ''}
+        </div>`;
+    }
+
     el.innerHTML = `
       <div class="portal-wrap">
         <!-- Header: marca + saludo (vista propia del alumno) -->
@@ -1550,6 +1629,8 @@ async function cargarPortalAlumno(id){
           </div>` : ''}
         </div>
 
+        ${cuotaHTML}
+
         <!-- Vitales: principales (peso con tendencia + IMC) + secundarios -->
         ${hayVitales ? `
         <div class="separador-zona"><span>🌱</span></div>
@@ -1582,6 +1663,15 @@ async function cargarPortalAlumno(id){
     el.querySelectorAll('[data-open-url]').forEach(btn=>{
       btn.addEventListener('click', ()=>window.open(btn.dataset.openUrl, '_blank', 'noopener'));
     });
+    const copiarAliasBtn=document.getElementById('portal-copiar-alias');
+    if(copiarAliasBtn){
+      copiarAliasBtn.addEventListener('click', async ()=>{
+        try{ await navigator.clipboard.writeText(ALIAS_PAGO); }catch(e){}
+        copiarAliasBtn.textContent='¡Copiado!';
+        copiarAliasBtn.classList.add('copiado');
+        setTimeout(()=>{ copiarAliasBtn.textContent='Copiar'; copiarAliasBtn.classList.remove('copiado'); }, 1800);
+      });
+    }
   } catch(e) {
     el.innerHTML = '<div class="portal-error">No se pudo cargar el perfil. Intentá de nuevo más tarde.</div>';
     console.error(e);
@@ -2250,23 +2340,30 @@ function verAlumno(id){
   // Header
   document.getElementById('perfil-nombre').textContent=a.nombre;
   document.getElementById('perfil-badge').innerHTML=pdBadge(a.estado);
-  // Badge de cobro del mes — visible solo en mobile (CSS lo muestra)
-  const _mkBadge=mesKey();
-  const _cBadge=(cobros[_mkBadge]||{})[id];
-  const _estadoBadge=_cBadge&&_cBadge.estado==='pagado'?'pagado':'pendiente';
-  let _badgeEl=document.getElementById('perfil-cobro-mes-badge');
-  if(!_badgeEl){
-    _badgeEl=document.createElement('span');
-    _badgeEl.id='perfil-cobro-mes-badge';
-    document.getElementById('perfil-badge').after(_badgeEl);
+
+  // Cuota (handoff vencimiento-cuota-portal-y-ficha): mismo cálculo que
+  // Cobros → Vencimientos (diaPago + historial), no el mes calendario —
+  // reemplaza al viejo badge mobile, que podía contradecir a Vencimientos.
+  // No se llama a asegurarDiaPago(): abrir una ficha no debe escribir en el Sheet.
+  const _hoyFicha = new Date(); _hoyFicha.setHours(0,0,0,0);
+  const venc = a.estado==='activo' ? calcularVencimiento(a, _hoyFicha) : null;
+  let cuotaItemHTML='';
+  if(venc){
+    let valorTxt, detalleTxt;
+    if(venc.categoria==='alDia'){ valorTxt='Al día'; detalleTxt=`vence ${fmtFecha(venc.proximoVencimiento)}`; }
+    else if(venc.categoria==='vencePronto'){
+      valorTxt=venc.diasParaVencer<=0?'Vence hoy':(venc.diasParaVencer===1?'Vence mañana':`Vence en ${venc.diasParaVencer} días`);
+      detalleTxt=fmtFecha(venc.proximoVencimiento);
+    } else if(venc.categoria==='vencido'){ valorTxt=`Debe ${venc.ciclosAdeudados} ciclo${venc.ciclosAdeudados!==1?'s':''}`; detalleTxt=`desde ${fmtFecha(venc.enMoraDesde)}`; }
+    else { valorTxt='Sin fecha'; detalleTxt=a.diaPago?'sin pagos todavía':'sin día de pago'; }
+    cuotaItemHTML=`<div class="pd-gestion-item cuota"><p>Cuota</p><p class="cuota-valor ${venc.categoria}">${escaparHTML(valorTxt)}<span class="cuota-detalle">${escaparHTML(detalleTxt)}</span></p></div>`;
   }
-  _badgeEl.className=`pd-cobro-mes-badge ${_estadoBadge}`;
-  _badgeEl.textContent=_estadoBadge==='pagado'?'✓ Cuota al día':'Cuota pendiente';
 
   // Gestión inline (el teléfono es redundante con el botón de WhatsApp del header)
   document.getElementById('perfil-gestion').innerHTML=`
     <div class="pd-gestion-item"><p>Frecuencia</p><p>${escaparHTML(a.frecuencia)}x por semana</p></div>
     <div class="pd-gestion-item"><p>Monto</p><p style="color:var(--pd-crema)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</p></div>
+    ${cuotaItemHTML}
   `;
 
   // Días como pilares + próxima sesión
@@ -2373,12 +2470,33 @@ function verAlumno(id){
     <button class="pd-btn pd-btn-primary" style="margin-top:0.5rem;font-size:0.75rem" onclick="guardarCampoAlumno('${id}','historialFis','perfil-historial-fis-txt')">Guardar</button>
   `;
 
-  // Cobros — ícono en el header (junto a WhatsApp), con punto ámbar solo
-  // cuando el mes está adeudado (mismo criterio de "atención" que el dot de Nutri)
-  const _mesNombre=MESES[parseInt(_mkBadge.split('-')[1],10)-1];
+  // Cobros — ícono en el header (junto a WhatsApp). Punto y tooltip usan el
+  // mismo cálculo de Cuota de arriba: rojo si vencido, ámbar si vence pronto,
+  // sin punto si está al día, sin fecha, o pausado/inactivo.
   const cobroBtn=document.getElementById('perfil-btn-cobro');
-  cobroBtn.title=`${_mesNombre}: ${_estadoBadge==='pagado'?'pagado':'pendiente'}`;
-  document.getElementById('perfil-cobro-dot').style.display=_estadoBadge==='pagado'?'none':'block';
+  const cobroDot=document.getElementById('perfil-cobro-dot');
+  if(!venc){
+    cobroBtn.title='Cobros';
+    cobroDot.style.display='none';
+    cobroDot.classList.remove('vencido');
+  } else if(venc.categoria==='vencido'){
+    cobroBtn.title=`Cuota: debe ${venc.ciclosAdeudados} ciclo${venc.ciclosAdeudados!==1?'s':''} (en mora desde ${fmtFecha(venc.enMoraDesde)})`;
+    cobroDot.style.display='block';
+    cobroDot.classList.add('vencido');
+  } else if(venc.categoria==='vencePronto'){
+    const dias=venc.diasParaVencer<=0?'hoy':(venc.diasParaVencer===1?'mañana':`en ${venc.diasParaVencer} días`);
+    cobroBtn.title=`Cuota: vence ${dias} (${fmtFecha(venc.proximoVencimiento)})`;
+    cobroDot.style.display='block';
+    cobroDot.classList.remove('vencido');
+  } else if(venc.categoria==='alDia'){
+    cobroBtn.title=`Cuota al día hasta el ${fmtFecha(venc.proximoVencimiento)}`;
+    cobroDot.style.display='none';
+    cobroDot.classList.remove('vencido');
+  } else {
+    cobroBtn.title='Cuota: sin fecha de cobro fijada';
+    cobroDot.style.display='none';
+    cobroDot.classList.remove('vencido');
+  }
   cobroBtn.onclick=()=>irACobrosAlumno(id);
 
   // Biblioteca → Sheet de Mapeo propio del alumno (handoff biblioteca-a-mapeo-externo,
@@ -3792,6 +3910,14 @@ function renderCobrosPage(){
 // registro por mes calendario que usa Finanzas, solo lo lee distinto para
 // decidir "¿está al día ahora mismo?" según el diaPago propio de cada alumno.
 
+// Parseo compartido de fecha de pago 'd/m/yyyy' — usado por _pagosDeAlumno()
+// (app) y por el portal (handoff vencimiento-cuota-portal-y-ficha), que recibe
+// las mismas fechas del proxy pero sin el `cobros` global para leerlas.
+function _parseFechaPago(s){
+  const f=new Date(String(s).split('/').reverse().join('-'));
+  return isNaN(f) ? null : f;
+}
+
 // Todas las fechas 'pagado' de un alumno, recorriendo TODOS los meses (no
 // solo el mes seleccionado) — mismo formato/parseo que ya usa Seguimiento
 // para fechas d/m/yyyy (toLocaleDateString('es-AR') sin opciones).
@@ -3800,12 +3926,16 @@ function _pagosDeAlumno(alumnoId){
   Object.values(cobros).forEach(cm=>{
     const c=cm[alumnoId];
     if(c && c.estado==='pagado' && c.fecha){
-      const f=new Date(c.fecha.split('/').reverse().join('-'));
-      if(!isNaN(f)) fechas.push(f);
+      const f=_parseFechaPago(c.fecha);
+      if(f) fechas.push(f);
     }
   });
   return fechas.sort((a,b)=>a-b);
 }
+
+// Formato corto de fecha (DD/MM), compartido por Vencimientos, el portal y la
+// ficha del alumno para que los 3 muestren exactamente el mismo texto.
+const fmtFecha=d=>d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
 
 // Autocompleta diaPago con el día del pago más antiguo registrado (decisión
 // de Luca: no se carga a mano). No pisa un valor ya cargado (a mano o por
@@ -3867,10 +3997,12 @@ const VENCE_PRONTO_DIAS=4;
 
 // Estado de vencimiento de un alumno según su diaPago + todo su historial de
 // cobros. No escribe nada (salvo el autocompletado de diaPago, aparte).
-function calcularVencimiento(alumno, hoy){
+// `pagos` es opcional (default: _pagosDeAlumno(), que lee el `cobros` global)
+// — el portal no tiene `cobros` global ni el ID real del alumno, así que pasa
+// su propio array (ya parseado y ordenado) de forma explícita.
+function calcularVencimiento(alumno, hoy, pagos=_pagosDeAlumno(alumno.id)){
   if(!alumno.diaPago) return {alumno, categoria:'sinFecha'};
   const diaPago=parseInt(alumno.diaPago,10);
-  const pagos=_pagosDeAlumno(alumno.id);
   if(!pagos.length) return {alumno, categoria:'sinFecha'};
   const fechaUltimoPago=pagos[pagos.length-1];
 
@@ -3914,7 +4046,6 @@ async function renderVencimientos(){
   const sinFecha=resultados.filter(r=>r.categoria==='sinFecha').sort((a,b)=>a.alumno.nombre.localeCompare(b.alumno.nombre,'es'));
 
   const ciclosTotal=vencidos.reduce((s,r)=>s+r.ciclosAdeudados,0);
-  const fmtFecha=d=>d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
 
   // El "Día de pago" siempre es editable inline (✏️): el autocompletado toma
   // el día del PRIMER pago digitalizado, que puede no reflejar el ciclo real
