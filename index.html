@@ -386,9 +386,8 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .chip{padding:0.4rem 0.7rem;border-radius:20px;font-size:0.74rem;font-weight:600;border:1px solid var(--pd-border2);background:var(--pd-bg3);color:var(--pd-text2);cursor:pointer;font-family:inherit}
 .chip.sel{background:var(--pd-verde-dim);color:var(--pd-verde);border-color:var(--pd-verde)}
 .pd-entrada-chip{display:inline-block;font-size:0.62rem;font-weight:700;color:var(--pd-verde);background:var(--pd-verde-dim);padding:0.05rem 0.4rem;border-radius:10px;margin-bottom:0.25rem;margin-right:0.3rem}
-.pd-entrada.auto{border-left:2px dashed var(--pd-text3);background:transparent;opacity:0.85}
-.entrada-auto-tag{font-size:0.62rem;color:var(--pd-text3);font-style:italic}
-.link-agregar-detalle{background:none;border:none;color:var(--pd-verde);font-size:0.72rem;font-weight:600;cursor:pointer;font-family:inherit;padding:0;margin-top:0.2rem;display:block}
+.asist-atajo{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;margin-top:0.5rem;padding:0.5rem 0.75rem;border-radius:8px;background:var(--pd-bg3);border:0.5px solid var(--pd-border2);font-size:0.74rem;color:var(--pd-text2)}
+.asist-atajo button{background:none;border:none;color:var(--pd-verde);font-weight:600;font-size:0.74rem;font-family:inherit;cursor:pointer;white-space:nowrap}
 
 .sugerencia-banner{background:rgba(232,168,74,0.08);border:1px solid rgba(232,168,74,0.25);border-radius:8px;padding:0.7rem 0.8rem;margin-top:0.6rem;display:flex;flex-direction:column;gap:0.5rem}
 .sugerencia-txt{font-size:0.78rem;color:var(--pd-text)}
@@ -651,6 +650,8 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .fin-chips{display:none;flex-wrap:wrap;gap:0.45rem;margin-top:0.65rem}
 .fin-chip{background:var(--bg);border:1px solid rgba(232,168,74,0.25);padding:0.28rem 0.7rem;border-radius:20px;font-size:0.76rem;cursor:pointer;transition:background 0.2s;color:var(--texto)}
 .fin-chip:hover{background:var(--amarillo-bg)}
+.fin-chip-ciclos{color:var(--amarillo);font-weight:600}
+.fin-chips-link{flex-basis:100%;font-size:0.72rem;color:var(--verde);font-weight:600;margin-top:0.15rem;cursor:pointer}
 
 /* ── FINANZAS (desktop only): KPIs con namespace propio (-fin) para no chocar con .kpi-card/.kpi-val/.kpi-label de Resumen ── */
 .kpi-row-fin{display:grid;grid-template-columns:repeat(3,1fr);gap:0.9rem;margin-bottom:1.4rem}
@@ -1106,6 +1107,10 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
               <span class="recup-icono">🧘</span><span class="recup-label">Recuperación</span>
             </button>
           </div>
+          <div class="asist-atajo" id="perfil-asist-atajo" style="display:none">
+            <span>Asistencia registrada.</span>
+            <button type="button" id="perfil-asist-atajo-btn">¿Anotás cómo fue? →</button>
+          </div>
 
           <div class="acciones-dinamicas">
             <button class="accion-circular" id="perfil-btn-drive" style="display:none">
@@ -1455,6 +1460,14 @@ const RANGO = {
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
 const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// Fecha de hoy en 'yyyy-mm-dd', en hora LOCAL — no usar toISOString() (UTC),
+// que en Argentina (UTC-3) desde las 21:00 da la fecha de mañana (handoff
+// seguimiento-y-alerta-cobros).
+function _hoyISOLocal(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
 
 function escaparHTML(str){
   if(!str) return '';
@@ -1959,8 +1972,15 @@ async function cargarDatos(){
           seguimiento={};
           rowsS.forEach(r=>{
             if(!r[0]) return;
+            const texto=r[2]||'', chips=r[4]?r[4].split('|').filter(Boolean):[], origen=r[5]||'manual';
+            // Entradas livianas de "auto" sin texto ni chips (viejo comportamiento
+            // de marcarAsistenciaFicha, ya no se crean) — se descartan acá, en la
+            // carga, y no solo al renderizar: si quedan en memoria,
+            // guardarSeguimientoCompleto() las reescribe en el Sheet y resucita
+            // las que Luca borró a mano (handoff seguimiento-y-alerta-cobros).
+            if(origen==='auto' && !texto && !chips.length) return;
             if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
-            seguimiento[r[0]].push({fecha:r[1]||'',texto:r[2]||'',id:r[3]||null,chips:r[4]?r[4].split('|').filter(Boolean):[],origen:r[5]||'manual'});
+            seguimiento[r[0]].push({fecha:r[1]||'',texto,id:r[3]||null,chips,origen});
           });
         }catch(e){console.warn('Error cargando Seguimiento:',e);seguimiento={};}
       })(),
@@ -2167,20 +2187,24 @@ function renderDashboard(){
   document.getElementById('fin-pct').textContent=pct+'%';
   document.getElementById('fin-barra-fill').style.width=pct+'%';
 
-  // Alerta cobros pendientes — colapsada dentro de fin-card
+  // Alerta de cuota vencida — colapsada dentro de fin-card. Mismo cálculo que
+  // Cobros → Vencimientos (no el mes calendario, que podía contradecirlo —
+  // handoff seguimiento-y-alerta-cobros). No llama a asegurarDiaPago(): abrir
+  // Resumen no debe escribir en el Sheet.
   const alertaEl=document.getElementById('fin-alerta');
   const chipsEl=document.getElementById('fin-chips');
-  const alumnosPendientes=activos.filter(a=>{
-    const c=cm[a.id];
-    return !c||c.estado!=='pagado';
-  });
-  if(alumnosPendientes.length===0){
+  const hoy0Alerta=new Date(); hoy0Alerta.setHours(0,0,0,0);
+  const vencidos=activos.map(a=>calcularVencimiento(a,hoy0Alerta))
+    .filter(r=>r.categoria==='vencido')
+    .sort((x,y)=>y.ciclosAdeudados-x.ciclosAdeudados);
+  if(vencidos.length===0){
     alertaEl.style.display='none';
     chipsEl.style.display='none';
   } else {
     alertaEl.style.display='flex';
-    document.getElementById('fin-alerta-count').textContent=`${alumnosPendientes.length} alumno${alumnosPendientes.length>1?'s':''} sin cobrar este mes`;
-    chipsEl.innerHTML=alumnosPendientes.map(a=>`<span class="fin-chip" onclick="verAlumno('${a.id}')">${escaparHTML(a.nombre)}</span>`).join('');
+    document.getElementById('fin-alerta-count').textContent=`${vencidos.length} alumno${vencidos.length>1?'s':''} con cuota vencida`;
+    chipsEl.innerHTML=vencidos.map(r=>`<span class="fin-chip" onclick="verAlumno('${r.alumno.id}')">${escaparHTML(r.alumno.nombre)} · <span class="fin-chip-ciclos">${r.ciclosAdeudados} ciclo${r.ciclosAdeudados!==1?'s':''}</span></span>`).join('')
+      + `<span class="fin-chips-link" onclick="irAVencimientos()">Ver vencimientos →</span>`;
   }
   renderResumenSemana();
   renderResumenHoy();
@@ -2495,8 +2519,10 @@ function verAlumno(id){
   `;
 
   // Seguimiento
-  document.getElementById('perfil-nueva-fecha').value=new Date().toISOString().slice(0,10);
+  document.getElementById('perfil-nueva-fecha').value=_hoyISOLocal();
   document.getElementById('perfil-nueva-entrada').value='';
+  document.getElementById('perfil-asist-atajo').style.display='none';
+  document.getElementById('perfil-asist-atajo-btn').onclick=abrirAtajoAsistencia;
   renderHistorial(id);
   document.getElementById('perfil-btn-guardar-entrada').onclick=()=>agregarEntradaPerfil(id);
 
@@ -2620,15 +2646,25 @@ async function marcarAsistenciaFicha(id){
   try{
     const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
     await _appendAsistencia(id, fecha, 'asistencia');
-    // Entrada liviana en Seguimiento — se puede completar después ("+ Agregar detalles")
-    await agregarEntradaSeguimiento(id, '', '', [], 'auto');
-    toast('Asistencia registrada 💪');
     renderRachaAccion(id);
-    renderHistorial(id);
+    // Atajo temporal para anotar la sesión, en vez de crear una entrada vacía
+    // en Seguimiento (handoff seguimiento-y-alerta-cobros) — el atajo ya
+    // confirma la acción, así que no hace falta el toast de antes.
+    document.getElementById('perfil-asist-atajo').style.display='flex';
   }catch(e){
     toast('Error al registrar');
     card.classList.remove('deshabilitada');
   }
+}
+
+// Atajo "¿Anotás cómo fue? →" tras marcar asistencia: abre Seguimiento con la
+// fecha de hoy y el foco listo para escribir. Temporal — verAlumno() lo
+// vuelve a ocultar, no se persiste.
+function abrirAtajoAsistencia(){
+  irYAbrirPerfil('body-perfil-seguimiento');
+  document.getElementById('perfil-nueva-fecha').value=_hoyISOLocal();
+  document.getElementById('perfil-nueva-entrada').focus();
+  document.getElementById('perfil-asist-atajo').style.display='none';
 }
 
 function toggleAcordeonPerfil(header, bodyId){
@@ -2689,15 +2725,6 @@ function renderHistorial(id){
     return;
   }
   lista.innerHTML=entradas.map((e,idx)=>{
-    // Entrada liviana creada al marcar asistencia sin escribir nada — se
-    // distingue visualmente y ofrece completar detalles después.
-    if(e.origen==='auto' && !e.texto && (!e.chips||!e.chips.length)){
-      return `<div class="pd-entrada auto" id="entrada-${id}-${idx}">
-        <span class="entrada-auto-tag">💪 Asistencia registrada automáticamente</span>
-        <span class="pd-entrada-fecha" style="display:inline;margin-left:0.4rem">${escaparHTML(e.fecha)}</span>
-        <div><button class="link-agregar-detalle" onclick="editarEntrada('${id}',${idx})">+ Agregar detalles de la sesión</button></div>
-      </div>`;
-    }
     const chipsHtml=(e.chips||[]).map(c=>`<span class="pd-entrada-chip"${c==='⚠️ Con molestias'?' style="color:var(--pd-amber);background:rgba(232,168,74,0.14)"':''}>${escaparHTML(c)}</span>`).join('');
     return `<div class="pd-entrada" id="entrada-${id}-${idx}">
       <div class="pd-entrada-top">
@@ -2809,7 +2836,7 @@ async function agregarEntradaPerfil(id){
   try{
     await agregarEntradaSeguimiento(id, texto, fechaInput.value, chips, 'manual');
     textarea.value='';
-    fechaInput.value=new Date().toISOString().slice(0,10);
+    fechaInput.value=_hoyISOLocal();
     chipsEl.forEach(c=>c.classList.remove('sel'));
     renderHistorial(id);
     toast('Entrada guardada ✓');
@@ -4019,6 +4046,13 @@ let cobrosFiltroAlumno='';
 function irACobrosAlumno(id){
   cobrosFiltroAlumno=id;
   vistaCobros='pormes'; // viene a ver el estado de un mes puntual de este alumno
+  showPage('cobros', document.getElementById('bn-cobros'));
+  syncBottomNav('cobros');
+}
+// Link "Ver vencimientos →" de la alerta de Resumen — mismo patrón que
+// irACobrosAlumno(), pero a la vista Vencimientos y sin filtrar alumno.
+function irAVencimientos(){
+  vistaCobros='vencimientos';
   showPage('cobros', document.getElementById('bn-cobros'));
   syncBottomNav('cobros');
 }
