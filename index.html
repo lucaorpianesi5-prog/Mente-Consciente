@@ -107,8 +107,12 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .turno-card.freq-1 .turno-hora{color:#4A9CC7}
 .turno-card.freq-2{background:rgba(155,127,212,0.12);border-left-color:#9B7FD4}
 .turno-card.freq-2 .turno-hora{color:#9B7FD4}
-.turno-card.freq-3{background:rgba(232,168,74,0.12);border-left-color:#E8A84A}
-.turno-card.freq-3 .turno-hora{color:#E8A84A}
+.turno-card.freq-3{background:rgba(184,204,78,0.12);border-left-color:#B8CC4E}
+.turno-card.freq-3 .turno-hora{color:#B8CC4E}
+.turno-card.freq-4{background:rgba(232,168,74,0.12);border-left-color:#E8A84A}
+.turno-card.freq-4 .turno-hora{color:#E8A84A}
+.turno-card.freq-5{background:rgba(212,111,160,0.12);border-left-color:#D46FA0}
+.turno-card.freq-5 .turno-hora{color:#D46FA0}
 .dia-body.drag-over{background:rgba(74,184,112,0.08);border-radius:4px}
 .turno-hora{font-size:0.7rem;font-weight:600}
 .turno-nombre{font-size:0.82rem;font-weight:500;color:var(--texto);margin-top:0.1rem}
@@ -131,7 +135,15 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .mini-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
 .mini-dot.freq-1{background:#4A9CC7}
 .mini-dot.freq-2{background:#9B7FD4}
-.mini-dot.freq-3{background:#E8A84A}
+.mini-dot.freq-3{background:#B8CC4E}
+.mini-dot.freq-4{background:#E8A84A}
+.mini-dot.freq-5{background:#D46FA0}
+.leyenda-muestra{width:12px;height:12px;border-radius:2px;display:inline-block;border-left:3px solid}
+.leyenda-muestra.freq-1{background:rgba(74,156,199,0.12);border-left-color:#4A9CC7}
+.leyenda-muestra.freq-2{background:rgba(155,127,212,0.12);border-left-color:#9B7FD4}
+.leyenda-muestra.freq-3{background:rgba(184,204,78,0.12);border-left-color:#B8CC4E}
+.leyenda-muestra.freq-4{background:rgba(232,168,74,0.12);border-left-color:#E8A84A}
+.leyenda-muestra.freq-5{background:rgba(212,111,160,0.12);border-left-color:#D46FA0}
 .mini-turno-txt{min-width:0}
 .mini-hora{font-size:0.66rem;color:var(--suave);font-variant-numeric:tabular-nums}
 .mini-nombre{font-size:0.76rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -936,9 +948,11 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
     <div class="page-header"><h2>Agenda semanal</h2><p>Vista de tus turnos de lunes a viernes · Arrastrá las tarjetas para cambiar de día</p></div>
     <div class="semana-grid" id="semana-grid"></div>
     <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:0.5rem"><span style="width:12px;height:12px;border-radius:2px;background:rgba(74,156,199,0.12);border-left:3px solid #4A9CC7;display:inline-block"></span><span style="font-size:0.78rem;color:var(--suave)">1x por semana</span></div>
-      <div style="display:flex;align-items:center;gap:0.5rem"><span style="width:12px;height:12px;border-radius:2px;background:rgba(155,127,212,0.12);border-left:3px solid #9B7FD4;display:inline-block"></span><span style="font-size:0.78rem;color:var(--suave)">2x por semana</span></div>
-      <div style="display:flex;align-items:center;gap:0.5rem"><span style="width:12px;height:12px;border-radius:2px;background:rgba(232,168,74,0.12);border-left:3px solid #E8A84A;display:inline-block"></span><span style="font-size:0.78rem;color:var(--suave)">3x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-1"></span><span style="font-size:0.78rem;color:var(--suave)">1x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-2"></span><span style="font-size:0.78rem;color:var(--suave)">2x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-3"></span><span style="font-size:0.78rem;color:var(--suave)">3x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-4"></span><span style="font-size:0.78rem;color:var(--suave)">4x por semana</span></div>
+      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-5"></span><span style="font-size:0.78rem;color:var(--suave)">5x por semana</span></div>
     </div>
   </div>
 
@@ -1297,6 +1311,8 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
             <option value="1">1 vez por semana</option>
             <option value="2" selected>2 veces por semana</option>
             <option value="3">3 veces por semana</option>
+            <option value="4">4 veces por semana</option>
+            <option value="5">5 veces por semana</option>
           </select>
         </div>
         <div class="field"><label>Monto mensual ($)</label><input type="number" id="a-monto" placeholder="0"/></div>
