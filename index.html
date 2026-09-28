@@ -148,10 +148,38 @@ tr:hover td{background:rgba(74,184,112,0.04)}
 .mini-hora{font-size:0.66rem;color:var(--suave);font-variant-numeric:tabular-nums}
 .mini-nombre{font-size:0.76rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mini-libre{font-size:0.7rem;color:var(--suave);padding:0.3rem 0.15rem}
-@media(max-width:640px){
-  .mini-semana{grid-template-columns:1fr;gap:0.6rem;background:transparent;border:none}
-  .mini-dia{border:1px solid var(--borde);border-radius:8px;min-height:0}
+
+/* Resumen: estados de turno compartidos entre la semana (desktop) y la lista
+   del día (mobile) — handoff resumen-mobile-y-desktop, 2026-09-28. */
+.mini-turno.pasado{opacity:0.45}
+.mini-turno.pasado:hover{opacity:0.8}
+.mini-turno.en-curso{background:rgba(74,184,112,0.12)}
+.mini-turno.en-curso .mini-hora{color:var(--verde);font-weight:600}
+.mini-ahora{display:inline-block;font-size:0.56rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#0D1A12;background:var(--verde);padding:0 0.35rem;border-radius:20px;margin-left:0.3rem;vertical-align:1px}
+.titulo-proxima{color:var(--suave)}
+
+/* Resumen: lista del día, solo mobile (≤768px) — reemplaza la grilla semanal ahí */
+.resumen-lbl-mobile, #resumen-hoy{display:none}
+@media(max-width:768px){
+  #resumen-semana, .resumen-lbl-desktop{display:none}
+  .resumen-lbl-mobile{display:inline}
+  #resumen-hoy{display:flex}
 }
+.hoy-titulo-dia{color:var(--verde)}
+.hoy-titulo-dia.proximo{color:var(--suave)}
+.hoy-lista{flex-direction:column}
+.hoy-turno{display:flex;align-items:center;gap:0.7rem;min-height:46px;padding:0.35rem 0.25rem;border-bottom:1px solid var(--borde);cursor:pointer}
+.hoy-turno:last-child{border-bottom:none}
+.hoy-hora{font-size:0.8rem;font-weight:600;color:var(--suave);font-variant-numeric:tabular-nums;width:3.2rem;flex-shrink:0}
+.hoy-nombre{font-size:0.92rem;font-weight:600;color:var(--texto);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hoy-chevron{color:var(--suave);font-size:0.9rem;flex-shrink:0}
+.hoy-ahora{font-size:0.62rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:#0D1A12;background:var(--verde);padding:0.15rem 0.5rem;border-radius:20px;flex-shrink:0}
+.hoy-turno.en-curso{background:rgba(74,184,112,0.08);border-radius:8px;border-bottom-color:transparent}
+.hoy-turno.en-curso .hoy-hora{color:var(--verde)}
+.hoy-turno.pasado{opacity:0.45}
+.hoy-vacio{font-size:0.82rem;color:var(--suave);padding:0.5rem 0.25rem}
+.hoy-sinhora .hoy-hora{font-size:0.66rem;font-weight:500}
+#resumen-hoy .mini-dot{width:8px;height:8px}
 
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center}
@@ -920,8 +948,13 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
       </div>
     </div>
     <div class="resumen-semana-wrap">
-      <div class="seccion-label">Esta semana <a onclick="showPage('agenda',document.getElementById('bn-agenda'));syncBottomNav('agenda')">Ver agenda completa →</a></div>
+      <div class="seccion-label">
+        <span class="resumen-lbl-desktop" id="resumen-semana-titulo">Esta semana</span>
+        <span class="resumen-lbl-mobile" id="resumen-hoy-titulo"></span>
+        <a onclick="showPage('agenda',document.getElementById('bn-agenda'));syncBottomNav('agenda')">Ver agenda completa →</a>
+      </div>
       <div class="mini-semana" id="resumen-semana"></div>
+      <div class="hoy-lista" id="resumen-hoy"></div>
     </div>
   </div>
 
@@ -2150,6 +2183,7 @@ function renderDashboard(){
     chipsEl.innerHTML=alumnosPendientes.map(a=>`<span class="fin-chip" onclick="verAlumno('${a.id}')">${escaparHTML(a.nombre)}</span>`).join('');
   }
   renderResumenSemana();
+  renderResumenHoy();
 }
 
 // ── ALUMNOS ──
@@ -3656,22 +3690,67 @@ function getSemanaActual(){
   });
 }
 
-// Mini agenda semanal de Resumen (handoff mini-agenda-resumen): mismos 5 días
-// y datos que renderAgenda(), pero de solo lectura — sin drag ni modal de
-// edición. El click en un turno navega directo a verAlumno(id).
+// Resumen (handoff resumen-mobile-y-desktop, 2026-09-28): lógica compartida
+// entre la semana de desktop (renderResumenSemana) y la lista del día en
+// mobile (renderResumenHoy). No reemplaza a getSemanaActual(), que sigue
+// usando Agenda — Agenda queda fuera de alcance y el fin de semana ahí sigue
+// mostrando la semana que ya terminó.
+const DURACION_TURNO_MIN=60; // supuesto de duración de sesión, ajustable
+
+// Semana que muestra Resumen: la que está en curso de lunes a viernes, o —el
+// fin de semana— la PRÓXIMA (para no mostrar una semana que ya terminó).
+function getSemanaResumen(hoy){
+  const dow=hoy.getDay(); // 0=domingo, 6=sábado
+  const lunes=new Date(hoy);
+  if(dow===0) lunes.setDate(hoy.getDate()+1);       // domingo → mañana
+  else if(dow===6) lunes.setDate(hoy.getDate()+2);  // sábado → pasado mañana
+  else lunes.setDate(hoy.getDate()-(dow-1));        // lunes de esta semana
+  lunes.setHours(0,0,0,0);
+  return DIAS.map((nombre,idx)=>{
+    const fecha=new Date(lunes); fecha.setDate(lunes.getDate()+idx);
+    return {nombre, fecha, fechaStr:fecha.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'})};
+  });
+}
+
+// 'pasado' | 'en-curso' | 'proximo' para un turno de un día dado. fechaDia va
+// a medianoche (00:00); un día anterior a hoy es todo pasado (aunque no tenga
+// horario, porque ya terminó); un día futuro o sin horario es "proximo" (no
+// se puede saber si ya pasó); hoy se compara contra la duración supuesta.
+function estadoTurno(fechaDia, hora, ahora){
+  const hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
+  if(fechaDia<hoy0) return 'pasado';
+  if(fechaDia>hoy0 || !hora) return 'proximo';
+  const [h,m]=hora.split(':').map(Number);
+  const inicio=new Date(ahora); inicio.setHours(h,m,0,0);
+  const fin=new Date(inicio.getTime()+DURACION_TURNO_MIN*60000);
+  if(ahora>=fin) return 'pasado';
+  if(ahora>=inicio) return 'en-curso';
+  return 'proximo';
+}
+
+// Mini agenda semanal de Resumen (handoff mini-agenda-resumen, extendida por
+// resumen-mobile-y-desktop): mismos 5 días y datos que renderAgenda(), pero
+// de solo lectura — sin drag ni modal de edición. El click en un turno
+// navega directo a verAlumno(id). Solo visible en desktop (≥769px); en
+// mobile la reemplaza renderResumenHoy().
 function renderResumenSemana(){
   const grid=document.getElementById('resumen-semana');
+  const tituloEl=document.getElementById('resumen-semana-titulo');
   const activos=alumnos.filter(a=>a.estado==='activo');
-  const semana=getSemanaActual();
   const ahora=new Date();
-  const hoyStr=ahora.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
+  const esFinDeSemana=ahora.getDay()===0||ahora.getDay()===6;
+  const semana=getSemanaResumen(ahora);
+  const hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
   const nombresCortos={Lunes:'Lun',Martes:'Mar',Miércoles:'Mié',Jueves:'Jue',Viernes:'Vie'};
+
+  tituloEl.textContent=esFinDeSemana?'Próxima semana':'Esta semana';
+  tituloEl.classList.toggle('titulo-proxima', esFinDeSemana);
 
   // Mismo cache que renderAgenda(): parsear horarios una sola vez por alumno
   const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
 
-  grid.innerHTML=semana.map(({nombre,fechaStr})=>{
-    const esHoy=fechaStr===hoyStr;
+  grid.innerHTML=semana.map(({nombre,fecha,fechaStr})=>{
+    const esHoy=!esFinDeSemana && fecha.getTime()===hoy0.getTime();
     const turnos=activos.filter(a=>a.dias.includes(nombre)).sort((a,b)=>{
       const horaA=hpdCache.get(a.id)[nombre]||'99:99';
       const horaB=hpdCache.get(b.id)[nombre]||'99:99';
@@ -3681,23 +3760,16 @@ function renderResumenSemana(){
     let cuerpo;
     if(turnos.length===0){
       cuerpo='<div class="mini-libre">Libre</div>';
-    } else if(esHoy && turnos.every(a=>{
-      // Un turno sin horario cargado no se puede saber si ya pasó — no cuenta
-      // como "pasado" para no ocultar de más.
-      const hora=hpdCache.get(a.id)[nombre];
-      if(!hora) return false;
-      const [h,m]=hora.split(':').map(Number);
-      const finTurno=new Date(ahora); finTurno.setHours(h,m,0,0);
-      return ahora>finTurno;
-    })){
-      cuerpo='<div class="mini-libre">Resto libre</div>';
     } else {
       cuerpo=turnos.map(a=>{
         const hora=hpdCache.get(a.id)[nombre]||'Sin horario';
         const freq=parseInt(a.frecuencia,10)||2;
-        return `<div class="mini-turno" onclick="verAlumno('${a.id}')">
+        const estado=estadoTurno(fecha, hpdCache.get(a.id)[nombre], ahora);
+        const horaTxt=estado==='en-curso'?`${escaparHTML(hora)}<span class="mini-ahora">Ahora</span>`:escaparHTML(hora);
+        const clases=['mini-turno', estado==='pasado'?'pasado':'', estado==='en-curso'?'en-curso':''].filter(Boolean).join(' ');
+        return `<div class="${clases}" onclick="verAlumno('${a.id}')">
           <span class="mini-dot freq-${freq}"></span>
-          <div class="mini-turno-txt"><div class="mini-hora">${escaparHTML(hora)}</div><div class="mini-nombre">${escaparHTML(a.nombre)}</div></div>
+          <div class="mini-turno-txt"><div class="mini-hora">${horaTxt}</div><div class="mini-nombre">${escaparHTML(a.nombre)}</div></div>
         </div>`;
       }).join('');
     }
@@ -3705,6 +3777,54 @@ function renderResumenSemana(){
     return `<div class="mini-dia${esHoy?' hoy':''}">
       <div class="mini-dia-header"><span class="mini-dia-nombre">${nombresCortos[nombre]}</span><span class="mini-dia-fecha">${fechaStr}</span></div>
       ${cuerpo}
+    </div>`;
+  }).join('');
+}
+
+// Lista del día en mobile (≤768px, CSS decide cuál de las dos se ve): mismo
+// filtro/orden/estado que la semana de desktop, para un solo día. Entre
+// semana muestra hoy; el fin de semana, el próximo lunes (primer elemento de
+// getSemanaResumen(), que ya devuelve la semana siguiente ese caso).
+function renderResumenHoy(){
+  const cont=document.getElementById('resumen-hoy');
+  const tituloEl=document.getElementById('resumen-hoy-titulo');
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  const ahora=new Date();
+  const esFinDeSemana=ahora.getDay()===0||ahora.getDay()===6;
+  const hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
+  const semana=getSemanaResumen(ahora);
+  const dia=esFinDeSemana?semana[0]:semana.find(d=>d.fecha.getTime()===hoy0.getTime());
+
+  const tituloDia=`${dia.nombre} ${dia.fechaStr}`;
+  tituloEl.innerHTML=esFinDeSemana
+    ? `Próximo · <span class="hoy-titulo-dia proximo">${escaparHTML(tituloDia)}</span>`
+    : `Hoy · <span class="hoy-titulo-dia">${escaparHTML(tituloDia)}</span>`;
+
+  const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
+  const turnos=activos.filter(a=>a.dias.includes(dia.nombre)).sort((a,b)=>{
+    const horaA=hpdCache.get(a.id)[dia.nombre]||'99:99';
+    const horaB=hpdCache.get(b.id)[dia.nombre]||'99:99';
+    return horaA.localeCompare(horaB);
+  });
+
+  if(turnos.length===0){
+    cont.innerHTML=esFinDeSemana
+      ? `<div class="hoy-vacio">No tenés turnos el ${escaparHTML(dia.nombre.toLowerCase())}.</div>`
+      : `<div class="hoy-vacio">Hoy no tenés turnos.</div>`;
+    return;
+  }
+
+  cont.innerHTML=turnos.map(a=>{
+    const hora=hpdCache.get(a.id)[dia.nombre];
+    const freq=parseInt(a.frecuencia,10)||2;
+    const estado=estadoTurno(dia.fecha, hora, ahora);
+    const clases=['hoy-turno', estado==='pasado'?'pasado':'', estado==='en-curso'?'en-curso':'', hora?'':'hoy-sinhora'].filter(Boolean).join(' ');
+    const derecha=estado==='en-curso'?'<span class="hoy-ahora">Ahora</span>':'<span class="hoy-chevron">›</span>';
+    return `<div class="${clases}" onclick="verAlumno('${a.id}')">
+      <span class="mini-dot freq-${freq}"></span>
+      <span class="hoy-hora">${escaparHTML(hora||'Sin horario')}</span>
+      <span class="hoy-nombre">${escaparHTML(a.nombre)}</span>
+      ${derecha}
     </div>`;
   }).join('');
 }
