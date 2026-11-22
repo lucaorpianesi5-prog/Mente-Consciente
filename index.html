@@ -222,7 +222,7 @@ tr:hover td{background:rgba(74,184,112,0.04)}
    que reutiliza las clases pd-* / dias-pilares / racha-accion / stats-*; sin
    esto los var(--pd-...) del portal resolverían a vacío y quedarían fondos y
    bordes sin color) */
-#perfil-dark, #portal-alumno{
+#perfil-dark, #portal-alumno, #plan-vista{
   --pd-bg:       #111B16;
   --pd-bg2:       #1C2B20;
   --pd-bg3:       #223527;
@@ -857,6 +857,95 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .cuota-copiar{background:var(--pd-verde-dim);border:1px solid rgba(74,184,112,0.3);color:var(--pd-verde);font-family:inherit;font-size:0.72rem;font-weight:600;padding:0.4rem 0.75rem;border-radius:20px;cursor:pointer;flex-shrink:0}
 .cuota-copiar.copiado{background:rgba(74,184,112,0.24);border-color:var(--pd-verde)}
 .cuota-aviso{font-size:0.66rem;color:var(--pd-text2);margin-top:0.6rem;line-height:1.4}
+
+/* ── PLAN DEL ALUMNO DENTRO DE LA APP (handoff plan-en-la-app) ──
+   Vista de pantalla completa para Fuerza y Mapeo. Clases con prefijo pv- para no
+   chocar con .chip/.tab/.sem de otras pantallas. */
+#plan-vista{position:fixed;inset:0;z-index:350;background:var(--pd-bg);color:var(--pd-text);display:none;justify-content:center}
+body.sesion-bar-on #plan-vista{top:34px}
+.pv-col{width:100%;max-width:600px;height:100%;display:flex;flex-direction:column;position:relative}
+.pv-top{padding:0.85rem 14px 0.6rem;border-bottom:1px solid var(--pd-border);display:flex;flex-direction:column;gap:0.55rem;background:var(--pd-bg);flex-shrink:0}
+.pv-fila1{display:flex;align-items:center;gap:0.6rem}
+.pv-cerrar{width:32px;height:32px;border-radius:50%;border:1px solid var(--pd-border2);background:var(--pd-bg3);color:var(--pd-text2);font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;font-family:inherit}
+.pv-tit{flex:1;min-width:0}
+.pv-nombre{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:700;font-size:1.15rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-meta{font-size:0.68rem;color:var(--pd-text2)}
+.pv-sheets{font-size:0.66rem;color:var(--pd-verde);font-weight:600;white-space:nowrap;text-decoration:none}
+.pv-tabs{display:flex;gap:0.3rem}
+.pv-tab{flex:1;text-align:center;padding:0.42rem 0;border-radius:8px;font-size:0.72rem;font-weight:700;color:var(--pd-text2);background:var(--pd-card);border:1px solid var(--pd-border);cursor:pointer;font-family:inherit}
+.pv-tab.on{background:var(--pd-verde);color:#0D1A12;border-color:var(--pd-verde)}
+.pv-semanas{display:flex;gap:0.3rem;align-items:center}
+.pv-semanas-lbl{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);font-weight:700;margin-right:0.15rem}
+.pv-sem{flex:1;text-align:center;padding:0.3rem 0;border-radius:20px;font-size:0.68rem;font-weight:600;color:var(--pd-text2);border:1px solid var(--pd-border2);background:transparent;cursor:pointer;font-family:inherit;position:relative}
+.pv-sem.on{border-color:var(--pd-verde);color:var(--pd-verde);background:var(--pd-verde-dim)}
+.pv-sem.llena::after{content:'';position:absolute;top:3px;right:6px;width:5px;height:5px;border-radius:50%;background:var(--pd-text3)}
+.pv-body{flex:1;overflow-y:auto;padding:0.75rem 14px 1rem;display:flex;flex-direction:column;gap:0.55rem;-webkit-overflow-scrolling:touch}
+.pv-bloque{display:flex;align-items:center;gap:0.5rem;margin-top:0.35rem}
+.pv-letra{min-width:20px;height:20px;padding:0 4px;border-radius:6px;background:var(--pd-bg3);color:var(--pd-crema);font-size:0.66rem;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pv-bnombre{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text2);font-weight:700}
+.pv-ej{background:var(--pd-card);border:1px solid var(--pd-border);border-radius:12px;padding:0.65rem 0.7rem;display:flex;flex-direction:column;gap:0.45rem}
+.pv-ej.guardado{border-color:rgba(74,184,112,0.35)}
+.pv-ej.error{border-color:var(--pd-red)}
+.pv-ej-top{display:flex;align-items:flex-start;gap:0.5rem}
+.pv-ej-nombre{flex:1;font-size:0.84rem;font-weight:600;line-height:1.3}
+.pv-ej-estado{font-size:0.62rem;color:var(--pd-verde);font-weight:700;white-space:nowrap;opacity:0;transition:opacity 0.2s}
+.pv-ej.guardado .pv-ej-estado{opacity:1}
+.pv-ej-err{display:none;font-size:0.68rem;color:var(--pd-red);font-weight:600}
+.pv-ej.error .pv-ej-err{display:flex;align-items:center;gap:0.5rem}
+.pv-ej-err button{background:none;border:none;color:var(--pd-red);font-family:inherit;font-size:0.68rem;font-weight:700;text-decoration:underline;cursor:pointer;padding:0}
+.pv-ref{display:flex;flex-wrap:wrap;gap:0.3rem 0.8rem;font-size:0.64rem;color:var(--pd-text3)}
+.pv-ref b{color:var(--pd-text2);font-weight:600;font-variant-numeric:tabular-nums}
+.pv-ref .mapeo b{color:var(--pd-crema)}
+.pv-campos{display:grid;grid-template-columns:1.3fr 0.7fr 1fr auto;gap:0.35rem;align-items:end}
+.pv-campo label{display:block;font-size:0.54rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);font-weight:700;margin-bottom:0.15rem}
+.pv-campo input,.pv-map-row input{width:100%;height:38px;border-radius:9px;background:var(--pd-bg3);border:1px solid var(--pd-border2);color:var(--pd-text);font-family:inherit;font-size:0.86rem;font-weight:600;text-align:center;font-variant-numeric:tabular-nums;outline:none}
+.pv-campo input:focus,.pv-map-row input:focus{border-color:var(--pd-verde)}
+.pv-campo input::placeholder,.pv-map-row input::placeholder{color:var(--pd-text3);font-weight:500}
+.pv-campo input[readonly],.pv-map-row input[readonly]{opacity:0.6;border-style:dashed}
+.pv-formula{color:var(--pd-crema);font-weight:700;text-transform:none;letter-spacing:0}
+.pv-igual{height:38px;padding:0 0.55rem;border-radius:9px;border:1px dashed var(--pd-border2);background:transparent;color:var(--pd-text2);font-family:inherit;font-size:0.62rem;font-weight:600;line-height:1.15;cursor:pointer;white-space:nowrap}
+.pv-fija{font-size:0.66rem;color:var(--pd-text2);cursor:pointer}
+.pv-fija b{color:var(--pd-text);font-variant-numeric:tabular-nums}
+.pv-barra{border-top:1px solid var(--pd-border);background:#0E1612;padding:0.55rem 10px;display:flex;align-items:center;gap:0.4rem;flex-shrink:0}
+.pv-ba{flex:1;display:flex;flex-direction:column;border-radius:10px;padding:0.35rem 0.55rem;background:var(--pd-card);border:1px solid var(--pd-border);min-width:0;cursor:pointer;font-family:inherit;color:var(--pd-text);text-align:left}
+.pv-ba.sig{align-items:flex-end;text-align:right;background:var(--pd-verde-dim);border-color:rgba(74,184,112,0.3)}
+.pv-ba.vacio{visibility:hidden}
+.pv-ba-lbl{font-size:0.54rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);font-weight:700}
+.pv-ba-nombre{font-size:0.78rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pv-ba.sig .pv-ba-nombre{color:var(--pd-verde)}
+.pv-lista-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.95rem;cursor:pointer;font-family:inherit}
+.pv-buscar{height:38px;border-radius:10px;background:var(--pd-bg3);border:1px solid var(--pd-border2);color:var(--pd-text);font-family:inherit;font-size:0.82rem;padding:0 0.75rem;width:100%;outline:none}
+.pv-buscar::placeholder{color:var(--pd-text3)}
+.pv-chips{display:flex;gap:0.3rem;overflow-x:auto;padding-bottom:0.1rem}
+.pv-chips::-webkit-scrollbar{height:0}
+.pv-chip{flex-shrink:0;padding:0.3rem 0.65rem;border-radius:20px;font-size:0.68rem;font-weight:600;border:1px solid var(--pd-border2);color:var(--pd-text2);background:transparent;font-family:inherit;cursor:pointer}
+.pv-chip.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
+.pv-map-grupo{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text2);font-weight:700;margin-top:0.4rem}
+.pv-map-row{display:grid;grid-template-columns:1fr 64px 64px;gap:0.35rem;align-items:center;background:var(--pd-card);border:1px solid var(--pd-border);border-radius:10px;padding:0.4rem 0.45rem 0.4rem 0.65rem}
+.pv-map-row.guardado{border-color:rgba(74,184,112,0.35)}
+.pv-map-row.error{border-color:var(--pd-red)}
+.pv-map-row input{height:32px;font-size:0.76rem;border-radius:8px}
+.pv-map-ej{font-size:0.76rem;font-weight:600;line-height:1.25;min-width:0}
+.pv-map-ej small{display:block;font-size:0.6rem;color:var(--pd-text3);font-weight:500}
+.pv-map-head{display:grid;grid-template-columns:1fr 64px 64px;gap:0.35rem;font-size:0.54rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);font-weight:700;padding:0 0.45rem 0 0.65rem;text-align:center}
+.pv-map-head span:first-child{text-align:left}
+.pv-nota{font-size:0.7rem;color:var(--pd-text2);line-height:1.5}
+.pv-nota b{color:var(--pd-text)}
+.pv-aviso{display:flex;flex-direction:column;gap:0.7rem;align-items:center;text-align:center;padding:2.5rem 1rem;font-size:0.86rem;color:var(--pd-text2)}
+.pv-aviso a,.pv-aviso button{background:var(--pd-verde);color:#0D1A12;border:none;border-radius:10px;padding:0.55rem 1rem;font-family:inherit;font-weight:700;font-size:0.8rem;text-decoration:none;cursor:pointer}
+.pv-esq{height:92px;border-radius:12px;background:linear-gradient(90deg,var(--pd-card) 25%,var(--pd-bg3) 50%,var(--pd-card) 75%);background-size:200% 100%;animation:pvEsq 1.2s linear infinite}
+@keyframes pvEsq{from{background-position:200% 0}to{background-position:-200% 0}}
+.pv-lista{position:absolute;inset:0;background:rgba(8,14,10,0.97);z-index:5;display:flex;flex-direction:column;padding:0.85rem 14px;gap:0.6rem}
+.pv-lista-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:0.35rem}
+.pv-lista-item{display:flex;justify-content:space-between;gap:0.6rem;align-items:center;padding:0.65rem 0.75rem;border-radius:10px;background:var(--pd-card);border:1px solid var(--pd-border);color:var(--pd-text);font-family:inherit;font-size:0.84rem;font-weight:600;cursor:pointer;text-align:left}
+.pv-lista-item.actual{border-color:var(--pd-verde)}
+.pv-lista-item small{font-size:0.66rem;color:var(--pd-text2);font-weight:500}
+.pv-lista-sec{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3);font-weight:700;margin-top:0.4rem}
+/* Atajo "Hoy toca…" en la ficha */
+.hoy-toca{display:flex;align-items:center;gap:0.6rem;background:var(--pd-verde-dim);border:1px solid rgba(74,184,112,0.3);border-radius:10px;padding:0.65rem 0.75rem;margin-top:0.75rem}
+.hoy-toca-txt{flex:1;font-size:0.76rem;color:var(--pd-text)}
+.hoy-toca-txt small{display:block;font-size:0.64rem;color:var(--pd-text2)}
+.hoy-toca button{background:var(--pd-verde);color:#0D1A12;border:none;border-radius:8px;padding:0.45rem 0.7rem;font-family:inherit;font-weight:700;font-size:0.74rem;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1130,12 +1219,13 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
               <div class="accion-circulo drive">🏋️‍♀️</div><span class="accion-label">Fuerza</span>
             </button>
             <button class="accion-circular" id="perfil-accion-biblioteca" style="display:none">
-              <div class="accion-circulo biblio">📚</div><span class="accion-label">Biblioteca</span>
+              <div class="accion-circulo biblio">📚</div><span class="accion-label">Mapeo</span>
             </button>
             <button class="accion-circular" id="perfil-accion-nutri" onclick="showPage('nutricion',document.getElementById('bn-nutricion'));syncBottomNav('nutricion')">
               <div class="accion-circulo nutri">🥗<span class="dot-activo" id="perfil-nutri-dot" style="display:none"></span></div><span class="accion-label">Nutri</span>
             </button>
           </div>
+          <div class="hoy-toca" id="perfil-hoy-toca" style="display:none"></div>
         </div>
       </div>
 
@@ -1405,6 +1495,9 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 
 <!-- PORTAL PÚBLICO ALUMNO -->
 <div id="portal-alumno" style="display:none"></div>
+
+<!-- Plan del alumno dentro de la app (Fuerza y Mapeo), pantalla completa -->
+<div id="plan-vista"></div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -2046,6 +2139,7 @@ function cerrarSesion(){
   if(accessToken){ try{ google.accounts.oauth2.revoke(accessToken); }catch(e){} }
   accessToken=null; tokenExp=0; emailGuardado=''; datosFrescos=false; cacheTs=0;
   _lsDel(AUTH_KEY); _lsDel(CACHE_KEY);
+  planCache={}; planSel={}; if(_planAbierto) _planOcultar();
   alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];configFinanzas={saldoInicial:0,fechaReferencia:''};
   biblioteca=[];progresionActual=[];
@@ -2286,6 +2380,7 @@ async function cargarDatos(opts){
       datosFrescos=true;
       _cacheGuardar();
       if(!silencioso) toast('Datos sincronizados ✓');
+      planPrecargarHoy();   // Fuerza de los alumnos de hoy, en segundo plano
     }
     _actualizando=false;
     actualizarBarraSesion();
@@ -2831,6 +2926,10 @@ function verAlumno(id){
   } else {
     biblioBtn.style.display='none';
   }
+
+  // Fuerza y Mapeo se abren dentro de la app (si el link es una planilla de Sheets),
+  // atajo "Hoy toca…" y precarga del plan en segundo plano
+  planPrepararFicha(a);
 
   showPage('perfil',null);
 }
@@ -4736,6 +4835,545 @@ function stringToHorariosPorDia(str){
     }
   });
   return result;
+}
+
+// ══ PLAN DEL ALUMNO DENTRO DE LA APP: Fuerza y Mapeo (handoff plan-en-la-app) ══
+// Lee y escribe las MISMAS planillas de Luca con la API de Sheets, con el scope
+// `spreadsheets` que ya usa la app. Las planillas no cambian: se siguen editando
+// en Sheets como siempre y la app solo toca celdas puntuales. Los planes viven
+// únicamente en memoria durante la sesión (nunca en localStorage), así que lo que
+// se muestra siempre viene de una lectura de esta sesión: por eso NO aplica
+// `datosFrescos`. Sí hace falta un token vigente para leer y para guardar.
+const PLAN_VIEJO_MS=2*60*1000;       // copia más vieja que esto → releer en segundo plano
+const PLAN_REINTENTO_MS=20*1000;     // un error de red/sesión se reintenta pasado este tiempo
+const PLAN_ORDEN_DIAS=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+let planCache={};                    // alumnoId → { fuerza:entrada, mapeo:entrada }
+let planVista=null;                  // estado de la vista abierta (null = cerrada)
+let planSel={};                      // alumnoId → {dia, sem} elegidos en esta sesión
+let _planAbierto=false;
+
+// Minúsculas, sin tildes, espacios simples y trim: para comparar textos de las planillas
+function _normTxt(s){
+  return String(s==null?'':s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+}
+function _planColLetras(i){
+  let s=''; i++;
+  while(i>0){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); }
+  return s;
+}
+const _planA1=(fila,col)=>_planColLetras(col)+fila;
+const _planNombreHoy=()=>['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
+
+// Del link al archivo. Si no es un link de Sheets (p. ej. una carpeta vieja de
+// Drive) devuelve null y el botón se comporta como siempre (abre el link).
+function planParseUrl(url){
+  const m=String(url||'').match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]{20,})/);
+  if(!m) return null;
+  const g=String(url).match(/[#?&]gid=(\d+)/);
+  return {id:m[1], gid:g?g[1]:null};
+}
+
+async function _planApi(url){
+  if(!accessToken || tokenExp<=Date.now()) throw {tipo:'sesion'};
+  let r;
+  try{ r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}}); }
+  catch(e){ throw {tipo:'red'}; }
+  if(r.status===401) throw {tipo:'sesion'};
+  if(r.status===403||r.status===404) throw {tipo:'acceso'};
+  if(!r.ok) throw {tipo:'red'};
+  return r.json();
+}
+
+// Dos llamadas livianas: 1) solo los títulos de las pestañas (para elegir la
+// correcta), 2) la grilla de esa pestaña (valores + fórmulas) en un solo pedido.
+async function planLeerHoja(spreadsheetId, gid, tipo){
+  const meta=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties(sheetId,title)`);
+  const hojas=(meta.sheets||[]).map(s=>s.properties);
+  let hoja=null;
+  if(tipo==='mapeo'){
+    // La pestaña es la del #gid. Sin gid solo se acepta si el archivo tiene una sola:
+    // adivinar entre varias podría mostrar (y guardar) los datos de otro alumno.
+    hoja=gid!=null ? hojas.find(h=>String(h.sheetId)===String(gid)) : (hojas.length===1?hojas[0]:null);
+  } else {
+    hoja=(gid!=null && hojas.find(h=>String(h.sheetId)===String(gid) && _normTxt(h.title)!=='notas'))
+      || hojas.find(h=>_normTxt(h.title)!=='notas');
+  }
+  if(!hoja) throw {tipo:'formato'};
+  const rango=`'${hoja.title.replace(/'/g,"''")}'!A1:V${tipo==='mapeo'?400:120}`;
+  const data=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?includeGridData=true&ranges=${encodeURIComponent(rango)}&fields=sheets(data(rowData(values(formattedValue,userEnteredValue))))`);
+  const rows=(((data.sheets||[])[0]||{}).data||[])[0];
+  const filas=(rows&&rows.rowData)||[];
+  const grid=filas.map(f=>(f.values||[]).map(c=>({
+    t:(c&&c.formattedValue!=null)?String(c.formattedValue):'',
+    f:!!(c&&c.userEnteredValue&&c.userEnteredValue.formulaValue)
+  })));
+  return {hoja:hoja.title, grid};
+}
+
+// ── Detección de formato: ESTRICTA. Ante cualquier duda → {tipo:'formato'}, y la
+// vista muestra "No reconozco el formato" + "Abrir en Sheets". Es preferible el
+// aviso de más que armar mal la vista y guardar en celdas equivocadas.
+function _planCelda(grid,mapa,r,c){
+  const x=(grid[r]&&grid[r][c])||{t:'',f:false};
+  const cel={fila:r+1,col:c,text:x.t,formula:x.f};
+  mapa.set(`${cel.fila},${cel.col}`,cel);
+  return cel;
+}
+function planParseFuerza(grid){
+  const txt=(r,c)=>((grid[r]&&grid[r][c]&&grid[r][c].t)||'').trim();
+  if(!/^mes/.test(_normTxt(txt(0,0)))) throw {tipo:'formato'};
+  const mm=txt(0,0).match(/(\d+)/);
+  const mes=mm?`Mes ${mm[1]}`:txt(0,0);
+  // Semanas: "Semana N" en la fila 1 desde la columna E, de a 3 columnas (R x 3S · RIR · KG)
+  const semanas=[];
+  for(let c=4;c<(grid[0]||[]).length;c++){
+    const m=_normTxt(txt(0,c)).match(/^semana (\d+)$/);
+    if(m) semanas.push({n:+m[1],col:c});
+  }
+  if(!semanas.length) throw {tipo:'formato'};
+  semanas.forEach((s,i)=>{ if(s.n!==i+1 || s.col!==4+i*3) throw {tipo:'formato'}; });
+  const mapa=new Map();
+  const dias=[];
+  let cur=null, bloque='', letra='';
+  for(let r=1;r<grid.length;r++){
+    const esDiaN=/^dia \d+$/.test(_normTxt(txt(r,0)));
+    // Un "Día N" que no va con "Ejercicios" al lado no es un encabezado que se reconozca:
+    // seguir de largo fundiría sus ejercicios con los del día anterior
+    if(esDiaN && _normTxt(txt(r,1))!=='ejercicios') throw {tipo:'formato'};
+    if(_normTxt(txt(r,1))==='ejercicios'){            // encabezado de un día: "Día N | Ejercicios | R x 3S | RIR | KG…"
+      const m=_normTxt(txt(r,0)).match(/^dia (\d+)$/);
+      if(!m || +m[1]!==dias.length+1) throw {tipo:'formato'};   // Día 1, Día 2… seguidos y sin repetir
+      for(const s of semanas){
+        if(_normTxt(txt(r,s.col))!=='r x 3s' || _normTxt(txt(r,s.col+1))!=='rir' || _normTxt(txt(r,s.col+2))!=='kg') throw {tipo:'formato'};
+      }
+      cur={n:+m[1],ejercicios:[]}; dias.push(cur); bloque=''; letra='';
+      continue;
+    }
+    const nombre=txt(r,3);
+    if(!cur){ if(nombre) throw {tipo:'formato'}; continue; }   // ejercicios sin encabezado de día
+    if(!nombre) continue;
+    // Las combinadas (bloque/letra) llegan solo en la primera fila: se arrastra el último valor
+    if(txt(r,1)) bloque=txt(r,1);
+    if(txt(r,2)) letra=txt(r,2);
+    const celdas=semanas.map(s=>({r:_planCelda(grid,mapa,r,s.col), rir:_planCelda(grid,mapa,r,s.col+1), kg:_planCelda(grid,mapa,r,s.col+2)}));
+    // Fila fija (Activación/Movilidad): R x 3S cargado en todas las semanas y nada de RIR ni KG
+    const fija=celdas.every(x=>x.r.text) && celdas.every(x=>!x.rir.text && !x.kg.text);
+    cur.ejercicios.push({fila:r+1,nombre,bloque,letra,celdas,fija});
+  }
+  if(!dias.length || dias.some(d=>!d.ejercicios.length)) throw {tipo:'formato'};
+  return {tipo:'fuerza',mes,semanas,dias,mapa};
+}
+function planParseMapeo(grid){
+  const txt=(r,c)=>((grid[r]&&grid[r][c]&&grid[r][c].t)||'').trim();
+  ['enfoque','patron','ejercicio','reps','kg'].forEach((h,c)=>{ if(_normTxt(txt(1,c))!==h) throw {tipo:'formato'}; });
+  const mapa=new Map(), filas=[];
+  let enfoque='', patron='';
+  for(let r=2;r<grid.length;r++){
+    const ej=txt(r,2);
+    if(!ej) continue;
+    if(txt(r,0)) enfoque=txt(r,0);
+    if(txt(r,1)) patron=txt(r,1);      // algunos patrones traen espacios de más
+    filas.push({fila:r+1,enfoque,patron,ejercicio:ej,reps:_planCelda(grid,mapa,r,3),kg:_planCelda(grid,mapa,r,4)});
+  }
+  return {tipo:'mapeo',filas,mapa};
+}
+// Coincidencia EXACTA del nombre (normalizado) entre un ejercicio de Fuerza y el Mapeo. Nada aproximado.
+function _planMapeoDe(alumnoId,nombre){
+  const e=planEntrada(alumnoId,'mapeo');
+  if(!e||e.estado!=='ok') return null;
+  const n=_normTxt(nombre);
+  return e.datos.filas.find(f=>_normTxt(f.ejercicio)===n)||null;
+}
+
+// ── Entradas en memoria ──
+function planEntrada(alumnoId,tipo){ return (planCache[alumnoId]||{})[tipo]||null; }
+function planUrlDe(a,tipo){ return ((tipo==='fuerza'?a.carpetaDrive:a.mapeoUrl)||'').trim(); }
+
+// Carga el plan si no está (o si falló hace un rato). Siempre devuelve una promesa.
+function planAsegurar(a,tipo){
+  const url=planUrlDe(a,tipo), p=planParseUrl(url);
+  if(!p) return Promise.resolve(null);
+  if(!planCache[a.id]) planCache[a.id]={};
+  const e=planCache[a.id][tipo];
+  if(e && e.url===url){
+    if(e.promesa) return e.promesa;
+    if(e.estado==='ok') return Promise.resolve(e);
+    if(Date.now()-e.ts<PLAN_REINTENTO_MS) return Promise.resolve(e);
+  }
+  return _planLeer(a,tipo,url,p,null);
+}
+function _planLeer(a,tipo,url,p,previa){
+  const e=previa || {url,estado:'cargando',datos:null,error:null,ts:0,promesa:null,spreadsheetId:p.id,hoja:'',cola:Promise.resolve(),pendientes:0};
+  if(!previa) planCache[a.id][tipo]=e;
+  e.promesa=(async()=>{
+    try{
+      const {hoja,grid}=await planLeerHoja(p.id,p.gid,tipo);
+      const datos=tipo==='fuerza'?planParseFuerza(grid):planParseMapeo(grid);
+      // Si Luca está tipeando o hay un guardado en curso, no se pisa: queda para la próxima
+      if(!previa || !(e.pendientes>0 || _planEditando())){ e.datos=datos; e.hoja=hoja; e.estado='ok'; e.error=null; e.ts=Date.now(); }
+    }catch(err){
+      if(!previa){ e.estado='error'; e.error=(err&&err.tipo)||'red'; e.ts=Date.now(); }
+      if(!(err&&err.tipo)) console.warn('Plan '+tipo+':',err);
+    }
+    e.promesa=null;
+    if(planVista && planVista.alumnoId===a.id && !_planEditando()) planRenderTodo();
+    _planActualizarHoyToca(a.id);
+    return e;
+  })();
+  return e.promesa;
+}
+// Relee en segundo plano una copia de más de 2 min (otra persona o Luca en Sheets pudo cambiarla)
+function planRefrescarSiViejo(a,tipo){
+  const e=planEntrada(a.id,tipo);
+  if(!e||e.estado!=='ok'||e.promesa||Date.now()-e.ts<=PLAN_VIEJO_MS) return;
+  const p=planParseUrl(e.url); if(!p) return;
+  _planLeer(a,tipo,e.url,p,e);
+}
+function _planEditando(){
+  const v=document.getElementById('plan-vista'), act=document.activeElement;
+  return !!(planVista && act && v.contains(act) && act.tagName==='INPUT');
+}
+
+// Alumnos que entrenan hoy, en orden de horario (mismo criterio que Resumen: el fin
+// de semana, el próximo lunes)
+function planAlumnosDeHoy(){
+  const hoyNombre=_planNombreHoy();
+  const nombre=(hoyNombre==='Sábado'||hoyNombre==='Domingo')?'Lunes':hoyNombre;
+  return alumnos.filter(a=>a.estado==='activo' && a.dias.includes(nombre))
+    .map(a=>({a,hora:stringToHorariosPorDia(a.horario)[nombre]||''}))
+    .sort((x,y)=>(x.hora||'99:99').localeCompare(y.hora||'99:99'));
+}
+// Al abrir la app (con los datos frescos): precargar la Fuerza de los de hoy, de a 2 como máximo
+async function planPrecargarHoy(){
+  if(!accessToken || tokenExp<=Date.now() || navigator.onLine===false) return;
+  const lista=planAlumnosDeHoy().map(x=>x.a).filter(a=>planParseUrl(a.carpetaDrive));
+  let i=0;
+  const worker=async()=>{ while(i<lista.length){ try{ await planAsegurar(lista[i++],'fuerza'); }catch(e){} } };
+  await Promise.all([worker(),worker()]);
+}
+
+// ── Día y semana por defecto ──
+function planDiaDefault(a,datos){
+  const mios=PLAN_ORDEN_DIAS.filter(d=>a.dias.includes(d));
+  // Si la cantidad de días de la planilla no coincide con los del alumno, Día 1
+  if(!mios.length || mios.length!==datos.dias.length) return datos.dias[0].n;
+  const hoyIdx=PLAN_ORDEN_DIAS.indexOf(_planNombreHoy());
+  for(let off=0;off<7;off++){                  // hoy, o el próximo día que entrena
+    const i=mios.indexOf(PLAN_ORDEN_DIAS[(hoyIdx+off)%7]);
+    if(i!==-1) return datos.dias[i].n;
+  }
+  return datos.dias[0].n;
+}
+// Primera semana con todos los "R x 3S" vacíos en las filas editables; si están todas cargadas, la última
+function planSemanaDefault(datos,diaN){
+  const dia=datos.dias.find(d=>d.n===diaN)||datos.dias[0];
+  const ed=dia.ejercicios.filter(e=>!e.fija);
+  const ult=datos.semanas[datos.semanas.length-1].n;
+  if(!ed.length) return ult;
+  for(const s of datos.semanas){ if(ed.every(e=>!e.celdas[s.n-1].r.text)) return s.n; }
+  return ult;
+}
+function _planSelDe(a,datos){
+  let s=planSel[a.id];
+  if(!s || !datos.dias.some(d=>d.n===s.dia) || !datos.semanas.some(w=>w.n===s.sem)){
+    const dia=planDiaDefault(a,datos);
+    s=planSel[a.id]={dia,sem:planSemanaDefault(datos,dia)};
+  }
+  return s;
+}
+
+// ── Atajo "Hoy toca Día N · Semana M" en la ficha ──
+function _planActualizarHoyToca(alumnoId){
+  const cont=document.getElementById('perfil-hoy-toca');
+  const pagina=document.getElementById('page-perfil');
+  if(!cont||!pagina||pagina.dataset.alumnoId!==alumnoId) return;
+  const a=alumnos.find(x=>x.id===alumnoId), e=a&&planEntrada(alumnoId,'fuerza');
+  if(!a||!e||e.estado!=='ok'||!a.dias.includes(_planNombreHoy())){ cont.style.display='none'; return; }
+  const sel=_planSelDe(a,e.datos);
+  let ultimo='';
+  const reg=asistencias.filter(r=>r[0]===alumnoId&&(!r[2]||r[2]==='asistencia')).map(r=>r[1].split('/')).filter(p=>p.length===3).map(p=>new Date(+p[2],+p[1]-1,+p[0])).sort((x,y)=>y-x)[0];
+  if(reg) ultimo=` · último registro: ${reg.toLocaleDateString('es-AR',{weekday:'long'})} ${reg.getDate()}/${reg.getMonth()+1}`;
+  cont.innerHTML=`<div class="hoy-toca-txt">Hoy toca <b>Día ${sel.dia} · Semana ${sel.sem}</b><small>${escaparHTML(e.datos.mes)}${escaparHTML(ultimo)}</small></div><button type="button">Abrir</button>`;
+  cont.querySelector('button').onclick=()=>abrirPlan(alumnoId,'fuerza');
+  cont.style.display='flex';
+}
+// Se llama desde verAlumno(): botones, atajo y precarga en segundo plano
+function planPrepararFicha(a){
+  const driveBtn=document.getElementById('perfil-btn-drive'), biblioBtn=document.getElementById('perfil-accion-biblioteca');
+  if(a.carpetaDrive) driveBtn.onclick=()=>planParseUrl(a.carpetaDrive)?abrirPlan(a.id,'fuerza'):window.open(a.carpetaDrive.trim(),'_blank','noopener');
+  if(a.mapeoUrl) biblioBtn.onclick=()=>planParseUrl(a.mapeoUrl)?abrirPlan(a.id,'mapeo'):window.open(a.mapeoUrl.trim(),'_blank','noopener');
+  document.getElementById('perfil-hoy-toca').style.display='none';
+  if(planParseUrl(a.carpetaDrive)) planAsegurar(a,'fuerza').then(()=>planRefrescarSiViejo(a,'fuerza'));
+  if(planParseUrl(a.mapeoUrl)) planAsegurar(a,'mapeo');
+  _planActualizarHoyToca(a.id);
+}
+
+// ── Vista ──
+function abrirPlan(alumnoId,tipo){
+  const a=alumnos.find(x=>x.id===alumnoId); if(!a) return;
+  if(!planParseUrl(planUrlDe(a,tipo))){ const u=planUrlDe(a,tipo); if(u) window.open(u,'_blank','noopener'); return; }
+  planVista={alumnoId,tipo,busqueda:'',enfoque:'',expandidas:new Set(),guardados:new Set()};
+  if(!_planAbierto){
+    // Botón atrás de Android: cierra la vista y vuelve a la ficha (sin esto sacaría de la app)
+    try{ history.pushState({mcPlan:1},''); }catch(e){}
+    _planAbierto=true;
+  }
+  document.getElementById('plan-vista').style.display='flex';
+  planRenderTodo();
+  _planCargarVista(a);
+}
+// Pide lo que hace falta para el alumno que se está viendo (y deja listos a sus vecinos de hoy)
+function _planCargarVista(a){
+  const tipo=planVista.tipo;
+  planAsegurar(a,tipo).then(()=>planRefrescarSiViejo(a,tipo));
+  if(tipo==='fuerza' && planParseUrl(a.mapeoUrl)) planAsegurar(a,'mapeo');
+  const v=planVecinos(a.id);
+  [v.prev,v.next].forEach(x=>{ if(x && planParseUrl(planUrlDe(x.a,tipo))) planAsegurar(x.a,tipo); });
+}
+function planIr(alumnoId){
+  const a=alumnos.find(x=>x.id===alumnoId); if(!a||!planVista) return;
+  planVista={alumnoId,tipo:planVista.tipo,busqueda:'',enfoque:'',expandidas:new Set(),guardados:new Set()};
+  planRenderTodo();
+  _planCargarVista(a);
+}
+function _planOcultar(){
+  _planAbierto=false; planVista=null;
+  const c=document.getElementById('plan-vista');
+  c.style.display='none'; c.innerHTML='';
+}
+function cerrarPlan(){
+  if(!_planAbierto) return;
+  if(history.state && history.state.mcPlan) history.back();   // popstate hace el resto
+  else _planOcultar();
+}
+function planVecinos(alumnoId){
+  const lista=planAlumnosDeHoy();
+  const i=lista.findIndex(x=>x.a.id===alumnoId);
+  return {lista, prev:i>0?lista[i-1]:null, next:i===-1?(lista[0]||null):(lista[i+1]||null)};
+}
+
+function _pvAviso(msg,a,tipo){
+  const url=escaparHTML(planUrlDe(a,tipo));
+  return `<div class="pv-aviso"><div>${msg}</div>${url?`<a href="${url}" target="_blank" rel="noopener">Abrir en Sheets ↗</a>`:''}</div>`;
+}
+function _pvEsqueleto(){ return '<div class="pv-esq"></div><div class="pv-esq"></div><div class="pv-esq"></div><div class="pv-esq"></div>'; }
+
+function planRenderTodo(){
+  if(!planVista) return;
+  const a=alumnos.find(x=>x.id===planVista.alumnoId);
+  const cont=document.getElementById('plan-vista');
+  if(!a){ _planOcultar(); return; }
+  const tipo=planVista.tipo, e=planEntrada(a.id,tipo), url=planUrlDe(a,tipo);
+  const esFuerza=tipo==='fuerza', ok=e&&e.estado==='ok';
+  let meta=esFuerza?'Fuerza':'Mapeo', extra='';
+  if(ok && esFuerza){
+    const sel=_planSelDe(a,e.datos), dia=e.datos.dias.find(d=>d.n===sel.dia);
+    meta=`Fuerza · ${e.datos.mes}`;
+    const llena=s=>dia.ejercicios.some(x=>!x.fija && (x.celdas[s.n-1].r.text||x.celdas[s.n-1].rir.text||x.celdas[s.n-1].kg.text));
+    extra=`<div class="pv-tabs">${e.datos.dias.map(d=>`<button type="button" class="pv-tab${d.n===sel.dia?' on':''}" data-pv="dia" data-n="${d.n}">Día ${d.n}</button>`).join('')}</div>
+      <div class="pv-semanas"><span class="pv-semanas-lbl">Semana</span>${e.datos.semanas.map(s=>`<button type="button" class="pv-sem${s.n===sel.sem?' on':''}${llena(s)?' llena':''}" data-pv="sem" data-n="${s.n}">${s.n}</button>`).join('')}</div>`;
+  } else if(ok){
+    meta=`Mapeo · ${e.datos.filas.length} ejercicios`;
+    const enfoques=[...new Set(e.datos.filas.map(f=>f.enfoque).filter(Boolean))];
+    extra=`<input class="pv-buscar" id="pv-buscar" type="search" placeholder="Buscar ejercicio o patrón…" value="${escaparHTML(planVista.busqueda)}" autocomplete="off">
+      <div class="pv-chips"><button type="button" class="pv-chip${!planVista.enfoque?' on':''}" data-pv="enfoque" data-e="">Todos</button>${enfoques.map(f=>`<button type="button" class="pv-chip${planVista.enfoque===f?' on':''}" data-pv="enfoque" data-e="${escaparHTML(f)}">${escaparHTML(f)}</button>`).join('')}</div>`;
+  }
+  const v=planVecinos(a.id);
+  const corto=x=>`${escaparHTML(x.a.nombre.split(' ')[0])}${x.hora?' · '+escaparHTML(x.hora):''}`;
+  const hoyNombre=_planNombreHoy(), finde=hoyNombre==='Sábado'||hoyNombre==='Domingo';
+  cont.innerHTML=`<div class="pv-col">
+    <div class="pv-top">
+      <div class="pv-fila1">
+        <button type="button" class="pv-cerrar" data-pv="cerrar" aria-label="Cerrar">✕</button>
+        <div class="pv-tit"><div class="pv-nombre">${escaparHTML(a.nombre)}</div><div class="pv-meta">${escaparHTML(meta)}</div></div>
+        ${url?`<a class="pv-sheets" href="${escaparHTML(url)}" target="_blank" rel="noopener">Abrir en Sheets ↗</a>`:''}
+      </div>${extra}
+    </div>
+    <div class="pv-body" id="pv-body"></div>
+    <div class="pv-barra">
+      ${v.prev?`<button type="button" class="pv-ba" data-pv="ir" data-id="${escaparHTML(v.prev.a.id)}"><span class="pv-ba-lbl">‹ Anterior</span><span class="pv-ba-nombre">${corto(v.prev)}</span></button>`:'<span class="pv-ba vacio"></span>'}
+      <button type="button" class="pv-lista-btn" data-pv="lista" aria-label="Lista de alumnos">☰</button>
+      ${v.next?`<button type="button" class="pv-ba sig" data-pv="ir" data-id="${escaparHTML(v.next.a.id)}"><span class="pv-ba-lbl">${finde?'Siguiente · lunes':'Siguiente de hoy'} ›</span><span class="pv-ba-nombre">${corto(v.next)}</span></button>`:'<span class="pv-ba vacio"></span>'}
+    </div>
+  </div>`;
+  planRenderBody();
+}
+
+function planRenderBody(){
+  const body=document.getElementById('pv-body');
+  if(!body||!planVista) return;
+  const a=alumnos.find(x=>x.id===planVista.alumnoId); if(!a) return;
+  const tipo=planVista.tipo, e=planEntrada(a.id,tipo), url=planUrlDe(a,tipo);
+  if(!url){ body.innerHTML=_pvAviso(`${escaparHTML(a.nombre)} no tiene ${tipo==='fuerza'?'la planilla de Fuerza cargada':'el Mapeo cargado'}.`,a,tipo); return; }
+  if(!planParseUrl(url)){ body.innerHTML=_pvAviso('Este link no es una planilla de Google Sheets.',a,tipo); return; }
+  if(!e || e.estado==='cargando'){ body.innerHTML=_pvEsqueleto(); return; }
+  if(e.estado==='error'){
+    const msg={formato:'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
+    body.innerHTML=_pvAviso(escaparHTML(msg),a,tipo)+((e.error==='red'||e.error==='sesion')?'<div class="pv-aviso" style="padding-top:0"><button type="button" data-pv="reintentar-plan">Reintentar</button></div>':'');
+    return;
+  }
+  body.innerHTML=tipo==='fuerza'?_pvBodyFuerza(a,e):_pvBodyMapeo(a,e);
+}
+
+function _pvCampo(cel,etq,inputmode,ph){
+  const ro=cel.formula;
+  return `<div class="pv-campo"><label>${etq}${ro?' <span class="pv-formula" title="Fórmula: solo lectura">ƒ</span>':''}</label><input type="text" inputmode="${inputmode}" data-fila="${cel.fila}" data-col="${cel.col}" data-orig="${escaparHTML(cel.text)}" value="${escaparHTML(cel.text)}" placeholder="${escaparHTML(ph||'—')}"${ro?' readonly':''} autocomplete="off"></div>`;
+}
+function _pvBodyFuerza(a,e){
+  const d=e.datos, sel=_planSelDe(a,d);
+  const dia=d.dias.find(x=>x.n===sel.dia)||d.dias[0];
+  const idx=d.semanas.findIndex(s=>s.n===sel.sem), si=idx<0?0:idx;
+  let html='', bloqueAct=null;
+  dia.ejercicios.forEach((ej,ei)=>{
+    const k=ej.bloque+'|'+ej.letra;
+    if(k!==bloqueAct){ bloqueAct=k; html+=`<div class="pv-bloque"><span class="pv-letra">${escaparHTML(ej.letra)}</span><span class="pv-bnombre">${escaparHTML(ej.bloque)}</span></div>`; }
+    const c=ej.celdas[si];
+    if(ej.fija && !planVista.expandidas.has(`${dia.n}-${ei}`)){
+      const todas=ej.celdas.every(x=>x.r.text===ej.celdas[0].r.text);
+      html+=`<div class="pv-ej"><div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span></div><div class="pv-fija" data-pv="expandir" data-ei="${ei}">${todas?'Todas las semanas':'Semana '+sel.sem}: <b>${escaparHTML(c.r.text||'—')}</b></div></div>`;
+      return;
+    }
+    // Referencia: las 2 semanas anteriores con datos, y el Mapeo si el nombre coincide exacto
+    const refs=[];
+    for(let j=si-1;j>=0 && refs.length<2;j--){
+      const x=ej.celdas[j];
+      if(x.r.text||x.kg.text) refs.push(`<span>Sem ${d.semanas[j].n}: <b>${escaparHTML(x.r.text||'—')}${x.kg.text?' · '+escaparHTML(x.kg.text)+' kg':''}</b></span>`);
+    }
+    const mp=_planMapeoDe(a.id,ej.nombre);
+    if(mp && (mp.reps.text||mp.kg.text)) refs.push(`<span class="mapeo">Mapeo: <b>${escaparHTML(mp.reps.text||'—')}${mp.kg.text?' · '+escaparHTML(mp.kg.text)+' kg':''}</b></span>`);
+    const prev=si>0?ej.celdas[si-1]:null;                       // placeholder = lo de la semana anterior
+    const hayPrev=prev && (prev.r.text||prev.kg.text) && !c.r.formula && !c.kg.formula;
+    const guardado=planVista.guardados.has('f'+ej.fila);
+    html+=`<div class="pv-ej${guardado?' guardado':''}" data-pvcard="${ei}">
+      <div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span><span class="pv-ej-estado">✓ Guardado</span></div>
+      ${refs.length?`<div class="pv-ref">${refs.join('')}</div>`:''}
+      <div class="pv-campos">${_pvCampo(c.r,'R x 3S','text',prev&&prev.r.text)}${_pvCampo(c.rir,'RIR','numeric',prev&&prev.rir.text)}${_pvCampo(c.kg,'KG','decimal',prev&&prev.kg.text)}${hayPrev?`<button type="button" class="pv-igual" data-pv="igual" data-ei="${ei}">= Sem ${d.semanas[si-1].n}</button>`:'<span></span>'}</div>
+      <div class="pv-ej-err"><span>No se guardó · </span><button type="button" data-pv="reintentar">reintentar</button></div>
+    </div>`;
+  });
+  return html;
+}
+function _pvBodyMapeo(a,e){
+  const q=_normTxt(planVista.busqueda), enf=planVista.enfoque;
+  const filas=e.datos.filas.filter(f=>(!enf||f.enfoque===enf) && (!q||_normTxt(f.ejercicio).includes(q)||_normTxt(f.patron).includes(q)||_normTxt(f.enfoque).includes(q)));
+  if(!filas.length) return '<div class="pv-nota">Sin resultados.</div>';
+  let html='<div class="pv-map-head"><span>Ejercicio</span><span>Reps</span><span>KG</span></div>', grupo=null;
+  filas.forEach(f=>{
+    const g=`${f.enfoque} · ${f.patron}`;
+    if(g!==grupo){ grupo=g; html+=`<div class="pv-map-grupo">${escaparHTML(g)}</div>`; }
+    const mk=c=>`<input type="text" inputmode="${c===f.kg?'decimal':'text'}" data-fila="${c.fila}" data-col="${c.col}" data-orig="${escaparHTML(c.text)}" value="${escaparHTML(c.text)}" placeholder="—"${c.formula?' readonly title="Fórmula: solo lectura"':''} autocomplete="off">`;
+    html+=`<div class="pv-map-row${planVista.guardados.has('m'+f.fila)?' guardado':''}" data-pvcard="m${f.fila}"><span class="pv-map-ej">${escaparHTML(f.ejercicio)}<small>${escaparHTML(f.patron)}</small></span>${mk(f.reps)}${mk(f.kg)}</div>`;
+  });
+  return html+'<div class="pv-nota" style="margin-top:0.6rem">Cambiar Reps o KG guarda en la misma fila del Mapeo. Para agregar o reordenar ejercicios, <b>Abrir en Sheets</b>.</div>';
+}
+
+// ── Guardado: una celda por vez, al salir del campo, solo si el valor cambió ──
+// USER_ENTERED a propósito (igual que tipear en la celda): "25" queda número y
+// "27,5-27,5-12,5" queda texto. Excepción: algo como "7-7-14" o "8-8" Sheets lo
+// convertiría en FECHA; para esos valores se usa RAW y se guarda tal cual, como texto.
+function _planModoEscritura(v){ return /^\d{1,4}[-/]\d{1,2}([-/]\d{1,4})?$/.test(v)?'RAW':'USER_ENTERED'; }
+async function _planEscribir(e,cel,valor){
+  if(!accessToken || tokenExp<=Date.now()) throw {tipo:'sesion'};
+  const rango=`'${e.hoja.replace(/'/g,"''")}'!${_planA1(cel.fila,cel.col)}`;
+  const url=`https://sheets.googleapis.com/v4/spreadsheets/${e.spreadsheetId}/values/${encodeRange(rango)}?valueInputOption=${_planModoEscritura(valor)}`;
+  let r;
+  try{
+    r=await fetchConRenovacion(url,{method:'PUT',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({range:rango,majorDimension:'ROWS',values:[[valor]]})});
+  }catch(err){ throw {tipo:'red'}; }
+  if(r.status===401) throw {tipo:'sesion'};
+  if(!r.ok) throw {tipo:'red'};
+}
+function planGuardarInput(inp){
+  if(!planVista || inp.readOnly) return;
+  const a=alumnos.find(x=>x.id===planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
+  if(!e||e.estado!=='ok') return;
+  const nuevo=inp.value.trim();
+  if(nuevo===(inp.dataset.orig||'')) return;
+  const cel=e.datos.mapa.get(`${inp.dataset.fila},${inp.dataset.col}`);
+  if(!cel || cel.formula) return;
+  const card=inp.closest('[data-pvcard]');
+  const clave=planVista.tipo==='fuerza'?'f'+cel.fila:'m'+cel.fila;
+  if(card) card.classList.remove('guardado','error');
+  e.pendientes++;
+  e.cola=e.cola.then(async()=>{
+    try{
+      await _planEscribir(e,cel,nuevo);
+      cel.text=nuevo; inp.dataset.orig=nuevo;
+      if(planVista) planVista.guardados.add(clave);
+      if(card && card.isConnected){ card.classList.remove('error'); card.classList.add('guardado'); }
+    }catch(err){
+      // El valor tipeado NO se pierde: queda en el campo y se puede reintentar
+      if(card && card.isConnected){
+        card.classList.add('error');
+        const sp=card.querySelector('.pv-ej-err span'); if(sp) sp.textContent=(err&&err.tipo==='sesion'?'Sesión vencida · ':'No se guardó · ');
+      }
+      toast(err&&err.tipo==='sesion'?'Tu sesión venció: reconectá para guardar':'No se guardó el cambio');
+    }
+    e.pendientes--;
+  });
+}
+
+// ── Eventos de la vista (delegados: el HTML se vuelve a dibujar seguido) ──
+(function(){
+  const vista=document.getElementById('plan-vista');
+  if(!vista) return;
+  vista.addEventListener('focusout',ev=>{ if(ev.target.matches && ev.target.matches('input[data-fila]')) planGuardarInput(ev.target); });
+  vista.addEventListener('keydown',ev=>{ if(ev.key==='Enter' && ev.target.matches && ev.target.matches('input[data-fila]')) ev.target.blur(); });
+  vista.addEventListener('input',ev=>{
+    if(ev.target.id==='pv-buscar' && planVista){ planVista.busqueda=ev.target.value; planRenderBody(); }
+    else if(ev.target.id==='pv-lista-buscar') _planRenderLista(ev.target.value);
+  });
+  vista.addEventListener('click',ev=>{
+    const el=ev.target.closest('[data-pv]'); if(!el||!planVista) return;
+    const a=alumnos.find(x=>x.id===planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
+    switch(el.dataset.pv){
+      case 'cerrar': cerrarPlan(); break;
+      case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; s.sem=planSemanaDefault(e.datos,s.dia); planVista.expandidas=new Set(); planRenderTodo(); break; }
+      case 'sem': planSel[a.id].sem=+el.dataset.n; planRenderTodo(); break;
+      case 'enfoque': planVista.enfoque=el.dataset.e||''; planRenderTodo(); break;
+      case 'expandir': planVista.expandidas.add(`${planSel[a.id].dia}-${el.dataset.ei}`); planRenderBody(); break;
+      case 'ir': planIr(el.dataset.id); break;
+      case 'lista': _planAbrirLista(); break;
+      case 'lista-cerrar': { const l=document.getElementById('pv-lista'); if(l) l.remove(); break; }
+      case 'lista-ir': planIr(el.dataset.id); break;
+      case 'reintentar-plan': { if(e){ e.ts=0; } planAsegurar(a,planVista.tipo); planRenderBody(); break; }
+      case 'reintentar': el.closest('[data-pvcard]').querySelectorAll('input[data-fila]').forEach(planGuardarInput); break;
+      case 'igual': {
+        // Copia R x 3S y KG de la semana anterior (el RIR no: es de cada sesión) y guarda
+        const sel=planSel[a.id], dia=e.datos.dias.find(d=>d.n===sel.dia), ej=dia.ejercicios[+el.dataset.ei];
+        const si=e.datos.semanas.findIndex(s=>s.n===sel.sem), prev=ej.celdas[si-1], card=el.closest('[data-pvcard]');
+        [[prev.r,0],[prev.kg,2]].forEach(([orig,i])=>{
+          const inp=card.querySelectorAll('input[data-fila]')[i];
+          // Solo se copia lo que la semana anterior tiene: nunca se borra un campo por copiar un vacío
+          if(orig.text && !inp.readOnly && !orig.formula && inp.value!==orig.text){ inp.value=orig.text; planGuardarInput(inp); }
+        });
+        break;
+      }
+    }
+  });
+  // Botón atrás de Android: cierra la vista y vuelve a la ficha
+  window.addEventListener('popstate',()=>{ if(_planAbierto) _planOcultar(); });
+})();
+
+// ☰: primero los de hoy, después todos con buscador. Pasar de alumno mantiene la vista (Fuerza o Mapeo)
+function _planAbrirLista(){
+  const col=document.querySelector('#plan-vista .pv-col'); if(!col||document.getElementById('pv-lista')) return;
+  const div=document.createElement('div'); div.className='pv-lista'; div.id='pv-lista';
+  div.innerHTML=`<div class="pv-fila1"><button type="button" class="pv-cerrar" data-pv="lista-cerrar" aria-label="Cerrar lista">✕</button><div class="pv-tit"><div class="pv-nombre">Alumnos</div></div></div>
+    <input class="pv-buscar" id="pv-lista-buscar" type="search" placeholder="Buscar alumno…" autocomplete="off"><div class="pv-lista-body" id="pv-lista-body"></div>`;
+  col.appendChild(div);
+  _planRenderLista('');
+}
+function _planRenderLista(q){
+  const body=document.getElementById('pv-lista-body'); if(!body||!planVista) return;
+  const n=_normTxt(q), hoy=planAlumnosDeHoy();
+  const item=(a,sub)=>`<button type="button" class="pv-lista-item${a.id===planVista.alumnoId?' actual':''}" data-pv="lista-ir" data-id="${escaparHTML(a.id)}"><span>${escaparHTML(a.nombre)}</span><small>${escaparHTML(sub||'')}</small></button>`;
+  let html='';
+  const h=hoy.filter(x=>!n||_normTxt(x.a.nombre).includes(n));
+  if(h.length) html+='<div class="pv-lista-sec">Hoy</div>'+h.map(x=>item(x.a,x.hora)).join('');
+  const resto=alumnos.filter(a=>a.estado==='activo' && !hoy.some(x=>x.a.id===a.id) && (!n||_normTxt(a.nombre).includes(n))).sort((x,y)=>x.nombre.localeCompare(y.nombre,'es'));
+  if(resto.length) html+='<div class="pv-lista-sec">Todos</div>'+resto.map(a=>item(a,'')).join('');
+  body.innerHTML=html||'<div class="pv-nota">Sin resultados.</div>';
 }
 
 // ── TOAST ──
