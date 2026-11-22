@@ -6,11 +6,13 @@
 <title>Mente Consciente</title>
 <link rel="icon" type="image/png" href="Logo_App.png"/>
 <link rel="apple-touch-icon" href="Logo_App.png"/>
+<meta name="theme-color" content="#111B16"/>
 <script>
 function scriptGoogleListo(){
   window._googleListo = true;
-  const btn = document.getElementById('login-btn');
-  if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.textContent='Iniciar sesión con Google'; }
+  // Puede dispararse antes de que el script principal (más abajo) termine de
+  // evaluarse; si es así, arrancarEntrenador() actualiza el botón después.
+  try{ _actualizarBotonLogin(); }catch(e){}
 }
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer onload="scriptGoogleListo()"></script>
@@ -41,6 +43,14 @@ body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--te
 
 /* LAYOUT */
 #app{display:none}
+/* Barra de sesión (handoff app-instalable-y-sesion). Fija arriba; mientras se ve,
+   el contenido y la barra lateral sticky bajan su alto para no quedar tapados. */
+#sesion-bar{position:fixed;top:0;left:0;right:0;height:34px;z-index:400;display:flex;align-items:center;gap:0.6rem;padding:0 0.85rem;background:#223527;border-bottom:1px solid rgba(74,184,112,0.22);font-size:0.74rem;color:var(--suave)}
+#sesion-bar.aviso{background:rgba(232,168,74,0.16);border-bottom-color:rgba(232,168,74,0.35);color:var(--amarillo)}
+#sesion-bar-txt{flex:1 1 auto;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sesion-bar-btn{flex:0 1 auto;min-width:0;max-width:78%;background:var(--verde);color:#0D1A12;border:none;border-radius:20px;padding:0.28rem 0.8rem;font-size:0.72rem;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body.sesion-bar-on{padding-top:34px}
+body.sesion-bar-on aside{top:34px;height:calc(100vh - 34px)}
 .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 
 /* SIDEBAR */
@@ -851,6 +861,9 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 </head>
 <body>
 
+<!-- Barra de sesión: "Actualizando…", sesión por vencer/vencida, sin conexión -->
+<div id="sesion-bar" style="display:none"><span id="sesion-bar-txt"></span><button type="button" id="sesion-bar-btn" style="display:none"></button></div>
+
 <!-- LOGIN -->
 <div id="login-screen">
   <img id="login-logo" src="Logo_App.png" alt="Mente Consciente"/>
@@ -1511,7 +1524,24 @@ let editandoId = null;
 (function(){
   const params = new URLSearchParams(window.location.search);
   const alumnoId = params.get('alumno');
-  if(!alumnoId) return;
+  if(!alumnoId){
+    // Modo entrenador (handoff app-instalable-y-sesion): el manifiesto y el
+    // service worker se agregan SOLO acá. El portal del alumno es este mismo
+    // index.html con ?alumno=<token>; si tuviera manifiesto, un alumno que lo
+    // "instalara" abriría el panel del entrenador y perdería su token.
+    // Si hay sesión o copia guardada se va a entrar directo: ocultar el login
+    // desde ya para que no parpadee antes de que arrancarEntrenador() decida.
+    try{
+      if(localStorage.getItem('mc_auth') || localStorage.getItem('mc_cache')){
+        const s=document.createElement('style');
+        s.id='estilo-sin-login';
+        s.textContent='#login-screen{display:none}';
+        document.head.appendChild(s);
+      }
+    }catch(e){}
+    document.addEventListener('DOMContentLoaded', arrancarEntrenador);
+    return;
+  }
   // Inyectar CSS inmediato para bloquear el paint del login antes de DOMContentLoaded
   const s = document.createElement('style');
   s.textContent = '#login-screen{display:none!important}#app{display:none!important}#portal-alumno{display:block!important}';
@@ -1771,86 +1801,258 @@ function calcularRachaSemanal(registros){
 }
 
 
-let tokenClient = null;
+// ── SESIÓN PERSISTENTE + CACHÉ (handoff app-instalable-y-sesion) ──
+// El permiso de Google (access token, dura 1 h) se guarda en localStorage para
+// no pedir login cada vez que se abre la app. Pasada la hora, un solo toque en
+// "Continuar como…" lo renueva (Chrome solo deja abrir la ventana de Google
+// como respuesta a un toque: por eso se sacó la renovación automática a los 55
+// min, que abría la ventana sin toque y Chrome la bloqueaba). Junto con eso se
+// guarda una copia de los datos (mc_cache) para abrir al instante.
+const AUTH_KEY='mc_auth', CACHE_KEY='mc_cache';
+const MARGEN_VENCE_MS=5*60*1000;   // la barra avisa cuando faltan menos de 5 min
+let tokenClient=null;
+let tokenExp=0;                    // ms epoch hasta cuándo vale accessToken
+let emailGuardado='';              // cuenta de la última sesión (login_hint)
+let datosFrescos=false;            // false desde que se restaura la caché hasta que cargarDatos() termina bien
+let _actualizando=false;           // cargarDatos() en curso
+let cacheTs=0;                     // cuándo se guardó la copia que se está mostrando
+let _appIniciada=false;
+let _ultimoBloqueo=0, _ultimoMsgBloqueo='';
+const MSG_ESPERA='Esperá un segundo, estoy actualizando los datos';
+const MSG_SIN_DATOS='Los datos no están actualizados. Tocá Sincronizar e intentá de nuevo';
 
-function iniciarSesion(){
+// Todo acceso a localStorage va protegido (modo privado, datos bloqueados, cuota llena…)
+function _lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function _lsSet(k,v){ try{ localStorage.setItem(k,v); return true; }catch(e){ return false; } }
+function _lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+
+function _authGuardar(token, expiresIn, email){
+  tokenExp=Date.now()+((+expiresIn||3600)-60)*1000;   // 1 min de margen
+  emailGuardado=email;
+  _lsSet(AUTH_KEY, JSON.stringify({token, exp:tokenExp, email}));
+}
+function _authLeer(){
+  try{
+    const a=JSON.parse(_lsGet(AUTH_KEY)||'null');
+    return (a && a.token && a.email) ? a : null;
+  }catch(e){ return null; }
+}
+// Un 401 deja el token inútil: se marca vencido sin borrar el email (sigue sirviendo de login_hint)
+function _authInvalidar(){
+  tokenExp=0;
+  const a=_authLeer();
+  if(a) _lsSet(AUTH_KEY, JSON.stringify({token:a.token, exp:0, email:a.email}));
+}
+
+function _cacheGuardar(){
+  const ts=Date.now();
+  if(_lsSet(CACHE_KEY, JSON.stringify({v:1, ts, alumnos, cobros, seguimiento, asistencias, clientesNutri, cobrosNutri, gastos, configFinanzas, biblioteca, progresionActual}))){
+    cacheTs=ts;
+  }
+}
+function _cacheRestaurar(){
+  try{
+    const c=JSON.parse(_lsGet(CACHE_KEY)||'null');
+    if(!c || c.v!==1 || !Array.isArray(c.alumnos) || !c.cobros || typeof c.cobros!=='object') return false;
+    alumnos=c.alumnos; cobros=c.cobros; seguimiento=c.seguimiento||{}; asistencias=c.asistencias||[];
+    clientesNutri=c.clientesNutri||[]; cobrosNutri=c.cobrosNutri||{}; gastos=c.gastos||[];
+    configFinanzas=c.configFinanzas||{saldoInicial:0,fechaReferencia:''};
+    biblioteca=c.biblioteca||[]; progresionActual=c.progresionActual||[];
+    cacheTs=c.ts||0;
+    return true;
+  }catch(e){ return false; }
+}
+
+// ── Barra de sesión ──
+// Una sola barra fina arriba que resume el estado: sesión vencida / por vencer
+// (con botón), sin conexión, o "Actualizando…". Nunca abre ventanas: solo la
+// toca el usuario.
+function _horaDe(ts){ return ts ? new Date(ts).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : ''; }
+function actualizarBarraSesion(){
+  const bar=document.getElementById('sesion-bar');
+  const appVisible=document.getElementById('app').style.display==='block';
+  let txt='', btn='', aviso=false, accion=pedirToken;
+  if(appVisible){
+    const ahora=Date.now();
+    const sinToken=!accessToken || tokenExp<=ahora;
+    if(sinToken){
+      txt='Sesión vencida'; aviso=true;
+      // Solo la parte antes de la @: el mail entero no entra en una barra de 375 px
+      btn=emailGuardado ? 'Continuar como '+emailGuardado.split('@')[0] : 'Reconectar';
+    } else if(tokenExp-ahora<MARGEN_VENCE_MS){
+      const min=Math.max(1,Math.ceil((tokenExp-ahora)/60000));
+      txt=`Tu sesión vence en ${min} min`; aviso=true; btn='Renovar';
+    } else if(navigator.onLine===false){
+      txt='Sin conexión'+(cacheTs?` · datos del ${_horaDe(cacheTs)}`:''); aviso=true;
+    } else if(_actualizando){
+      txt='Actualizando…';
+    } else if(!datosFrescos && cacheTs){
+      // La actualización falló (no era falta de sesión ni de conexión): se sigue
+      // viendo la copia guardada, con los cambios bloqueados, hasta reintentar
+      txt=`Datos del ${_horaDe(cacheTs)} · sin actualizar`; aviso=true; btn='Reintentar';
+      accion=()=>cargarDatos({silencioso:true});
+    }
+  }
+  const visible=!!txt;
+  bar.style.display=visible?'flex':'none';
+  bar.classList.toggle('aviso',aviso);
+  document.body.classList.toggle('sesion-bar-on',visible);
+  document.getElementById('sesion-bar-txt').textContent=txt;
+  const b=document.getElementById('sesion-bar-btn');
+  b.style.display=btn?'':'none';
+  b.textContent=btn;
+  b.onclick=btn?accion:null;
+}
+
+// ── Login / renovación ──
+function _actualizarBotonLogin(){
+  const btn=document.getElementById('login-btn');
+  if(!btn) return;
+  if(!window._googleListo){ btn.disabled=true; btn.style.opacity='0.7'; btn.textContent='Cargando...'; return; }
+  btn.disabled=false; btn.style.opacity='1';
+  btn.textContent=emailGuardado ? 'Continuar como '+emailGuardado : 'Iniciar sesión con Google';
+}
+
+function iniciarSesion(){ pedirToken(); }
+
+// Pide un token a Google. Siempre se llama desde un toque del usuario (botón de
+// login o de la barra): con login_hint Google saltea el selector de cuentas y la
+// ventana aparece y se cierra sola.
+function pedirToken(){
   if(!window._googleListo){
     toast('Cargando Google... intentá de nuevo en un momento');
     return;
   }
-  tokenClient = google.accounts.oauth2.initTokenClient({
+  const cfg={
     client_id: CLIENT_ID,
     scope: SCOPES,
     prompt: '',
-    callback: async (resp) => {
-      if(resp.error) { toast('Error al iniciar sesión'); return; }
-      accessToken = resp.access_token;
-      // Renovar automáticamente 5 min antes de que expire (55 min)
-      setTimeout(renovarToken, 55 * 60 * 1000);
-      if(document.getElementById('login-screen').style.display!=='none'){
-        let email='';
-        try {
-          const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {headers:{Authorization:'Bearer '+accessToken}});
-          if(r.ok){
-            const u = await r.json();
-            email = u.email||'';
-          }
-        } catch(e){}
-        if(!ALLOWED_EMAILS.includes(email)){
-          google.accounts.oauth2.revoke(accessToken);
-          accessToken=null;
-          toast('Esta cuenta no está autorizada para acceder al panel');
-          return;
-        }
-        document.getElementById('user-email').textContent = email;
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('app').style.display='block';
-        await cargarDatos();
-        renderDashboard();
-        initMeses();
-        initNutriMeses();
-        initFinAnios();
-      }
+    callback: _alRecibirToken,
+    error_callback: (err)=>{
+      if(err && err.type==='popup_failed_to_open') toast('No se pudo abrir la ventana de Google');
     }
-  });
+  };
+  if(emailGuardado) cfg.login_hint=emailGuardado;
+  tokenClient=google.accounts.oauth2.initTokenClient(cfg);
   tokenClient.requestAccessToken({prompt:''});
 }
 
-function renovarToken(){
-  if(!tokenClient) return;
-  tokenClient.requestAccessToken({prompt:''});
-}
-
-async function fetchConRenovacion(url, opciones={}){
-  let r = await fetch(url, opciones);
-  if(r.status===401){
-    // Token expiró, renovar y reintentar
-    await new Promise(resolve=>{
-      const clientTemp = google.accounts.oauth2.initTokenClient({
-        client_id: CLIENT_ID,
-        scope: SCOPES,
-        prompt: '',
-        callback: async(resp)=>{
-          if(!resp.error){ accessToken=resp.access_token; }
-          resolve();
-        }
-      });
-      clientTemp.requestAccessToken({prompt:''});
-    });
-    // Actualizar header con nuevo token
-    if(opciones.headers) opciones.headers['Authorization']='Bearer '+accessToken;
-    r = await fetch(url, opciones);
+async function _alRecibirToken(resp){
+  if(resp.error){ toast('Error al iniciar sesión'); return; }
+  const token=resp.access_token;
+  // La cuenta se verifica cada vez que se obtiene un token nuevo. Un token
+  // restaurado de localStorage ya pasó esta verificación cuando se guardó.
+  let email='';
+  try {
+    const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {headers:{Authorization:'Bearer '+token}});
+    if(r.ok){ email=(await r.json()).email||''; }
+  } catch(e){}
+  if(!ALLOWED_EMAILS.includes(email)){
+    try{ google.accounts.oauth2.revoke(token); }catch(e){}
+    toast('Esta cuenta no está autorizada para acceder al panel');
+    return;
   }
+  const yaEnLaApp=document.getElementById('app').style.display==='block';
+  accessToken=token;
+  _authGuardar(token, resp.expires_in, email);
+  actualizarBarraSesion();
+  if(!yaEnLaApp){
+    await entrarALaApp(email);
+  } else {
+    document.getElementById('user-email').textContent=email;
+    // Estaba mirando la caché en modo lectura: ahora que hay permiso, actualizar
+    if(!datosFrescos) await cargarDatos({silencioso:true});
+  }
+}
+
+function _mostrarApp(email){
+  document.getElementById('user-email').textContent=email||'';
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  if(!_appIniciada){ initMeses(); initNutriMeses(); initFinAnios(); _appIniciada=true; }
+}
+
+// Se llama tras un login nuevo (token fresco, sin datos en pantalla todavía)
+async function entrarALaApp(email){
+  _mostrarApp(email);
+  await cargarDatos();
+}
+
+// Arranque del modo entrenador: manifiesto + service worker (solo acá) y
+// restauración de sesión y caché.
+function arrancarEntrenador(){
+  try{
+    const l=document.createElement('link'); l.rel='manifest'; l.href='manifest.webmanifest';
+    document.head.appendChild(l);
+    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }catch(e){}
+
+  const auth=_authLeer();
+  if(auth){ emailGuardado=auth.email; tokenExp=+auth.exp||0; }
+  const tokenVigente=!!(auth && tokenExp>Date.now());
+  if(tokenVigente) accessToken=auth.token;
+  const hayCache=_cacheRestaurar();
+
+  if(tokenVigente || hayCache){
+    // Entrar directo: sin pantalla de login. Con caché, el Resumen aparece ya.
+    _mostrarApp(emailGuardado);
+    if(hayCache){ renderTablaAlumnos(); renderDashboard(); }
+    if(tokenVigente){
+      if(navigator.onLine!==false) cargarDatos({silencioso:true});
+    }
+  }
+  const estiloSinLogin=document.getElementById('estilo-sin-login');
+  if(estiloSinLogin) estiloSinLogin.remove();   // si no se pudo entrar, el login se ve normal
+  _actualizarBotonLogin();
+  actualizarBarraSesion();
+
+  // La barra se recalcula al volver a la app, al cambiar la conexión y cada 30 s.
+  // Al pasar a segundo plano se guarda la copia con los cambios de esta sesión.
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden'){ if(datosFrescos) _cacheGuardar(); }
+    else actualizarBarraSesion();
+  });
+  window.addEventListener('online',()=>{
+    actualizarBarraSesion();
+    if(accessToken && tokenExp>Date.now() && !datosFrescos && !_actualizando) cargarDatos({silencioso:true});
+  });
+  window.addEventListener('offline',actualizarBarraSesion);
+  setInterval(actualizarBarraSesion,30000);
+}
+
+// Las llamadas a la API ya NO renuevan el token solas: abrir la ventana de
+// Google sin un toque del usuario lo bloquea Chrome. Si un 401 indica que el
+// permiso venció, se muestra la barra "Continuar como…" y la operación falla
+// con el toast de error de siempre (se repite después de reconectar).
+async function fetchConRenovacion(url, opciones={}){
+  actualizarBarraSesion();
+  const r=await fetch(url, opciones);
+  if(r.status===401){ _authInvalidar(); actualizarBarraSesion(); }
   return r;
 }
 
+// Chequeo único por tipo de escritura (Sheets y Calendar): mientras se está
+// mostrando la copia guardada, los cambios quedan bloqueados para no pisar
+// datos más nuevos con una versión vieja. La navegación no se frena.
+function _escrituraPermitida(){
+  if(datosFrescos) return true;
+  _ultimoBloqueo=Date.now();
+  _ultimoMsgBloqueo=_actualizando ? MSG_ESPERA : MSG_SIN_DATOS;
+  toast(_ultimoMsgBloqueo);
+  return false;
+}
+
 function cerrarSesion(){
-  if(accessToken) google.accounts.oauth2.revoke(accessToken);
-  accessToken=null;alumnos=[];cobros={};seguimiento={};
+  if(accessToken){ try{ google.accounts.oauth2.revoke(accessToken); }catch(e){} }
+  accessToken=null; tokenExp=0; emailGuardado=''; datosFrescos=false; cacheTs=0;
+  _lsDel(AUTH_KEY); _lsDel(CACHE_KEY);
+  alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];configFinanzas={saldoInicial:0,fechaReferencia:''};
   biblioteca=[];progresionActual=[];
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
+  _actualizarBotonLogin();
+  actualizarBarraSesion();
 }
 
 // ── SHEETS API ──
@@ -1868,6 +2070,7 @@ async function sheetsGet(range, unformatted=false){
 }
 
 async function sheetsUpdate(range, values){
+  if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}?valueInputOption=RAW`;
   const r=await fetchConRenovacion(url,{
     method:'PUT',
@@ -1879,6 +2082,7 @@ async function sheetsUpdate(range, values){
 }
 
 async function sheetsAppend(range, values){
+  if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
   const r=await fetchConRenovacion(url,{
     method:'POST',
@@ -1917,9 +2121,24 @@ async function sheetsReplaceRange(range, values){
 }
 
 // ── CARGAR DATOS ──
-async function cargarDatos(){
+async function cargarDatos(opts){
+  const silencioso=!!(opts && opts.silencioso);
+  if(_actualizando) return;
+  // Sin permiso vigente no se puede leer: la barra ofrece reconectar
+  if(!accessToken || tokenExp<=Date.now()){
+    actualizarBarraSesion();
+    if(!silencioso) toast('Tu sesión venció: tocá el botón de arriba para reconectar');
+    return;
+  }
+  // Foto del estado actual: si una lectura falla (sin conexión, 401…) se vuelve
+  // a esto en vez de dejar en blanco lo que ya se estaba mostrando (copia guardada).
+  const antes={alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual};
+  const habiaDatos=alumnos.length>0;
+  let fallo=false;
+  _actualizando=true;
+  actualizarBarraSesion();
   try {
-    toast('Sincronizando...');
+    if(!silencioso) toast('Sincronizando...');
 
     await Promise.all([
       // Alumnos
@@ -1949,7 +2168,7 @@ async function cargarDatos(){
             diaPago:      r[19]||'',
             mapeoUrl:     r[20]||'',
           })).filter(a=>a.id);
-        }catch(e){console.warn('Error cargando Alumnos:',e);alumnos=[];}
+        }catch(e){console.warn('Error cargando Alumnos:',e);fallo=true;alumnos=[];}
       })(),
 
       // Cobros
@@ -1962,7 +2181,7 @@ async function cargarDatos(){
             if(!cobros[r[0]]) cobros[r[0]]={};
             cobros[r[0]][r[1]]={estado:r[2]||'pendiente',fecha:r[3]||'',bono:r[4]||'',fechaBono:r[5]||'',monto:r[6]||''};
           });
-        }catch(e){console.warn('Error cargando Cobros:',e);cobros={};}
+        }catch(e){console.warn('Error cargando Cobros:',e);fallo=true;cobros={};}
       })(),
 
       // Seguimiento
@@ -1982,7 +2201,7 @@ async function cargarDatos(){
             if(!seguimiento[r[0]]) seguimiento[r[0]]=[];
             seguimiento[r[0]].push({fecha:r[1]||'',texto,id:r[3]||null,chips,origen});
           });
-        }catch(e){console.warn('Error cargando Seguimiento:',e);seguimiento={};}
+        }catch(e){console.warn('Error cargando Seguimiento:',e);fallo=true;seguimiento={};}
       })(),
 
       // Nutrición - Clientes
@@ -1992,7 +2211,7 @@ async function cargarDatos(){
           clientesNutri=rowsNC.map(r=>({
             id:r[0]||'',nombre:r[1]||'',telefono:r[2]||'',estado:r[3]||'activo',notas:r[4]||''
           })).filter(c=>c.id);
-        }catch(e){console.warn('Error cargando Nutricion:',e);clientesNutri=[];}
+        }catch(e){console.warn('Error cargando Nutricion:',e);fallo=true;clientesNutri=[];}
       })(),
 
       // Nutrición - Cobros
@@ -2005,7 +2224,7 @@ async function cargarDatos(){
             if(!cobrosNutri[r[0]]) cobrosNutri[r[0]]={};
             cobrosNutri[r[0]][r[1]]={monto:r[2]||'',fecha:r[3]||''};
           });
-        }catch(e){console.warn('Error cargando NutricionCobros:',e);cobrosNutri={};}
+        }catch(e){console.warn('Error cargando NutricionCobros:',e);fallo=true;cobrosNutri={};}
       })(),
 
       // Gastos
@@ -2013,7 +2232,7 @@ async function cargarDatos(){
         try{
           const rowsG = await sheetsGet(RANGO.GASTOS_READ);
           gastos=rowsG.map(r=>({id:r[0]||'',fecha:r[1]||'',desc:r[2]||'',monto:r[3]||'0'})).filter(g=>g.id);
-        }catch(e){console.warn('Error cargando Gastos:',e);gastos=[];}
+        }catch(e){console.warn('Error cargando Gastos:',e);fallo=true;gastos=[];}
       })(),
 
       // Config Finanzas (saldo inicial de ahorro — B7, ver handoff ahorros-finanzas)
@@ -2023,7 +2242,7 @@ async function cargarDatos(){
           const fila=rowsA2[0]||[];
           configFinanzas={saldoInicial:parseFloat(fila[0]||0),fechaReferencia:fila[1]||''};
         }catch(e){
-          console.warn('Error cargando config de Finanzas:',e);
+          console.warn('Error cargando config de Finanzas:',e);fallo=true;
           configFinanzas={saldoInicial:0,fechaReferencia:''};
           toast('⚠️ No se pudo leer el saldo inicial: '+e.message);
         }
@@ -2033,7 +2252,7 @@ async function cargarDatos(){
       (async()=>{
         try{
           asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
-        }catch(e){console.warn('Error cargando Asistencias:',e);asistencias=[];}
+        }catch(e){console.warn('Error cargando Asistencias:',e);fallo=true;asistencias=[];}
       })(),
 
       // Biblioteca de ejercicios
@@ -2056,16 +2275,44 @@ async function cargarDatos(){
       })(),
     ]);
 
-    toast('Datos sincronizados ✓');
-    renderTablaAlumnos();
-    renderDashboard();
-    if(document.getElementById('page-cobros').classList.contains('active')) renderCobrosPage();
-    if(document.getElementById('page-agenda').classList.contains('active')) renderAgenda();
-    if(document.getElementById('page-nutricion').classList.contains('active')) renderNutri();
-    if(document.getElementById('page-finanzas').classList.contains('active')) renderFinanzas();
+    if(fallo){
+      // Una lectura falló: si ya había datos en pantalla (la copia guardada), se
+      // conservan tal cual y no se da por actualizado ni se pisa la copia.
+      if(habiaDatos){
+        ({alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual}=antes);
+      }
+      toast(habiaDatos ? 'No se pudo actualizar. Mostrando los últimos datos guardados' : 'No se pudieron cargar los datos. Tocá Sincronizar para reintentar');
+    } else {
+      datosFrescos=true;
+      _cacheGuardar();
+      if(!silencioso) toast('Datos sincronizados ✓');
+    }
+    _actualizando=false;
+    actualizarBarraSesion();
+    _renderPaginaActual();
   } catch(e){
+    _actualizando=false;
+    actualizarBarraSesion();
     toast('Error al sincronizar');
     console.error(e);
+  }
+}
+
+// Vuelve a dibujar donde esté Luca (sin cambiar de página) tras actualizar los datos
+function _renderPaginaActual(){
+  renderTablaAlumnos();
+  renderDashboard();
+  if(document.getElementById('page-cobros').classList.contains('active')) renderCobrosPage();
+  if(document.getElementById('page-agenda').classList.contains('active')) renderAgenda();
+  if(document.getElementById('page-nutricion').classList.contains('active')) renderNutri();
+  if(document.getElementById('page-finanzas').classList.contains('active')) renderFinanzas();
+  const perfil=document.getElementById('page-perfil');
+  if(perfil.classList.contains('active') && perfil.dataset.alumnoId){
+    // La ficha reinicia sus campos al dibujarse: se conserva lo que Luca estaba tipeando
+    const txt=document.getElementById('perfil-nueva-entrada'), fecha=document.getElementById('perfil-nueva-fecha');
+    const guardado={txt:txt.value, fecha:fecha.value};
+    verAlumno(perfil.dataset.alumnoId);
+    txt.value=guardado.txt; fecha.value=guardado.fecha;
   }
 }
 
@@ -3576,6 +3823,7 @@ async function crearEventoCalendar(alumno, dia, horario){
     recurrence:rrule?[rrule]:[],
     extendedProperties:{private:{agendaLucaId:alumno.id, agendaLucaDia:dia}}
   };
+  if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   const r=await fetchConRenovacion(
     `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events`,
     {method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify(evento)}
@@ -3597,6 +3845,8 @@ async function eliminarEventosAlumno(alumnoId){
     eventos.push(...(data.items||[]));
     pageToken=data.nextPageToken||'';
   }while(pageToken);
+  // La lectura de arriba no se bloquea; borrar sí (es una escritura)
+  if(eventos.length && !_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   await Promise.all(eventos.map(async ev=>{
     await fetchConRenovacion(
       `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events/${ev.id}`,
@@ -4112,6 +4362,9 @@ const fmtFecha=d=>d.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
 // una corrida previa de esta misma función).
 async function asegurarDiaPago(alumno){
   if(alumno.diaPago) return alumno;
+  // Escritura automática al navegar: con la copia guardada en pantalla no se
+  // intenta (se hace después, cuando los datos estén actualizados).
+  if(!datosFrescos) return alumno;
   const pagos=_pagosDeAlumno(alumno.id);
   if(!pagos.length) return alumno;
   alumno.diaPago=String(pagos[0].getDate());
@@ -4488,6 +4741,10 @@ function stringToHorariosPorDia(str){
 // ── TOAST ──
 let toastTimer;
 function toast(msg){
+  // Si una escritura se bloqueó por datos sin actualizar, quien la llamó suele
+  // mostrar enseguida su propio "Error al guardar": ese toast genérico taparía
+  // el aviso real, así que se descarta durante un instante.
+  if(Date.now()-_ultimoBloqueo<600 && msg!==_ultimoMsgBloqueo) return;
   const el=document.getElementById('toast');
   el.textContent=msg;el.classList.add('show');
   clearTimeout(toastTimer);
