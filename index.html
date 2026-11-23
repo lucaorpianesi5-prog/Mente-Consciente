@@ -6,7 +6,7 @@
 <title>Mente Consciente</title>
 <link rel="icon" type="image/png" href="Logo_App.png"/>
 <link rel="apple-touch-icon" href="Logo_App.png"/>
-<meta name="theme-color" content="#111B16"/>
+<meta name="theme-color" content="#0B1310"/>
 <script>
 function scriptGoogleListo(){
   window._googleListo = true;
@@ -25,7 +25,7 @@ function scriptGoogleListo(){
   if(t!=='calma') t='nocturno';
   document.documentElement.dataset.tema=t;
   var m=document.querySelector('meta[name="theme-color"]');
-  if(m) m.content = t==='calma' ? '#EEF3F1' : '#13162A';
+  if(m) m.content = t==='calma' ? '#F5F5F0' : '#0B1310';
 })();
 </script>
 <style>
@@ -46,59 +46,56 @@ function scriptGoogleListo(){
   --barra:#0E1612; --tip-fin:#2A2318; --sobre-amber:#1F1608; --ok:#4AB870;
   --hueco:#0C140F; --lleno:#2A4231; --valor:#FFFFFF;
   --f1:#4A9CC7; --f2:#9B7FD4; --f3:#B8CC4E; --f4:#E8A84A; --f5:#D46FA0; --f-alpha:12%;
-  --velo1:rgba(8,16,11,0.55); --velo2:rgba(8,16,11,0.8);
 }
-/* ── NOCTURNO ── (oscuro, acento lavanda) */
+/* ── NOCTURNO ── (el logo tal cual: fondo verde-negro, verde hoja, dorado secundario) */
 html[data-tema="nocturno"]{
   color-scheme:dark;
-  --verde:#A7A3FF; --verde-s:#6E68E8; --verde-bg:rgba(167,163,255,0.10);
-  --marron:#F2C48D; --marron-s:#D9A86E;
-  --crema:#262B49; --crema-d:#1C2038;
-  --bg:#13162A; --blanco:#1C2038;
-  --texto:#E8E9F5; --suave:#A3A6C7; --texto3:#7A7EA3; --borde:rgba(167,163,255,0.12);
-  --rojo:#F27272; --rojo-bg:rgba(242,114,114,0.12);
-  --verde-ok:#5CD69A; --verde-ok-bg:rgba(92,214,154,0.12); --ok:#5CD69A;
-  --amarillo:#F2B45C; --amarillo-bg:rgba(242,180,92,0.12);
-  --sobre-acento:#15122E; --acento-hover:#B9B6FF; --barra:#0F1226; --tip-fin:#2C2442; --sobre-amber:#21170A;
-  --hueco:#0E1020; --lleno:#2E3160; --valor:#FFFFFF;
-  --f1:#62B2DE; --f2:#B39AEA; --f3:#B8CC4E; --f4:#F2B45C; --f5:#E688B6; --f-alpha:14%;
-  --velo1:rgba(11,13,24,0.55); --velo2:rgba(11,13,24,0.92);
+  --verde:#5BBE7E; --verde-s:#3E9A5E; --verde-bg:rgba(91,190,126,0.10);
+  --marron:#D9B074; --marron-s:#B8925A;
+  --crema:#19251F; --crema-d:#121C17;
+  --bg:#0B1310; --blanco:#121C17;
+  --texto:#ECF2EE; --suave:#9DB3A6; --texto3:#6F877A; --borde:rgba(140,200,160,0.09);
+  --rojo:#EF6B6B; --rojo-bg:rgba(239,107,107,0.12);
+  --verde-ok:#6CCB8A; --verde-ok-bg:rgba(108,203,138,0.12); --ok:#6CCB8A;
+  --amarillo:#F09A4A; --amarillo-bg:rgba(240,154,74,0.12);
+  --sobre-acento:#06100C; --acento-hover:#71CB90; --barra:#09110D; --tip-fin:#1E1A12; --sobre-amber:#1E1206;
+  --hueco:#070D0A; --lleno:#1D3326; --valor:#FFFFFF;
+  --f1:#62B2DE; --f2:#B39AEA; --f3:#C3D45A; --f4:#F2B45C; --f5:#E688B6; --f-alpha:14%;
 }
 html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno{
-  --pd-bg:#13162A; --pd-bg2:#1C2038; --pd-bg3:#262B49; --pd-card:#1C2038; --pd-card2:#262B49;
-  --pd-border:rgba(167,163,255,0.12); --pd-border2:rgba(167,163,255,0.24);
-  --pd-verde:#A7A3FF; --pd-verde-d:#6E68E8; --pd-verde-dim:rgba(167,163,255,0.12);
-  --pd-crema:#F2C48D; --pd-crema-dim:rgba(242,196,141,0.12);
-  --pd-text:#E8E9F5; --pd-text2:#A3A6C7; --pd-text3:#7A7EA3;
-  --pd-red:#F27272; --pd-red-dim:rgba(242,114,114,0.12); --pd-amber:#F2B45C;
-  --pd-ok:#5CD69A; --pd-sobre-acento:#15122E; --pd-acento-hover:#B9B6FF; --pd-barra:#0F1226; --pd-tip-fin:#2C2442; --pd-sobre-amber:#21170A;
-  --pd-hueco:#0E1020; --pd-lleno:#2E3160; --pd-valor:#FFFFFF;
+  --pd-bg:#0B1310; --pd-bg2:#121C17; --pd-bg3:#19251F; --pd-card:#121C17; --pd-card2:#19251F;
+  --pd-border:rgba(140,200,160,0.09); --pd-border2:rgba(140,200,160,0.16);
+  --pd-verde:#5BBE7E; --pd-verde-d:#3E9A5E; --pd-verde-dim:rgba(91,190,126,0.13);
+  --pd-crema:#D9B074; --pd-crema-dim:rgba(217,176,116,0.14);
+  --pd-text:#ECF2EE; --pd-text2:#9DB3A6; --pd-text3:#6F877A;
+  --pd-red:#EF6B6B; --pd-red-dim:rgba(239,107,107,0.12); --pd-amber:#F09A4A;
+  --pd-ok:#6CCB8A; --pd-sobre-acento:#06100C; --pd-acento-hover:#71CB90; --pd-barra:#09110D; --pd-tip-fin:#1E1A12; --pd-sobre-amber:#1E1206;
+  --pd-hueco:#070D0A; --pd-lleno:#1D3326; --pd-valor:#FFFFFF;
 }
-/* ── CALMA ── (claro, verde agua) */
+/* ── CALMA ── (el logo sobre papel: blanco cálido, verde hoja y dorado oscurecidos para que se lean) */
 html[data-tema="calma"]{
   color-scheme:light;
-  --verde:#0F7A6E; --verde-s:#0A5A51; --verde-bg:rgba(15,122,110,0.08);
-  --marron:#94622A; --marron-s:#7A4F1F;
-  --crema:#E3EBE8; --crema-d:#FFFFFF;
-  --bg:#EEF3F1; --blanco:#FFFFFF;
-  --texto:#13201D; --suave:#4B5E59; --texto3:#677A75; --borde:rgba(15,90,80,0.12);
-  --rojo:#B83A3A; --rojo-bg:rgba(184,58,58,0.08);
-  --verde-ok:#1A7A43; --verde-ok-bg:rgba(26,122,67,0.10); --ok:#1A7A43;
-  --amarillo:#9A5B00; --amarillo-bg:rgba(154,91,0,0.10);
-  --sobre-acento:#FFFFFF; --acento-hover:#0C6A60; --barra:#FFFFFF; --tip-fin:#E3EFEA; --sobre-amber:#FFFFFF;
-  --hueco:#E3EBE8; --lleno:#DDEEEA; --valor:#13201D;
-  --f1:#1F6FA8; --f2:#6E4FC2; --f3:#526A0A; --f4:#9A5B00; --f5:#B23E78; --f-alpha:10%;
-  --velo1:rgba(238,243,241,0.55); --velo2:rgba(238,243,241,0.96);
+  --verde:#2E7D4F; --verde-s:#1F5C3A; --verde-bg:rgba(46,125,79,0.08);
+  --marron:#9A6B1F; --marron-s:#7D5618;
+  --crema:#EEF0EA; --crema-d:#FFFFFF;
+  --bg:#F5F5F0; --blanco:#FFFFFF;
+  --texto:#14201A; --suave:#4D5E55; --texto3:#627166; --borde:rgba(20,50,35,0.08);
+  --rojo:#B23B3B; --rojo-bg:rgba(178,59,59,0.08);
+  --verde-ok:#23864B; --verde-ok-bg:rgba(35,134,75,0.10); --ok:#23864B;
+  --amarillo:#A8570A; --amarillo-bg:rgba(168,87,10,0.10);
+  --sobre-acento:#FFFFFF; --acento-hover:#256B42; --barra:#FFFFFF; --tip-fin:#F6EEDD; --sobre-amber:#FFFFFF;
+  --hueco:#EEF0EA; --lleno:#E3F0E7; --valor:#14201A;
+  --f1:#1F6FA8; --f2:#6E4FC2; --f3:#5A7A0A; --f4:#9A5B00; --f5:#B23E78; --f-alpha:10%;
 }
 html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno{
-  --pd-bg:#EEF3F1; --pd-bg2:#FFFFFF; --pd-bg3:#E3EBE8; --pd-card:#FFFFFF; --pd-card2:#E3EBE8;
-  --pd-border:rgba(15,90,80,0.12); --pd-border2:rgba(15,90,80,0.22);
-  --pd-verde:#0F7A6E; --pd-verde-d:#0A5A51; --pd-verde-dim:rgba(15,122,110,0.10);
-  --pd-crema:#94622A; --pd-crema-dim:rgba(148,98,42,0.10);
-  --pd-text:#13201D; --pd-text2:#4B5E59; --pd-text3:#677A75;
-  --pd-red:#B83A3A; --pd-red-dim:rgba(184,58,58,0.08); --pd-amber:#9A5B00;
-  --pd-ok:#1A7A43; --pd-sobre-acento:#FFFFFF; --pd-acento-hover:#0C6A60; --pd-barra:#FFFFFF; --pd-tip-fin:#E3EFEA; --pd-sobre-amber:#FFFFFF;
-  --pd-hueco:#E3EBE8; --pd-lleno:#DDEEEA; --pd-valor:#13201D;
+  --pd-bg:#F5F5F0; --pd-bg2:#FFFFFF; --pd-bg3:#EEF0EA; --pd-card:#FFFFFF; --pd-card2:#EEF0EA;
+  --pd-border:rgba(20,50,35,0.08); --pd-border2:rgba(20,50,35,0.15);
+  --pd-verde:#2E7D4F; --pd-verde-d:#1F5C3A; --pd-verde-dim:rgba(46,125,79,0.09);
+  --pd-crema:#9A6B1F; --pd-crema-dim:rgba(184,140,70,0.14);
+  --pd-text:#14201A; --pd-text2:#4D5E55; --pd-text3:#627166;
+  --pd-red:#B23B3B; --pd-red-dim:rgba(178,59,59,0.08); --pd-amber:#A8570A;
+  --pd-ok:#23864B; --pd-sobre-acento:#FFFFFF; --pd-acento-hover:#256B42; --pd-barra:#FFFFFF; --pd-tip-fin:#F6EEDD; --pd-sobre-amber:#FFFFFF;
+  --pd-hueco:#EEF0EA; --pd-lleno:#E3F0E7; --pd-valor:#14201A;
 }
 body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;line-height:1.5}
 
@@ -141,7 +138,7 @@ body.sesion-bar-on aside{top:34px;height:calc(100vh - 34px)}
 .shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 
 /* SIDEBAR */
-aside{background:var(--bg);color:var(--texto);padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid color-mix(in srgb,var(--verde) 10%,transparent)}
+aside{background:var(--bg);color:var(--texto);padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid var(--borde)}
 .logo{padding:0 1.5rem 1.5rem;border-bottom:1px solid color-mix(in srgb,var(--verde) 12%,transparent);margin-bottom:1rem}
 .logo h1{font-size:1.1rem;font-weight:600;color:var(--verde)}
 .logo p{font-size:0.72rem;color:var(--texto3);margin-top:0.2rem}
@@ -563,65 +560,6 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 }
 /* ── FIN FICHA REDISEÑADA ── */
 
-/* Fondo atmosférico + efecto vidrio — todo el escritorio, todas las páginas.
-   Imagen como archivo aparte (no base64): así el navegador no la descarga
-   en mobile, donde este media query no matchea. */
-@media (min-width: 769px){
-  .shell{
-    position: relative;
-    isolation: isolate;
-  }
-  /* Fondo en un pseudo-elemento fixed a pantalla completa (inset:0), en vez
-     de directo en .shell: así background-size:cover se calcula contra
-     el viewport, no contra la altura real del contenido (mucho mas alta,
-     con todas las cards) — evita el recorte extremo que dejaba franjas
-     planas sin textura detras del panel lateral. z-index:-1 lo manda detras
-     de todo el contenido normal (antes solo estaba en #page-perfil; ahora
-     vive en .shell para cubrir las 7 páginas de la app).
-     isolation:isolate en .shell es necesario: sin eso, este z-index:-1
-     escapa al stacking context raiz y el background solido de <body> lo tapa
-     por completo (bug real, encontrado al verificar en el rediseño de Perfil). */
-  .shell::before{
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    background-image:
-      linear-gradient(180deg, color-mix(in srgb,var(--bg) 55%,transparent), color-mix(in srgb,var(--bg) 78%,transparent)),
-      url('assets/fondo-perfil.webp');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-
-  /* Contenedores base transparentes para que se vea el fondo fijo detrás */
-  main{ background: transparent; }
-  aside{
-    background: color-mix(in srgb,var(--bg) 55%,transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-right-color: color-mix(in srgb,var(--verde) 18%,transparent);
-  }
-
-  /* Cards de todas las páginas — mismo tratamiento vidrio que ya tenía Perfil */
-  .stat, .table-wrap, .dia-col, .alumno-card, .cobro-row, .resumen-card,
-  .cobro-card, .kpi-card, .fin-card, .kpi-card-fin, .tendencia-card,
-  .lista-card, .resumen-semana-wrap, #page-perfil .pd-header-main, #page-perfil .pd-card{
-    background: color-mix(in srgb,var(--blanco) 55%,transparent);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-color: color-mix(in srgb,var(--verde) 18%,transparent);
-  }
-
-  /* Headers de tabla / columna resaltada — misma familia, tono base --crema */
-  th, .dia-header, tr.total td{
-    background: color-mix(in srgb,var(--crema) 55%,transparent);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-}
-
-/* ── FIN FONDO ATMOSFÉRICO DESKTOP ── */
 
 /* ALUMNOS CARDS MOBILE */
 #alumnos-cards{display:none;flex-direction:column;gap:0.6rem}
@@ -909,7 +847,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
     position:fixed;
     inset:0;
     z-index:0;
-    background:linear-gradient(180deg, var(--velo1) 0%, var(--velo2) 100%), url('portal-fondo.webp') top center/cover no-repeat;
+    background:radial-gradient(70% 40% at 50% 0%, var(--pd-crema-dim), transparent 70%);
     pointer-events:none;
   }
 }
@@ -2152,7 +2090,7 @@ function aplicarTema(t){
   document.documentElement.dataset.tema=t;
   _lsSet('mc_tema',t);
   const m=document.querySelector('meta[name="theme-color"]');
-  if(m) m.content=t==='calma'?'#EEF3F1':'#13162A';
+  if(m) m.content=t==='calma'?'#F5F5F0':'#0B1310';
   _sincronizarTemaUI();
 }
 function alternarTema(){ aplicarTema(document.documentElement.dataset.tema==='calma'?'nocturno':'calma'); }
