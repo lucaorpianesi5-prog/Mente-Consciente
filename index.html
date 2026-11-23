@@ -152,9 +152,14 @@ body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--te
 .email-estado{display:block;font-size:0.72rem;font-weight:600;margin-top:0.3rem}
 .email-estado.ok{color:var(--ok)}
 .email-estado.sin{color:var(--texto3)}
+/* Encabezado de página en el celu: logo + texto corto a la izquierda, tema a la derecha */
+.apphead-m{display:none}
+.apphead-m.sin{display:none!important}
+.apphead-m .marca{display:flex;align-items:center;gap:10px;font-size:0.86rem;font-weight:650}
+.apphead-m .marca img{width:30px;height:30px;border-radius:9px;object-fit:cover}
 /* Selector de tema: botón redondo en el Resumen (celu) y segmentado en la barra lateral (compu) */
 #page-dashboard .page-header{position:relative}
-.tema-btn{display:none;position:absolute;top:0;right:0;width:34px;height:34px;border-radius:50%;border:1px solid var(--borde);background:var(--crema);color:var(--texto);cursor:pointer;align-items:center;justify-content:center;font-size:1rem;font-family:inherit;padding:0}
+.tema-btn{display:flex;width:40px;height:40px;border-radius:12px;border:1px solid var(--borde);background:var(--blanco);color:var(--texto);cursor:pointer;align-items:center;justify-content:center;font-size:1rem;font-family:inherit;padding:0}
 .tema-seg{display:flex;gap:0.25rem;background:var(--verde-bg);border:1px solid var(--borde);border-radius:8px;padding:0.2rem}
 .tema-seg button{flex:1;border:none;background:transparent;color:var(--suave);padding:0.4rem 0.3rem;border-radius:6px;font-size:0.74rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
 .tema-seg button.on{background:var(--verde);color:var(--sobre-acento)}
@@ -778,6 +783,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .fab{display:none}
 @media(max-width:768px){
   /* ── Layout base ── */
+  .apphead-m{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
   .shell{grid-template-columns:1fr}
   aside{display:none}
   main{padding:1rem 0.85rem 5.5rem;background:var(--bg)}
@@ -794,7 +800,6 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   #page-dashboard .top-row{order:2}
   #page-dashboard .resumen-semana-wrap{order:1;margin-bottom:1rem}
   #page-dashboard .page-header{order:0}
-  .tema-btn{display:flex}
 
   /* ── Resumen: KPIs + financiero apilados, en una columna ── */
   .top-row{display:flex;flex-direction:column;gap:1.3rem}
@@ -824,13 +829,15 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   .form-grid{grid-template-columns:1fr}
 
   /* ── Barra inferior ── */
-  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--bg);z-index:150;border-top:1px solid color-mix(in srgb,var(--verde) 12%,transparent)}
-  .bottom-nav a{flex:1;display:flex;align-items:center;justify-content:center;padding:0.75rem 0.25rem;color:var(--texto3);text-decoration:none;cursor:pointer;transition:color 0.2s;border-top:2px solid transparent;margin-top:-1px}
-  .bottom-nav a svg{width:22px;height:22px}
-  .bottom-nav a.active{color:var(--verde);border-top-color:var(--verde)}
+  .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--barra);z-index:150;border-top:1px solid var(--borde);padding:6px 4px calc(14px + env(safe-area-inset-bottom))}
+  .bottom-nav a,.bottom-nav a:hover,.bottom-nav a.active{padding:0;border-left:none;background:none}
+  .bottom-nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:44px;color:var(--texto3);text-decoration:none;cursor:pointer;font-size:0.58rem;font-weight:600}
+  .bottom-nav a .pill{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px;transition:background 0.2s}
+  .bottom-nav a.active{color:var(--texto)}
+  .bottom-nav a.active .pill{background:color-mix(in srgb,var(--verde) 13%,transparent);color:var(--verde)}
 
   /* ── FAB ── */
-  .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:4.75rem;right:1.25rem;width:50px;height:50px;border-radius:50%;background:var(--verde);color:var(--sobre-acento);font-size:1.6rem;border:none;cursor:pointer;z-index:160;box-shadow:0 4px 16px rgba(0,0,0,0.4);transition:transform 0.2s}
+  .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:calc(5.5rem + env(safe-area-inset-bottom));right:18px;width:54px;height:54px;border-radius:17px;background:var(--verde);color:var(--sobre-acento);border:none;cursor:pointer;z-index:160;box-shadow:0 8px 20px color-mix(in srgb,var(--verde) 35%,transparent);transition:transform 0.2s}
   .fab:hover{transform:scale(1.08)}
 
   /* ── Toast por encima de la barra ── */
@@ -882,7 +889,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 }
 /* header simple: marca + saludo (vista propia del alumno, sin volver/kebab) */
 .portal-top{display:flex;flex-direction:column;gap:0.15rem;padding:0.2rem 0 0.3rem;position:relative}
-.tema-btn.portal-tema{display:flex;top:0;right:0;background:color-mix(in srgb,var(--pd-card) 80%,transparent);border-color:var(--pd-border2)}
+.tema-btn.portal-tema{position:absolute;top:0;right:0;background:color-mix(in srgb,var(--pd-card) 80%,transparent);border-color:var(--pd-border2)}
 .portal-salir{background:none;border:none;color:var(--pd-text2);font-family:inherit;font-size:0.68rem;cursor:pointer;text-decoration:underline;padding:0.4rem}
 .portal-brand{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem}
 .portal-brand img{height:22px;width:auto}
@@ -1119,12 +1126,15 @@ body.sesion-bar-on #plan-vista{top:34px}
 </aside>
 
 <main>
+  <div class="apphead-m" id="apphead-m">
+    <div class="marca"><img src="Logo_App.png" alt=""><span id="apphead-txt">Hola, Luca</span></div>
+    <button type="button" class="tema-btn" id="tema-btn" onclick="alternarTema()"></button>
+  </div>
   <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
     <div class="page-header">
       <h2>Resumen</h2>
       <p id="fecha-hoy"></p>
-      <button type="button" class="tema-btn" id="tema-btn" onclick="alternarTema()"></button>
     </div>
     <div class="top-row">
       <div class="kpi-row">
@@ -1422,22 +1432,22 @@ body.sesion-bar-on #plan-vista{top:34px}
 <!-- BOTTOM NAV MOBILE — solo íconos, 5 secciones -->
 <nav class="bottom-nav">
   <a class="active" id="bn-dashboard" onclick="showPage('dashboard',this);syncBottomNav('dashboard')" title="Resumen">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <span class="pill"><svg class="i"><use href="#i-home"/></svg></span>Resumen
   </a>
   <a id="bn-agenda" onclick="showPage('agenda',this);syncBottomNav('agenda')" title="Agenda">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    <span class="pill"><svg class="i"><use href="#i-cal"/></svg></span>Agenda
   </a>
   <a id="bn-alumnos" onclick="showPage('alumnos',this);syncBottomNav('alumnos')" title="Alumnos">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+    <span class="pill"><svg class="i"><use href="#i-users"/></svg></span>Alumnos
   </a>
   <a id="bn-cobros" onclick="showPage('cobros',this);syncBottomNav('cobros')" title="Cobros">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+    <span class="pill"><svg class="i"><use href="#i-cash"/></svg></span>Cobros
   </a>
   <a id="bn-nutricion" onclick="showPage('nutricion',this);syncBottomNav('nutricion')" title="Nutrición">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+    <span class="pill"><svg class="i"><use href="#i-leaf"/></svg></span>Nutrición
   </a>
 </nav>
-<button class="fab" onclick="abrirModalAlumno()">+</button>
+<button class="fab" onclick="abrirModalAlumno()" aria-label="Nuevo alumno"><svg class="i"><use href="#i-plus"/></svg></button>
 </div>
 
 <!-- POPUP RÁPIDO AGENDA -->
@@ -2728,6 +2738,8 @@ async function guardarCobroFila(mk, aid){
 
 // ── NAVEGACIÓN ──
 function showPage(id,el){
+  const _ah=document.getElementById('apphead-m');
+  if(_ah){ _ah.classList.toggle('sin',id==='perfil'); const _t=document.getElementById('apphead-txt'); if(_t) _t.textContent=({dashboard:'Hola, Luca',alumnos:'Alumnos',agenda:'Agenda',cobros:'Cobros',nutricion:'Nutrición',finanzas:'Finanzas'})[id]||''; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('aside nav a').forEach(a=>a.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
