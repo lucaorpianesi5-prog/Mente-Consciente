@@ -46,6 +46,7 @@ function scriptGoogleListo(){
   --barra:#0E1612; --tip-fin:#2A2318; --sobre-amber:#1F1608; --ok:#4AB870;
   --hueco:#0C140F; --lleno:#2A4231; --valor:#FFFFFF;
   --f1:#4A9CC7; --f2:#9B7FD4; --f3:#B8CC4E; --f4:#E8A84A; --f5:#D46FA0; --f-alpha:12%;
+  --sombra:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.25);
 }
 /* ── NOCTURNO ── (el logo tal cual: fondo verde-negro, verde hoja, dorado secundario) */
 html[data-tema="nocturno"]{
@@ -61,6 +62,7 @@ html[data-tema="nocturno"]{
   --sobre-acento:#06100C; --acento-hover:#71CB90; --barra:#09110D; --tip-fin:#1E1A12; --sobre-amber:#1E1206;
   --hueco:#070D0A; --lleno:#1D3326; --valor:#FFFFFF;
   --f1:#62B2DE; --f2:#B39AEA; --f3:#C3D45A; --f4:#F2B45C; --f5:#E688B6; --f-alpha:14%;
+  --sombra:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.25);
 }
 html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno{
   --pd-bg:#0B1310; --pd-bg2:#121C17; --pd-bg3:#19251F; --pd-card:#121C17; --pd-card2:#19251F;
@@ -86,6 +88,7 @@ html[data-tema="calma"]{
   --sobre-acento:#FFFFFF; --acento-hover:#256B42; --barra:#FFFFFF; --tip-fin:#F6EEDD; --sobre-amber:#FFFFFF;
   --hueco:#EEF0EA; --lleno:#E3F0E7; --valor:#14201A;
   --f1:#1F6FA8; --f2:#6E4FC2; --f3:#5A7A0A; --f4:#9A5B00; --f5:#B23E78; --f-alpha:10%;
+  --sombra:0 1px 2px rgba(20,40,30,.06),0 6px 20px rgba(20,40,30,.07);
 }
 html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno{
   --pd-bg:#F5F5F0; --pd-bg2:#FFFFFF; --pd-bg3:#EEF0EA; --pd-card:#FFFFFF; --pd-card2:#EEF0EA;
@@ -98,6 +101,32 @@ html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[
   --pd-hueco:#EEF0EA; --pd-lleno:#E3F0E7; --pd-valor:#14201A;
 }
 body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;line-height:1.5}
+
+.racha-icono{color:var(--pd-crema)}
+.racha-icono .i{width:26px;height:26px}
+/* ── B1 · Fundamentos del rediseño (handoff paleta-logo-y-sin-imagenes) ── */
+/* Escala tipográfica fija: 5 niveles en Sora. El nombre del alumno sigue en Georgia itálica. */
+.t-display{font-size:1.6rem;font-weight:700;letter-spacing:-0.02em;line-height:1.15}
+.t-title{font-size:1.02rem;font-weight:650;letter-spacing:-0.01em}
+.t-body{font-size:0.86rem;font-weight:500}
+.t-cap{font-size:0.74rem;color:var(--suave)}
+.t-label{font-size:0.62rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--texto3)}
+#perfil-dark .t-cap,#portal-alumno .t-cap,#plan-vista .t-cap{color:var(--pd-text2)}
+#perfil-dark .t-label,#portal-alumno .t-label,#plan-vista .t-label{color:var(--pd-text3)}
+.num{font-variant-numeric:tabular-nums}
+/* Íconos de línea: un solo set (sprite al inicio del body) */
+.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-4px}
+.i.s{width:16px;height:16px;vertical-align:-3px}
+.kebab-item .i,.jump-chip .i,.tema-seg button .i,.sugerencia-txt .i{margin-right:0.35rem}
+.kebab-item,.jump-chip{display:flex;align-items:center}
+.accion-circulo .i{width:22px;height:22px}
+.cobro-contacto .i,.wa-contacto .i,.tema-btn .i{width:18px;height:18px}
+.recup-icono .i{width:16px;height:16px}
+.dot-estado{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:0.35rem;vertical-align:1px;background:var(--texto3)}
+.dot-estado.rojo{background:var(--rojo)}.dot-estado.amarillo{background:var(--amarillo)}.dot-estado.verde{background:var(--ok)}
+/* Esqueletos de carga: silueta gris animada con la forma del contenido */
+.esq{border-radius:14px;background:linear-gradient(90deg,var(--blanco) 25%,var(--crema) 50%,var(--blanco) 75%);background-size:200% 100%;animation:esqAnim 1.2s linear infinite}
+@keyframes esqAnim{from{background-position:200% 0}to{background-position:-200% 0}}
 
 /* LOGIN */
 @keyframes loginFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -987,6 +1016,37 @@ body.sesion-bar-on #plan-vista{top:34px}
 </style>
 </head>
 <body>
+<!-- Íconos de línea (estilo Lucide, 24x24, trazo 1.8). Uso: <svg class="i"><use href="#i-nombre"/></svg> -->
+<svg style="display:none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-sol" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-luna" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M16 2.5v4M8 2.5v4M3 10h18"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20"/><circle cx="9.5" cy="7.5" r="3.5"/><path d="M21 20v-1.5a4 4 0 0 0-3-3.87M15.5 4.13a3.5 3.5 0 0 1 0 6.75"/></symbol>
+  <symbol id="i-cash" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.6"/><path d="M6 9.5v5M18 9.5v5"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-14 15-15-1 10-7 15-15 15z"/><path d="M5 19c3-4 6-6.5 9.5-8.5"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12C12 8 9.5 6 5 6c0 4 2.5 6 7 6z"/><path d="M12 14c0-3 2-5 7-5 0 3.500-2.500 5-7 5z"/></symbol>
+  <symbol id="i-tree" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M12 3 6 11h3l-4 6h14l-4-6h3z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2.5 19.5h19z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2 1.9 3.9 4 4.6l1.2-1.1 1.8.8-.3 1.7c-3.6.3-7.4-3.3-7.3-6.9l1.7-.3.8 1.8z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 10.5v6M14 10.5v6"/></symbol>
+  <symbol id="i-dumbbell" viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z"/><path d="M9 4v13.5M15 6.5V20"/></symbol>
+  <symbol id="i-apple" viewBox="0 0 24 24"><path d="M12 7c-1-2-4-2.5-5.5-.5C4.8 9 5.5 14 8 17.5c1.2 1.6 2.4 2 4 1.2 1.6.8 2.8.4 4-1.2 2.5-3.5 3.2-8.5 1.5-11-1.5-2-4.5-1.5-5.5.5z"/><path d="M12 7c0-2 1-3.5 3-4"/></symbol>
+  <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h16a3 3 0 1 1-3 3M3 16h8"/></symbol>
+  <symbol id="i-notebook" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 3v18M12.5 8h3M12.5 12h3"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+  <symbol id="i-dna" viewBox="0 0 24 24"><path d="M5 3c0 6 14 6 14 18M19 3c0 6-14 6-14 18M8 7h8M7 12h10M8 17h8"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8M7.5 8a2.500 2.500 0 1 1 4.500-1.500M16.500 8a2.500 2.500 0 1 0-4.500-1.500"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="18.5" r="1"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+</svg>
 
 <!-- Barra de sesión: "Actualizando…", sesión por vencer/vencida, sin conexión -->
 <div id="sesion-bar" style="display:none"><span id="sesion-bar-txt"></span><button type="button" id="sesion-bar-btn" style="display:none"></button></div>
@@ -998,7 +1058,7 @@ body.sesion-bar-on #plan-vista{top:34px}
   <p>Entrá con tu cuenta de Google para ver tu perfil.</p>
   <div id="login-aviso" class="login-aviso" style="display:none"></div>
   <button id="login-btn" onclick="iniciarSesion()" style="display:none"></button>
-  <div id="gsi-btn" class="gsi-btn"><span class="login-cargando">Cargando...</span></div>
+  <div id="gsi-btn" class="gsi-btn"><div class="esq" style="width:240px;height:44px;border-radius:22px"></div></div>
   <p class="login-sub">Usá el mail que le pasaste a tu entrenador.</p>
 </div>
 
@@ -1040,8 +1100,8 @@ body.sesion-bar-on #plan-vista{top:34px}
   </nav>
   <div class="sidebar-bottom">
     <div class="tema-seg" id="tema-seg" role="group" aria-label="Tema">
-      <button type="button" data-tema="nocturno" onclick="aplicarTema('nocturno')">🌙 Nocturno</button>
-      <button type="button" data-tema="calma" onclick="aplicarTema('calma')">☀ Calma</button>
+      <button type="button" data-tema="nocturno" onclick="aplicarTema('nocturno')"><svg class="i s"><use href="#i-luna"/></svg> Nocturno</button>
+      <button type="button" data-tema="calma" onclick="aplicarTema('calma')"><svg class="i s"><use href="#i-sol"/></svg> Calma</button>
     </div>
     <button class="sidebar-btn" onclick="sincronizarTodosCalendar()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -1221,10 +1281,10 @@ body.sesion-bar-on #plan-vista{top:34px}
           <div class="kebab-wrap">
             <button class="kebab-btn" onclick="document.getElementById('perfil-kebab-menu').classList.toggle('abierto')">⋮</button>
             <div class="kebab-menu" id="perfil-kebab-menu">
-              <button class="kebab-item" id="perfil-btn-editar">✏️ Editar datos</button>
-              <button class="kebab-item" onclick="copiarLinkPortal();document.getElementById('perfil-kebab-menu').classList.remove('abierto')">🔗 Copiar link del portal</button>
-              <button class="kebab-item" id="perfil-btn-invitar" style="display:none" onclick="enviarInvitacion();document.getElementById('perfil-kebab-menu').classList.remove('abierto')">💬 Enviar invitación</button>
-              <button class="kebab-item danger" id="perfil-btn-eliminar">🗑️ Eliminar alumno</button>
+              <button class="kebab-item" id="perfil-btn-editar"><svg class="i s"><use href="#i-edit"/></svg> Editar datos</button>
+              <button class="kebab-item" onclick="copiarLinkPortal();document.getElementById('perfil-kebab-menu').classList.remove('abierto')"><svg class="i s"><use href="#i-link"/></svg> Copiar link del portal</button>
+              <button class="kebab-item" id="perfil-btn-invitar" style="display:none" onclick="enviarInvitacion();document.getElementById('perfil-kebab-menu').classList.remove('abierto')"><svg class="i s"><use href="#i-wa"/></svg> Enviar invitación</button>
+              <button class="kebab-item danger" id="perfil-btn-eliminar"><svg class="i s"><use href="#i-trash"/></svg> Eliminar alumno</button>
             </div>
           </div>
         </div>
@@ -1242,8 +1302,8 @@ body.sesion-bar-on #plan-vista{top:34px}
               </div>
             </div>
             <div class="header-top-actions">
-              <button id="perfil-btn-cobro" class="cobro-contacto" title="Cobros">💰<span class="dot-adeudado" id="perfil-cobro-dot" style="display:none"></span></button>
-              <button id="perfil-btn-whatsapp" class="wa-contacto" style="display:none" title="Escribir por WhatsApp">💬</button>
+              <button id="perfil-btn-cobro" class="cobro-contacto" title="Cobros"><svg class="i"><use href="#i-cash"/></svg><span class="dot-adeudado" id="perfil-cobro-dot" style="display:none"></span></button>
+              <button id="perfil-btn-whatsapp" class="wa-contacto" style="display:none" title="Escribir por WhatsApp"><svg class="i"><use href="#i-wa"/></svg></button>
             </div>
           </div>
 
@@ -1253,7 +1313,7 @@ body.sesion-bar-on #plan-vista{top:34px}
           <div class="racha-row">
             <div id="perfil-racha-card" style="flex:1;min-width:0"></div>
             <button class="recup-chip" id="perfil-btn-recuperacion" title="Marcar recuperación de hoy">
-              <span class="recup-icono">🧘</span><span class="recup-label">Recuperación</span>
+              <span class="recup-icono"><svg class="i s"><use href="#i-wind"/></svg></span><span class="recup-label">Recuperación</span>
             </button>
           </div>
           <div class="asist-atajo" id="perfil-asist-atajo" style="display:none">
@@ -1263,33 +1323,31 @@ body.sesion-bar-on #plan-vista{top:34px}
 
           <div class="acciones-dinamicas">
             <button class="accion-circular" id="perfil-btn-drive" style="display:none">
-              <div class="accion-circulo drive">🏋️‍♀️</div><span class="accion-label">Fuerza</span>
+              <div class="accion-circulo drive"><svg class="i"><use href="#i-dumbbell"/></svg></div><span class="accion-label">Fuerza</span>
             </button>
             <button class="accion-circular" id="perfil-accion-biblioteca" style="display:none">
-              <div class="accion-circulo biblio">📚</div><span class="accion-label">Mapeo</span>
+              <div class="accion-circulo biblio"><svg class="i"><use href="#i-map"/></svg></div><span class="accion-label">Mapeo</span>
             </button>
             <button class="accion-circular" id="perfil-accion-nutri" onclick="showPage('nutricion',document.getElementById('bn-nutricion'));syncBottomNav('nutricion')">
-              <div class="accion-circulo nutri">🥗<span class="dot-activo" id="perfil-nutri-dot" style="display:none"></span></div><span class="accion-label">Nutri</span>
+              <div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg><span class="dot-activo" id="perfil-nutri-dot" style="display:none"></span></div><span class="accion-label">Nutri</span>
             </button>
           </div>
           <div class="hoy-toca" id="perfil-hoy-toca" style="display:none"></div>
         </div>
       </div>
 
-      <div class="separador-zona"><span>🌿</span></div>
 
       <!-- VITALES -->
       <div class="stats-principales" id="perfil-stats-principales"></div>
       <div class="stats-secundarios" id="perfil-stats-secundarios"></div>
 
-      <div class="separador-zona"><span>🌱</span></div>
 
       <!-- SALTO RÁPIDO -->
       <div class="jump-bar">
-        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-seguimiento')">📝 Seguimiento</button>
-        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-molestias')">⚠️ Molestias <span class="n" id="jump-n-molestias"></span></button>
-        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-objetivos')">🎯 Objetivos <span class="n ok" id="jump-n-objetivos"></span></button>
-        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-historial')">🧬 Historial</button>
+        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-seguimiento')"><svg class="i s"><use href="#i-notebook"/></svg> Seguimiento</button>
+        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-molestias')"><svg class="i s"><use href="#i-alert"/></svg> Molestias <span class="n" id="jump-n-molestias"></span></button>
+        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-objetivos')"><svg class="i s"><use href="#i-target"/></svg> Objetivos <span class="n ok" id="jump-n-objetivos"></span></button>
+        <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-historial')"><svg class="i s"><use href="#i-dna"/></svg> Historial</button>
       </div>
 
       <!-- SEGUIMIENTO -->
@@ -1627,6 +1685,9 @@ function _hoyISOLocal(){
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
+// Ícono de línea del sprite (ver <symbol id="i-…"> al inicio del body)
+const ic=(n,c='i')=>`<svg class="${c}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+
 function escaparHTML(str){
   if(!str) return '';
   return String(str)
@@ -1753,8 +1814,8 @@ async function cargarPortalAlumno(id){
   // Apertura instantánea: se pinta la última respuesta mientras se refresca. El portal
   // no escribe nada, así que no hace falta el guardia de datosFrescos.
   const cache=_portalCacheLeer(id);
-  if(cache){ try{ _pintarPortal(el,cache.data); }catch(e){ el.innerHTML='<div class="portal-loading">Cargando tu perfil...</div>'; } }
-  else el.innerHTML = '<div class="portal-loading">Cargando tu perfil...</div>';
+  if(cache){ try{ _pintarPortal(el,cache.data); }catch(e){ el.innerHTML='<div class="portal-wrap"><div class="esq" style="height:56px;width:60%"></div><div class="esq" style="height:170px"></div><div class="esq" style="height:130px"></div><div class="esq" style="height:90px"></div></div>'; } }
+  else el.innerHTML = '<div class="portal-wrap"><div class="esq" style="height:56px;width:60%"></div><div class="esq" style="height:170px"></div><div class="esq" style="height:130px"></div><div class="esq" style="height:90px"></div></div>';
   try {
     const res = await fetch(`${PORTAL_API_URL}?alumno=${encodeURIComponent(id)}`);
     if(!res.ok) throw new Error('Error al leer datos');
@@ -1834,13 +1895,13 @@ function _pintarPortal(el,data){
     }).join('');
 
     // Racha como componente informativo (el alumno no marca su propia asistencia)
-    const rachaIcono = racha>=30 ? '🌳' : racha>=7 ? '🌿' : '🌱';
+    const rachaIcono = racha>=30 ? '<svg class="i"><use href="#i-tree"/></svg>' : racha>=7 ? '<svg class="i"><use href="#i-leaf"/></svg>' : '<svg class="i"><use href="#i-sprout"/></svg>';
     const rachaTitulo = racha>=1 ? `${racha} día${racha!==1?'s':''} de constancia` : 'Sin racha activa';
     const rachaSiguiente = racha>=30
-      ? 'Constancia sostenida — ¡nivel máximo! 🌳'
-      : racha>=7 ? `${30-racha} días más para 🌳`
-      : racha>=1 ? `${7-racha} días más para 🌿`
-      : 'Tu próxima clase la reactiva 🌱';
+      ? 'Constancia sostenida — ¡nivel máximo!'
+      : racha>=7 ? `${30-racha} días más para el árbol`
+      : racha>=1 ? `${7-racha} días más para la hoja`
+      : 'Tu próxima clase la reactiva';
 
     // Vitales
     const edad = calcularEdad(a.fechaNac);
@@ -1917,7 +1978,7 @@ function _pintarPortal(el,data){
           </div>
 
           <div class="dias-pilares">${pilaresHTML}</div>
-          ${proximaLineaStr ? `<div class="proxima-linea">📅 Próxima sesión: ${escaparHTML(proximaLineaStr)}</div>` : ''}
+          ${proximaLineaStr ? `<div class="proxima-linea"><svg class="i s"><use href="#i-cal"/></svg> Próxima sesión: ${escaparHTML(proximaLineaStr)}</div>` : ''}
 
           <div class="racha-accion">
             <span class="racha-icono">${rachaIcono}</span>
@@ -1930,8 +1991,8 @@ function _pintarPortal(el,data){
           <!-- Materiales: botones circulares (Fuerza · Nutri) -->
           ${(a.carpetaDrive || a.nutriDrive) ? `
           <div class="acciones-dinamicas">
-            ${a.carpetaDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.carpetaDrive)}"><div class="accion-circulo drive">🏋️‍♀️</div><span class="accion-label">Fuerza</span></button>` : ''}
-            ${a.nutriDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.nutriDrive)}"><div class="accion-circulo nutri">🥗</div><span class="accion-label">Nutri</span></button>` : ''}
+            ${a.carpetaDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.carpetaDrive)}"><div class="accion-circulo drive"><svg class="i"><use href="#i-dumbbell"/></svg></div><span class="accion-label">Fuerza</span></button>` : ''}
+            ${a.nutriDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.nutriDrive)}"><div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg></div><span class="accion-label">Nutri</span></button>` : ''}
           </div>` : ''}
         </div>
 
@@ -1939,7 +2000,6 @@ function _pintarPortal(el,data){
 
         <!-- Vitales: principales (peso con tendencia + IMC) + secundarios -->
         ${hayVitales ? `
-        <div class="separador-zona"><span>🌱</span></div>
         <div class="stats-principales">
           <div class="stat-principal">
             <div class="stat-principal-label">Peso actual</div>
@@ -2079,7 +2139,7 @@ function _cacheRestaurar(){
 function _sincronizarTemaUI(){
   const t=document.documentElement.dataset.tema==='calma'?'calma':'nocturno';
   document.querySelectorAll('.tema-btn').forEach(b=>{       // Resumen del entrenador y portal del alumno
-    b.textContent=t==='calma'?'🌙':'☀️';
+    b.innerHTML=t==='calma'?ic('luna'):ic('sol');
     const msg=t==='calma'?'Cambiar a tema Nocturno':'Cambiar a tema Calma';
     b.title=msg; b.setAttribute('aria-label',msg);
   });
@@ -2527,7 +2587,7 @@ async function cargarDatos(opts){
         }catch(e){
           console.warn('Error cargando config de Finanzas:',e);fallo=true;
           configFinanzas={saldoInicial:0,fechaReferencia:''};
-          toast('⚠️ No se pudo leer el saldo inicial: '+e.message);
+          toast('No se pudo leer el saldo inicial: '+e.message);
         }
       })(),
 
@@ -3058,7 +3118,7 @@ function verAlumno(id){
   recuperacionBtn.disabled = yaRecuperacionHoy;
   recuperacionBtn.innerHTML = yaRecuperacionHoy
     ? '<span class="recup-icono">✓</span><span class="recup-label">Recuperado</span>'
-    : '<span class="recup-icono">🧘</span><span class="recup-label">Recuperación</span>';
+    : '<span class="recup-icono"><svg class="i s"><use href="#i-wind"/></svg></span><span class="recup-label">Recuperación</span>';
   recuperacionBtn.onclick=()=>marcarRecuperacionFicha(id);
 
   // Vitales: Peso/IMC protagonistas, Edad/Altura/Peso inicial secundarios
@@ -3194,9 +3254,9 @@ function renderRachaAccion(id){
   const registrosAlumno=asistencias.filter(r=>r[0]===id).map(r=>[r[1],r[2]]);
   const racha=calcularRachaSemanal(registrosAlumno);
   const yaHoy=asistencias.some(r=>r[0]===id && r[1]===fechaHoy && (!r[2]||r[2]==='asistencia'));
-  const icono=racha>=30?'🌳':racha>=7?'🌿':'🌱';
+  const icono=racha>=30?'<svg class="i"><use href="#i-tree"/></svg>':racha>=7?'<svg class="i"><use href="#i-leaf"/></svg>':'<svg class="i"><use href="#i-sprout"/></svg>';
   const siguiente=yaHoy
-    ?(racha>=30?'Constancia sostenida — nivel máximo':(racha>=7?(30-racha)+' días más para 🌳':(7-racha)+' días más para 🌿'))
+    ?(racha>=30?'Constancia sostenida — nivel máximo':(racha>=7?(30-racha)+' días más para el árbol':(7-racha)+' días más para la hoja'))
     :'Tocá para marcar asistencia de hoy →';
   document.getElementById('perfil-racha-card').innerHTML=`
     <div class="racha-accion${yaHoy?' confirmada':''}" id="perfil-racha-accion"${yaHoy?'':` onclick="marcarAsistenciaFicha('${id}')"`}>
@@ -3266,7 +3326,7 @@ async function marcarRecuperacionFicha(id){
   try{
     const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
     await _appendAsistencia(id, fecha, 'recuperacion');
-    toast('Recuperación registrada 🧘');
+    toast('Recuperación registrada');
     btn.innerHTML='<span class="recup-icono">✓</span><span class="recup-label">Recuperado</span>';
   }catch(e){
     toast('Error al registrar');
@@ -3421,7 +3481,7 @@ async function agregarEntradaPerfil(id){
 function mostrarSugerenciaMolestia(id){
   document.getElementById('perfil-seg-sugerencia').innerHTML=`
     <div class="sugerencia-banner">
-      <span class="sugerencia-txt">⚠️ Marcaste "Con molestias" — ¿la agregamos también a la card de Molestias?</span>
+      <span class="sugerencia-txt"><svg class="i s"><use href="#i-alert"/></svg> Marcaste "Con molestias" — ¿la agregamos también a la card de Molestias?</span>
       <div class="sugerencia-btns">
         <button class="btn-sugerencia-si" onclick="irYAbrirPerfil('body-perfil-molestias');document.getElementById('perfil-nueva-molestia').focus();document.getElementById('perfil-seg-sugerencia').innerHTML=''">Sí, agregar</button>
         <button class="btn-sugerencia-no" onclick="document.getElementById('perfil-seg-sugerencia').innerHTML=''">No, gracias</button>
@@ -3596,7 +3656,7 @@ function renderMolestias(id){
 
   const tipHtml=localStorage.getItem('mc_tip_molestias_visto') ? '' : `
     <div class="tip-card" id="tip-molestias">
-      <span class="tip-txt">💡 Marcá una molestia como resuelta en vez de borrarla, así no perdés el historial.</span>
+      <span class="tip-txt">Marcá una molestia como resuelta en vez de borrarla, así no perdés el historial.</span>
       <button type="button" class="tip-close" onclick="localStorage.setItem('mc_tip_molestias_visto','1');document.getElementById('tip-molestias').remove()">✕</button>
     </div>`;
 
@@ -4793,7 +4853,7 @@ async function renderVencimientos(){
 
   const ciclosTotal=vencidos.reduce((s,r)=>s+r.ciclosAdeudados,0);
 
-  // El "Día de pago" siempre es editable inline (✏️): el autocompletado toma
+  // El "Día de pago" siempre es editable inline (ícono de editar): el autocompletado toma
   // el día del PRIMER pago digitalizado, que puede no reflejar el ciclo real
   // si ese primer pago fue atípico (alta tardía, corrección puntual, etc.) —
   // solo Luca sabe cuál es el día correcto de cada alumno.
@@ -4819,7 +4879,7 @@ async function renderVencimientos(){
       <div class="venc-avatar ${color}">${escaparHTML(inicial)}</div>
       <div class="venc-info">
         <div class="venc-nombre">${escaparHTML(a.nombre)}</div>
-        <div class="venc-detalle">Día de pago: ${diaPagoTxt}<button type="button" class="venc-edit-dia" data-alumno-id="${escaparHTML(a.id)}" title="Corregir día de pago">✏️</button> · ${escaparHTML(resto)}</div>
+        <div class="venc-detalle">Día de pago: ${diaPagoTxt}<button type="button" class="venc-edit-dia" data-alumno-id="${escaparHTML(a.id)}" title="Corregir día de pago"><svg class="i s"><use href="#i-edit"/></svg></button> · ${escaparHTML(resto)}</div>
       </div>
       <span class="venc-badge ${color}">${escaparHTML(badge)}</span>
     </div>`;
@@ -4837,10 +4897,10 @@ async function renderVencimientos(){
       <div class="venc-resumen-item"><div class="venc-resumen-num amarillo">${vencenPronto.length}</div><div class="venc-resumen-label">Vencen pronto</div></div>
       <div class="venc-resumen-item"><div class="venc-resumen-num verde">${alDia.length}</div><div class="venc-resumen-label">Al día</div></div>
     </div>
-    ${seccion('Vencidos','🔴','rojo',vencidos)}
-    ${seccion('Vencen pronto','🟡','amarillo',vencenPronto)}
-    ${seccion('Al día','🟢','verde',alDia)}
-    ${sinFecha.length?seccion('Nuevos, sin fecha de cobro fijada','🆕','gris',sinFecha):''}
+    ${seccion('Vencidos','<i class="dot-estado rojo"></i>','rojo',vencidos)}
+    ${seccion('Vencen pronto','<i class="dot-estado amarillo"></i>','amarillo',vencenPronto)}
+    ${seccion('Al día','<i class="dot-estado verde"></i>','verde',alDia)}
+    ${sinFecha.length?seccion('Nuevos, sin fecha de cobro fijada','<i class="dot-estado"></i>','gris',sinFecha):''}
   `;
   document.getElementById('vencimientos-lista').querySelectorAll('.venc-edit-dia').forEach(btn=>{
     btn.addEventListener('click', ()=>editarDiaPagoVencimiento(btn.dataset.alumnoId));
@@ -4904,7 +4964,7 @@ function renderCobros(){
   function tarjetaCobro({a,c}){
     const esPagado=c.estado==='pagado';
     const bonoHtml=c.bono
-      ?`<span class="bono-existente">🎁 $${parseFloat(c.bono).toLocaleString('es-AR')} · ${c.fechaBono||''}</span>
+      ?`<span class="bono-existente"><svg class="i s"><use href="#i-gift"/></svg> $${parseFloat(c.bono).toLocaleString('es-AR')} · ${c.fechaBono||''}</span>
         <button class="btn btn-secondary btn-sm" data-bono="${escaparHTML(String(c.bono))}" onclick="editarBono('${mk}','${a.id}',this.dataset.bono)">Editar</button>
         <button class="btn btn-danger btn-sm" onclick="eliminarBono('${mk}','${a.id}')">×</button>`
       :`<span class="bono-chip" onclick="toggleBono(this)">+ Agregar bono</span>
@@ -4944,7 +5004,7 @@ function renderCobros(){
     <div class="cols">
       <div>
         <div class="seccion-label">Pendientes <span class="seccion-count">${pendientes.length}</span></div>
-        ${pendientes.length?pendientes.map(tarjetaCobro).join(''):'<p style="color:var(--suave);font-size:0.82rem">No hay pendientes 🎉</p>'}
+        ${pendientes.length?pendientes.map(tarjetaCobro).join(''):'<p style="color:var(--suave);font-size:0.82rem">No hay pendientes</p>'}
       </div>
       <div>
         <div class="seccion-label">Pagados <span class="seccion-count ok">${pagados.length}</span></div>
@@ -5416,7 +5476,7 @@ function planRenderTodo(){
     <div class="pv-body" id="pv-body"></div>
     <div class="pv-barra">
       ${v.prev?`<button type="button" class="pv-ba" data-pv="ir" data-id="${escaparHTML(v.prev.a.id)}"><span class="pv-ba-lbl">‹ Anterior</span><span class="pv-ba-nombre">${corto(v.prev)}</span></button>`:'<span class="pv-ba vacio"></span>'}
-      <button type="button" class="pv-lista-btn" data-pv="lista" aria-label="Lista de alumnos">☰</button>
+      <button type="button" class="pv-lista-btn" data-pv="lista" aria-label="Lista de alumnos"><svg class="i"><use href="#i-menu"/></svg></button>
       ${v.next?`<button type="button" class="pv-ba sig" data-pv="ir" data-id="${escaparHTML(v.next.a.id)}"><span class="pv-ba-lbl">${finde?'Siguiente · lunes':'Siguiente de hoy'} ›</span><span class="pv-ba-nombre">${corto(v.next)}</span></button>`:'<span class="pv-ba vacio"></span>'}
     </div>
   </div>`;
@@ -5580,7 +5640,7 @@ function planGuardarInput(inp){
   window.addEventListener('popstate',()=>{ if(_planAbierto) _planOcultar(); });
 })();
 
-// ☰: primero los de hoy, después todos con buscador. Pasar de alumno mantiene la vista (Fuerza o Mapeo)
+// Botón de lista: primero los de hoy, después todos con buscador. Pasar de alumno mantiene la vista (Fuerza o Mapeo)
 function _planAbrirLista(){
   const col=document.querySelector('#plan-vista .pv-col'); if(!col||document.getElementById('pv-lista')) return;
   const div=document.createElement('div'); div.className='pv-lista'; div.id='pv-lista';
