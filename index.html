@@ -1009,6 +1009,44 @@ body.sesion-bar-on #plan-vista{top:34px}
 .pv-sem.on.llena::after{background:var(--pd-sobre-acento)}
 .pv-body{flex:1;overflow-y:auto;padding:0.75rem 14px 1rem;display:flex;flex-direction:column;gap:0.55rem;-webkit-overflow-scrolling:touch}
 .pv-bloque{display:flex;align-items:center;gap:0.5rem;margin-top:0.35rem}
+/* Bloques del día como desplegables */
+.pv-blq{border:1px solid var(--pd-border);border-radius:14px;background:color-mix(in srgb,var(--pd-card) 55%,transparent);overflow:hidden;flex-shrink:0}
+.pv-blq.abierto{border-color:var(--pd-border2)}
+.pv-blq.completo{border-color:color-mix(in srgb,var(--pd-ok) 35%,transparent)}
+.pv-blq-head{width:100%;display:flex;align-items:center;gap:0.6rem;padding:0.75rem 0.8rem;min-height:56px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;color:var(--pd-text);-webkit-tap-highlight-color:transparent}
+.pv-blq-head:active{background:var(--pd-bg3)}
+.pv-blq-head .pv-letra{min-width:26px;height:26px;border-radius:8px;font-size:0.78rem;flex-shrink:0}
+.pv-blq.completo .pv-letra{background:var(--pd-ok);color:var(--pd-sobre-acento)}
+.pv-blq-tit{flex:1;min-width:0;display:flex;flex-direction:column;gap:0.1rem}
+.pv-blq-tit .pv-bnombre{font-size:0.74rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-blq-meta{font-size:0.68rem;color:var(--pd-text2)}
+.pv-blq-meta b{color:var(--pd-text);font-weight:700}
+.pv-blq.completo .pv-blq-meta b{color:var(--pd-ok)}
+.pv-blq-ok{display:none;color:var(--pd-ok);font-weight:800;font-size:0.9rem}
+.pv-blq.completo .pv-blq-ok{display:block}
+.pv-blq-chev{width:16px;height:16px;color:var(--pd-text3);transition:transform 0.22s;flex-shrink:0}
+.pv-blq.abierto .pv-blq-chev{transform:rotate(90deg)}
+.pv-blq-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows 0.24s ease}
+.pv-blq.abierto .pv-blq-body{grid-template-rows:1fr}
+.pv-blq-in{overflow:hidden;display:flex;flex-direction:column;gap:0.55rem;padding:0 0.55rem;visibility:hidden;transition:padding 0.24s ease,visibility 0s 0.24s}
+.pv-blq.abierto .pv-blq-in{padding:0 0.55rem 0.6rem;visibility:visible;transition:padding 0.24s ease}
+/* Cierre del día */
+.pv-fin{margin-top:0.4rem;display:flex;flex-direction:column;gap:0.45rem;align-items:stretch;flex-shrink:0}
+.pv-fin>small{font-size:0.68rem;color:var(--pd-text2);text-align:center;line-height:1.45}
+.pv-terminar{display:flex;align-items:center;justify-content:center;gap:0.55rem;min-height:52px;border-radius:14px;background:var(--pd-verde);color:var(--pd-sobre-acento);border:none;font-family:inherit;font-size:0.9rem;font-weight:800;cursor:pointer}
+.pv-terminar:active{transform:scale(0.98)}
+.pv-terminar:disabled{opacity:0.6}
+.pv-fin-check{width:24px;height:24px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:900;border:2px solid currentColor;flex-shrink:0}
+.pv-fin.hecho{background:var(--pd-verde-dim);border:1px solid color-mix(in srgb,var(--pd-ok) 35%,transparent);border-radius:14px;padding:0.8rem}
+.pv-fin.hecho .pv-fin-check{background:var(--pd-ok);color:var(--pd-sobre-acento);border-color:var(--pd-ok)}
+.pv-fin-tit{display:flex;align-items:center;gap:0.65rem;color:var(--pd-text)}
+.pv-fin-tit b{display:block;font-size:0.88rem}
+.pv-fin-tit small{display:block;font-size:0.7rem;color:var(--pd-text2);margin-top:0.1rem}
+.pv-fin-acc{display:flex;gap:0.5rem;margin-top:0.2rem}
+.pv-fin-ir{flex:1;min-height:40px;border-radius:10px;border:1px solid var(--pd-verde);background:transparent;color:var(--pd-verde);font-family:inherit;font-weight:700;font-size:0.8rem;cursor:pointer}
+.pv-fin-des{min-height:40px;padding:0 0.9rem;border-radius:10px;border:1px solid var(--pd-border2);background:transparent;color:var(--pd-text2);font-family:inherit;font-size:0.76rem;cursor:pointer}
+.pv-tab.hecho:not(.on){color:var(--pd-ok);border-color:color-mix(in srgb,var(--pd-ok) 40%,transparent)}
+.pv-sem.hecha:not(.on){color:var(--pd-ok);border-color:color-mix(in srgb,var(--pd-ok) 40%,transparent);font-weight:800}
 .pv-letra{min-width:20px;height:20px;padding:0 4px;border-radius:6px;background:var(--pd-crema);color:var(--pd-bg);font-size:0.66rem;font-weight:800;display:flex;align-items:center;justify-content:center}
 .pv-bnombre{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-crema);font-weight:700}
 .pv-ej{background:var(--pd-card);border:1px solid var(--pd-border);border-radius:12px;padding:0.65rem 0.7rem;display:flex;flex-direction:column;gap:0.45rem}
@@ -1812,7 +1850,8 @@ const RANGO = {
   // configuración: [SaldoInicialAhorro, FechaReferenciaSaldoInicial].
   CONFIG_FINANZAS_READ:  'Ahorros!A2:B2',
   CONFIG_FINANZAS_WRITE: 'Ahorros!A2:B2',
-  ASISTENCIAS_READ:    'Asistencias!A2:C1000',
+  // D = día del plan terminado ("Mes 2 · Día 1 · Semana 3"), vacío si la asistencia se marcó desde la ficha
+  ASISTENCIAS_READ:    'Asistencias!A2:D1000',
   ASISTENCIAS_START:   'Asistencias!A2',
   BIBLIOTECA_READ:     'Biblioteca!A2:D1000',
   BIBLIOTECA_START:    'Biblioteca!A2',
@@ -5452,6 +5491,8 @@ function renderMiPerfil(){
       </div>
       <div class="dias-pilares">${pilares}</div>
       ${prox?`<div class="proxima-linea"><svg class="i s"><use href="#i-cal"/></svg> Mi próximo entreno: ${escaparHTML(prox.txt.toLowerCase())}</div>`:''}
+      ${(()=>{ const r=calcularRachaSemanal(asistencias.filter(x=>x[0]===MI_ID).map(x=>[x[1],x[2]]));
+        return `<div class="racha-accion" style="cursor:default"><span class="racha-icono">${r>=30?ic('tree'):r>=7?ic('leaf'):ic('sprout')}</span><div class="racha-info"><div class="racha-dias">${r>=1?`${r} día${r!==1?'s':''} de constancia`:'Sin racha activa'}</div><div class="racha-siguiente">Se suma cada vez que tocás "Terminé el día" en tu Fuerza</div></div></div>`; })()}
 
       <div class="acciones-dinamicas">
         <button type="button" class="accion-circular" onclick="_yoAbrir('fuerza')"><div class="accion-circulo drive"><svg class="i"><use href="#i-dumbbell"/></svg></div><span class="accion-label">Fuerza</span></button>
@@ -5856,11 +5897,35 @@ function planSemanaDefault(datos,diaN){
   for(const s of datos.semanas){ if(ed.every(e=>!e.celdas[s.n-1].r.text)) return s.n; }
   return ult;
 }
+// ── Días terminados ("Terminé el día"): viven en Asistencias, columna D ──
+function _planDetalle(mes,dia,sem){ return `${mes} · Día ${dia} · Semana ${sem}`; }
+function _planHechos(alumnoId,mes){
+  const m=_normTxt(mes), out=[];
+  asistencias.forEach(r=>{
+    if(r[0]!==alumnoId || !r[3]) return;
+    const x=String(r[3]).match(/^(.*?)\s*·\s*D[ií]a (\d+)\s*·\s*Semana (\d+)/i);
+    if(x && _normTxt(x[1])===m) out.push({dia:+x[2],sem:+x[3],fecha:r[1]});
+  });
+  return out;
+}
+function _planHecho(alumnoId,mes,dia,sem){ return _planHechos(alumnoId,mes).find(h=>h.dia===dia&&h.sem===sem)||null; }
+// Lo que sigue después de un día: el próximo día de la misma semana, o el Día 1 de la siguiente
+function _planSiguiente(datos,dia,sem){
+  const di=datos.dias.findIndex(d=>d.n===dia), wi=datos.semanas.findIndex(w=>w.n===sem);
+  if(di>=0 && di<datos.dias.length-1) return {dia:datos.dias[di+1].n,sem};
+  if(wi>=0 && wi<datos.semanas.length-1) return {dia:datos.dias[0].n,sem:datos.semanas[wi+1].n};
+  return null;   // último día de la última semana: plan terminado
+}
 function _planSelDe(a,datos){
   let s=planSel[a.id];
   if(!s || !datos.dias.some(d=>d.n===s.dia) || !datos.semanas.some(w=>w.n===s.sem)){
-    const dia=planDiaDefault(a,datos);
-    s=planSel[a.id]={dia,sem:planSemanaDefault(datos,dia)};
+    // Con días terminados, la progresión manda: arranca en el que sigue al último terminado
+    const hechos=_planHechos(a.id,datos.mes);
+    const ult=hechos[hechos.length-1];
+    const sig=ult && datos.dias.some(d=>d.n===ult.dia) && datos.semanas.some(w=>w.n===ult.sem) ? _planSiguiente(datos,ult.dia,ult.sem) : null;
+    if(sig) s=planSel[a.id]={dia:sig.dia,sem:sig.sem};
+    else if(ult) s=planSel[a.id]={dia:ult.dia,sem:ult.sem};
+    else { const dia=planDiaDefault(a,datos); s=planSel[a.id]={dia,sem:planSemanaDefault(datos,dia)}; }
   }
   return s;
 }
@@ -5953,10 +6018,14 @@ function planRenderTodo(){
   let meta=esFuerza?'Fuerza':'Mapeo', extra='';
   if(ok && esFuerza){
     const sel=_planSelDe(a,e.datos), dia=e.datos.dias.find(d=>d.n===sel.dia);
-    meta=`Fuerza · ${e.datos.mes}`;
+    const hechosA=_planHechos(a.id,e.datos.mes);
+    const diaOk=(dn,sn)=>hechosA.some(h=>h.dia===dn&&h.sem===sn);
+    const semOk=sn=>e.datos.dias.every(d=>diaOk(d.n,sn));
+    const nHechosSem=e.datos.dias.filter(d=>diaOk(d.n,sel.sem)).length;
+    meta=`Fuerza · ${e.datos.mes} · Semana ${sel.sem}: ${nHechosSem}/${e.datos.dias.length} días`;
     const llena=s=>dia.ejercicios.some(x=>!x.fija && (x.celdas[s.n-1].r.text||x.celdas[s.n-1].rir.text||x.celdas[s.n-1].kg.text));
-    extra=`<div class="pv-tabs">${e.datos.dias.map(d=>`<button type="button" class="pv-tab${d.n===sel.dia?' on':''}" data-pv="dia" data-n="${d.n}">Día ${d.n}</button>`).join('')}</div>
-      <div class="pv-semanas"><span class="pv-semanas-lbl">Semana</span>${e.datos.semanas.map(s=>`<button type="button" class="pv-sem${s.n===sel.sem?' on':''}${llena(s)?' llena':''}" data-pv="sem" data-n="${s.n}">${s.n}</button>`).join('')}</div>`;
+    extra=`<div class="pv-tabs">${e.datos.dias.map(d=>`<button type="button" class="pv-tab${d.n===sel.dia?' on':''}${diaOk(d.n,sel.sem)?' hecho':''}" data-pv="dia" data-n="${d.n}">${diaOk(d.n,sel.sem)?'✓ ':''}Día ${d.n}</button>`).join('')}</div>
+      <div class="pv-semanas"><span class="pv-semanas-lbl">Semana</span>${e.datos.semanas.map(s=>`<button type="button" class="pv-sem${s.n===sel.sem?' on':''}${semOk(s.n)?' hecha':(llena(s)?' llena':'')}" data-pv="sem" data-n="${s.n}">${semOk(s.n)?'✓':s.n}</button>`).join('')}</div>`;
   } else if(ok){
     const tab=e.tabs&&e.tabs[e.sel];
     const barra=(e.tabs&&e.tabs.length>1)?`<div class="pv-hojas" id="pv-hojas">${e.tabs.map((t,i)=>`<button type="button" class="pv-hoja${i===e.sel?' on':''}" data-pv="hoja" data-i="${i}">${escaparHTML(t.title)}</button>`).join('')}</div>`:'';
@@ -6036,19 +6105,39 @@ function _pvCampo(cel,etq,inputmode,ph){
   const ro=cel.formula;
   return `<div class="pv-campo"><label>${etq}${ro?' <span class="pv-formula" title="Fórmula: solo lectura">ƒ</span>':''}</label><input type="text" inputmode="${inputmode}" data-fila="${cel.fila}" data-col="${cel.col}" data-orig="${escaparHTML(cel.text)}" value="${escaparHTML(cel.text)}" placeholder="${escaparHTML(ph||'—')}"${ro?' readonly':''} autocomplete="off"></div>`;
 }
+// Un ejercicio "cuenta" si es editable (no fijo); está cargado con R x 3S o KG de la semana
+function _pvEjCargado(c){ return !!(c.r.text||c.kg.text); }
 function _pvBodyFuerza(a,e){
   const d=e.datos, sel=_planSelDe(a,d);
   const dia=d.dias.find(x=>x.n===sel.dia)||d.dias[0];
   const idx=d.semanas.findIndex(s=>s.n===sel.sem), si=idx<0?0:idx;
-  let html='', bloqueAct=null;
+  // Agrupar por bloque (letra + nombre), respetando el orden de la planilla
+  const bloques=[];
   dia.ejercicios.forEach((ej,ei)=>{
     const k=ej.bloque+'|'+ej.letra;
-    if(k!==bloqueAct){ bloqueAct=k; html+=`<div class="pv-bloque"><span class="pv-letra">${escaparHTML(ej.letra)}</span><span class="pv-bnombre">${escaparHTML(ej.bloque)}</span></div>`; }
+    let b=bloques[bloques.length-1];
+    if(!b||b.k!==k){ b={k,letra:ej.letra,nombre:ej.bloque,items:[]}; bloques.push(b); }
+    b.items.push({ej,ei});
+  });
+  bloques.forEach(b=>{
+    const ed=b.items.filter(x=>!x.ej.fija);
+    b.total=ed.length; b.hechos=ed.filter(x=>_pvEjCargado(x.ej.celdas[si])).length;
+    b.completo=b.total>0 && b.hechos===b.total;
+  });
+  // Qué bloques están abiertos (por día y semana). La primera vez: el primero sin completar.
+  if(!planVista.bloques) planVista.bloques=new Map();
+  const clave=`${dia.n}-${sel.sem}`;
+  if(!planVista.bloques.has(clave)){
+    const primero=bloques.length===1?bloques[0]:bloques.find(b=>b.total&&!b.completo);
+    planVista.bloques.set(clave,new Set(primero?[primero.k]:[]));
+  }
+  const abiertos=planVista.bloques.get(clave);
+
+  const ejHTML=({ej,ei})=>{
     const c=ej.celdas[si];
     if(ej.fija && !planVista.expandidas.has(`${dia.n}-${ei}`)){
       const todas=ej.celdas.every(x=>x.r.text===ej.celdas[0].r.text);
-      html+=`<div class="pv-ej"><div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span></div><div class="pv-fija" data-pv="expandir" data-ei="${ei}">${todas?'Todas las semanas':'Semana '+sel.sem}: <b>${escaparHTML(c.r.text||'—')}</b></div></div>`;
-      return;
+      return `<div class="pv-ej"><div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span></div><div class="pv-fija" data-pv="expandir" data-ei="${ei}">${todas?'Todas las semanas':'Semana '+sel.sem}: <b>${escaparHTML(c.r.text||'—')}</b></div></div>`;
     }
     // Referencia: las 2 semanas anteriores con datos, y el Mapeo si el nombre coincide exacto
     const refs=[];
@@ -6062,14 +6151,129 @@ function _pvBodyFuerza(a,e){
     const prev=si>0?ej.celdas[si-1]:null;                       // solo para "= Sem N": el placeholder ya no repite la semana anterior
     const hayPrev=prev && (prev.r.text||prev.kg.text) && !c.r.formula && !c.kg.formula;
     const guardado=planVista.guardados.has('f'+ej.fila);
-    html+=`<div class="pv-ej${guardado?' guardado':''}" data-pvcard="${ei}">
+    return `<div class="pv-ej${guardado?' guardado':''}" data-pvcard="${ei}"${ej.fija?'':' data-cuenta="1"'}>
       <div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span><span class="pv-ej-estado">✓ Guardado</span></div>
       ${refs.length?`<div class="pv-ref">${refs.join('')}</div>`:''}
       <div class="pv-campos">${_pvCampo(c.r,'R x 3S','text','—')}${_pvCampo(c.rir,'RIR','numeric','—')}${_pvCampo(c.kg,'KG','decimal','—')}${hayPrev?`<button type="button" class="pv-igual" data-pv="igual" data-ei="${ei}">= Sem ${d.semanas[si-1].n}</button>`:'<span></span>'}</div>
       <div class="pv-ej-err"><span>No se guardó · </span><button type="button" data-pv="reintentar">reintentar</button></div>
     </div>`;
-  });
+  };
+
+  let html=bloques.map(b=>{
+    const ab=abiertos.has(b.k);
+    const meta=`${b.items.length} ejercicio${b.items.length!==1?'s':''}${b.total?` · <b>${b.hechos}/${b.total}</b> cargados`:''}`;
+    return `<div class="pv-blq${ab?' abierto':''}${b.completo?' completo':''}">
+      <button type="button" class="pv-blq-head" data-pv="bloque" data-k="${escaparHTML(b.k)}" aria-expanded="${ab}">
+        <span class="pv-letra">${escaparHTML(b.letra||'•')}</span>
+        <span class="pv-blq-tit"><span class="pv-bnombre">${escaparHTML(b.nombre||'Ejercicios')}</span><small class="pv-blq-meta">${meta}</small></span>
+        <span class="pv-blq-ok" aria-hidden="true">✓</span>
+        <svg class="i pv-blq-chev" aria-hidden="true"><use href="#i-chev"/></svg>
+      </button>
+      <div class="pv-blq-body"><div class="pv-blq-in">${b.items.map(ejHTML).join('')}</div></div>
+    </div>`;
+  }).join('');
+
+  // Cierre del día: suma a la constancia y deja lista la próxima sesión
+  const hecho=_planHecho(a.id,d.mes,dia.n,sel.sem);
+  const sig=_planSiguiente(d,dia.n,sel.sem);
+  const sigTxt=sig?`Día ${sig.dia} · Semana ${sig.sem}`:'';
+  if(hecho){
+    html+=`<div class="pv-fin hecho">
+      <div class="pv-fin-tit"><span class="pv-fin-check">✓</span><div><b>Día ${dia.n} · Semana ${sel.sem} terminado</b><small>${escaparHTML(hecho.fecha||'')}${sig?' · Próximo: '+sigTxt:' · ¡Plan del mes completo!'}</small></div></div>
+      <div class="pv-fin-acc">${sig?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button></div>
+    </div>`;
+  } else {
+    const pend=bloques.reduce((n,b)=>n+(b.total-b.hechos),0);
+    html+=`<div class="pv-fin">
+      <button type="button" class="pv-terminar" data-pv="terminar-dia"><span class="pv-fin-check">✓</span> Terminé el Día ${dia.n} · Semana ${sel.sem}</button>
+      <small>${pend?`Quedan ${pend} ejercicio${pend!==1?'s':''} sin cargar. `:''}Suma a la constancia${sig?` y la próxima sesión arranca en ${sigTxt}`:''}.</small>
+    </div>`;
+  }
   return html;
+}
+// Recalcula "x/y cargados" y el ✓ de un bloque después de guardar (sin redibujar todo)
+function _pvRefrescarBloque(blq){
+  const cards=[...blq.querySelectorAll('[data-pvcard][data-cuenta]')];
+  const hechos=cards.filter(c=>{ const i=c.querySelectorAll('input[data-fila]'); return !!((i[0]&&i[0].dataset.orig)||(i[2]&&i[2].dataset.orig)); }).length;
+  const b=blq.querySelector('.pv-blq-meta b'); if(b) b.textContent=`${hechos}/${cards.length}`;
+  blq.classList.toggle('completo',cards.length>0&&hechos===cards.length);
+}
+function _pvToggleBloque(btn){
+  const blq=btn.closest('.pv-blq'); if(!blq||!planVista) return;
+  const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,'fuerza'); if(!e||!e.datos) return;
+  const sel=_planSelDe(a,e.datos), set=planVista.bloques&&planVista.bloques.get(`${sel.dia}-${sel.sem}`);
+  const abrir=!blq.classList.contains('abierto');
+  blq.classList.toggle('abierto',abrir);
+  btn.setAttribute('aria-expanded',abrir);
+  if(set){ if(abrir) set.add(btn.dataset.k); else set.delete(btn.dataset.k); }
+  if(abrir) setTimeout(()=>{ const r=btn.getBoundingClientRect(), body=document.getElementById('pv-body'); if(body){ const br=body.getBoundingClientRect(); if(r.top<br.top||r.top>br.bottom-120) body.scrollTo({top:body.scrollTop+r.top-br.top-8,behavior:'smooth'}); } },60);
+}
+
+// "Terminé el día": registra la asistencia de hoy con el día del plan (columna D de Asistencias)
+const _fechaHoyAR=()=>new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+async function planTerminarDia(btn){
+  if(!planVista) return;
+  const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,'fuerza');
+  if(!e||e.estado!=='ok') return;
+  const d=e.datos, sel=_planSelDe(a,d);
+  if(_planHecho(a.id,d.mes,sel.dia,sel.sem)) return;
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();   // guarda lo último tipeado
+  const det=_planDetalle(d.mes,sel.dia,sel.sem), fecha=_fechaHoyAR();
+  const esAsist=r=>r[0]===a.id && r[1]===fecha && (!r[2]||r[2]==='asistencia');
+  btn.disabled=true;
+  try{
+    const iLocal=asistencias.findIndex(r=>esAsist(r)&&!r[3]);
+    let listo=false;
+    if(iLocal>=0){
+      // La asistencia de hoy ya estaba marcada (p. ej. desde la ficha): se le suma qué día fue
+      const filas=await sheetsGet('Asistencias!A2:D1000');
+      const k=filas.findIndex(r=>esAsist(r)&&!r[3]);
+      if(k>=0){ await sheetsUpdate(`Asistencias!D${k+2}`,[[det]]); asistencias[iLocal][3]=det; listo=true; }
+    }
+    if(!listo){
+      // Un segundo día terminado en la misma fecha se guarda como 'dia': no duplica la constancia
+      const tipo=asistencias.some(esAsist)?'dia':'asistencia';
+      await sheetsAppend(RANGO.ASISTENCIAS_START,[[a.id,fecha,tipo,det]]);
+      asistencias.push([a.id,fecha,tipo,det]);
+    }
+    _cacheGuardar();
+    const sig=_planSiguiente(d,sel.dia,sel.sem);
+    toast(sig?`¡Día ${sel.dia} terminado! Próximo: Día ${sig.dia} · Semana ${sig.sem}`:'¡Último día del mes terminado! 🎉');
+    planRenderTodo();
+    _planActualizarHoyToca(a.id);
+    _planTrasCambioAsistencia(a.id);
+  }catch(err){
+    console.warn('Terminar día:',err);
+    toast(_escrituraPermitida()?'No se pudo registrar el día':MSG_SIN_DATOS);
+    btn.disabled=false;
+  }
+}
+async function planDeshacerDia(btn){
+  if(!planVista) return;
+  const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,'fuerza');
+  if(!e||e.estado!=='ok') return;
+  const sel=_planSelDe(a,e.datos), det=_planDetalle(e.datos.mes,sel.dia,sel.sem);
+  btn.disabled=true;
+  try{
+    // Se borra solo la marca del día (columna D); la asistencia de esa fecha queda
+    const filas=await sheetsGet('Asistencias!A2:D1000');
+    let k=-1; filas.forEach((r,i)=>{ if(r[0]===a.id && r[3]===det) k=i; });
+    if(k>=0) await sheetsUpdate(`Asistencias!D${k+2}`,[['']]);
+    for(let i=asistencias.length-1;i>=0;i--){ if(asistencias[i][0]===a.id && asistencias[i][3]===det){ asistencias[i][3]=''; break; } }
+    _cacheGuardar();
+    toast('Listo, el día quedó sin terminar');
+    planRenderTodo();
+    _planActualizarHoyToca(a.id);
+  }catch(err){
+    toast(_escrituraPermitida()?'No se pudo deshacer':MSG_SIN_DATOS);
+    btn.disabled=false;
+  }
+}
+// Mantiene al día la racha visible (ficha del alumno o Mi perfil) después de terminar un día
+function _planTrasCambioAsistencia(id){
+  const pf=document.getElementById('page-perfil');
+  if(pf && pf.dataset.alumnoId===id && typeof renderRachaAccion==='function'){ try{ renderRachaAccion(id); }catch(e){} }
+  if(id===MI_ID && document.getElementById('page-yo').classList.contains('active')) renderMiPerfil();
 }
 function _pvBodyMapeo(a,e){
   const q=_normTxt(planVista.busqueda), enf=planVista.enfoque;
@@ -6118,7 +6322,7 @@ function planGuardarInput(inp){
       await _planEscribir(e,cel,nuevo);
       cel.text=nuevo; inp.dataset.orig=nuevo;
       if(planVista) planVista.guardados.add(clave);
-      if(card && card.isConnected){ card.classList.remove('error'); card.classList.add('guardado'); }
+      if(card && card.isConnected){ card.classList.remove('error'); card.classList.add('guardado'); const blq=card.closest('.pv-blq'); if(blq) _pvRefrescarBloque(blq); }
     }catch(err){
       // El valor tipeado NO se pierde: queda en el campo y se puede reintentar
       if(card && card.isConnected){
@@ -6147,6 +6351,10 @@ function planGuardarInput(inp){
     switch(el.dataset.pv){
       case 'cerrar': cerrarPlan(); break;
       case 'hoja': _planIrPestana(+el.dataset.i); break;
+      case 'bloque': _pvToggleBloque(el); break;
+      case 'terminar-dia': planTerminarDia(el); break;
+      case 'deshacer-dia': planDeshacerDia(el); break;
+      case 'ir-prox': { const sel=planSel[a.id], sig=sel&&_planSiguiente(e.datos,sel.dia,sel.sem); if(sig){ sel.dia=sig.dia; sel.sem=sig.sem; planVista.expandidas=new Set(); planRenderTodo(); const b=document.getElementById('pv-body'); if(b) b.scrollTop=0; } break; }
       case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; s.sem=planSemanaDefault(e.datos,s.dia); planVista.expandidas=new Set(); planRenderTodo(); break; }
       case 'sem': planSel[a.id].sem=+el.dataset.n; planRenderTodo(); break;
       case 'enfoque': planVista.enfoque=el.dataset.e||''; planRenderTodo(); break;
