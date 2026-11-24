@@ -653,6 +653,14 @@ button.yo-dato.peligro .i{color:var(--pd-red)}
 .yo-editar .i{width:16px;height:16px}
 .yo-aviso{font-size:0.74rem;color:var(--pd-text2);text-align:center;padding:0.3rem 0.5rem}
 .yo-aviso a{color:var(--pd-verde);font-weight:600;cursor:pointer}
+/* Instalar como app */
+.instalar-sub{font-size:0.86rem;color:var(--suave);line-height:1.5;margin-bottom:1rem}
+.instalar-pasos{list-style:none;display:flex;flex-direction:column;gap:0.7rem;padding:0;margin:0}
+.instalar-pasos li{display:flex;gap:0.7rem;align-items:flex-start;font-size:0.88rem;line-height:1.45;color:var(--texto)}
+.instalar-pasos li span{width:24px;height:24px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:0.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.instalar-aviso{font-size:0.76rem;color:var(--suave);margin-top:1rem;line-height:1.45}
+button.yo-dato.destacado{color:var(--pd-verde);font-weight:600}
+button.yo-dato.destacado .i{color:var(--pd-verde)}
 .mes-selector{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
 .mes-selector select{padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:var(--crema);color:var(--texto)}
 .cobros-lista{display:flex;flex-direction:column;gap:0.75rem}
@@ -1168,6 +1176,7 @@ body.sesion-bar-on #plan-vista{top:34px}
   <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/></symbol>
   <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></symbol>
   <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></symbol>
   <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
 </svg>
 
@@ -1222,6 +1231,10 @@ body.sesion-bar-on #plan-vista{top:34px}
     </a>
   </nav>
   <div class="sidebar-bottom">
+    <button class="sidebar-btn" id="sb-instalar" onclick="abrirInstalar()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>
+      Instalar app
+    </button>
     <div class="tema-seg" id="tema-seg" role="group" aria-label="Tema">
       <button type="button" data-tema="nocturno" onclick="aplicarTema('nocturno')"><svg class="i s"><use href="#i-luna"/></svg> Nocturno</button>
       <button type="button" data-tema="calma" onclick="aplicarTema('calma')"><svg class="i s"><use href="#i-sol"/></svg> Calma</button>
@@ -1747,6 +1760,18 @@ body.sesion-bar-on #plan-vista{top:34px}
 <!-- PORTAL PÚBLICO ALUMNO -->
 <div id="portal-alumno" style="display:none"></div>
 
+<!-- INSTALAR COMO APP -->
+<div class="overlay" id="modal-instalar">
+  <div class="modal" style="width:min(420px,95vw)">
+    <div class="modal-header">
+      <h3>Instalar Mente Consciente</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-instalar')">&times;</button>
+    </div>
+    <div class="modal-body" id="instalar-cuerpo"></div>
+    <div class="modal-footer"><button class="btn btn-primary" onclick="cerrarModal('modal-instalar')">Entendido</button></div>
+  </div>
+</div>
+
 <!-- MODAL MI PERFIL (entrenador) -->
 <div class="overlay" id="modal-mi-perfil">
   <div class="modal">
@@ -1974,11 +1999,45 @@ function _modoPortalCSS(){
 // Manifiesto y service worker en TODOS los modos: con mc_alumno el token ya no
 // depende de la URL, así que la app instalada de un alumno abre su portal.
 function _registrarPWA(){
+  _pintarInstalar();
   try{
     const l=document.createElement('link'); l.rel='manifest'; l.href='manifest.webmanifest';
     document.head.appendChild(l);
     if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
   }catch(e){}
+}
+
+// ── Instalar como app (igual que Profe Virtual) ──
+// Chrome/Edge en Android y compu ofrecen su propio diálogo (beforeinstallprompt);
+// en iPhone/iPad solo Safari instala, desde Compartir → Agregar a inicio.
+const _esStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+let _instalarEvt=null;
+addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); _instalarEvt=e; });
+addEventListener('appinstalled',()=>{
+  _instalarEvt=null;
+  try{ toast('App instalada ✓ Abrila desde su ícono'); }catch(e){}
+  _pintarInstalar();
+});
+function _pintarInstalar(){
+  const sb=document.getElementById('sb-instalar'); if(sb) sb.style.display=_esStandalone()?'none':'';
+  const pg=document.getElementById('page-yo'); if(pg && pg.classList.contains('active')) renderMiPerfil();
+}
+function abrirInstalar(){
+  if(_esStandalone()){ toast('Ya estás usando la app instalada'); return; }
+  if(_instalarEvt){ const e=_instalarEvt; _instalarEvt=null; e.prompt(); return; }
+  const ua=navigator.userAgent, ios=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const otroNavIos=/CriOS|FxiOS|EdgiOS/.test(ua);
+  const pasos=ios
+    ?['Abrí esta página en <b>Safari</b>.','Tocá <b>Compartir</b> (el cuadrado con la flecha hacia arriba).','Elegí <b>Agregar a inicio</b> y después <b>Agregar</b>.']
+    :/Android/.test(ua)
+      ?['Abrí el menú <b>⋮</b> de Chrome (arriba a la derecha).','Tocá <b>Instalar app</b> (o <b>Agregar a la pantalla principal</b> → <b>Instalar</b>).','Abrí Mente Consciente desde el ícono nuevo, no desde Chrome.']
+      :['Buscá el ícono de <b>instalar</b> a la derecha de la barra de direcciones.','O abrí el menú del navegador y elegí <b>Instalar Mente Consciente</b>.','En Safari de Mac: <b>Archivo → Agregar al Dock</b>.'];
+  document.getElementById('instalar-cuerpo').innerHTML=`
+    <p class="instalar-sub">Queda con su propio ícono, se abre a pantalla completa (sin la barra del navegador) y abre al instante aunque no haya señal.</p>
+    <ol class="instalar-pasos">${pasos.map((t,k)=>`<li><span>${k+1}</span><div>${t}</div></li>`).join('')}</ol>
+    ${ios&&otroNavIos?'<p class="instalar-aviso">En iPhone y iPad solo Safari puede instalar apps web: copiá el link y abrilo en Safari.</p>':''}
+    ${/Android/.test(ua)?'<p class="instalar-aviso">Si no aparece "Instalar app", recargá la página una vez y volvé a probar.</p>':''}`;
+  document.getElementById('modal-instalar').classList.add('open');
 }
 
 // "Salir" del portal: borra lo del alumno (no el tema), saca el token de la URL
@@ -2215,7 +2274,7 @@ function _pintarPortal(el,data){
           <p class="portal-frase-texto">${frase}</p>
         </div>
 
-        <p class="portal-footer">Tu entrenador personal · Mente Consciente<br><button type="button" class="portal-salir" onclick="_portalSalir()">Salir</button></p>
+        <p class="portal-footer">Tu entrenador personal · Mente Consciente<br>${_esStandalone()?'':'<button type="button" class="portal-salir" onclick="abrirInstalar()">Instalar como app</button> · '}<button type="button" class="portal-salir" onclick="_portalSalir()">Salir</button></p>
       </div>
     `;
     el.querySelectorAll('[data-open-url]').forEach(btn=>{
@@ -5538,6 +5597,7 @@ function renderMiPerfil(){
 
     <div class="yo-card">
       <div class="yo-card-tit">Gestión</div>
+      ${_esStandalone()?'':`<button type="button" class="yo-dato destacado" onclick="abrirInstalar()">${ic('download')}<span>Instalar como app</span>${ic('chev','i chev')}</button>`}
       <button type="button" class="yo-dato" onclick="showPage('finanzas')">${ic('chart')}<span>Finanzas</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="cargarDatos()">${ic('sync')}<span>Sincronizar datos</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="sincronizarTodosCalendar()">${ic('cal')}<span>Exportar a Calendar</span>${ic('chev','i chev')}</button>

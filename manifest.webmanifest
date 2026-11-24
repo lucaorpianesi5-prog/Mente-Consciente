@@ -1,5 +1,7 @@
 {
+  "id": "./?app=1",
   "name": "Mente Consciente",
+  "description": "Entrenamiento personal: alumnos, agenda, cobros y planes de fuerza.",
   "short_name": "Mente C.",
   "start_url": "./?app=1",
   "scope": "./",
