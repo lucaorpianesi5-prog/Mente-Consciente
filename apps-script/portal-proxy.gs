@@ -11,6 +11,10 @@
 //      planilla de Fuerza o de Mapeo de ESE alumno (ver planPortal_()).
 //      Asistencias suma la columna D (día del plan terminado).
 //   El login con Google queda exactamente igual.
+// Cambios de la auditoría del 24/11 (marcados con [aud 24/11]):
+//   4. Un alumno "inactivo" ya no ve NADA del portal: doGet responde not_found
+//      (el portal borra la sesión y vuelve al login) y el login con Google
+//      responde 'inactivo' en vez de entregar el token.
 // ═══════════════════════════════════════════════════════════════════════
 
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
@@ -57,6 +61,8 @@ function doGet(e) {
     if (!fila) {
       return _jsonOut({ error: 'not_found' });
     }
+    // [aud 24/11] Inactivo: como si no existiera (no se cachea)
+    if (String(fila[8]).trim() === 'inactivo') return _jsonOut({ error: 'not_found' });
     const id = fila[0]; // ID real — solo se usa puertas adentro, nunca se devuelve al cliente
 
     // Solo los campos que el portal muestra — nada de teléfono, notas
@@ -178,6 +184,7 @@ function doPost(e) {
     // Sin token no hay a dónde mandarlo: la app lo genera al guardar el mail.
     const fila = filas.find(f => String(f[21] || '').trim().toLowerCase() === email && f[18]);
     if (!fila) return _jsonOut({ error: 'no_habilitado' });
+    if (String(fila[8]).trim() === 'inactivo') return _jsonOut({ error: 'inactivo' });   // [aud 24/11]
 
     return _jsonOut({ token: String(fila[18]) });
   } catch (err) {

@@ -3033,6 +3033,9 @@ async function _alIniciarConGoogle(resp){
       try{ localStorage.setItem('mc_alumno',JSON.stringify({token:d.token,email})); }catch(e){}
       _modoPortalCSS();
       cargarPortalAlumno(d.token);
+    } else if(d && d.error==='inactivo'){
+      try{ google.accounts.id.disableAutoSelect(); }catch(e){}
+      _loginAviso('<b>Tu perfil está inactivo</b><br>Si querés volver a entrenar, escribile a tu entrenador.');
     } else if(d && d.error==='no_habilitado'){
       try{ google.accounts.id.disableAutoSelect(); }catch(e){}   // para poder probar con otra cuenta
       _loginAviso(`<b>Este mail todavía no está habilitado</b><br>${escaparHTML(email)} no figura en la lista. Pedile a tu entrenador que lo agregue a tu perfil y volvé a intentar.`);
@@ -3907,6 +3910,39 @@ function pdBadge(estado){
   if(estado==='activo') return `<span class="pd-badge-activo">Activo</span>`;
   if(estado==='pausado') return `<span class="pd-badge-pausado">Pausado</span>`;
   return `<span class="pd-badge-inactivo">Inactivo</span>`;
+}
+
+// Auditoría 24/11: cambia el código secreto (columna S) de TODOS los alumnos que
+// tienen uno. Los links viejos y las sesiones abiertas dejan de valer: el alumno
+// vuelve a entrar con "Continuar con Google" (el proxy le da el código nuevo).
+// Se escribe solo la celda S de cada fila, todo en un pedido (values:batchUpdate).
+async function renovarAccesosPortal(){
+  if(!_escrituraPermitida()) return;
+  const conToken=alumnos.filter(a=>a.portalToken);
+  if(!conToken.length){ toast('Ningún alumno tiene acceso al portal todavía'); return; }
+  if(!confirm(`Se renuevan los accesos de ${conToken.length} alumno${conToken.length===1?'':'s'}.\n\nLos links viejos dejan de funcionar y cada alumno tiene que volver a entrar con "Continuar con Google" (puede tardar hasta 5 minutos en aplicarse).\n\n¿Seguimos?`)) return;
+  try{
+    const colA=await sheetsGet(RANGO.ALUMNOS_ID_COL);
+    const nuevos=[], data=[];
+    conToken.forEach(a=>{
+      const idx=colA.findIndex(r=>r[0]===a.id); if(idx===-1) return;
+      const tok=crypto.randomUUID();
+      nuevos.push([a,tok]); data.push({range:`Alumnos!S${idx+2}`,majorDimension:'ROWS',values:[[tok]]});
+    });
+    if(!data.length){ toast('No se encontraron los alumnos en la planilla'); return; }
+    if(!_escrituraPermitida()) return;
+    const r=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchUpdate`,{
+      method:'POST',
+      headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({valueInputOption:'RAW',data})
+    });
+    if(!r.ok) throw new Error('Error guardando en Sheets');
+    nuevos.forEach(([a,tok])=>{ a.portalToken=tok; if(_alumnoBase[a.id]) _alumnoBase[a.id][18]=tok; });
+    _cacheGuardar();
+    toast(`Accesos renovados ✓ (${nuevos.length})`);
+  }catch(e){
+    console.error(e); toast('No se pudieron renovar los accesos. Probá de nuevo');
+  }
 }
 
 // Invitación por WhatsApp: link de la app SIN token + el mail con el que tiene que entrar.
@@ -6176,6 +6212,7 @@ function renderMiPerfil(){
       ${_esStandalone()?'':`<button type="button" class="yo-dato destacado" onclick="abrirInstalar()">${ic('download')}<span>Instalar como app</span>${ic('chev','i chev')}</button>`}
       <button type="button" class="yo-dato" onclick="cargarDatos()">${ic('sync')}<span>Sincronizar datos</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="sincronizarTodosCalendar()">${ic('cal')}<span>Exportar a Calendar</span>${ic('chev','i chev')}</button>
+      <button type="button" class="yo-dato" onclick="renovarAccesosPortal()">${ic('sync')}<span>Renovar accesos del portal</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="alternarTema();renderMiPerfil()">${ic(temaCalma?'luna':'sol')}<span>Tema: ${temaCalma?'Calma':'Nocturno'}</span><small>cambiar</small></button>
       <button type="button" class="yo-dato peligro" onclick="cerrarSesion()">${ic('logout')}<span>Cerrar sesión</span></button>
     </div>
