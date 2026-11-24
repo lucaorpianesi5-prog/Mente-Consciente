@@ -101,6 +101,9 @@ html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[
   --pd-hueco:#EEF0EA; --pd-lleno:#E3F0E7; --pd-valor:#14201A;
 }
 body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;line-height:1.5}
+html{-webkit-tap-highlight-color:transparent}
+.bottom-nav a:focus{outline:none}
+.bottom-nav a:focus-visible{outline:2px solid var(--verde);outline-offset:2px;border-radius:12px}
 
 .racha-icono{color:var(--pd-crema)}
 .racha-icono .i{width:26px;height:26px}
@@ -811,6 +814,75 @@ button.yo-dato.destacado .i{color:var(--pd-verde)}
 .tbar.negativo{background:var(--rojo-bg)}
 .tbar-mes{font-size:0.62rem;color:var(--suave)}
 
+/* ── FINANZAS (rediseño): legible en el celu ── */
+.fin-anios{display:flex;gap:0.4rem;margin-bottom:0.9rem}
+.fin-anio{padding:0.45rem 1rem;border-radius:20px;border:1px solid var(--borde);background:var(--blanco);color:var(--suave);font-family:inherit;font-size:0.8rem;font-weight:700;cursor:pointer}
+.fin-anio.on{background:var(--verde);border-color:var(--verde);color:var(--sobre-acento)}
+.fin-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem;align-items:start}
+.fin-col{display:flex;flex-direction:column;gap:0.9rem;min-width:0}
+.fin-eti{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--suave);font-weight:600}
+#fin-disponible-card{margin-bottom:0}
+.fin-disp{padding:0;overflow:hidden}
+.disp-top{width:100%;display:flex;align-items:center;gap:0.8rem;padding:1.05rem 1.15rem;background:none;border:none;font-family:inherit;text-align:left;cursor:pointer;color:var(--texto)}
+.disp-top>div{flex:1;min-width:0}
+.disp-val{font-size:1.9rem;font-weight:700;color:var(--verde);letter-spacing:-0.02em;line-height:1.2;margin-top:0.15rem}
+.disp-sub{font-size:0.72rem;color:var(--suave);margin-top:0.15rem}
+.disp-chev{width:18px;height:18px;color:var(--texto3);transition:transform 0.2s;flex-shrink:0;transform:rotate(90deg)}
+.disp-chev.on{transform:rotate(-90deg)}
+.fin-disp .disp-desglose{padding:0 1.15rem 1.05rem;border-top:1px solid var(--borde);padding-top:0.8rem}
+.disp-row{gap:1rem}
+.disp-nota{font-size:0.7rem;color:var(--suave);line-height:1.45;margin-top:0.4rem}
+.disp-editar{align-self:flex-start;background:none;border:none;color:var(--verde);font-family:inherit;font-weight:600;font-size:0.78rem;padding:0.3rem 0;cursor:pointer}
+.fin-mes-top{margin-bottom:0.8rem}
+.fin-neto{font-size:1.7rem;font-weight:700;color:var(--texto);letter-spacing:-0.02em;line-height:1.2;margin-top:0.15rem}
+.fin-neto.neg{color:var(--rojo)}
+.fin-neto-sub{font-size:0.72rem;color:var(--suave);margin-top:0.2rem;display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center}
+.fin-comp{font-weight:700;padding:0.1rem 0.45rem;border-radius:20px}
+.fin-comp.sube{color:var(--ok);background:var(--verde-ok-bg)}
+.fin-comp.baja{color:var(--rojo);background:var(--rojo-bg)}
+.fin-filas{display:flex;flex-direction:column}
+.fin-fila{display:flex;justify-content:space-between;gap:1rem;padding:0.5rem 0;border-top:1px solid var(--borde);font-size:0.86rem;color:var(--suave)}
+.fin-fila b{color:var(--texto);font-weight:600;font-variant-numeric:tabular-nums}
+.fin-fila.fuerte{color:var(--texto);font-weight:600}
+.fin-fila.ing b{color:var(--ok)}
+.fin-fila.gas b{color:var(--rojo)}
+.fin-graf-tit{display:flex;justify-content:space-between;align-items:center;gap:0.5rem;margin-bottom:0.6rem;flex-wrap:wrap}
+.fin-ley{display:flex;align-items:center;gap:0.35rem;font-size:0.68rem;color:var(--suave)}
+.fin-ley i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-left:0.3rem}
+.fin-ley i.ing,.fbar-par i.ing{background:var(--verde)}
+.fin-ley i.gas,.fbar-par i.gas{background:color-mix(in srgb,var(--rojo) 70%,transparent)}
+.fbars{display:flex;align-items:stretch;gap:0.15rem;height:150px}
+.fbar{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:0.25rem;background:none;border:none;border-radius:8px;padding:0.2rem 0 0.25rem;cursor:pointer;font-family:inherit}
+.fbar.on{background:var(--verde-bg)}
+.fbar-val{font-size:0.6rem;font-weight:700;color:var(--verde);height:0.9rem;white-space:nowrap}
+.fbar-par{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;padding:0 2px}
+.fbar-par i{flex:1;max-width:12px;border-radius:3px 3px 1px 1px;opacity:0.55;transition:opacity 0.2s}
+.fbar.on .fbar-par i{opacity:1}
+.fbar-mes{font-size:0.6rem;color:var(--suave)}
+.fbar.on .fbar-mes{color:var(--texto);font-weight:700}
+.fin-graf-ayuda{font-size:0.68rem;color:var(--texto3);margin-top:0.5rem;text-align:center}
+.fin-anio-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem 1rem;margin-top:0.6rem}
+.fin-anio-grid small{display:block;font-size:0.7rem;color:var(--suave)}
+.fin-anio-grid b{display:block;font-size:1.05rem;font-weight:700;color:var(--texto);margin-top:0.1rem;font-variant-numeric:tabular-nums}
+.fin-anio-grid b.ing{color:var(--ok)} .fin-anio-grid b.gas{color:var(--rojo)} .fin-anio-grid b.net{color:var(--verde)}
+.fin-prop{height:7px;border-radius:4px;background:color-mix(in srgb,var(--verde) 30%,transparent);margin-top:0.9rem;overflow:hidden}
+.fin-prop i{display:block;height:100%;background:color-mix(in srgb,var(--rojo) 75%,transparent);border-radius:4px}
+.fin-prop-txt{font-size:0.72rem;color:var(--suave);margin-top:0.4rem}
+.fin-prop-txt b{color:var(--texto)}
+.gmes{display:flex;justify-content:space-between;align-items:center;padding:0.55rem 1.2rem;background:var(--crema);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--suave);font-weight:600}
+.gmes b{color:var(--texto);font-size:0.8rem;letter-spacing:0}
+#fin-gastos-lista .gasto-row{gap:0.6rem;padding:0.55rem 0.6rem 0.55rem 1.2rem}
+#fin-gastos-lista .gasto-desc{flex:1;min-width:0}
+.gasto-borrar{width:36px;height:36px;border-radius:9px;border:none;background:transparent;color:var(--texto3);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.gasto-borrar .i{width:16px;height:16px}
+.gasto-borrar:active{background:var(--rojo-bg);color:var(--rojo)}
+.fin-ver-todos{width:100%;padding:0.8rem;background:none;border:none;border-top:1px solid var(--borde);color:var(--verde);font-family:inherit;font-weight:600;font-size:0.8rem;cursor:pointer}
+.fin-vacio{color:var(--suave);font-size:0.85rem;padding:1rem 1.25rem}
+@media(max-width:768px){
+  .fin-grid{grid-template-columns:1fr}
+  .fin-tabla-desk{display:none}
+  #page-finanzas .page-header{display:none}
+}
 /* Tabla mensual: clases en vez de style="" inline por celda */
 tr.actual td{background:var(--verde-bg);font-weight:600}
 tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--borde);border-bottom:none}
@@ -898,10 +970,24 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   .bottom-nav a .pill{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px;transition:background 0.2s}
   .bottom-nav a.active{color:var(--texto)}
   .bottom-nav a.active .pill{background:color-mix(in srgb,var(--verde) 13%,transparent);color:var(--verde)}
-  /* Ítem central "Yo": avatar redondo, un poco más grande que el resto */
-  .bottom-nav a.bn-yo .pill{width:38px;height:38px;border-radius:50%;margin-top:-6px;background:var(--verde-bg);border:1.5px solid color-mix(in srgb,var(--verde) 45%,transparent);color:var(--verde);font-size:0.78rem;font-weight:700}
-  .bottom-nav a.bn-yo.active .pill{background:var(--verde);color:var(--sobre-acento);border-color:var(--verde)}
-  .bottom-nav a.bn-yo{gap:0}
+  /* Botón central "Mi perfil": brote sobre tierra, flota apenas sobre la barra
+     (un aro del color de la barra lo recorta). Sin texto: el ícono se entiende solo. */
+  .bottom-nav a.bn-yo{justify-content:center}
+  .bn-yo .flota{width:54px;height:54px;margin-top:-14px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:radial-gradient(circle at 50% 35%, color-mix(in srgb,var(--verde) 22%,var(--barra)) 0%, var(--barra) 75%);
+    border:1.5px solid color-mix(in srgb,var(--verde) 45%,transparent);
+    box-shadow:0 0 0 4px var(--barra),0 6px 14px rgba(0,0,0,.24),0 1px 3px rgba(0,0,0,.16);transition:transform .15s,background .2s}
+  .bn-yo:active .flota{transform:translateY(1px) scale(.95)}
+  .bn-yo.active .flota{background:var(--verde);border-color:var(--verde);box-shadow:0 0 0 4px var(--barra),0 6px 16px color-mix(in srgb,var(--verde) 40%,transparent)}
+  .bn-yo .brote{width:34px;height:34px}
+  .bn-yo .brote .tallo{stroke:var(--verde)}
+  .bn-yo .brote .hoja{fill:color-mix(in srgb,var(--verde) 85%,transparent);stroke:var(--verde)}
+  .bn-yo .brote .tierra{fill:color-mix(in srgb,var(--marron) 75%,transparent)}
+  .bn-yo .brote .grano{fill:var(--marron)}
+  .bn-yo.active .brote .tallo,.bn-yo.active .brote .hoja{stroke:var(--sobre-acento)}
+  .bn-yo.active .brote .hoja{fill:var(--sobre-acento)}
+  .bn-yo.active .brote .tierra{fill:color-mix(in srgb,var(--sobre-acento) 70%,transparent)}
+  .bn-yo.active .brote .grano{fill:var(--verde)}
 
   /* ── FAB ── */
   .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:calc(5.5rem + env(safe-area-inset-bottom));right:18px;width:54px;height:54px;border-radius:17px;background:var(--verde);color:var(--sobre-acento);border:none;cursor:pointer;z-index:160;box-shadow:0 8px 20px color-mix(in srgb,var(--verde) 35%,transparent);transition:transform 0.2s}
@@ -1388,31 +1474,41 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- FINANZAS -->
   <div class="page" id="page-finanzas">
-    <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem">
-      <div><h2>Finanzas</h2><p>Resumen anual de ingresos, gastos y ahorros</p></div>
-      <select id="fin-anio-select" onchange="renderFinanzas()" style="padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:var(--crema);color:var(--texto)"></select>
+    <div class="page-header fin-head">
+      <div><h2>Finanzas</h2><p>Ingresos, gastos y disponible</p></div>
     </div>
-    <!-- B7: card fija, no depende del año seleccionado -->
-    <div class="fin-card" id="fin-disponible-card"></div>
-    <div class="kpi-row-fin" id="fin-stats"></div>
-    <div class="tendencia-card">
-      <div class="tendencia-titulo">Total mensual — <span id="fin-tendencia-rango"></span></div>
-      <div class="tendencia-bars" id="fin-tendencia-bars"></div>
-    </div>
-    <div class="table-wrap" style="margin-bottom:1.5rem">
-      <div class="table-header"><h3>Resumen mensual</h3></div>
-      <table>
-        <thead><tr><th>Mes</th><th>Cuotas</th><th>Bonos</th><th>Nutri</th><th>Total</th><th>Gastos</th><th>Neto</th></tr></thead>
-        <tbody id="fin-tabla"></tbody>
-      </table>
-    </div>
-    <div class="lista-card">
-      <div class="lista-header">
-        <h3>Gastos</h3>
-        <button class="btn btn-primary btn-sm" onclick="abrirModalGasto()">+ Agregar</button>
+    <div class="fin-anios" id="fin-anios"></div>
+    <select id="fin-anio-select" onchange="renderFinanzas()" hidden></select>
+    <div class="fin-grid">
+      <div class="fin-col">
+        <!-- B7: card fija, no depende del año seleccionado -->
+        <div class="fin-card fin-disp" id="fin-disponible-card"></div>
+        <div class="fin-card" id="fin-mes"></div>
+        <div class="fin-card">
+          <div class="fin-graf-tit"><span class="fin-eti">Mes a mes · <span id="fin-tendencia-rango"></span></span>
+            <span class="fin-ley"><i class="ing"></i>Ingresos <i class="gas"></i>Gastos</span></div>
+          <div class="fbars" id="fin-tendencia-bars"></div>
+          <p class="fin-graf-ayuda">Tocá un mes para ver su detalle arriba.</p>
+        </div>
+        <div class="fin-card" id="fin-stats"></div>
       </div>
-      <div id="fin-gastos-lista"></div>
+      <div class="fin-col">
+        <div class="lista-card">
+          <div class="lista-header">
+            <h3>Gastos</h3>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalGasto()">+ Agregar</button>
+          </div>
+          <div id="fin-gastos-lista"></div>
+        </div>
+      </div>
     </div>
+    <div class="table-wrap fin-tabla-desk" style="margin-top:1rem">
+          <div class="table-header"><h3>Resumen mensual</h3></div>
+          <table>
+            <thead><tr><th>Mes</th><th>Cuotas</th><th>Bonos</th><th>Nutri</th><th>Ingresos</th><th>Gastos</th><th>Neto</th></tr></thead>
+            <tbody id="fin-tabla"></tbody>
+          </table>
+        </div>
   </div>
 
   <!-- MI PERFIL (entrenador): mis datos + mi propio Fuerza/Mapeo con la misma vista que mis alumnos -->
@@ -1581,8 +1677,16 @@ body.sesion-bar-on #plan-vista{top:34px}
   <a id="bn-agenda" onclick="showPage('agenda')" title="Agenda">
     <span class="pill"><svg class="i"><use href="#i-cal"/></svg></span>Agenda
   </a>
-  <a id="bn-yo" class="bn-yo" onclick="showPage('yo')" title="Mi perfil">
-    <span class="pill" id="bn-yo-ini">L</span>Yo
+  <a id="bn-yo" class="bn-yo" onclick="showPage('yo')" title="Mi perfil" aria-label="Mi perfil">
+    <span class="flota">
+      <svg class="brote" viewBox="0 0 40 40" aria-hidden="true">
+        <path class="tierra" d="M7 31c3.5-4 8-5.6 13-5.6S29.5 27 33 31z"/>
+        <circle class="grano" cx="14" cy="30" r="0.9"/><circle class="grano" cx="25" cy="29.2" r="0.8"/><circle class="grano" cx="20.5" cy="30.4" r="0.7"/>
+        <path class="tallo" d="M20 26V15" fill="none" stroke-width="2" stroke-linecap="round"/>
+        <path class="hoja" d="M20 18c-1-4.6-4.6-6.8-9-6.4.4 4.4 3.6 7 9 6.4z" stroke-width="1.2" stroke-linejoin="round"/>
+        <path class="hoja" d="M20 15.5c.6-4.4 3.8-7 8.6-7-.2 4.6-3.4 7.4-8.6 7z" stroke-width="1.2" stroke-linejoin="round"/>
+      </svg>
+    </span>
   </a>
   <a id="bn-cobros" onclick="showPage('cobros')" title="Cobros">
     <span class="pill"><svg class="i"><use href="#i-cash"/></svg></span>Cobros
@@ -1637,7 +1741,7 @@ body.sesion-bar-on #plan-vista{top:34px}
     </div>
     <div class="modal-body">
       <div class="form-grid">
-        <div class="field"><label>Fecha</label><input type="date" id="g-fecha"/></div>
+        <div class="field"><label>Mes</label><input type="month" id="g-fecha"/></div>
         <div class="field"><label>Monto ($)</label><input type="number" id="g-monto" placeholder="0"/></div>
         <div class="field" style="grid-column:1/-1"><label>Descripción</label><input type="text" id="g-desc" placeholder="ej: Bandas elásticas"/></div>
       </div>
@@ -3025,11 +3129,13 @@ function _fabActualizar(id){
   const f=document.getElementById('fab'); if(!f) return;
   f.dataset.pagina=id;
   f.style.visibility=(id==='yo'||id==='perfil')?'hidden':'';
-  f.setAttribute('aria-label',id==='nutricion'?'Nuevo cliente de nutrición':'Nuevo alumno');
+  f.setAttribute('aria-label',id==='nutricion'?'Nuevo cliente de nutrición':id==='finanzas'?'Nuevo gasto':'Nuevo alumno');
 }
 function _fabAccion(){
   const f=document.getElementById('fab');
-  if(f && f.dataset.pagina==='nutricion') abrirModalNutri(); else abrirModalAlumno();
+  if(f && f.dataset.pagina==='nutricion') abrirModalNutri();
+  else if(f && f.dataset.pagina==='finanzas') abrirModalGasto();
+  else abrirModalAlumno();
 }
 
 // ── FECHA ──
@@ -4140,20 +4246,22 @@ function calcularDisponible(){
 function renderDisponible(){
   const {saldoInicial,totalCobrado,totalGastado,disponible}=calcularDisponible();
   document.getElementById('fin-disponible-card').innerHTML=`
-    <div class="disp-header">
-      <h3>Disponible</h3>
-      <button class="btn btn-sm" onclick="toggleEditSaldoInicial()">Editar saldo inicial</button>
-    </div>
-    <div class="disp-desglose">
-      <div class="disp-row"><span>Saldo inicial (al empezar a usar la app, antes del primer cobro registrado)</span><span>$${saldoInicial.toLocaleString('es-AR')}</span></div>
-      <div class="disp-row"><span>+ Cobrado a alumnos</span><span>$${totalCobrado.toLocaleString('es-AR')}</span></div>
-      <div class="disp-row"><span>− Gastado en el espacio</span><span>$${totalGastado.toLocaleString('es-AR')}</span></div>
-      <div class="disp-row disp-total"><span>= Disponible</span><span>$${disponible.toLocaleString('es-AR')}</span></div>
-    </div>
-    <div class="disp-edit" id="disp-edit-form" style="display:none">
-      <input type="number" id="disp-saldo-input" placeholder="Saldo inicial" value="${saldoInicial||''}"/>
-      <button class="btn btn-primary btn-sm" onclick="guardarSaldoInicial()">Guardar</button>
-    </div>
+    <button type="button" class="disp-top" onclick="finDispAbierto=!finDispAbierto;renderDisponible()" aria-expanded="${finDispAbierto}">
+      <div><div class="fin-eti">Disponible hoy</div><div class="disp-val">${_$firmado(disponible)}</div><div class="disp-sub">saldo inicial + todo lo cobrado − todo lo gastado</div></div>
+      <svg class="i disp-chev${finDispAbierto?' on':''}" aria-hidden="true"><use href="#i-chev"/></svg>
+    </button>
+    ${finDispAbierto?`<div class="disp-desglose">
+      <div class="disp-row"><span>Saldo inicial</span><span>${_$(saldoInicial)}</span></div>
+      <div class="disp-row"><span>+ Cobrado (alumnos, bonos y nutrición)</span><span>${_$(totalCobrado)}</span></div>
+      <div class="disp-row"><span>− Gastado</span><span>${_$(totalGastado)}</span></div>
+      <div class="disp-row disp-total"><span>= Disponible</span><span>${_$firmado(disponible)}</span></div>
+      <p class="disp-nota">El saldo inicial es lo que tenías al empezar a usar la app, antes del primer cobro registrado.</p>
+      <button type="button" class="disp-editar" onclick="toggleEditSaldoInicial()">Editar saldo inicial</button>
+      <div class="disp-edit" id="disp-edit-form" style="display:none">
+        <input type="number" inputmode="decimal" id="disp-saldo-input" placeholder="Saldo inicial" value="${saldoInicial||''}"/>
+        <button class="btn btn-primary btn-sm" onclick="guardarSaldoInicial()">Guardar</button>
+      </div>
+    </div>`:''}
   `;
 }
 function toggleEditSaldoInicial(){
@@ -4201,90 +4309,129 @@ function getIngresosMes(mk){
   return {cuotas,bonos,nutri};
 }
 
+// ── FINANZAS ──
+// Pensada para el celu: Disponible arriba, el mes elegido en detalle, gráfico mes a mes
+// (tocar una barra elige el mes), total del año y gastos agrupados por mes.
+// En la compu además se ve la tabla anual completa.
+let finMesSel=null;          // 'yyyy-mm' elegido en el gráfico (null = el mes actual o el último con datos)
+let finDispAbierto=false;    // detalle de Disponible desplegado
+let finGastosTodos=false;    // mostrar todos los meses de gastos (si no, los últimos 3)
+const _$=n=>'$'+Math.round(n).toLocaleString('es-AR');
+const _$firmado=n=>(n<0?'−':'')+_$(Math.abs(n));
+// Montos cortos para el gráfico: 170k · 2,48 M
+function _$corto(n){
+  const a=Math.abs(n), s=n<0?'−':'';
+  if(a>=1e6) return s+(a/1e6).toFixed(a<1e7?2:1).replace('.',',').replace(/,?0+$/,'')+' M';
+  if(a>=1e3) return s+Math.round(a/1e3)+'k';
+  return s+Math.round(a);
+}
+function _finMes(mkey){
+  const {cuotas,bonos,nutri}=getIngresosMes(mkey);
+  const gastosMes=gastos.filter(g=>g.fecha&&g.fecha.startsWith(mkey)).reduce((s,g)=>s+parseFloat(g.monto||0),0);
+  const ingresos=cuotas+bonos+nutri;
+  return {mkey,cuotas,bonos,nutri,ingresos,gastos:gastosMes,neto:ingresos-gastosMes};
+}
+function _finNombreMes(mkey,corto){ const [y,m]=mkey.split('-'); const n=MESES[+m-1]; return corto?n.slice(0,3):`${n} ${y}`; }
+function _finMesAnterior(mkey){ const [y,m]=mkey.split('-').map(Number); const d=new Date(y,m-2,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; }
+
 function renderFinanzas(){
-  const anio=parseInt(document.getElementById('fin-anio-select').value);
+  const sel=document.getElementById('fin-anio-select');
+  const anio=parseInt(sel.value)||new Date().getFullYear();
   const mk=mesKey();
+  const hoy=new Date(), anioActual=hoy.getFullYear();
+
+  // Años como botones (el <select> queda oculto como fuente del valor)
+  document.getElementById('fin-anios').innerHTML=[...sel.options].map(o=>`<button type="button" class="fin-anio${+o.value===anio?' on':''}" onclick="finElegirAnio(${o.value})">${o.value}</button>`).join('');
 
   renderDisponible();
 
-  // Tabla mensual
-  let totalCuotas=0,totalBonos=0,totalNutri=0,totalGastos=0;
-  const totalesPorMes=[];
-  const filas=MESES.map((mes,idx)=>{
-    const m=String(idx+1).padStart(2,'0');
-    const mkey=`${anio}-${m}`;
-    const {cuotas,bonos,nutri}=getIngresosMes(mkey);
-    const gastosMes=gastos.filter(g=>g.fecha&&g.fecha.startsWith(mkey)).reduce((s,g)=>s+parseFloat(g.monto||0),0);
-    const total=cuotas+bonos+nutri;
-    const neto=total-gastosMes;
-    totalCuotas+=cuotas;totalBonos+=bonos;totalNutri+=nutri;totalGastos+=gastosMes;
-    const esActual=mkey===mk;
-    totalesPorMes.push({mes,total,neto,esActual});
-    return `<tr class="${esActual?'actual':''}">
-      <td>${mes}</td>
-      <td>${cuotas?'$'+cuotas.toLocaleString('es-AR'):'—'}</td>
-      <td>${bonos?'$'+bonos.toLocaleString('es-AR'):'—'}</td>
-      <td>${nutri?'$'+nutri.toLocaleString('es-AR'):'—'}</td>
-      <td class="cell-verde">${total?'$'+total.toLocaleString('es-AR'):'—'}</td>
-      <td class="cell-rojo">${gastosMes?'$'+gastosMes.toLocaleString('es-AR'):'—'}</td>
-      <td>${neto?'$'+neto.toLocaleString('es-AR'):'—'}</td>
-    </tr>`;
-  });
-
-  document.getElementById('fin-tabla').innerHTML=filas.join('')+`
-    <tr class="total">
-      <td>Total ${anio}</td>
-      <td>$${totalCuotas.toLocaleString('es-AR')}</td>
-      <td>$${totalBonos.toLocaleString('es-AR')}</td>
-      <td>$${totalNutri.toLocaleString('es-AR')}</td>
-      <td>$${(totalCuotas+totalBonos+totalNutri).toLocaleString('es-AR')}</td>
-      <td>$${totalGastos.toLocaleString('es-AR')}</td>
-      <td>$${(totalCuotas+totalBonos+totalNutri-totalGastos).toLocaleString('es-AR')}</td>
-    </tr>
-  `;
-
-  // Stats anuales
-  const totalIngresos=totalCuotas+totalBonos+totalNutri;
-  const totalNeto=totalIngresos-totalGastos;
-  document.getElementById('fin-stats').innerHTML=`
-    <div class="kpi-card-fin"><div class="kpi-label-fin">Ingresos ${anio}</div><div class="kpi-val-fin">$${totalIngresos.toLocaleString('es-AR')}</div><div class="kpi-sub">cuotas + bonos + nutri</div></div>
-    <div class="kpi-card-fin"><div class="kpi-label-fin">Gastos ${anio}</div><div class="kpi-val-fin rojo">$${totalGastos.toLocaleString('es-AR')}</div><div class="kpi-sub">entrenamiento</div></div>
-    <div class="kpi-card-fin"><div class="kpi-label-fin">Neto ${anio}</div><div class="kpi-val-fin verde">$${totalNeto.toLocaleString('es-AR')}</div><div class="kpi-sub">ingresos − gastos</div></div>
-  `;
-
-  // Tendencia mensual — deriva de totalesPorMes, ya calculado arriba en el mismo .map()
-  const hoyDate=new Date();
-  const anioActual=hoyDate.getFullYear();
-  const mesActualIdx=hoyDate.getMonth();
-  const mesesAMostrar=(anio===anioActual)?totalesPorMes.slice(0,mesActualIdx+1):totalesPorMes;
-  const maxTotal=Math.max(...mesesAMostrar.map(x=>x.total),1);
-  document.getElementById('fin-tendencia-rango').textContent=(anio===anioActual)
-    ?`${MESES[0]} a ${MESES[mesActualIdx]} ${anio}`
-    :`${MESES[0]} a ${MESES[11]} ${anio}`;
-  document.getElementById('fin-tendencia-bars').innerHTML=mesesAMostrar.map(x=>{
-    const pct=Math.max(4,Math.round((x.total/maxTotal)*100));
-    const clases=['tbar',x.esActual?'actual':'',x.neto<0?'negativo':''].filter(Boolean).join(' ');
-    return `<div class="tbar-col"><div class="${clases}" style="height:${pct}%"></div><span class="tbar-mes">${x.mes.slice(0,3)}</span></div>`;
-  }).join('');
-
-  // Lista gastos del año
-  const gastosAnio=gastos.filter(g=>g.fecha&&g.fecha.startsWith(String(anio))).sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  const listaGastos=document.getElementById('fin-gastos-lista');
-  if(!gastosAnio.length){
-    listaGastos.innerHTML='<p style="color:var(--suave);font-size:0.85rem;padding:1rem 1.25rem">Sin gastos registrados.</p>';
-  } else {
-    listaGastos.innerHTML=gastosAnio.map(g=>`
-      <div class="gasto-row">
-        <div><div class="gasto-desc">${escaparHTML(g.desc)}</div><div class="gasto-fecha">${g.fecha}</div></div>
-        <div style="display:flex;align-items:center;gap:0.7rem"><span class="gasto-monto">$${parseFloat(g.monto).toLocaleString('es-AR')}</span><button class="btn btn-danger btn-sm" onclick="eliminarGasto('${g.id}')">×</button></div>
-      </div>
-    `).join('');
+  const meses=MESES.map((_,i)=>_finMes(`${anio}-${String(i+1).padStart(2,'0')}`));
+  const visibles=anio===anioActual?meses.slice(0,hoy.getMonth()+1):meses;
+  if(!finMesSel || !finMesSel.startsWith(anio+'-') || !visibles.some(x=>x.mkey===finMesSel)){
+    const conDatos=visibles.filter(x=>x.ingresos||x.gastos);
+    finMesSel=visibles.some(x=>x.mkey===mk)?mk:(conDatos.length?conDatos[conDatos.length-1].mkey:visibles[visibles.length-1].mkey);
   }
 
+  // ── Mes elegido ──
+  const m=_finMes(finMesSel), ant=_finMes(_finMesAnterior(finMesSel));
+  let comp='';
+  if(ant.ingresos||ant.gastos){
+    const dif=m.neto-ant.neto;
+    comp=`<span class="fin-comp ${dif>=0?'sube':'baja'}">${dif>=0?'↑':'↓'} ${_$(Math.abs(dif))} vs ${_finNombreMes(ant.mkey,true).toLowerCase()}</span>`;
+  }
+  const fila=(lbl,val,cls='')=>`<div class="fin-fila ${cls}"><span>${lbl}</span><b>${val}</b></div>`;
+  document.getElementById('fin-mes').innerHTML=`
+    <div class="fin-mes-top">
+      <div><div class="fin-eti">${finMesSel===mk?'Este mes':'Mes elegido'} · ${_finNombreMes(finMesSel)}</div>
+        <div class="fin-neto ${m.neto<0?'neg':''}">${_$firmado(m.neto)}</div>
+        <div class="fin-neto-sub">neto (ingresos − gastos) ${comp}</div></div>
+    </div>
+    <div class="fin-filas">
+      ${fila('Cuotas',m.cuotas?_$(m.cuotas):'—')}
+      ${fila('Bonos',m.bonos?_$(m.bonos):'—')}
+      ${fila('Nutrición',m.nutri?_$(m.nutri):'—')}
+      ${fila('Ingresos',_$(m.ingresos),'fuerte ing')}
+      ${fila('Gastos',m.gastos?'−'+_$(m.gastos):'—','fuerte gas')}
+    </div>`;
+
+  // ── Gráfico mes a mes: ingresos y gastos lado a lado ──
+  const max=Math.max(1,...visibles.map(x=>Math.max(x.ingresos,x.gastos)));
+  document.getElementById('fin-tendencia-rango').textContent=`${anio}`;
+  document.getElementById('fin-tendencia-bars').innerHTML=visibles.map(x=>{
+    const hi=x.ingresos?Math.max(3,Math.round(x.ingresos/max*100)):0, hg=x.gastos?Math.max(3,Math.round(x.gastos/max*100)):0;
+    const on=x.mkey===finMesSel;
+    return `<button type="button" class="fbar${on?' on':''}" onclick="finElegirMes('${x.mkey}')" aria-label="${_finNombreMes(x.mkey)}: ingresos ${_$(x.ingresos)}, gastos ${_$(x.gastos)}">
+      <span class="fbar-val">${on&&x.ingresos?_$corto(x.ingresos):''}</span>
+      <span class="fbar-par"><i class="ing" style="height:${hi}%"></i><i class="gas" style="height:${hg}%"></i></span>
+      <span class="fbar-mes">${_finNombreMes(x.mkey,true)}</span>
+    </button>`;
+  }).join('');
+
+  // ── Total del año ──
+  const T=meses.reduce((t,x)=>({ingresos:t.ingresos+x.ingresos,gastos:t.gastos+x.gastos,cuotas:t.cuotas+x.cuotas,bonos:t.bonos+x.bonos,nutri:t.nutri+x.nutri}),{ingresos:0,gastos:0,cuotas:0,bonos:0,nutri:0});
+  const neto=T.ingresos-T.gastos, nMeses=Math.max(1,visibles.length);
+  const pctGasto=T.ingresos?Math.min(100,Math.round(T.gastos/T.ingresos*100)):0;
+  document.getElementById('fin-stats').innerHTML=`
+    <div class="fin-eti">Total ${anio}</div>
+    <div class="fin-anio-grid">
+      <div><small>Ingresos</small><b class="ing">${_$(T.ingresos)}</b></div>
+      <div><small>Gastos</small><b class="gas">${_$(T.gastos)}</b></div>
+      <div><small>Neto</small><b class="${neto<0?'gas':'net'}">${_$firmado(neto)}</b></div>
+      <div><small>Neto promedio / mes</small><b>${_$firmado(neto/nMeses)}</b></div>
+    </div>
+    ${T.ingresos?`<div class="fin-prop"><i style="width:${pctGasto}%"></i></div><div class="fin-prop-txt">Los gastos se llevan el <b>${pctGasto}%</b> de lo que entró</div>`:''}`;
+
+  // ── Tabla anual (solo compu) ──
+  const celda=v=>v?_$(v):'—';
+  document.getElementById('fin-tabla').innerHTML=meses.map((x,i)=>`<tr class="${x.mkey===mk?'actual':''}">
+      <td>${MESES[i]}</td><td>${celda(x.cuotas)}</td><td>${celda(x.bonos)}</td><td>${celda(x.nutri)}</td>
+      <td class="cell-verde">${celda(x.ingresos)}</td><td class="cell-rojo">${celda(x.gastos)}</td><td>${x.neto?_$firmado(x.neto):'—'}</td>
+    </tr>`).join('')+`<tr class="total"><td>Total ${anio}</td><td>${_$(T.cuotas)}</td><td>${_$(T.bonos)}</td><td>${_$(T.nutri)}</td><td>${_$(T.ingresos)}</td><td>${_$(T.gastos)}</td><td>${_$firmado(neto)}</td></tr>`;
+
+  // ── Gastos del año, agrupados por mes ──
+  const gastosAnio=gastos.filter(g=>g.fecha&&g.fecha.startsWith(String(anio))).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const grupos=[];
+  gastosAnio.forEach(g=>{ const k=g.fecha.slice(0,7); let gr=grupos[grupos.length-1]; if(!gr||gr.k!==k){ gr={k,items:[],total:0}; grupos.push(gr); } gr.items.push(g); gr.total+=parseFloat(g.monto||0); });
+  const lista=document.getElementById('fin-gastos-lista');
+  if(!grupos.length){
+    lista.innerHTML='<p class="fin-vacio">Sin gastos registrados en '+anio+'.</p>';
+  } else {
+    const ver=finGastosTodos?grupos:grupos.slice(0,3);
+    lista.innerHTML=ver.map(gr=>`
+      <div class="gmes"><span>${_finNombreMes(gr.k)}</span><b>${_$(gr.total)}</b></div>
+      ${gr.items.map(g=>`<div class="gasto-row">
+        <div class="gasto-desc">${escaparHTML(g.desc)}</div>
+        <span class="gasto-monto">${_$(parseFloat(g.monto||0))}</span>
+        <button type="button" class="gasto-borrar" onclick="eliminarGasto('${g.id}')" aria-label="Eliminar gasto">${ic('trash')}</button>
+      </div>`).join('')}`).join('')
+      +(grupos.length>3?`<button type="button" class="fin-ver-todos" onclick="finGastosTodos=!finGastosTodos;renderFinanzas()">${finGastosTodos?'Ver menos':`Ver los ${grupos.length} meses`}</button>`:'');
+  }
 }
+function finElegirAnio(y){ document.getElementById('fin-anio-select').value=String(y); finMesSel=null; finGastosTodos=false; renderFinanzas(); }
+function finElegirMes(mkey){ finMesSel=mkey; renderFinanzas(); }
 
 function abrirModalGasto(){
-  document.getElementById('g-fecha').value=new Date().toISOString().slice(0,7)+'-01';
+  document.getElementById('g-fecha').value=(finMesSel||mesKey());   // el mes que se está mirando
   document.getElementById('g-monto').value='';
   document.getElementById('g-desc').value='';
   document.getElementById('modal-gasto').classList.add('open');
@@ -4294,7 +4441,7 @@ async function guardarGasto(){
   const fecha=document.getElementById('g-fecha').value;
   const monto=document.getElementById('g-monto').value;
   const desc=document.getElementById('g-desc').value.trim();
-  if(!monto||!desc){toast('Completá todos los campos');return;}
+  if(!monto||!desc||!fecha){toast('Completá todos los campos');return;}
   const nuevoId=crypto.randomUUID();
   gastos.push({id:nuevoId,fecha:fecha.slice(0,7),desc,monto});
   try{
@@ -5483,7 +5630,7 @@ function _miIniciales(){
   const n=(miPerfil.nombre||'').trim()||'Luca';
   return n.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 }
-function _actualizarIniYo(){ const el=document.getElementById('bn-yo-ini'); if(el) el.textContent=_miIniciales(); }
+function _actualizarIniYo(){}   // la barra muestra el brote; las iniciales quedan en Mi perfil
 
 async function _crearPestanaPerfil(){
   if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
