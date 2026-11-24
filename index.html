@@ -1268,9 +1268,13 @@ button.pv-e .res{font-size:0.74rem;color:var(--pd-text2);font-weight:600;font-va
 .pv-e.act.guardado{border-color:color-mix(in srgb,var(--pd-ok) 55%,transparent)}
 .pv-e.act.error{border-color:var(--pd-red)}
 .pv-e-h{display:flex;align-items:flex-start;gap:10px}
-.pv-e-h .n{flex:1;font-size:1rem;font-weight:800;line-height:1.25}
+.pv-e-h .n{flex:1;font-size:1rem;font-weight:800;line-height:1.25;background:none;border:none;padding:0;text-align:left;color:var(--pd-text);font-family:inherit;cursor:pointer}
+.pv-e-h button.chk{background:none;cursor:pointer;padding:0;color:var(--pd-sobre-acento);font-family:inherit}
+.pv-e-h .chk.on{background:var(--pd-ok);border-color:var(--pd-ok)}
+.pv-min{width:32px;height:32px;border-radius:9px;border:1px solid var(--pd-border2);background:var(--pd-card2);color:var(--pd-text2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin:-4px -2px 0 0}
+.pv-min .i{width:15px;height:15px;transform:rotate(-90deg)}
 .pv-e-h .n small{display:block;font-size:0.68rem;color:var(--pd-text3);font-weight:600;margin-top:2px}
-.pv-e.act .pv-ej-estado{opacity:0} .pv-e.act.guardado .pv-ej-estado{opacity:1}
+.pv-e.act .pv-ej-estado{opacity:0;font-size:0.62rem;color:var(--pd-ok);font-weight:700;white-space:nowrap;align-self:center} .pv-e.act.guardado .pv-ej-estado{opacity:1}
 .pv-e.act .pv-ej-err{display:none} .pv-e.act.error .pv-ej-err{display:flex;align-items:center;gap:0.5rem}
 .pv-ref2{background:var(--pd-card2);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:10px}
 .pv-ref2 .q{flex:1;min-width:0}
@@ -6575,7 +6579,7 @@ function planRenderTodo(){
     const nHechosSem=e.datos.dias.filter(d=>diaOk(d.n,sel.sem)).length;
     meta=`Fuerza · ${e.datos.mes} · Semana ${sel.sem}: ${nHechosSem}/${e.datos.dias.length} días`;
     const ws=e.datos.semanas, wi=ws.findIndex(w=>w.n===sel.sem), prevW=ws[wi-1], nextW=ws[wi+1];
-    const pr=_pvProgresoDia(e.datos,sel), pct=pr.total?Math.round(pr.hechos/pr.total*100):0;
+    const pr=_pvProgresoDia(a,e.datos,sel), pct=pr.total?Math.round(pr.hechos/pr.total*100):0;
     extra=`<div class="pv-sel">
         <div class="pv-dias">${e.datos.dias.map(d=>{ const on=d.n===sel.dia, ok=diaOk(d.n,sel.sem); return `<button type="button" class="${on?'on':''}${ok?' ok':''}" data-pv="dia" data-n="${d.n}">${ok&&!on?'✓ ':''}${on||e.datos.dias.length<=3?'Día '+d.n:'D'+d.n}</button>`; }).join('')}</div>
         <div class="pv-semst"><button type="button" data-pv="sem" data-n="${prevW?prevW.n:''}"${prevW?'':' disabled'} aria-label="Semana anterior">‹</button><div><b>${semOk(sel.sem)?'✓ ':''}Sem ${sel.sem}</b><small>de ${ws.length}</small></div><button type="button" data-pv="sem" data-n="${nextW?nextW.n:''}"${nextW?'':' disabled'} aria-label="Semana siguiente">›</button></div>
@@ -6679,11 +6683,28 @@ const PV_INFO={
   rpe:'<b>RPE · esfuerzo percibido</b>, de 1 a 10: qué tan dura se sintió la serie. Se calcula del RIR (RPE ≈ 10 − RIR): RPE 10 es el máximo esfuerzo; RPE 7, que te quedaban unas 3.'
 };
 function _pvClaveDia(sel){ return `${sel.dia}-${sel.sem}`; }
-function _pvHecho(ej,ei,si,k){ return _pvEjCargado(ej.celdas[si]) || !!(planVista.listos&&planVista.listos.has(`${k}-${ei}`)); }
-function _pvProgresoDia(datos,sel){
-  const dia=datos.dias.find(x=>x.n===sel.dia)||datos.dias[0], si=Math.max(0,datos.semanas.findIndex(s=>s.n===sel.sem)), k=_pvClaveDia(sel);
+// Un ejercicio está LISTO solo cuando se toca "Listo" (o el día entero con "Terminé el día").
+// Tener valores cargados no alcanza: la planilla puede traer de antemano lo que hay que hacer.
+// Las marcas por ejercicio quedan en este dispositivo; el día terminado vive en el Sheet (Asistencias).
+const PV_LISTOS_KEY='mc_pv_listos';
+function _pvListosTodos(){ try{ return JSON.parse(_lsGet(PV_LISTOS_KEY)||'{}')||{}; }catch(e){ return {}; } }
+function _pvListosClave(aid,mes,sel){ return `${aid}|${_normTxt(mes)}|${sel.dia}|${sel.sem}`; }
+function _pvListos(aid,mes,sel){
+  const L=new Set(_pvListosTodos()[_pvListosClave(aid,mes,sel)]||[]);
+  if(_planHecho(aid,mes,sel.dia,sel.sem)) L.add('*');
+  return L;
+}
+function _pvMarcarListo(aid,mes,sel,ei,on){
+  const t=_pvListosTodos(), k=_pvListosClave(aid,mes,sel), L=new Set(t[k]||[]);
+  if(on) L.add(ei); else L.delete(ei);
+  if(L.size) t[k]=[...L]; else delete t[k];
+  _lsSet(PV_LISTOS_KEY,JSON.stringify(t));
+}
+function _pvHecho(L,ei){ return L.has('*')||L.has(ei); }
+function _pvProgresoDia(a,datos,sel){
+  const dia=datos.dias.find(x=>x.n===sel.dia)||datos.dias[0], L=_pvListos(a.id,datos.mes,sel);
   const ed=dia.ejercicios.map((ej,ei)=>({ej,ei})).filter(x=>!x.ej.fija);
-  return {total:ed.length, hechos:ed.filter(x=>_pvHecho(x.ej,x.ei,si,k)).length};
+  return {total:ed.length, hechos:ed.filter(x=>_pvHecho(L,x.ei)).length};
 }
 // Referencia: la semana anterior con datos
 function _pvRef(ej,si,semanas){
@@ -6701,10 +6722,10 @@ function _pvBodyFuerza(a,e){
   const d=e.datos, sel=_planSelDe(a,d);
   const dia=d.dias.find(x=>x.n===sel.dia)||d.dias[0];
   const si=Math.max(0,d.semanas.findIndex(s=>s.n===sel.sem));
-  if(!planVista.listos) planVista.listos=new Set();
+  const L=_pvListos(a.id,d.mes,sel);
   if(!planVista.activo) planVista.activo=new Map();
   const k=_pvClaveDia(sel);
-  if(!planVista.activo.has(k)) planVista.activo.set(k,dia.ejercicios.findIndex((ej,ei)=>!ej.fija&&!_pvHecho(ej,ei,si,k)));
+  if(!planVista.activo.has(k)) planVista.activo.set(k,dia.ejercicios.findIndex((ej,ei)=>!ej.fija&&!_pvHecho(L,ei)));
   const act=planVista.activo.get(k);
 
   const bloques=[];
@@ -6725,9 +6746,10 @@ function _pvBodyFuerza(a,e){
     const rpe=_pvRpe(c.rir.text);
     const rirChips=[0,1,2,3,4,5].map(v=>`<button type="button" class="${c.rir.text!==''&&parseInt(c.rir.text,10)===v?'on':''}" data-pv="rir" data-v="${v}"${c.rir.formula?' disabled':''}>${v===5?'5+':v}</button>`).join('');
     const puedeRepetir=ref&&!c.r.formula&&!c.kg.formula;
-    const ultimo=!dia.ejercicios.some((x,i)=>i!==ei&&!x.fija&&!_pvHecho(x,i,si,k));
+    const ultimo=!dia.ejercicios.some((x,i)=>i!==ei&&!x.fija&&!_pvHecho(L,i));
+    const listo=_pvHecho(L,ei);
     return `<div class="pv-e act${planVista.guardados.has('f'+ej.fila)?' guardado':''}" data-pvcard="${ei}">
-      <div class="pv-e-h"><span class="chk"></span><div class="n">${escaparHTML(ej.nombre)}<small>${escaparHTML((ej.letra||'')+(pos||''))}${ej.nombre&&ej.bloque?' · '+escaparHTML(ej.bloque):''}</small></div><span class="pv-ej-estado">✓ Guardado</span></div>
+      <div class="pv-e-h">${ej.fija?'<span class="chk"></span>':`<button type="button" class="chk${listo?' on':''}" data-pv="toggle-listo" data-ei="${ei}" aria-label="${listo?'Desmarcar':'Marcar como listo'}">${listo?'✓':''}</button>`}<button type="button" class="n" data-pv="${ej.fija?'cerrar-fija':'cerrar-ej'}" data-ei="${ei}">${escaparHTML(ej.nombre)}<small>${escaparHTML((ej.letra||'')+(pos||''))}${ej.nombre&&ej.bloque?' · '+escaparHTML(ej.bloque):''}</small></button><span class="pv-ej-estado">✓ Guardado</span><button type="button" class="pv-min" data-pv="${ej.fija?'cerrar-fija':'cerrar-ej'}" data-ei="${ei}" aria-label="Minimizar">${ic('chev')}</button></div>
       ${ref?`<div class="pv-ref2"><div class="q"><small>${ref.j===si-1?'La semana pasada':'Semana '+ref.sem}</small><b>${escaparHTML(_pvRefTxt(ref.c))}</b>${otras.length?`<div class="otras">${otras.join(' · ')}</div>`:''}</div>${puedeRepetir?`<button type="button" class="pv-rep" data-pv="repetir" data-ei="${ei}">Repetir</button>`:''}</div>`
            :(otras.length?`<div class="pv-ref2"><div class="q"><div class="otras">${otras.join(' · ')}</div></div></div>`:'')}
       <div class="pv-campos2">
@@ -6749,9 +6771,9 @@ function _pvBodyFuerza(a,e){
 
   let html='';
   bloques.forEach(b=>{
-    const ed=b.items.filter(x=>!x.ej.fija), h=ed.filter(x=>_pvHecho(x.ej,x.ei,si,k)).length;
+    const ed=b.items.filter(x=>!x.ej.fija), h=ed.filter(x=>_pvHecho(L,x.ei)).length;
     const completo=ed.length>0&&h===ed.length;
-    html+=`<div class="pv-bt${completo||!ed.length?' ok':''}"><span class="l">${escaparHTML(b.letra||'•')}</span>${escaparHTML(b.nombre||'Ejercicios')}<small>${completo||!ed.length?'✓ listo':`${h} de ${ed.length}`}</small></div>`;
+    html+=`<div class="pv-bt${completo?' ok':''}"><span class="l">${escaparHTML(b.letra||'•')}</span>${escaparHTML(b.nombre||'Ejercicios')}<small>${!ed.length?'':completo?'✓ listo':`${h} de ${ed.length}`}</small></div>`;
     let pos=0;
     b.items.forEach(({ej,ei})=>{
       pos++;
@@ -6762,11 +6784,11 @@ function _pvBodyFuerza(a,e){
         return;
       }
       if(ei===act || ej.fija){ html+=tarjeta(ej,ei,pos); return; }
-      if(_pvHecho(ej,ei,si,k)){
+      if(_pvHecho(L,ei)){
         html+=`<button type="button" class="pv-e hecho" data-pv="ej" data-ei="${ei}"><span class="chk">✓</span><span class="n">${escaparHTML(ej.nombre)}</span><span class="res">${escaparHTML([c.r.text,c.kg.text&&c.kg.text+' kg'].filter(Boolean).join(' · ')||'listo')}</span></button>`;
       } else {
-        const ref=_pvRef(ej,si,d.semanas);
-        html+=`<button type="button" class="pv-e pend" data-pv="ej" data-ei="${ei}"><span class="chk"></span><span class="n">${escaparHTML(ej.nombre)}</span><span class="res">${ref?`Sem ${ref.sem}: ${escaparHTML([ref.c.r.text,ref.c.kg.text&&ref.c.kg.text+' kg'].filter(Boolean).join(' · '))}`:''}</span></button>`;
+        const ref=_pvRef(ej,si,d.semanas), plan=[c.r.text,c.kg.text&&c.kg.text+' kg'].filter(Boolean).join(' · ');
+        html+=`<button type="button" class="pv-e pend" data-pv="ej" data-ei="${ei}"><span class="chk"></span><span class="n">${escaparHTML(ej.nombre)}</span><span class="res">${plan?escaparHTML(plan):ref?`Sem ${ref.sem}: ${escaparHTML([ref.c.r.text,ref.c.kg.text&&ref.c.kg.text+' kg'].filter(Boolean).join(' · '))}`:''}</span></button>`;
       }
     });
   });
@@ -7056,8 +7078,9 @@ function planGuardarInput(inp){
         ins.forEach(inp=>{ clearTimeout(inp._t); planGuardarInput(inp); });
         const sel=planSel[a.id], k=_pvClaveDia(sel), ei=+el.dataset.ei;
         const dia=e.datos.dias.find(d=>d.n===sel.dia), si=e.datos.semanas.findIndex(w=>w.n===sel.sem);
-        if([...ins].some(x=>x.value.trim())) planVista.listos.add(`${k}-${ei}`);
-        const libre=i=>{ const x=dia.ejercicios[i]; return x&&!x.fija&&!_pvHecho(x,i,si,k); };
+        _pvMarcarListo(a.id,e.datos.mes,sel,ei,true);
+        const L=_pvListos(a.id,e.datos.mes,sel);
+        const libre=i=>{ const x=dia.ejercicios[i]; return x&&!x.fija&&!_pvHecho(L,i); };
         let sig=-1;
         for(let i=ei+1;i<dia.ejercicios.length&&sig<0;i++) if(libre(i)) sig=i;
         for(let i=0;i<ei&&sig<0;i++) if(libre(i)) sig=i;
@@ -7068,6 +7091,13 @@ function planGuardarInput(inp){
         break;
       }
       case 'timer': _pvDescanso(!(_pvDesc.fin>Date.now())); break;
+      case 'cerrar-ej': { if(document.activeElement&&document.activeElement.blur) document.activeElement.blur(); planVista.activo.set(_pvClaveDia(planSel[a.id]),-1); planRenderBody(); break; }
+      case 'cerrar-fija': { planVista.expandidas.delete(`${planSel[a.id].dia}-${el.dataset.ei}`); planRenderBody(); break; }
+      case 'toggle-listo': {
+        const sel=planSel[a.id], L=_pvListos(a.id,e.datos.mes,sel), ei=+el.dataset.ei;
+        if(L.has('*')){ toast('El día ya está terminado: tocá "Deshacer" abajo para desmarcarlo'); break; }
+        _pvMarcarListo(a.id,e.datos.mes,sel,ei,!L.has(ei)); planRenderTodo(); break;
+      }
       case 'mapeo-abrir': { const f=e.datos.filas.find(x=>x.fila===+el.dataset.fila); if(f) _pvAbrirSheet(f); break; }
       case 'ref-mapeo': {
         const sel=planSel[a.id], dia=e.datos.dias.find(d=>d.n===sel.dia), ej=dia.ejercicios[+el.dataset.ei];
