@@ -19,7 +19,7 @@ function scriptGoogleListo(){
 <script>
 // Tema de la app de entrenador (Nocturno por defecto, o Calma), aplicado ANTES del
 // primer pintado para que no haya un flash de verde. El portal del alumno
-// (?alumno=) no lleva tema y queda en Bosque (handoff temas-nocturno-calma).
+// no lleva tema y queda en Bosque (handoff temas-nocturno-calma).
 (function(){
   var t='nocturno'; try{ t=localStorage.getItem('mc_tema')||t; }catch(e){}
   if(t!=='calma') t='nocturno';
@@ -1795,8 +1795,7 @@ div.pv-mf.ro{cursor:default}
             <button class="kebab-btn" onclick="document.getElementById('perfil-kebab-menu').classList.toggle('abierto')">⋮</button>
             <div class="kebab-menu" id="perfil-kebab-menu">
               <button class="kebab-item" id="perfil-btn-editar"><svg class="i s"><use href="#i-edit"/></svg> Editar datos</button>
-              <button class="kebab-item" onclick="copiarLinkPortal();document.getElementById('perfil-kebab-menu').classList.remove('abierto')"><svg class="i s"><use href="#i-link"/></svg> Copiar link del portal</button>
-              <button class="kebab-item" id="perfil-btn-invitar" style="display:none" onclick="enviarInvitacion();document.getElementById('perfil-kebab-menu').classList.remove('abierto')"><svg class="i s"><use href="#i-wa"/></svg> Enviar invitación</button>
+              <button class="kebab-item" id="perfil-btn-invitar" onclick="enviarInvitacion();document.getElementById('perfil-kebab-menu').classList.remove('abierto')"><svg class="i s"><use href="#i-wa"/></svg> Enviar invitación</button>
               <button class="kebab-item danger" id="perfil-btn-eliminar"><svg class="i s"><use href="#i-trash"/></svg> Eliminar alumno</button>
             </div>
           </div>
@@ -2316,29 +2315,26 @@ let editandoNutriId = null;
 let editandoId = null;
 
 // ── PORTAL PÚBLICO ──
-// B-5: el parámetro 'alumno' de la URL ahora es un token no adivinable
-// (columna portalToken en el Sheet), no el ID real del alumno.
+// Auditoría 24/11: al portal se entra SOLO con "Continuar con Google" (la invitación
+// por WhatsApp manda el link sin token). Un link viejo con ?alumno=<token> ya no abre
+// nada: se limpia de la URL y va al login. El token sigue existiendo, pero solo lo
+// entrega el proxy después de verificar el mail con Google.
 (function(){
   const params = new URLSearchParams(window.location.search);
-  const urlToken = params.get('alumno');
+  if(params.has('alumno')){ try{ history.replaceState(null,'',location.pathname); }catch(e){} }
   // Entrada única (handoff portal-login-y-temas): a dónde va cada uno, en este orden:
-  //  1. ?alumno=<token> en la URL → portal con ese token
-  //  2. sesión o copia del entrenador (mc_auth / mc_cache) → panel del entrenador
-  //  3. mc_alumno (alumno que ya entró con Google, o instaló la app) → su portal
-  //  4. nada → login único con Google
-  let tienePanel=false, tieneAuth=false, guardado=null;
+  //  1. sesión o copia del entrenador (mc_auth / mc_cache) → panel del entrenador
+  //  2. mc_alumno CON email (alumno que ya entró con Google) → su portal
+  //  3. nada → login único con Google
+  let tienePanel=false, guardado=null;
   try{
-    tieneAuth=!!localStorage.getItem('mc_auth');
-    tienePanel=tieneAuth || !!localStorage.getItem('mc_cache');
+    tienePanel=!!localStorage.getItem('mc_auth') || !!localStorage.getItem('mc_cache');
     guardado=JSON.parse(localStorage.getItem('mc_alumno')||'null');
+    // Sesiones guardadas desde un link con token (sin mail): ya no valen, se borran
+    if(guardado && !guardado.email){ localStorage.removeItem('mc_alumno'); localStorage.removeItem('mc_portal_cache'); guardado=null; }
   }catch(e){}
   let tokenPortal=null;
-  if(urlToken){
-    tokenPortal=urlToken;
-    // Sin sesión de entrenador en este dispositivo, se recuerda el token: si instala la app
-    // desde acá, la app instalada (start_url sin token) abre su portal.
-    if(!tieneAuth){ try{ localStorage.setItem('mc_alumno',JSON.stringify({token:urlToken,email:(guardado&&guardado.token===urlToken&&guardado.email)||''})); }catch(e){} }
-  } else if(!tienePanel && guardado && guardado.token){
+  if(!tienePanel && guardado && guardado.token){
     tokenPortal=guardado.token;
   }
   document.addEventListener('DOMContentLoaded', _registrarPWA);
@@ -3913,32 +3909,14 @@ function pdBadge(estado){
   return `<span class="pd-badge-inactivo">Inactivo</span>`;
 }
 
-// B-5: genera un token no adivinable la primera vez que se pide el link
-// (si el alumno ya tiene uno, lo reusa) y copia la URL del portal al
-// portapapeles. El link usa el token, nunca el ID real del alumno.
-async function copiarLinkPortal(){
-  const id = document.getElementById('page-perfil').dataset.alumnoId;
-  const i = alumnos.findIndex(x=>x.id===id);
-  if(i===-1) return;
-  try{
-    if(!alumnos[i].portalToken){
-      alumnos[i].portalToken = crypto.randomUUID();
-      await guardarFilaAlumno(alumnos[i]);
-    }
-    const url = `${window.location.origin}${window.location.pathname}?alumno=${alumnos[i].portalToken}`;
-    await navigator.clipboard.writeText(url);
-    toast('Link copiado ✓');
-  }catch(e){
-    toast('Error al generar el link');
-  }
-}
-
 // Invitación por WhatsApp: link de la app SIN token + el mail con el que tiene que entrar.
 // Mismo armado de número que el botón de WhatsApp de la ficha.
 function enviarInvitacion(){
   const id=document.getElementById('page-perfil').dataset.alumnoId;
   const a=alumnos.find(x=>x.id===id);
-  if(!a||!a.email||!a.telefono) return;
+  if(!a) return;
+  if(!a.email){ toast('Primero cargá su mail en Editar: con ese mail entra a la app'); return; }
+  if(!a.telefono){ toast('Primero cargá su teléfono en Editar'); return; }
   const url=`${location.origin}${location.pathname}`;
   const txt=`¡Hola ${a.nombre.split(' ')[0]}! Ya podés ver tu perfil en la app de Mente Consciente: ${url}\nEntrá con "Continuar con Google" usando ${a.email}.\nPara tenerla como app: en Chrome, menú ⋮ → "Instalar app".`;
   window.open(`https://wa.me/54${a.telefono.replace(/\D/g,'')}?text=${encodeURIComponent(txt)}`,'_blank');
@@ -4002,7 +3980,6 @@ function verAlumno(id){
     waBtn.style.display='none';
   }
   // Invitación al portal: solo si el alumno tiene mail Y teléfono
-  document.getElementById('perfil-btn-invitar').style.display=(a.email&&a.telefono)?'':'none';
 
   // Fuerza (Drive) — acceso rápido circular
   const driveBtn=document.getElementById('perfil-btn-drive');

@@ -11,6 +11,12 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 - [ ] Patrón de `onclick` inline pervasivo en vez de `addEventListener` — auditoría del 09/07 (MANTENIBILIDAD, refactor grande) — decisión de Luca: no tocar. Mismo riesgo que el estado global (cientos de puntos a cambiar sin tests), sin bug real detrás. Reconsiderar solo si en algún momento hace falta una política CSP estricta.
 - [ ] Re-render completo vía `innerHTML` en cada actualización de estado (`renderCobros`, `renderNutri`, `renderFinanzas`) — auditoría del 09/07 (RENDIMIENTO/BAJO, refactor grande) — decisión de Luca: no tocar. La propia auditoría ya marcaba esto como imperceptible hoy, solo preocupación de escala futura.
 
+- [ ] **Proxy: inactivos siguen viendo el portal** — auditoría del 24/11 (MEDIO) — `doGet` y el login de `doPost` no chequean `estado`; Fuerza/Mapeo y la entrevista sí. Arreglo de 2 líneas en `portal-proxy.gs` (publicarlo junto con la versión nueva).
+- [ ] **Tokens de links viejos siguen valiendo en el proxy** — auditoría del 24/11 (BAJO) — la app ya no abre links con token, pero alguien con un link viejo podría llamar al proxy directo. Opción: regenerar todos los tokens una vez (los alumnos vuelven a entrar con Google).
+- [ ] **Caché de 5 min del proxy** — auditoría del 24/11 (BAJO) — tras cambiar el token o pasar a inactivo, la respuesta vieja puede servirse hasta 5 min.
+- [ ] **Fuerza sin `#gid`** — auditoría del 24/11 (BAJO) — el proxy muestra la primera pestaña que no se llame "Notas"; conviene pegar los links de Fuerza con el `#gid`.
+- [ ] **Dispositivo del entrenador** — auditoría del 24/11 (BAJO, riesgo aceptado) — `mc_cache` (todos los datos) y el permiso de Google (todas las planillas y el calendario, 1 h) quedan en el dispositivo hasta "Cerrar sesión". Mitigación: bloqueo de pantalla.
+
 ---
 
 ## Features planificadas
