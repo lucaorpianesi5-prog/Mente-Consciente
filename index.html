@@ -5579,6 +5579,11 @@ async function _planApi(url){
   catch(e){ throw {tipo:'red'}; }
   if(r.status===401) throw {tipo:'sesion'};
   if(r.status===403||r.status===404) throw {tipo:'acceso'};
+  // Un Excel (.xlsx) subido a Drive se abre en Sheets, pero la API no lo puede leer
+  if(r.status===400){
+    let m=''; try{ m=((await r.json()).error||{}).message||''; }catch(e){}
+    if(/not supported for this document/i.test(m)) throw {tipo:'excel'};
+  }
   if(!r.ok) throw {tipo:'red'};
   return r.json();
 }
@@ -5912,7 +5917,7 @@ function planRenderBody(){
   if(!planParseUrl(url)){ body.innerHTML=_pvAviso('Este link no es una planilla de Google Sheets.',a,tipo); return; }
   if(!e || e.estado==='cargando'){ body.innerHTML=_pvEsqueleto(); return; }
   if(e.estado==='error'){
-    const msg={formato:'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
+    const msg={excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
     body.innerHTML=_pvAviso(escaparHTML(msg),a,tipo)+((e.error==='red'||e.error==='sesion')?'<div class="pv-aviso" style="padding-top:0"><button type="button" data-pv="reintentar-plan">Reintentar</button></div>':'');
     return;
   }
