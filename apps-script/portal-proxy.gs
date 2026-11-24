@@ -191,8 +191,8 @@ function probarConexionGoogle() {
 // El alumno completa o edita su fecha de nacimiento, altura, peso, objetivo y
 // molestia. Se escribe SOLO en la fila del alumno dueño del token y SOLO en:
 //   K fechaNac · L estatura · M pesoInicial (solo si estaba vacío) · N pesoActual
-//   G objetivos y H molestias: un ítem con origen "entrevista" (al editar se
-//   reemplaza ese ítem; los que cargó Luca no se tocan).
+//   G objetivos y H molestias: ítems con origen "entrevista" (hasta 7 y 8; al
+//   editar se reemplazan esos ítems; los que cargó Luca no se tocan).
 // Nunca toca monto, estado, horario, días, token, email ni datos de otros.
 // Los valores se validan y recortan; un alumno "inactivo" no puede escribir.
 // LockService evita que dos guardados simultáneos se pisen.
@@ -247,19 +247,26 @@ function guardarPerfilAlumno_(cuerpo) {
       // ── Objetivo y molestia: un ítem "de la entrevista" que se reemplaza al editar ──
       const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');   // mismo formato que la ficha
       const recortar = (s, n) => String(s || '').replace(/[\r\n]+/g, ' ').trim().slice(0, n);
-      const ponerItem = (col, item) => {
+      // Reemplaza TODOS los ítems "de la entrevista" de la celda por los nuevos (los de Luca quedan)
+      const ponerItems = (col, items) => {
         const lineas = String(actual[col - 1] || '').split('\n').filter(l => l.trim());
         const otras = lineas.filter(l => {
           try { const o = JSON.parse(l); return !(o && o.origen === 'entrevista'); } catch (e) { return true; }
         });
-        otras.push(JSON.stringify(item));
+        items.forEach(it => otras.push(JSON.stringify(it)));
         hoja.getRange(fila, col).setValue(otras.join('\n'));
       };
-      if (datos.objetivo && datos.objetivo.texto) {
-        ponerItem(COL_PERFIL.objetivos, { texto: recortar(datos.objetivo.texto, 140), categoria: recortar(datos.objetivo.categoria, 40), estado: 'activo', fecha: hoy, origen: 'entrevista' });
+      // Varios objetivos (máx. 7) — o un solo ítem, el formato anterior
+      const objs = Array.isArray(datos.objetivos) ? datos.objetivos.slice(0, 7) : (datos.objetivo ? [datos.objetivo] : null);
+      if (objs) {
+        const items = objs.filter(o => o && o.texto).map(o => ({ texto: recortar(o.texto, 140), categoria: recortar(o.categoria, 40), estado: 'activo', fecha: hoy, origen: 'entrevista' }));
+        if (items.length) ponerItems(COL_PERFIL.objetivos, items);
       }
-      if (datos.molestia && datos.molestia.texto) {
-        ponerItem(COL_PERFIL.notas, { texto: recortar(datos.molestia.texto, 140), zona: recortar(datos.molestia.zona, 30), estado: 'activa', fecha: hoy, origen: 'entrevista' });
+      // Varias molestias (máx. 8); una lista vacía ("No tengo") borra las de una entrevista anterior
+      const mols = Array.isArray(datos.molestias) ? datos.molestias.slice(0, 8) : (datos.molestia ? [datos.molestia] : null);
+      if (mols) {
+        const items = mols.filter(m => m && m.texto).map(m => ({ texto: recortar(m.texto, 140), zona: recortar(m.zona, 30), estado: 'activa', fecha: hoy, origen: 'entrevista' }));
+        ponerItems(COL_PERFIL.notas, items);
       }
     } finally {
       lock.releaseLock();

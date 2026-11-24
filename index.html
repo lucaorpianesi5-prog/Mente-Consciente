@@ -1163,10 +1163,10 @@ button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
 .ent-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
 .ent-x{width:40px;height:40px;border-radius:12px;border:1px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text2);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;font-family:inherit;flex-shrink:0}
 .ent-x .i{width:18px;height:18px}
-.ent-prog{flex:1;display:flex;gap:5px;max-width:260px}
+.ent-prog{flex:1;display:flex;gap:5px;max-width:260px;margin:0 auto}
 .ent-prog i{flex:1;height:5px;border-radius:3px;background:var(--pd-border2)}
 .ent-prog i.on{background:var(--pd-verde)}
-.ent-cuerpo{flex:1;display:flex;flex-direction:column;gap:12px;padding-top:9vh}
+.ent-cuerpo{flex:1;display:flex;flex-direction:column;gap:12px;padding-top:9vh;text-align:center;align-items:stretch}
 .ent-cuerpo h2{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;line-height:1.2}
 .ent-cuerpo>p{font-size:0.9rem;color:var(--pd-text2);line-height:1.5;margin-top:-4px}
 .ent-hola{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
@@ -1175,12 +1175,17 @@ button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
 .ent-hola .ent-nota{font-size:0.82rem;color:var(--pd-text3)}
 .ent-ico{width:64px;height:64px;border-radius:20px;background:var(--pd-verde-dim);color:var(--pd-verde);display:flex;align-items:center;justify-content:center}
 .ent-ico .i{width:34px;height:34px}
-.ent-input{width:100%;height:58px;border-radius:14px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:1.35rem;font-weight:600;padding:0 16px;outline:none;margin-top:10px;color-scheme:inherit}
+.ent-input{width:100%;height:60px;border-radius:14px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:1.45rem;font-weight:700;padding:0 16px;outline:none;margin-top:10px;color-scheme:inherit;text-align:center;-moz-appearance:textfield;appearance:textfield}
+.ent-input::-webkit-outer-spin-button,.ent-input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ent-input[type=date]{display:flex;justify-content:center}
+.ent-input[type=date]::-webkit-date-and-time-value{text-align:center}
 .ent-input:focus{border-color:var(--pd-verde)}
 .ent-input.chico{height:50px;font-size:0.95rem;font-weight:500}
-.ent-num{display:flex;align-items:center;gap:10px}
-.ent-num span{font-size:1.1rem;color:var(--pd-text2);font-weight:600;margin-top:10px}
-.ent-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ent-input::placeholder{color:var(--pd-text3);font-weight:500}
+.ent-num{position:relative}
+.ent-num .ent-input{padding:0 56px}
+.ent-num span{position:absolute;right:20px;top:calc(50% + 5px);transform:translateY(-50%);font-size:1rem;color:var(--pd-text2);font-weight:600;pointer-events:none}
+.ent-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;justify-content:center}
 .ent-chip{padding:0.65rem 0.95rem;border-radius:22px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:0.88rem;font-weight:600;cursor:pointer}
 .ent-chip.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
 .ent-error{color:var(--pd-red);font-size:0.84rem;font-weight:600}
@@ -2670,11 +2675,16 @@ function _entPendiente(a){
   let visto=false; try{ visto=!!localStorage.getItem('mc_entrevista_'+_portalToken); }catch(e){}
   return !visto && !a.fechaNac && !a.estatura && !a.pesoActual;
 }
+// Objetivos que el alumno ya eligió en una entrevista anterior (llegan en a.objetivos)
+function _entObjetivosPrevios(a){
+  return String(a.objetivos||'').split('\n').map(l=>{ try{ const o=JSON.parse(l); return o&&o.origen==='entrevista'?o.texto:null; }catch(e){ return null; } })
+    .filter(t=>t&&ENT_OBJETIVOS.includes(t));
+}
 function abrirEntrevista(a,editar){
   if(!PORTAL_PERFIL_EDITABLE) return;
   _ent={paso:editar?1:0, editar:!!editar, nombre:(a.nombre||'').split(' ')[0], d:{
     fechaNac:a.fechaNac||'', estatura:a.estatura||'', pesoActual:a.pesoActual||'',
-    objetivo:'', objetivoTxt:'', zona:'', molestiaTxt:'', sinMolestias:false }, saltados:new Set(), guardando:false, error:''};
+    objetivos:_entObjetivosPrevios(a), objetivoTxt:'', zonas:[], molestiaTxt:'', sinMolestias:false }, saltados:new Set(), guardando:false, error:''};
   let el=document.getElementById('entrevista');
   if(!el){ el=document.createElement('div'); el.id='entrevista'; document.body.appendChild(el); }
   el.style.display='flex';
@@ -2716,9 +2726,10 @@ function entAtras(){ if(!_ent||_ent.paso<=(_ent.editar?1:0)) return; _entLeerPas
 function entElegir(campo,valor){
   _entLeerPaso();
   const d=_ent.d;
-  if(campo==='objetivo') d.objetivo=d.objetivo===valor?'':valor;
-  if(campo==='zona'){ d.sinMolestias=false; d.zona=d.zona===valor?'':valor; }
-  if(campo==='sin'){ d.sinMolestias=!d.sinMolestias; if(d.sinMolestias){ d.zona=''; d.molestiaTxt=''; } }
+  const alternar=(lista,v)=>lista.includes(v)?lista.filter(x=>x!==v):[...lista,v];
+  if(campo==='objetivo') d.objetivos=alternar(d.objetivos,valor);
+  if(campo==='zona'){ d.sinMolestias=false; d.zonas=alternar(d.zonas,valor); }
+  if(campo==='sin'){ d.sinMolestias=!d.sinMolestias; if(d.sinMolestias){ d.zonas=[]; d.molestiaTxt=''; } }
   _entRender();
 }
 async function _entGuardar(){
@@ -2727,8 +2738,20 @@ async function _entGuardar(){
   if(!sk.has(2)&&d.estatura) datos.estatura=String(d.estatura).replace(',','.');
   if(!sk.has(3)&&d.pesoActual) datos.pesoActual=String(d.pesoActual).replace(',','.');
   const CAT_FICHA={'Ganar fuerza':'Fuerza','Ganar músculo':'Composición corporal','Bajar de peso':'Composición corporal','Rendimiento deportivo':'Resistencia','Movilidad y menos dolor':'Movilidad'};
-  if(!sk.has(4)&&(d.objetivo||d.objetivoTxt)) datos.objetivo={texto:d.objetivoTxt||d.objetivo,categoria:CAT_FICHA[d.objetivo]||''};
-  if(!sk.has(5)&&!d.sinMolestias&&(d.zona||d.molestiaTxt)) datos.molestia={texto:d.molestiaTxt||('Molestia en '+d.zona.toLowerCase()),zona:d.zona||''};
+  if(!sk.has(4)&&(d.objetivos.length||d.objetivoTxt)){
+    datos.objetivos=d.objetivos.map(o=>({texto:o,categoria:CAT_FICHA[o]||''}));
+    if(d.objetivoTxt) datos.objetivos.push({texto:d.objetivoTxt,categoria:''});
+    // Para el proxy de antes (un solo ítem): todo junto en uno
+    datos.objetivo={texto:[d.objetivos.join(', '),d.objetivoTxt].filter(Boolean).join(' — '),categoria:CAT_FICHA[d.objetivos[0]]||''};
+  }
+  if(!sk.has(5)){
+    if(d.sinMolestias) datos.molestias=[];   // "No tengo": se borran las de una entrevista anterior
+    else if(d.zonas.length||d.molestiaTxt){
+      const zonas=d.zonas.length?d.zonas:[''];
+      datos.molestias=zonas.map(z=>({texto:d.molestiaTxt||('Molestia en '+z.toLowerCase()),zona:z}));
+      datos.molestia={texto:d.molestiaTxt||('Molestia en '+d.zonas.join(', ').toLowerCase()),zona:d.zonas.join(', ')};
+    }
+  }
   if(!Object.keys(datos).length){ cerrarEntrevista(true); return; }
   _ent.guardando=true; _ent.error=''; _entRender();
   try{
@@ -2763,12 +2786,12 @@ function _entRender(){
     cuerpo=`<h2>¿Cuánto pesás hoy?</h2><p>Un número aproximado alcanza. Sirve para ver tu progreso.</p>
       <div class="ent-num"><input class="ent-input" id="ent-peso" type="number" inputmode="decimal" step="0.1" placeholder="64,5" value="${escaparHTML(d.pesoActual)}"><span>kg</span></div>`;
   } else if(p===4){
-    cuerpo=`<h2>¿Qué querés lograr?</h2><p>Elegí el que más te represente.</p>
-      <div class="ent-chips">${ENT_OBJETIVOS.map(o=>chip('objetivo',o,d.objetivo===o)).join('')}</div>
+    cuerpo=`<h2>¿Qué querés lograr?</h2><p>Podés elegir más de uno.</p>
+      <div class="ent-chips">${ENT_OBJETIVOS.map(o=>chip('objetivo',o,d.objetivos.includes(o))).join('')}</div>
       <input class="ent-input chico" id="ent-obj-txt" type="text" maxlength="140" placeholder="Contalo con tus palabras (opcional)" value="${escaparHTML(d.objetivoTxt)}">`;
   } else if(p===5){
-    cuerpo=`<h2>¿Tenés alguna molestia o lesión?</h2><p>Así se tiene en cuenta en tus entrenamientos.</p>
-      <div class="ent-chips">${chip('sin','No tengo',d.sinMolestias)}${MOLESTIA_ZONAS.map(z=>chip('zona',z,d.zona===z)).join('')}</div>
+    cuerpo=`<h2>¿Tenés alguna molestia o lesión?</h2><p>Marcá todas las zonas que correspondan. Así se tienen en cuenta en tus entrenamientos.</p>
+      <div class="ent-chips">${chip('sin','No tengo',d.sinMolestias)}${MOLESTIA_ZONAS.map(z=>chip('zona',z,d.zonas.includes(z))).join('')}</div>
       ${d.sinMolestias?'':`<input class="ent-input chico" id="ent-mol-txt" type="text" maxlength="140" placeholder="¿Qué te pasa? (opcional)" value="${escaparHTML(d.molestiaTxt)}">`}`;
   }
   const ultimo=p===ENT_PASOS;
