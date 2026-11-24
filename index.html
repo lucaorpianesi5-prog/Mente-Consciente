@@ -1050,6 +1050,20 @@ body.sesion-bar-on #plan-vista{top:34px}
 .pv-buscar{height:38px;border-radius:10px;background:var(--pd-bg3);border:1px solid var(--pd-border2);color:var(--pd-text);font-family:inherit;font-size:0.82rem;padding:0 0.75rem;width:100%;outline:none}
 .pv-buscar::placeholder{color:var(--pd-text3)}
 .pv-chips{display:flex;gap:0.3rem;overflow-x:auto;padding-bottom:0.1rem}
+/* Pestañas del Mapeo: barra deslizable + animación al cambiar */
+.pv-hojas{display:flex;gap:0.3rem;overflow-x:auto;scrollbar-width:none;padding-bottom:0.1rem}
+.pv-hojas::-webkit-scrollbar{display:none}
+.pv-hoja{flex-shrink:0;padding:0.42rem 0.8rem;border-radius:8px;font-size:0.72rem;font-weight:700;color:var(--pd-text2);background:var(--pd-card);border:1px solid var(--pd-border);cursor:pointer;font-family:inherit;white-space:nowrap;max-width:60vw;overflow:hidden;text-overflow:ellipsis}
+.pv-hoja.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
+.pv-entra-der{animation:pvEntraDer .22s ease-out}
+.pv-entra-izq{animation:pvEntraIzq .22s ease-out}
+@keyframes pvEntraDer{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes pvEntraIzq{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.pv-tabla-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--pd-border);border-radius:10px;background:var(--pd-card)}
+.pv-tabla{border-collapse:collapse;font-size:0.76rem;color:var(--pd-text);min-width:100%}
+.pv-tabla td{padding:0.45rem 0.6rem;border-bottom:1px solid var(--pd-border);border-right:1px solid var(--pd-border);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;vertical-align:top}
+.pv-tabla td:first-child{position:sticky;left:0;background:var(--pd-card);font-weight:600}
+.pv-tabla tr.pv-tabla-h td{color:var(--pd-text2);font-size:0.66rem;text-transform:uppercase;letter-spacing:0.05em;font-weight:700;background:var(--pd-bg3)}
 .pv-chips::-webkit-scrollbar{height:0}
 .pv-chip{flex-shrink:0;padding:0.3rem 0.65rem;border-radius:20px;font-size:0.68rem;font-weight:600;border:1px solid var(--pd-border2);color:var(--pd-text2);background:transparent;font-family:inherit;cursor:pointer}
 .pv-chip.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
@@ -5667,26 +5681,74 @@ function planParseFuerza(grid){
   if(!dias.length || dias.some(d=>!d.ejercicios.length)) throw {tipo:'formato'};
   return {tipo:'fuerza',mes,semanas,dias,mapa};
 }
+// Mapeo: busca la fila de títulos en las primeras 10 filas y ubica cada columna por su
+// nombre (Ejercicio, Reps y KG obligatorias; Enfoque y Patrón opcionales). Solo se
+// edita una pestaña cuyos títulos se reconocen así: se escribe en la columna con ese título.
+const _MAPEO_TITULOS={enfoque:['enfoque'],patron:['patron','patron de movimiento','patrones'],ejercicio:['ejercicio','ejercicios'],reps:['reps','rep','repeticiones'],kg:['kg','kgs','peso','carga','peso (kg)']};
 function planParseMapeo(grid){
   const txt=(r,c)=>((grid[r]&&grid[r][c]&&grid[r][c].t)||'').trim();
-  ['enfoque','patron','ejercicio','reps','kg'].forEach((h,c)=>{ if(_normTxt(txt(1,c))!==h) throw {tipo:'formato'}; });
+  let hr=-1, col=null;
+  for(let r=0;r<Math.min(grid.length,10)&&hr<0;r++){
+    const c={};
+    (grid[r]||[]).forEach((x,i)=>{
+      const t=_normTxt(x&&x.t);
+      for(const k in _MAPEO_TITULOS){ if(c[k]==null && _MAPEO_TITULOS[k].includes(t)) c[k]=i; }
+    });
+    if(c.ejercicio!=null && c.reps!=null && c.kg!=null){ hr=r; col=c; }
+  }
+  if(hr<0) throw {tipo:'formato'};
   const mapa=new Map(), filas=[];
   let enfoque='', patron='';
-  for(let r=2;r<grid.length;r++){
-    const ej=txt(r,2);
+  for(let r=hr+1;r<grid.length;r++){
+    const ej=txt(r,col.ejercicio);
     if(!ej) continue;
-    if(txt(r,0)) enfoque=txt(r,0);
-    if(txt(r,1)) patron=txt(r,1);      // algunos patrones traen espacios de más
-    filas.push({fila:r+1,enfoque,patron,ejercicio:ej,reps:_planCelda(grid,mapa,r,3),kg:_planCelda(grid,mapa,r,4)});
+    if(col.enfoque!=null && txt(r,col.enfoque)) enfoque=txt(r,col.enfoque);
+    if(col.patron!=null && txt(r,col.patron)) patron=txt(r,col.patron);      // algunos patrones traen espacios de más
+    filas.push({fila:r+1,enfoque,patron,ejercicio:ej,reps:_planCelda(grid,mapa,r,col.reps),kg:_planCelda(grid,mapa,r,col.kg)});
   }
   return {tipo:'mapeo',filas,mapa};
+}
+// Pestaña sin formato de Mapeo: se muestra tal cual, como tabla de solo lectura
+function planParseTabla(grid){
+  let filas=grid.map(f=>f.map(c=>(c&&c.t)||''));
+  while(filas.length && filas[filas.length-1].every(t=>!t.trim())) filas.pop();
+  let nc=0; filas.forEach(f=>{ for(let c=f.length-1;c>=0;c--){ if(f[c].trim()){ nc=Math.max(nc,c+1); break; } } });
+  filas=filas.map(f=>{ const x=f.slice(0,nc); while(x.length<nc) x.push(''); return x; });
+  return {tipo:'tabla',filas,mapa:new Map()};
+}
+// Todas las pestañas del Mapeo en un solo pedido (hasta 30)
+async function planLeerMapeo(spreadsheetId){
+  const meta=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties(sheetId,title,hidden)`);
+  const hojas=(meta.sheets||[]).map(x=>x.properties).filter(h=>!h.hidden).slice(0,30);
+  if(!hojas.length) throw {tipo:'formato'};
+  const qs=hojas.map(h=>'ranges='+encodeURIComponent(`'${h.title.replace(/'/g,"''")}'!A1:Z400`)).join('&');
+  const data=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?includeGridData=true&${qs}&fields=sheets(properties(sheetId,title),data(rowData(values(formattedValue,userEnteredValue))))`);
+  return (data.sheets||[]).map(sh=>{
+    const rows=((sh.data||[])[0]||{}).rowData||[];
+    const grid=rows.map(f=>(f.values||[]).map(c=>({
+      t:(c&&c.formattedValue!=null)?String(c.formattedValue):'',
+      f:!!(c&&c.userEnteredValue&&c.userEnteredValue.formulaValue)
+    })));
+    let datos; try{ datos=planParseMapeo(grid); }catch(err){ datos=planParseTabla(grid); }
+    datos.mapa.forEach(cel=>{ cel.hoja=sh.properties.title; });   // cada celda sabe a qué pestaña se guarda
+    return {id:String(sh.properties.sheetId), title:sh.properties.title, datos};
+  });
+}
+// Elegir la pestaña visible (sin cambiar la principal) y reflejarla en e.datos/e.hoja
+function _planUsarPestana(e,i){
+  const t=e.tabs[i]||e.tabs[0];
+  e.sel=e.tabs.indexOf(t); e.datos=t.datos; e.hoja=t.title;
 }
 // Coincidencia EXACTA del nombre (normalizado) entre un ejercicio de Fuerza y el Mapeo. Nada aproximado.
 function _planMapeoDe(alumnoId,nombre){
   const e=planEntrada(alumnoId,'mapeo');
-  if(!e||e.estado!=='ok') return null;
+  if(!e||e.estado!=='ok'||!e.tabs) return null;
+  // Para la referencia en Fuerza solo vale la pestaña del #gid (o la única): con varias
+  // pestañas sin #gid no se adivina, podría ser la de otra persona.
+  const t=e.principal!=null?e.tabs[e.principal]:null;
+  if(!t||t.datos.tipo!=='mapeo') return null;
   const n=_normTxt(nombre);
-  return e.datos.filas.find(f=>_normTxt(f.ejercicio)===n)||null;
+  return t.datos.filas.find(f=>_normTxt(f.ejercicio)===n)||null;
 }
 
 // Mi propio plan (Mi perfil) usa la misma vista que el de un alumno, con un id reservado
@@ -5714,10 +5776,24 @@ function _planLeer(a,tipo,url,p,previa){
   if(!previa) planCache[a.id][tipo]=e;
   e.promesa=(async()=>{
     try{
-      const {hoja,grid}=await planLeerHoja(p.id,p.gid,tipo);
-      const datos=tipo==='fuerza'?planParseFuerza(grid):planParseMapeo(grid);
-      // Si Luca está tipeando o hay un guardado en curso, no se pisa: queda para la próxima
-      if(!previa || !(e.pendientes>0 || _planEditando())){ e.datos=datos; e.hoja=hoja; e.estado='ok'; e.error=null; e.ts=Date.now(); }
+      if(tipo==='mapeo'){
+        const tabs=await planLeerMapeo(p.id);
+        // Si Luca está tipeando o hay un guardado en curso, no se pisa: queda para la próxima
+        if(!previa || !(e.pendientes>0 || _planEditando())){
+          const selId=previa&&e.tabs&&e.tabs[e.sel]?e.tabs[e.sel].id:null;
+          let pi=p.gid!=null?tabs.findIndex(t=>t.id===String(p.gid)):(tabs.length===1?0:-1);
+          e.tabs=tabs; e.principal=pi>=0?pi:null;
+          let si=selId!=null?tabs.findIndex(t=>t.id===selId):-1;
+          if(si<0) si=pi>=0?pi:Math.max(0,tabs.findIndex(t=>t.datos.tipo==='mapeo'));
+          _planUsarPestana(e,si);
+          e.estado='ok'; e.error=null; e.ts=Date.now();
+        }
+      } else {
+        const {hoja,grid}=await planLeerHoja(p.id,p.gid,tipo);
+        const datos=planParseFuerza(grid);
+        datos.mapa.forEach(cel=>{ cel.hoja=hoja; });
+        if(!previa || !(e.pendientes>0 || _planEditando())){ e.datos=datos; e.hoja=hoja; e.estado='ok'; e.error=null; e.ts=Date.now(); }
+      }
     }catch(err){
       if(!previa){ e.estado='error'; e.error=(err&&err.tipo)||'red'; e.ts=Date.now(); }
       if(!(err&&err.tipo)) console.warn('Plan '+tipo+':',err);
@@ -5882,20 +5958,30 @@ function planRenderTodo(){
     extra=`<div class="pv-tabs">${e.datos.dias.map(d=>`<button type="button" class="pv-tab${d.n===sel.dia?' on':''}" data-pv="dia" data-n="${d.n}">Día ${d.n}</button>`).join('')}</div>
       <div class="pv-semanas"><span class="pv-semanas-lbl">Semana</span>${e.datos.semanas.map(s=>`<button type="button" class="pv-sem${s.n===sel.sem?' on':''}${llena(s)?' llena':''}" data-pv="sem" data-n="${s.n}">${s.n}</button>`).join('')}</div>`;
   } else if(ok){
-    meta=`Mapeo · ${e.datos.filas.length} ejercicios`;
+    const tab=e.tabs&&e.tabs[e.sel];
+    const barra=(e.tabs&&e.tabs.length>1)?`<div class="pv-hojas" id="pv-hojas">${e.tabs.map((t,i)=>`<button type="button" class="pv-hoja${i===e.sel?' on':''}" data-pv="hoja" data-i="${i}">${escaparHTML(t.title)}</button>`).join('')}</div>`:'';
+    if(e.datos.tipo!=='mapeo'){
+      meta=`Mapeo · ${tab?tab.title:''} · solo lectura`;
+      extra=barra;
+    } else {
+    meta=`Mapeo · ${e.tabs&&e.tabs.length>1&&tab?tab.title+' · ':''}${e.datos.filas.length} ejercicios`;
     const enfoques=[...new Set(e.datos.filas.map(f=>f.enfoque).filter(Boolean))];
-    extra=`<input class="pv-buscar" id="pv-buscar" type="search" placeholder="Buscar ejercicio o patrón…" value="${escaparHTML(planVista.busqueda)}" autocomplete="off">
+    extra=barra+`<input class="pv-buscar" id="pv-buscar" type="search" placeholder="Buscar ejercicio o patrón…" value="${escaparHTML(planVista.busqueda)}" autocomplete="off">
       <div class="pv-chips"><button type="button" class="pv-chip${!planVista.enfoque?' on':''}" data-pv="enfoque" data-e="">Todos</button>${enfoques.map(f=>`<button type="button" class="pv-chip${planVista.enfoque===f?' on':''}" data-pv="enfoque" data-e="${escaparHTML(f)}">${escaparHTML(f)}</button>`).join('')}</div>`;
+    }
   }
+  const tabVista=ok&&!esFuerza&&e.tabs&&e.tabs[e.sel];
+  const urlVista=tabVista?`https://docs.google.com/spreadsheets/d/${e.spreadsheetId}/edit#gid=${tabVista.id}`:url;
   const v=planVecinos(a.id);
   const corto=x=>`${escaparHTML(x.a.nombre.split(' ')[0])}${x.hora?' · '+escaparHTML(x.hora):''}`;
   const hoyNombre=_planNombreHoy(), finde=hoyNombre==='Sábado'||hoyNombre==='Domingo';
+  const hojasScroll=(document.getElementById('pv-hojas')||{}).scrollLeft||0;
   cont.innerHTML=`<div class="pv-col">
     <div class="pv-top">
       <div class="pv-fila1">
         <button type="button" class="pv-cerrar" data-pv="cerrar" aria-label="Cerrar">✕</button>
         <div class="pv-tit"><div class="pv-nombre">${escaparHTML(a.nombre)}</div><div class="pv-meta">${escaparHTML(meta)}</div></div>
-        ${url?`<a class="pv-sheets" href="${escaparHTML(url)}" target="_blank" rel="noopener">Abrir en Sheets ↗</a>`:''}
+        ${urlVista?`<a class="pv-sheets" href="${escaparHTML(urlVista)}" target="_blank" rel="noopener">Abrir en Sheets ↗</a>`:''}
       </div>${extra}
     </div>
     <div class="pv-body" id="pv-body"></div>
@@ -5905,6 +5991,9 @@ function planRenderTodo(){
       ${v.next?`<button type="button" class="pv-ba sig" data-pv="ir" data-id="${escaparHTML(v.next.a.id)}"><span class="pv-ba-lbl">${finde?'Siguiente · lunes':'Siguiente de hoy'} ›</span><span class="pv-ba-nombre">${corto(v.next)}</span></button>`:'<span class="pv-ba vacio"></span>'}
     </div>`}
   </div>`;
+  // La pestaña elegida queda a la vista en la barra
+  const hb=document.getElementById('pv-hojas');
+  if(hb){ hb.scrollLeft=hojasScroll; const on=hb.querySelector('.on'); if(on) on.scrollIntoView({block:'nearest',inline:'center'}); }
   planRenderBody();
 }
 
@@ -5921,7 +6010,26 @@ function planRenderBody(){
     body.innerHTML=_pvAviso(escaparHTML(msg),a,tipo)+((e.error==='red'||e.error==='sesion')?'<div class="pv-aviso" style="padding-top:0"><button type="button" data-pv="reintentar-plan">Reintentar</button></div>':'');
     return;
   }
-  body.innerHTML=tipo==='fuerza'?_pvBodyFuerza(a,e):_pvBodyMapeo(a,e);
+  body.innerHTML=tipo==='fuerza'?_pvBodyFuerza(a,e):(e.datos.tipo==='tabla'?_pvBodyTabla(e):_pvBodyMapeo(a,e));
+}
+function _pvBodyTabla(e){
+  const f=e.datos.filas;
+  if(!f.length) return '<div class="pv-nota">Esta pestaña está vacía.</div>';
+  return `<div class="pv-tabla-wrap"><table class="pv-tabla">${f.map((r,ri)=>`<tr${ri===0?' class="pv-tabla-h"':''}>${r.map(c=>`<td>${escaparHTML(c)}</td>`).join('')}</tr>`).join('')}</table></div>
+    <div class="pv-nota" style="margin-top:0.6rem">Esta pestaña no tiene los títulos del Mapeo (Ejercicio · Reps · KG), así que se ve tal cual y no se edita desde acá. Para cambiarla, <b>Abrir en Sheets</b>.</div>`;
+}
+// Cambiar de pestaña del Mapeo (botón o deslizar). dir: 1 entra desde la derecha, -1 desde la izquierda
+function _planIrPestana(i,dir){
+  if(!planVista||planVista.tipo!=='mapeo') return;
+  const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,'mapeo');
+  if(!e||e.estado!=='ok'||!e.tabs||i<0||i>=e.tabs.length||i===e.sel) return;
+  if(document.activeElement && document.activeElement.blur) document.activeElement.blur();   // guarda lo que se estaba tipeando
+  if(dir==null) dir=i>e.sel?1:-1;
+  _planUsarPestana(e,i);
+  planVista.busqueda=''; planVista.enfoque='';
+  planRenderTodo();
+  const body=document.getElementById('pv-body');
+  if(body){ body.scrollTop=0; body.classList.add(dir>0?'pv-entra-der':'pv-entra-izq'); }
 }
 
 function _pvCampo(cel,etq,inputmode,ph){
@@ -5984,7 +6092,7 @@ function _pvBodyMapeo(a,e){
 function _planModoEscritura(v){ return /^\d{1,4}[-/]\d{1,2}([-/]\d{1,4})?$/.test(v)?'RAW':'USER_ENTERED'; }
 async function _planEscribir(e,cel,valor){
   if(!accessToken || tokenExp<=Date.now()) throw {tipo:'sesion'};
-  const rango=`'${e.hoja.replace(/'/g,"''")}'!${_planA1(cel.fila,cel.col)}`;
+  const rango=`'${(cel.hoja||e.hoja).replace(/'/g,"''")}'!${_planA1(cel.fila,cel.col)}`;
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${e.spreadsheetId}/values/${encodeRange(rango)}?valueInputOption=${_planModoEscritura(valor)}`;
   let r;
   try{
@@ -6002,7 +6110,7 @@ function planGuardarInput(inp){
   const cel=e.datos.mapa.get(`${inp.dataset.fila},${inp.dataset.col}`);
   if(!cel || cel.formula) return;
   const card=inp.closest('[data-pvcard]');
-  const clave=planVista.tipo==='fuerza'?'f'+cel.fila:'m'+cel.fila;
+  const clave=planVista.tipo==='fuerza'?'f'+cel.fila:'m'+(e.tabs&&e.tabs[e.sel]?e.tabs[e.sel].id+'-':'')+cel.fila;
   if(card) card.classList.remove('guardado','error');
   e.pendientes++;
   e.cola=e.cola.then(async()=>{
@@ -6038,6 +6146,7 @@ function planGuardarInput(inp){
     const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
     switch(el.dataset.pv){
       case 'cerrar': cerrarPlan(); break;
+      case 'hoja': _planIrPestana(+el.dataset.i); break;
       case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; s.sem=planSemanaDefault(e.datos,s.dia); planVista.expandidas=new Set(); planRenderTodo(); break; }
       case 'sem': planSel[a.id].sem=+el.dataset.n; planRenderTodo(); break;
       case 'enfoque': planVista.enfoque=el.dataset.e||''; planRenderTodo(); break;
@@ -6061,6 +6170,24 @@ function planGuardarInput(inp){
       }
     }
   });
+  // Deslizar el dedo a los lados en el Mapeo pasa a la pestaña anterior/siguiente.
+  // Dentro de una tabla ancha, primero scrollea la tabla y recién en su borde cambia de pestaña.
+  let _sw=null;
+  vista.addEventListener('touchstart',ev=>{
+    if(!planVista||planVista.tipo!=='mapeo'||ev.touches.length!==1||!ev.target.closest('#pv-body')) { _sw=null; return; }
+    const t=ev.touches[0], w=ev.target.closest('.pv-tabla-wrap');
+    _sw={x:t.clientX,y:t.clientY,ts:Date.now(),
+      izq:!w||w.scrollLeft<=2, der:!w||w.scrollLeft+w.clientWidth>=w.scrollWidth-2};
+  },{passive:true});
+  vista.addEventListener('touchend',ev=>{
+    if(!_sw) return;
+    const t=ev.changedTouches[0], dx=t.clientX-_sw.x, dy=t.clientY-_sw.y, s=_sw; _sw=null;
+    if(Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.5 || Date.now()-s.ts>800) return;
+    const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,'mapeo');
+    if(!e||!e.tabs||e.tabs.length<2) return;
+    if(dx<0 && s.der) _planIrPestana(e.sel+1,1);
+    else if(dx>0 && s.izq) _planIrPestana(e.sel-1,-1);
+  },{passive:true});
   // Botón atrás de Android: cierra la vista y vuelve a la ficha
   window.addEventListener('popstate',()=>{ if(_planAbierto) _planOcultar(); });
 })();
