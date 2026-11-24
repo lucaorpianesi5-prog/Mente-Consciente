@@ -64,7 +64,7 @@ html[data-tema="nocturno"]{
   --f1:#62B2DE; --f2:#B39AEA; --f3:#C3D45A; --f4:#F2B45C; --f5:#E688B6; --f-alpha:14%;
   --sombra:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.25);
 }
-html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno{
+html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno, html[data-tema="nocturno"] #yo-dark{
   --pd-bg:#0B1310; --pd-bg2:#121C17; --pd-bg3:#19251F; --pd-card:#121C17; --pd-card2:#19251F;
   --pd-border:rgba(140,200,160,0.09); --pd-border2:rgba(140,200,160,0.16);
   --pd-verde:#5BBE7E; --pd-verde-d:#3E9A5E; --pd-verde-dim:rgba(91,190,126,0.13);
@@ -90,7 +90,7 @@ html[data-tema="calma"]{
   --f1:#1F6FA8; --f2:#6E4FC2; --f3:#5A7A0A; --f4:#9A5B00; --f5:#B23E78; --f-alpha:10%;
   --sombra:0 1px 2px rgba(20,40,30,.06),0 6px 20px rgba(20,40,30,.07);
 }
-html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno{
+html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno, html[data-tema="calma"] #yo-dark{
   --pd-bg:#F5F5F0; --pd-bg2:#FFFFFF; --pd-bg3:#EEF0EA; --pd-card:#FFFFFF; --pd-card2:#EEF0EA;
   --pd-border:rgba(20,50,35,0.08); --pd-border2:rgba(20,50,35,0.15);
   --pd-verde:#2E7D4F; --pd-verde-d:#1F5C3A; --pd-verde-dim:rgba(46,125,79,0.09);
@@ -111,8 +111,8 @@ body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--te
 .t-body{font-size:0.86rem;font-weight:500}
 .t-cap{font-size:0.74rem;color:var(--suave)}
 .t-label{font-size:0.62rem;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--texto3)}
-#perfil-dark .t-cap,#portal-alumno .t-cap,#plan-vista .t-cap{color:var(--pd-text2)}
-#perfil-dark .t-label,#portal-alumno .t-label,#plan-vista .t-label{color:var(--pd-text3)}
+#perfil-dark .t-cap,#portal-alumno .t-cap,#plan-vista .t-cap,#yo-dark .t-cap{color:var(--pd-text2)}
+#perfil-dark .t-label,#portal-alumno .t-label,#plan-vista .t-label,#yo-dark .t-label{color:var(--pd-text3)}
 .num{font-variant-numeric:tabular-nums}
 /* Íconos de línea: un solo set (sprite al inicio del body) */
 .i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-4px}
@@ -340,7 +340,7 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
    que reutiliza las clases pd-* / dias-pilares / racha-accion / stats-*; sin
    esto los var(--pd-...) del portal resolverían a vacío y quedarían fondos y
    bordes sin color) */
-#perfil-dark, #portal-alumno, #plan-vista{
+#perfil-dark, #portal-alumno, #plan-vista, #yo-dark{
   --pd-bg:       #111B16;
   --pd-bg2:       #1C2B20;
   --pd-bg3:       #223527;
@@ -595,17 +595,64 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 /* ── FIN FICHA REDISEÑADA ── */
 
 
-/* ALUMNOS CARDS MOBILE */
-#alumnos-cards{display:none;flex-direction:column;gap:0.6rem}
-.alumno-card{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;padding:0.9rem 1rem;cursor:pointer;transition:background 0.15s}
-.alumno-card:hover{background:color-mix(in srgb,var(--verde) 4%,transparent)}
-.alumno-card:active{background:color-mix(in srgb,var(--verde) 8%,transparent)}
-.alumno-card-top{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem}
-.alumno-card-avatar{width:36px;height:36px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.alumno-card-info{flex:1;min-width:0}
-.alumno-card-nombre{font-weight:600;font-size:0.95rem;color:var(--texto)}
-.alumno-card-dias{font-size:0.78rem;color:var(--suave);margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.alumno-card-bottom{display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;color:var(--suave);padding-top:0.6rem;border-top:1px solid var(--borde)}
+/* ALUMNOS — lista compacta para el celu (en la compu sigue la tabla) */
+#alumnos-cards{display:none;flex-direction:column;background:var(--blanco);border:1px solid var(--borde);border-radius:12px;overflow:hidden}
+.al-row{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0.8rem;border-bottom:1px solid var(--borde);cursor:pointer;transition:background 0.15s;min-height:60px}
+.al-row:last-child{border-bottom:none}
+.al-row:active{background:color-mix(in srgb,var(--verde) 8%,transparent)}
+.al-row.apagado{opacity:0.55}
+.al-av{width:38px;height:38px;border-radius:50%;background:var(--verde-bg);color:var(--verde);font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.al-av.hoy{box-shadow:0 0 0 2px var(--blanco),0 0 0 3.5px var(--verde)}
+.al-info{flex:1;min-width:0}
+.al-nombre{font-weight:600;font-size:0.92rem;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.al-sub{font-size:0.74rem;color:var(--suave);margin-top:0.1rem;display:flex;gap:0.45rem;align-items:center;white-space:nowrap;overflow:hidden}
+.al-sub .al-dias{letter-spacing:0.04em;font-weight:600;color:var(--texto3)}
+.al-sub .al-prox{overflow:hidden;text-overflow:ellipsis}
+.al-sub .al-prox.hoy{color:var(--verde);font-weight:600}
+.al-der{display:flex;align-items:center;gap:0.45rem;flex-shrink:0}
+.al-cuota{font-size:0.66rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:20px;white-space:nowrap}
+.al-cuota.alDia{color:var(--ok);background:var(--verde-ok-bg)}
+.al-cuota.vencePronto{color:var(--amarillo);background:var(--amarillo-bg)}
+.al-cuota.vencido{color:var(--rojo);background:var(--rojo-bg)}
+.al-cuota.sinFecha,.al-cuota.pausado{color:var(--texto3);background:var(--crema)}
+.al-wa{width:34px;height:34px;border-radius:10px;border:1px solid var(--borde);background:transparent;color:var(--verde);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.al-wa .i{width:17px;height:17px}
+.al-resumen{display:none;font-size:0.76rem;color:var(--suave);margin:-0.4rem 0 0.7rem}
+.al-resumen b{color:var(--texto);font-weight:700}
+.al-filtros{display:flex;gap:0.4rem;overflow-x:auto;scrollbar-width:none;margin-bottom:0.8rem}
+.al-filtros::-webkit-scrollbar{display:none}
+.al-filtro{flex:0 0 auto;padding:0.4rem 0.8rem;border-radius:20px;font-size:0.76rem;font-weight:600;border:1px solid var(--borde);background:var(--blanco);color:var(--suave);cursor:pointer;font-family:inherit;white-space:nowrap}
+.al-filtro.on{background:var(--verde);color:var(--sobre-acento);border-color:var(--verde)}
+.al-filtro .n{opacity:0.75;margin-left:0.25rem}
+
+/* Selector Alumnos · Nutrición (Nutrición vive dentro de Alumnos) */
+.seg-alumnos{max-width:360px}
+
+/* ── MI PERFIL (entrenador) — misma estética que la ficha y el portal ── */
+#yo-dark{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:0.9rem;color:var(--pd-text)}
+.yo-titulo{font-size:0.74rem;color:var(--pd-text2);margin-top:0.25rem}
+.yo-card{background:var(--pd-card);border:0.5px solid var(--pd-border2);border-radius:10px;padding:0.35rem 0}
+.yo-card-tit{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3);padding:0.6rem 1.1rem 0.3rem}
+.yo-dato{display:flex;align-items:center;gap:0.75rem;padding:0.6rem 1.1rem;border-top:0.5px solid var(--pd-border);font-size:0.84rem;color:var(--pd-text);min-height:44px}
+.yo-card-tit+.yo-dato{border-top:none}
+.yo-dato .i{width:17px;height:17px;color:var(--pd-text3);flex-shrink:0}
+.yo-dato span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.yo-dato small{color:var(--pd-text3);font-size:0.7rem}
+.yo-dato.vacio span{color:var(--pd-text3);font-style:italic}
+.yo-bio{padding:0.2rem 1.1rem 0.8rem;font-size:0.84rem;line-height:1.55;color:var(--pd-text2);white-space:pre-line}
+.yo-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem}
+.yo-kpi{background:var(--pd-card);border:0.5px solid var(--pd-border);border-radius:8px;padding:0.65rem 0.7rem}
+.yo-kpi b{display:block;font-size:1.2rem;color:var(--pd-verde);font-weight:700}
+.yo-kpi small{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--pd-text3)}
+button.yo-dato{width:100%;background:none;border-left:none;border-right:none;border-bottom:none;font-family:inherit;text-align:left;cursor:pointer}
+button.yo-dato:active{background:var(--pd-bg3)}
+button.yo-dato .i.chev{width:14px;height:14px}
+button.yo-dato.peligro{color:var(--pd-red)}
+button.yo-dato.peligro .i{color:var(--pd-red)}
+.yo-editar{background:var(--pd-bg3);border:0.5px solid var(--pd-border2);color:var(--pd-text2);width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;padding:0}
+.yo-editar .i{width:16px;height:16px}
+.yo-aviso{font-size:0.74rem;color:var(--pd-text2);text-align:center;padding:0.3rem 0.5rem}
+.yo-aviso a{color:var(--pd-verde);font-weight:600;cursor:pointer}
 .mes-selector{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
 .mes-selector select{padding:0.5rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:var(--crema);color:var(--texto)}
 .cobros-lista{display:flex;flex-direction:column;gap:0.75rem}
@@ -782,6 +829,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .bottom-nav{display:none}
 .fab{display:none}
 @media(max-width:768px){
+  #btn-nuevo-nutri{display:none}
   /* ── Layout base ── */
   .apphead-m{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem}
   .shell{grid-template-columns:1fr}
@@ -794,6 +842,13 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   /* ── Alumnos: cards en lugar de tabla ── */
   #alumnos-table-wrap{display:none}
   #alumnos-cards{display:flex}
+  .al-resumen{display:block}
+  #page-alumnos .page-header,#page-nutricion .page-header{margin-bottom:1rem}
+  #page-alumnos .page-header h2,#page-alumnos .page-header p,#page-nutricion .page-header>div>h2,#page-nutricion .page-header>div>p{display:none}
+  #page-alumnos .page-header>div:last-child{width:100%}
+  #filtro-alumnos{flex:1;width:auto!important;padding:0.65rem 0.9rem!important;border-radius:10px!important;font-size:0.9rem!important}
+  #btn-nuevo-alumno{display:none}
+  .seg-alumnos{max-width:none}
 
   /* ── Dashboard: "Esta semana" primero ── */
   #page-dashboard.active{display:flex;flex-direction:column}
@@ -835,6 +890,10 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   .bottom-nav a .pill{display:flex;align-items:center;justify-content:center;width:52px;height:30px;border-radius:15px;transition:background 0.2s}
   .bottom-nav a.active{color:var(--texto)}
   .bottom-nav a.active .pill{background:color-mix(in srgb,var(--verde) 13%,transparent);color:var(--verde)}
+  /* Ítem central "Yo": avatar redondo, un poco más grande que el resto */
+  .bottom-nav a.bn-yo .pill{width:38px;height:38px;border-radius:50%;margin-top:-6px;background:var(--verde-bg);border:1.5px solid color-mix(in srgb,var(--verde) 45%,transparent);color:var(--verde);font-size:0.78rem;font-weight:700}
+  .bottom-nav a.bn-yo.active .pill{background:var(--verde);color:var(--sobre-acento);border-color:var(--verde)}
+  .bottom-nav a.bn-yo{gap:0}
 
   /* ── FAB ── */
   .fab{display:flex;align-items:center;justify-content:center;position:fixed;bottom:calc(5.5rem + env(safe-area-inset-bottom));right:18px;width:54px;height:54px;border-radius:17px;background:var(--verde);color:var(--sobre-acento);border:none;cursor:pointer;z-index:160;box-shadow:0 8px 20px color-mix(in srgb,var(--verde) 35%,transparent);transition:transform 0.2s}
@@ -1053,6 +1112,11 @@ body.sesion-bar-on #plan-vista{top:34px}
   <symbol id="i-gift" viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-8M7.5 8a2.500 2.500 0 1 1 4.500-1.500M16.500 8a2.500 2.500 0 1 0-4.500-1.500"/></symbol>
   <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="18.5" r="1"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 20h18M6 16v-5M11 16V7M16 16v-8M21 16V4"/></symbol>
+  <symbol id="i-sync" viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
 </svg>
 
 <!-- Barra de sesión: "Actualizando…", sesión por vencer/vencida, sin conexión -->
@@ -1080,29 +1144,29 @@ body.sesion-bar-on #plan-vista{top:34px}
     <p class="logo-user" id="user-email"></p>
   </div>
   <nav>
-    <a class="active" onclick="showPage('dashboard',this)">
+    <a class="active" id="sb-dashboard" onclick="showPage('dashboard')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
       Resumen
     </a>
-    <a onclick="showPage('alumnos',this)">
+    <a id="sb-alumnos" onclick="showPage('alumnos')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       Alumnos
     </a>
-    <a onclick="showPage('agenda',this)">
+    <a id="sb-agenda" onclick="showPage('agenda')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Agenda semanal
     </a>
-    <a onclick="showPage('cobros',this)">
+    <a id="sb-cobros" onclick="showPage('cobros')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       Cobros
     </a>
-    <a onclick="showPage('nutricion',this)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
-      Nutrición
-    </a>
-    <a onclick="showPage('finanzas',this)">
+    <a id="sb-finanzas" onclick="showPage('finanzas')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Finanzas
+    </a>
+    <a id="sb-yo" onclick="showPage('yo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
+      Mi perfil
     </a>
   </nav>
   <div class="sidebar-bottom">
@@ -1170,7 +1234,7 @@ body.sesion-bar-on #plan-vista{top:34px}
       <div class="seccion-label">
         <span class="resumen-lbl-desktop" id="resumen-semana-titulo">Esta semana</span>
         <span class="resumen-lbl-mobile" id="resumen-hoy-titulo"></span>
-        <a onclick="showPage('agenda',document.getElementById('bn-agenda'));syncBottomNav('agenda')">Ver agenda completa →</a>
+        <a onclick="showPage('agenda')">Ver agenda completa →</a>
       </div>
       <div class="mini-semana" id="resumen-semana"></div>
       <div class="hoy-lista" id="resumen-hoy"></div>
@@ -1179,13 +1243,19 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- ALUMNOS -->
   <div class="page" id="page-alumnos">
+    <div class="venc-toggle-row seg-alumnos">
+      <button class="venc-toggle-btn active" onclick="showPage('alumnos')">Alumnos</button>
+      <button class="venc-toggle-btn" onclick="showPage('nutricion')">Nutrición</button>
+    </div>
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
       <div><h2>Alumnos</h2><p>Gestioná tu lista de alumnos activos</p></div>
       <div style="display:flex;gap:0.75rem;align-items:center">
-        <input type="text" id="filtro-alumnos" placeholder="Buscar por nombre..." oninput="renderTablaAlumnos()" style="padding:0.5rem 0.85rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:var(--blanco);outline:none;width:200px"/>
-        <button class="btn btn-primary" onclick="abrirModalAlumno()">+ Nuevo alumno</button>
+        <input type="search" id="filtro-alumnos" placeholder="Buscar alumno..." oninput="renderTablaAlumnos()" autocomplete="off" style="padding:0.5rem 0.85rem;border:1px solid var(--borde);border-radius:5px;font-size:0.85rem;background:var(--blanco);outline:none;width:200px"/>
+        <button class="btn btn-primary" id="btn-nuevo-alumno" onclick="abrirModalAlumno()">+ Nuevo alumno</button>
       </div>
     </div>
+    <div class="al-filtros" id="alumnos-filtros"></div>
+    <div class="al-resumen" id="alumnos-resumen"></div>
     <div class="table-wrap" id="alumnos-table-wrap">
       <table>
         <thead><tr><th>Nombre</th><th>Días</th><th>Frecuencia</th><th>Monto/mes</th><th>Estado</th><th></th></tr></thead>
@@ -1232,9 +1302,13 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- NUTRICIÓN -->
   <div class="page" id="page-nutricion">
+    <div class="venc-toggle-row seg-alumnos">
+      <button class="venc-toggle-btn" onclick="showPage('alumnos')">Alumnos</button>
+      <button class="venc-toggle-btn active" onclick="showPage('nutricion')">Nutrición</button>
+    </div>
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
       <div><h2>Nutrición</h2><p>Seguimiento de clientes nutricionales</p></div>
-      <button class="btn btn-primary" onclick="abrirModalNutri()">+ Nuevo cliente</button>
+      <button class="btn btn-primary" id="btn-nuevo-nutri" onclick="abrirModalNutri()">+ Nuevo cliente</button>
     </div>
     <!-- Resumen del mes -->
     <div id="nutri-resumen" style="margin-bottom:1.5rem"></div>
@@ -1276,6 +1350,11 @@ body.sesion-bar-on #plan-vista{top:34px}
     </div>
   </div>
 
+  <!-- MI PERFIL (entrenador): mis datos + mi propio Fuerza/Mapeo con la misma vista que mis alumnos -->
+  <div class="page" id="page-yo">
+    <div id="yo-dark"></div>
+  </div>
+
   <div class="page" id="page-perfil">
     <!-- PERFIL DARK WRAPPER -->
     <div id="perfil-dark">
@@ -1284,7 +1363,7 @@ body.sesion-bar-on #plan-vista{top:34px}
       <div class="pd-header">
         <!-- Barra superior: Volver + menú kebab -->
         <div class="pd-header-top">
-          <button class="pd-back" onclick="showPage(perfilOrigen,null);_syncBottomNavFromPerfil()">
+          <button class="pd-back" onclick="showPage(perfilOrigen)">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             Volver
           </button>
@@ -1338,7 +1417,7 @@ body.sesion-bar-on #plan-vista{top:34px}
             <button class="accion-circular" id="perfil-accion-biblioteca" style="display:none">
               <div class="accion-circulo biblio"><svg class="i"><use href="#i-map"/></svg></div><span class="accion-label">Mapeo</span>
             </button>
-            <button class="accion-circular" id="perfil-accion-nutri" onclick="showPage('nutricion',document.getElementById('bn-nutricion'));syncBottomNav('nutricion')">
+            <button class="accion-circular" id="perfil-accion-nutri" onclick="showPage('nutricion')">
               <div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg><span class="dot-activo" id="perfil-nutri-dot" style="display:none"></span></div><span class="accion-label">Nutri</span>
             </button>
           </div>
@@ -1429,25 +1508,25 @@ body.sesion-bar-on #plan-vista{top:34px}
 </main>
 </div>
 
-<!-- BOTTOM NAV MOBILE — solo íconos, 5 secciones -->
+<!-- BOTTOM NAV MOBILE — 5 secciones, "Yo" (mi perfil) al medio, Alumnos (con Nutrición adentro) a la derecha -->
 <nav class="bottom-nav">
-  <a class="active" id="bn-dashboard" onclick="showPage('dashboard',this);syncBottomNav('dashboard')" title="Resumen">
+  <a class="active" id="bn-dashboard" onclick="showPage('dashboard')" title="Resumen">
     <span class="pill"><svg class="i"><use href="#i-home"/></svg></span>Resumen
   </a>
-  <a id="bn-agenda" onclick="showPage('agenda',this);syncBottomNav('agenda')" title="Agenda">
+  <a id="bn-agenda" onclick="showPage('agenda')" title="Agenda">
     <span class="pill"><svg class="i"><use href="#i-cal"/></svg></span>Agenda
   </a>
-  <a id="bn-alumnos" onclick="showPage('alumnos',this);syncBottomNav('alumnos')" title="Alumnos">
-    <span class="pill"><svg class="i"><use href="#i-users"/></svg></span>Alumnos
+  <a id="bn-yo" class="bn-yo" onclick="showPage('yo')" title="Mi perfil">
+    <span class="pill" id="bn-yo-ini">L</span>Yo
   </a>
-  <a id="bn-cobros" onclick="showPage('cobros',this);syncBottomNav('cobros')" title="Cobros">
+  <a id="bn-cobros" onclick="showPage('cobros')" title="Cobros">
     <span class="pill"><svg class="i"><use href="#i-cash"/></svg></span>Cobros
   </a>
-  <a id="bn-nutricion" onclick="showPage('nutricion',this);syncBottomNav('nutricion')" title="Nutrición">
-    <span class="pill"><svg class="i"><use href="#i-leaf"/></svg></span>Nutrición
+  <a id="bn-alumnos" onclick="showPage('alumnos')" title="Alumnos">
+    <span class="pill"><svg class="i"><use href="#i-users"/></svg></span>Alumnos
   </a>
 </nav>
-<button class="fab" onclick="abrirModalAlumno()" aria-label="Nuevo alumno"><svg class="i"><use href="#i-plus"/></svg></button>
+<button class="fab" id="fab" onclick="_fabAccion()" aria-label="Nuevo alumno"><svg class="i"><use href="#i-plus"/></svg></button>
 </div>
 
 <!-- POPUP RÁPIDO AGENDA -->
@@ -1616,6 +1695,51 @@ body.sesion-bar-on #plan-vista{top:34px}
 <!-- PORTAL PÚBLICO ALUMNO -->
 <div id="portal-alumno" style="display:none"></div>
 
+<!-- MODAL MI PERFIL (entrenador) -->
+<div class="overlay" id="modal-mi-perfil">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Mi perfil</h3>
+      <button class="modal-close" onclick="cerrarModal('modal-mi-perfil')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field" style="grid-column:1/-1"><label>Nombre</label><input type="text" id="yo-nombre" placeholder="Tu nombre"/></div>
+        <div class="field" style="grid-column:1/-1"><label>Título / especialidad</label><input type="text" id="yo-titulo" placeholder="ej: Entrenador personal · Lic. en Educación Física"/></div>
+        <div class="field"><label>Teléfono / WhatsApp</label><input type="tel" id="yo-telefono" placeholder="ej: 3516123456"/></div>
+        <div class="field"><label>Instagram</label><input type="text" id="yo-instagram" placeholder="@usuario" autocomplete="off"/></div>
+        <div class="field"><label>Zona / lugar de trabajo</label><input type="text" id="yo-zona" placeholder="ej: Gimnasio X, Córdoba"/></div>
+        <div class="field"><label>Alias para cobrar</label><input type="text" id="yo-alias" placeholder="alias.mp" autocomplete="off"/></div>
+        <div class="field" style="grid-column:1/-1"><label>Sobre mí</label><textarea id="yo-bio" rows="3" placeholder="Formación, enfoque de trabajo…"></textarea></div>
+        <div class="field" style="grid-column:1/-1">
+          <label>Mis días de entrenamiento</label>
+          <div class="dias-check" id="yo-dias-check">
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Lunes">Lun</span>
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Martes">Mar</span>
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Miércoles">Mié</span>
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Jueves">Jue</span>
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Viernes">Vie</span>
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Sábado">Sáb</span>
+            <span class="dia-check-label" onclick="this.classList.toggle('checked')" data-dia="Domingo">Dom</span>
+          </div>
+        </div>
+        <div class="field"><label>Horario habitual</label><input type="text" id="yo-horario" placeholder="ej: 7:00"/></div>
+        <div class="field"><label>Fecha de nacimiento</label><input type="text" id="yo-fechaNac" placeholder="dd/mm/aaaa" inputmode="numeric"/></div>
+        <div class="field"><label>Altura (cm)</label><input type="number" id="yo-estatura" inputmode="decimal"/></div>
+        <div class="field"><label>Peso inicial (kg)</label><input type="number" id="yo-pesoInicial" inputmode="decimal" step="0.1"/></div>
+        <div class="field"><label>Peso actual (kg)</label><input type="number" id="yo-pesoActual" inputmode="decimal" step="0.1"/></div>
+        <div class="field" style="grid-column:1/-1"><label>Mi planilla de Fuerza (URL)</label><input type="url" id="yo-fuerzaUrl" placeholder="https://docs.google.com/spreadsheets/..."/></div>
+        <div class="field" style="grid-column:1/-1"><label>Mi Sheet de Mapeo (URL)</label><input type="url" id="yo-mapeoUrl" placeholder="https://docs.google.com/spreadsheets/...#gid=..."/></div>
+        <div class="field" style="grid-column:1/-1"><label>Mi Nutrición (URL, opcional)</label><input type="url" id="yo-nutriUrl" placeholder="https://drive.google.com/..."/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-mi-perfil')">Cancelar</button>
+      <button class="btn btn-primary" id="yo-btn-guardar" onclick="guardarModalMiPerfil()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Plan del alumno dentro de la app (Fuerza y Mapeo), pantalla completa -->
 <div id="plan-vista"></div>
 
@@ -1682,6 +1806,9 @@ const RANGO = {
   PROGRESION_ACTUAL_KEYS: 'Progresion_Actual!A2:B10000',
   PROGRESION_ACTUAL_START: 'Progresion_Actual!A2',
   PROGRESION_HISTORIAL_START: 'Progresion_Historial!A2',
+  // Mi perfil (entrenador): pares Clave/Valor; la pestaña se crea sola al guardar
+  PERFIL_READ:         'Perfil!A2:B40',
+  PERFIL_WRITE:        'Perfil!A2:B40',
 };
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
@@ -1722,6 +1849,8 @@ function montoCobro(a,c){
 
 let accessToken = null;
 let alumnos = [];
+const MI_ID = "__yo";       // id reservado: mi propio perfil en el visor de planes (nunca es un alumno real)
+let miPerfil = {};           // Mi perfil (pestaña "Perfil" del Sheet, clave/valor)
 let cobros  = {};
 let seguimiento = {};
 let asistencias = [];
@@ -2127,7 +2256,7 @@ function _authInvalidar(){
 
 function _cacheGuardar(){
   const ts=Date.now();
-  if(_lsSet(CACHE_KEY, JSON.stringify({v:1, ts, alumnos, cobros, seguimiento, asistencias, clientesNutri, cobrosNutri, gastos, configFinanzas, biblioteca, progresionActual}))){
+  if(_lsSet(CACHE_KEY, JSON.stringify({v:1, ts, alumnos, cobros, seguimiento, asistencias, clientesNutri, cobrosNutri, gastos, configFinanzas, biblioteca, progresionActual, miPerfil}))){
     cacheTs=ts;
   }
 }
@@ -2139,6 +2268,7 @@ function _cacheRestaurar(){
     clientesNutri=c.clientesNutri||[]; cobrosNutri=c.cobrosNutri||{}; gastos=c.gastos||[];
     configFinanzas=c.configFinanzas||{saldoInicial:0,fechaReferencia:''};
     biblioteca=c.biblioteca||[]; progresionActual=c.progresionActual||[];
+    miPerfil=(c.miPerfil && typeof c.miPerfil==='object')?c.miPerfil:{};
     cacheTs=c.ts||0;
     return true;
   }catch(e){ return false; }
@@ -2400,7 +2530,7 @@ function cerrarSesion(){
   planCache={}; planSel={}; if(_planAbierto) _planOcultar();
   alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];configFinanzas={saldoInicial:0,fechaReferencia:''};
-  biblioteca=[];progresionActual=[];
+  biblioteca=[];progresionActual=[];miPerfil={};
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
   _actualizarBotonLogin();
@@ -2484,7 +2614,7 @@ async function cargarDatos(opts){
   }
   // Foto del estado actual: si una lectura falla (sin conexión, 401…) se vuelve
   // a esto en vez de dejar en blanco lo que ya se estaba mostrando (copia guardada).
-  const antes={alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual};
+  const antes={alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil};
   const habiaDatos=alumnos.length>0;
   let fallo=false;
   _actualizando=true;
@@ -2626,13 +2756,19 @@ async function cargarDatos(opts){
           })).filter(p=>p.alumnoId&&p.ejercicioId);
         }catch(e){console.warn('Error cargando Progresion_Actual:',e);progresionActual=[];}
       })(),
+
+      // Mi perfil (pestaña opcional: si todavía no existe queda vacío, no es un fallo)
+      (async()=>{
+        try{ miPerfil=_perfilDesdeFilas(await sheetsGet(RANGO.PERFIL_READ)); }
+        catch(e){ console.warn('Sin pestaña Perfil (se crea al guardar):',e); }
+      })(),
     ]);
 
     if(fallo){
       // Una lectura falló: si ya había datos en pantalla (la copia guardada), se
       // conservan tal cual y no se da por actualizado ni se pisa la copia.
       if(habiaDatos){
-        ({alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual}=antes);
+        ({alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil}=antes);
       }
       toast(habiaDatos ? 'No se pudo actualizar. Mostrando los últimos datos guardados' : 'No se pudieron cargar los datos. Tocá Sincronizar para reintentar');
     } else {
@@ -2658,6 +2794,10 @@ function _renderPaginaActual(){
   renderDashboard();
   if(document.getElementById('page-cobros').classList.contains('active')) renderCobrosPage();
   if(document.getElementById('page-agenda').classList.contains('active')) renderAgenda();
+  if(document.getElementById('page-yo').classList.contains('active')) renderMiPerfil();
+  _actualizarIniYo();
+  const _ah=document.getElementById('apphead-txt');
+  if(_ah && document.getElementById('page-dashboard').classList.contains('active')) _ah.textContent='Hola, '+_miNombreCorto();
   if(document.getElementById('page-nutricion').classList.contains('active')) renderNutri();
   if(document.getElementById('page-finanzas').classList.contains('active')) renderFinanzas();
   const perfil=document.getElementById('page-perfil');
@@ -2737,29 +2877,47 @@ async function guardarCobroFila(mk, aid){
 }
 
 // ── NAVEGACIÓN ──
-function showPage(id,el){
+// Qué ítem de la barra (inferior y lateral) queda resaltado en cada página:
+// Nutrición vive dentro de Alumnos, Finanzas se abre desde Mi perfil en el celu,
+// y la ficha de un alumno resalta la sección de donde se vino.
+function _navDe(id){
+  if(id==='perfil') return _navDe(perfilOrigen);
+  if(id==='nutricion') return 'alumnos';
+  return id;
+}
+function showPage(id){
   const _ah=document.getElementById('apphead-m');
-  if(_ah){ _ah.classList.toggle('sin',id==='perfil'); const _t=document.getElementById('apphead-txt'); if(_t) _t.textContent=({dashboard:'Hola, Luca',alumnos:'Alumnos',agenda:'Agenda',cobros:'Cobros',nutricion:'Nutrición',finanzas:'Finanzas'})[id]||''; }
+  if(_ah){ _ah.classList.toggle('sin',id==='perfil'||id==='yo'); const _t=document.getElementById('apphead-txt'); if(_t) _t.textContent=({dashboard:'Hola, '+_miNombreCorto(),alumnos:'Alumnos',agenda:'Agenda',cobros:'Cobros',nutricion:'Nutrición',finanzas:'Finanzas'})[id]||''; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('aside nav a').forEach(a=>a.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  if(el) el.classList.add('active');
+  syncBottomNav(id);
+  _fabActualizar(id);
   if(id==='dashboard') renderDashboard();
   if(id==='agenda')    renderAgenda();
   if(id==='alumnos')   renderTablaAlumnos();
   if(id==='cobros')    renderCobrosPage();
   if(id==='nutricion') renderNutri();
   if(id==='finanzas')  renderFinanzas();
-}function syncBottomNav(id){
-  document.querySelectorAll('.bottom-nav a').forEach(a=>a.classList.remove('active'));
-  const el=document.getElementById('bn-'+id);
-  if(el) el.classList.add('active');
+  if(id==='yo')        renderMiPerfil();
 }
+function syncBottomNav(id){
+  const nav=_navDe(id);
+  document.querySelectorAll('.bottom-nav a, aside nav a').forEach(a=>a.classList.remove('active'));
+  ['bn-','sb-'].forEach(pre=>{ const el=document.getElementById(pre+nav); if(el) el.classList.add('active'); });
+}
+// Compatibilidad con llamadores viejos
+function _syncBottomNavFromPerfil(){ syncBottomNav('perfil'); }
 
-// Sincroniza la barra inferior cuando se navega al perfil desde cualquier sección
-function _syncBottomNavFromPerfil(){
-  // El perfil no tiene su propio ítem en la barra; resalta la sección de origen
-  syncBottomNav(perfilOrigen);
+// Botón flotante (celu): nuevo alumno, o nuevo cliente en Nutrición; no aparece en Mi perfil ni en la ficha
+function _fabActualizar(id){
+  const f=document.getElementById('fab'); if(!f) return;
+  f.dataset.pagina=id;
+  f.style.visibility=(id==='yo'||id==='perfil')?'hidden':'';
+  f.setAttribute('aria-label',id==='nutricion'?'Nuevo cliente de nutrición':'Nuevo alumno');
+}
+function _fabAccion(){
+  const f=document.getElementById('fab');
+  if(f && f.dataset.pagina==='nutricion') abrirModalNutri(); else abrirModalAlumno();
 }
 
 // ── FECHA ──
@@ -2819,44 +2977,99 @@ function badgeEstado(e){
   if(e==='pausado') return '<span class="badge badge-amarillo">Pausado</span>';
   return '<span class="badge badge-rojo">Inactivo</span>';
 }
+// Filtro rápido de la lista (celu y compu): todos · entrenan hoy · cuota · pausados/inactivos
+let filtroAlumnosRapido='todos';
+const _DIAS_SEM=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const _LETRA_DIA={Lunes:'L',Martes:'M','Miércoles':'X',Jueves:'J',Viernes:'V','Sábado':'S',Domingo:'D'};
+// Próxima sesión en texto corto: "Hoy 18:00", "Mañana 9:00", "Jue 18:00"
+function _proximaSesionCorta(a){
+  if(!a.dias.length) return null;
+  const hpd=stringToHorariosPorDia(a.horario), hoy=new Date();
+  for(let off=0;off<7;off++){
+    const d=new Date(hoy); d.setDate(hoy.getDate()+off);
+    const nombre=_DIAS_SEM[d.getDay()];
+    if(a.dias.includes(nombre)){
+      const hora=(hpd[nombre]||'').split('-')[0].trim();
+      const dia=off===0?'Hoy':off===1?'Mañana':nombre.slice(0,3);
+      return {txt:dia+(hora?' '+hora:''), hoy:off===0};
+    }
+  }
+  return null;
+}
+function _cuotaCorta(a,hoy0){
+  if(a.estado!=='activo') return {cls:'pausado',txt:a.estado==='pausado'?'Pausado':'Inactivo'};
+  const v=calcularVencimiento(a,hoy0);
+  if(v.categoria==='vencido') return {cls:'vencido',txt:`Debe ${v.ciclosAdeudados}`};
+  if(v.categoria==='vencePronto') return {cls:'vencePronto',txt:v.diasParaVencer<=0?'Vence hoy':v.diasParaVencer===1?'Vence mañana':`Vence ${v.diasParaVencer}d`};
+  if(v.categoria==='alDia') return {cls:'alDia',txt:'Al día'};
+  return {cls:'sinFecha',txt:'Sin fecha'};
+}
+function setFiltroAlumnos(f){ filtroAlumnosRapido=f; renderTablaAlumnos(); }
+function _abrirWhatsAppAlumno(ev,id){
+  ev.stopPropagation();
+  const a=alumnos.find(x=>x.id===id); if(!a||!a.telefono) return;
+  window.open(`https://wa.me/54${a.telefono.replace(/\D/g,'')}`,'_blank');
+}
 function renderTablaAlumnos(){
   const tbody=document.getElementById('tabla-alumnos');
   const cards=document.getElementById('alumnos-cards');
   const filtroEl=document.getElementById('filtro-alumnos');
   const filtro=filtroEl?filtroEl.value.toLowerCase().trim():'';
-  const lista=filtro
-    ?alumnos.filter(a=>a.nombre.toLowerCase().includes(filtro))
-    :alumnos;
+  const hoy0=new Date(); hoy0.setHours(0,0,0,0);
+  const hoyNombre=_DIAS_SEM[hoy0.getDay()];
+  const ordenEstado={activo:0,pausado:1,inactivo:2};
+  // Datos derivados una sola vez por alumno (cuota y próxima sesión); activos primero, por nombre
+  const filas=alumnos.map(a=>({a,cuota:_cuotaCorta(a,hoy0),prox:a.estado==='activo'?_proximaSesionCorta(a):null,hoy:a.estado==='activo'&&a.dias.includes(hoyNombre)}))
+    .sort((x,y)=>((ordenEstado[x.a.estado]??3)-(ordenEstado[y.a.estado]??3))||x.a.nombre.localeCompare(y.a.nombre,'es'));
+  const debe=f=>f.cuota.cls==='vencido'||f.cuota.cls==='vencePronto';
+  const pasa={todos:()=>true,hoy:f=>f.hoy,deben:debe,pausados:f=>f.a.estado!=='activo'};
+  const cuenta={}; Object.keys(pasa).forEach(k=>cuenta[k]=filas.filter(pasa[k]).length);
+  if(!pasa[filtroAlumnosRapido]) filtroAlumnosRapido='todos';
+  const lista=filas.filter(pasa[filtroAlumnosRapido]).filter(f=>!filtro||f.a.nombre.toLowerCase().includes(filtro));
+
+  const filtrosEl=document.getElementById('alumnos-filtros');
+  if(filtrosEl){
+    const chip=(k,lbl)=>`<button type="button" class="al-filtro${filtroAlumnosRapido===k?' on':''}" onclick="setFiltroAlumnos('${k}')">${lbl}<span class="n">${cuenta[k]}</span></button>`;
+    filtrosEl.innerHTML=alumnos.length?chip('todos','Todos')+chip('hoy','Entrenan hoy')+chip('deben','Cuota por cobrar')+(cuenta.pausados?chip('pausados','Pausados'):''):'';
+  }
+  const resumenEl=document.getElementById('alumnos-resumen');
+  if(resumenEl){
+    const act=alumnos.filter(a=>a.estado==='activo').length;
+    resumenEl.innerHTML=alumnos.length?`<b>${act}</b> activo${act!==1?'s':''} · <b>${cuenta.hoy}</b> entrena${cuenta.hoy!==1?'n':''} hoy${cuenta.deben?` · <b style="color:var(--rojo)">${cuenta.deben}</b> con cuota por cobrar`:''}`:'';
+  }
+
   if(!lista.length){
-    const msg=filtro?`Sin resultados para "${filtro}"`:'No hay alumnos. Agregá el primero.';
+    const msg=filtro?`Sin resultados para "${escaparHTML(filtro)}"`:(alumnos.length?'Nadie en este filtro.':'No hay alumnos. Agregá el primero.');
     tbody.innerHTML=`<tr><td colspan="6" style="text-align:center;color:var(--suave);padding:2rem">${msg}</td></tr>`;
     cards.innerHTML=`<p style="text-align:center;color:var(--suave);padding:2rem">${msg}</p>`;
     return;
   }
-  tbody.innerHTML=lista.map(a=>`<tr>
+  tbody.innerHTML=lista.map(({a})=>`<tr>
     <td style="font-weight:500">${escaparHTML(a.nombre)}</td>
     <td style="font-size:0.8rem">${escaparHTML(a.dias.join(', '))}</td>
-    <td>${a.frecuencia}x/sem</td>
+    <td>${escaparHTML(a.frecuencia)}x/sem</td>
     <td style="font-weight:600;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</td>
     <td>${badgeEstado(a.estado)}</td>
     <td><button class="btn btn-secondary btn-sm" onclick="verAlumno('${a.id}')">Ver</button></td>
   </tr>`).join('');
-  cards.innerHTML=lista.map(a=>`
-    <div class="alumno-card" onclick="verAlumno('${a.id}')">
-      <div class="alumno-card-top">
-        <div class="alumno-card-avatar">${a.nombre.charAt(0).toUpperCase()}</div>
-        <div class="alumno-card-info">
-          <div class="alumno-card-nombre">${escaparHTML(a.nombre)}</div>
-          <div class="alumno-card-dias">${escaparHTML(a.dias.join(', '))}</div>
-        </div>
-        ${badgeEstado(a.estado)}
+  // Celu: una fila compacta por alumno con lo que se mira en el gimnasio —
+  // quién entrena hoy (anillo en el avatar), sus días, la próxima sesión,
+  // el estado de la cuota y WhatsApp a un toque. El monto queda en Cobros.
+  cards.innerHTML=lista.map(({a,cuota,prox,hoy})=>{
+    const ini=a.nombre.split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase()||'?';
+    const letras=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'].filter(d=>a.dias.includes(d)).map(d=>_LETRA_DIA[d]).join(' ');
+    return `<div class="al-row${a.estado!=='activo'?' apagado':''}" onclick="verAlumno('${a.id}')">
+      <div class="al-av${hoy?' hoy':''}">${escaparHTML(ini)}</div>
+      <div class="al-info">
+        <div class="al-nombre">${escaparHTML(a.nombre)}</div>
+        <div class="al-sub">${letras?`<span class="al-dias">${escaparHTML(letras)}</span>`:'<span>Sin días</span>'}${prox?`<span class="al-prox${prox.hoy?' hoy':''}">· ${escaparHTML(prox.txt)}</span>`:''}</div>
       </div>
-      <div class="alumno-card-bottom">
-        <span>${a.frecuencia}x por semana</span>
-        <span style="font-weight:700;color:var(--verde)">$${parseFloat(a.monto||0).toLocaleString('es-AR')}</span>
+      <div class="al-der">
+        <span class="al-cuota ${cuota.cls}">${escaparHTML(cuota.txt)}</span>
+        ${a.telefono?`<button type="button" class="al-wa" aria-label="WhatsApp" onclick="_abrirWhatsAppAlumno(event,'${a.id}')">${ic('wa')}</button>`:''}
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 // Línea de estado bajo el campo Email del modal de alumno
@@ -4691,15 +4904,13 @@ let cobrosFiltroAlumno='';
 function irACobrosAlumno(id){
   cobrosFiltroAlumno=id;
   vistaCobros='pormes'; // viene a ver el estado de un mes puntual de este alumno
-  showPage('cobros', document.getElementById('bn-cobros'));
-  syncBottomNav('cobros');
+  showPage('cobros');
 }
 // Link "Ver vencimientos →" de la alerta de Resumen — mismo patrón que
 // irACobrosAlumno(), pero a la vista Vencimientos y sin filtrar alumno.
 function irAVencimientos(){
   vistaCobros='vencimientos';
-  showPage('cobros', document.getElementById('bn-cobros'));
-  syncBottomNav('cobros');
+  showPage('cobros');
 }
 
 // ── COBROS: toggle "Vencimientos" (default) / "Por mes" (handoff vencimientos-cobros) ──
@@ -5133,6 +5344,198 @@ function stringToHorariosPorDia(str){
   return result;
 }
 
+
+// ══ MI PERFIL (entrenador) ══
+// Mis datos profesionales y personales, y mi propio Fuerza/Mapeo abiertos con la
+// MISMA vista que uso con los alumnos (abrirPlan), para probar la app como ellos.
+// Se guarda en la pestaña "Perfil" del Sheet como pares Clave/Valor (A=clave,
+// B=valor); si la pestaña no existe se crea sola la primera vez que se guarda.
+// No toca Alumnos/Cobros/Asistencias: mi perfil no cuenta como alumno en ningún lado.
+const PERFIL_CAMPOS=['nombre','titulo','telefono','instagram','zona','alias','bio','fechaNac','estatura','pesoInicial','pesoActual','dias','horario','fuerzaUrl','mapeoUrl','nutriUrl'];
+function _perfilDesdeFilas(rows){
+  const o={};
+  (rows||[]).forEach(r=>{ const k=(r[0]||'').trim(); if(PERFIL_CAMPOS.includes(k)) o[k]=r[1]==null?'':String(r[1]); });
+  return o;
+}
+function _miNombreCorto(){ return ((miPerfil.nombre||'').trim().split(/\s+/)[0])||'Luca'; }
+function _miDias(){ return miPerfil.dias?miPerfil.dias.split('|').filter(Boolean):[]; }
+// Mi perfil con la forma de un alumno, para reutilizar el visor de planes y los cálculos
+function _miComoAlumno(){
+  const dias=_miDias();
+  return {id:MI_ID, nombre:(miPerfil.nombre||'').trim()||'Mi entrenamiento', dias, horario:miPerfil.horario||'',
+    frecuencia:String(dias.length||''), estado:'activo', carpetaDrive:miPerfil.fuerzaUrl||'', mapeoUrl:miPerfil.mapeoUrl||'',
+    nutriDrive:miPerfil.nutriUrl||'', fechaNac:miPerfil.fechaNac||'', estatura:miPerfil.estatura||'',
+    pesoInicial:miPerfil.pesoInicial||'', pesoActual:miPerfil.pesoActual||''};
+}
+function _miIniciales(){
+  const n=(miPerfil.nombre||'').trim()||'Luca';
+  return n.split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+}
+function _actualizarIniYo(){ const el=document.getElementById('bn-yo-ini'); if(el) el.textContent=_miIniciales(); }
+
+async function _crearPestanaPerfil(){
+  if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
+  const r=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}:batchUpdate`,{
+    method:'POST',
+    headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+    body:JSON.stringify({requests:[{addSheet:{properties:{title:'Perfil'}}}]})
+  });
+  if(!r.ok) throw new Error('No se pudo crear la pestaña Perfil');
+  await sheetsUpdate('Perfil!A1:B1',[['Clave','Valor']]);
+}
+async function guardarMiPerfil(nuevo){
+  const filas=PERFIL_CAMPOS.map(k=>[k,nuevo[k]||'']);
+  try{
+    await sheetsReplaceRange(RANGO.PERFIL_WRITE, filas);
+  }catch(e){
+    if(!_escrituraPermitida()) throw e;
+    // Lo más probable: la pestaña todavía no existe. Se crea y se reintenta una vez.
+    await _crearPestanaPerfil();
+    await sheetsReplaceRange(RANGO.PERFIL_WRITE, filas);
+  }
+  miPerfil={...nuevo};
+  _cacheGuardar();
+}
+
+function _yoDato(icono,valor,vacio,extra=''){
+  return valor
+    ? `<div class="yo-dato">${ic(icono)}<span>${escaparHTML(valor)}</span>${extra}</div>`
+    : `<div class="yo-dato vacio">${ic(icono)}<span>${escaparHTML(vacio)}</span></div>`;
+}
+function renderMiPerfil(){
+  const cont=document.getElementById('yo-dark'); if(!cont) return;
+  const a=_miComoAlumno(), p=miPerfil;
+  const DIAS_SEMANA=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'], LETRAS=['D','L','M','X','J','V','S'];
+  const hoyNum=new Date().getDay();
+  const pilares=LETRAS.map((l,i)=>`<div class="${['dia-pilar',a.dias.includes(DIAS_SEMANA[i])?'activo':'',i===hoyNum?'hoy':''].filter(Boolean).join(' ')}">${l}</div>`).join('');
+  const prox=_proximaSesionCorta(a);
+  const edad=calcularEdad(a.fechaNac);
+  const imc=(a.pesoActual&&a.estatura)?(parseFloat(a.pesoActual)/Math.pow(parseFloat(a.estatura)/100,2)).toFixed(1):null;
+  const pesoDiff=(a.pesoInicial&&a.pesoActual)?+(parseFloat(a.pesoActual)-parseFloat(a.pesoInicial)).toFixed(1):null;
+  const activos=alumnos.filter(x=>x.estado==='activo');
+  const sesiones=activos.reduce((n,x)=>n+x.dias.length,0);
+  const nutriN=clientesNutri.filter(c=>c.estado==='activo').length+activos.filter(x=>x.tieneNutri==='si'&&!clientesNutri.find(c=>c.id===x.id)).length;
+  const alias=p.alias||ALIAS_PAGO;
+  const insta=(p.instagram||'').replace(/^@/,'');
+  const temaCalma=document.documentElement.dataset.tema==='calma';
+
+  cont.innerHTML=`
+    <div class="portal-top">
+      <div class="portal-brand"><img src="Logo_App.png" alt="Mente Consciente"/><span>Mente Consciente</span></div>
+      <button type="button" class="tema-btn portal-tema" onclick="alternarTema();renderMiPerfil()"></button>
+      <span class="portal-saludo">Mi perfil profesional</span>
+      <span class="portal-saludo-nombre">${escaparHTML(a.nombre==='Mi entrenamiento'?'Luca':a.nombre)}</span>
+    </div>
+
+    <div class="pd-header-main">
+      <div style="display:flex;align-items:center;gap:0.75rem">
+        <div class="pd-avatar">${escaparHTML(_miIniciales())}</div>
+        <div style="flex:1;min-width:0">
+          <div class="portal-freq" style="color:var(--pd-text)">${escaparHTML(p.titulo||'Entrenador personal')}</div>
+          <div class="yo-titulo">${a.dias.length?`Entreno ${a.dias.length}x por semana`:'Cargá tus días de entrenamiento'}</div>
+        </div>
+        <button type="button" class="yo-editar" onclick="abrirModalMiPerfil()" aria-label="Editar mi perfil" title="Editar mi perfil">${ic('edit')}</button>
+      </div>
+      <div class="dias-pilares">${pilares}</div>
+      ${prox?`<div class="proxima-linea"><svg class="i s"><use href="#i-cal"/></svg> Mi próximo entreno: ${escaparHTML(prox.txt.toLowerCase())}</div>`:''}
+
+      <div class="acciones-dinamicas">
+        <button type="button" class="accion-circular" onclick="_yoAbrir('fuerza')"><div class="accion-circulo drive"><svg class="i"><use href="#i-dumbbell"/></svg></div><span class="accion-label">Fuerza</span></button>
+        <button type="button" class="accion-circular" onclick="_yoAbrir('mapeo')"><div class="accion-circulo biblio"><svg class="i"><use href="#i-map"/></svg></div><span class="accion-label">Mapeo</span></button>
+        ${p.nutriUrl?`<button type="button" class="accion-circular" onclick="_yoAbrir('nutri')"><div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg></div><span class="accion-label">Nutri</span></button>`:''}
+      </div>
+      <div class="hoy-toca" id="yo-hoy-toca" style="display:none"></div>
+      ${(!p.fuerzaUrl||!p.mapeoUrl)?`<p class="yo-aviso" style="margin-top:0.6rem">Cargá los links de tu ${!p.fuerzaUrl&&!p.mapeoUrl?'Fuerza y tu Mapeo':(!p.fuerzaUrl?'Fuerza':'Mapeo')} en <a onclick="abrirModalMiPerfil()">Editar perfil</a> para usarlos como tus alumnos.</p>`:''}
+    </div>
+
+    ${(a.pesoActual||a.estatura||a.pesoInicial||edad)?`
+    <div>
+      <div class="stats-principales">
+        <div class="stat-principal">
+          <div class="stat-principal-label">Peso actual</div>
+          <div class="stat-principal-val">${a.pesoActual?escaparHTML(a.pesoActual)+' kg':'—'}${pesoDiff!==null?` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>`:''}</div>
+          <div class="stat-principal-sub">${pesoDiff!==null?'desde el inicio':'&nbsp;'}</div>
+        </div>
+        <div class="stat-principal"><div class="stat-principal-label">IMC</div><div class="stat-principal-val">${imc||'—'}</div></div>
+      </div>
+      <div class="stats-secundarios">
+        <div class="stat-secundario"><div class="stat-secundario-label">Edad</div><div class="stat-secundario-val">${edad?edad+' años':'—'}</div></div>
+        <div class="stat-secundario"><div class="stat-secundario-label">Altura</div><div class="stat-secundario-val">${a.estatura?escaparHTML(a.estatura)+' cm':'—'}</div></div>
+        <div class="stat-secundario"><div class="stat-secundario-label">Peso inicial</div><div class="stat-secundario-val">${a.pesoInicial?escaparHTML(a.pesoInicial)+' kg':'—'}</div></div>
+      </div>
+    </div>`:''}
+
+    <div class="yo-kpis">
+      <div class="yo-kpi"><b>${activos.length}</b><small>Alumnos activos</small></div>
+      <div class="yo-kpi"><b>${sesiones}</b><small>Sesiones / sem</small></div>
+      <div class="yo-kpi"><b>${nutriN}</b><small>Nutrición</small></div>
+    </div>
+
+    <div class="yo-card">
+      <div class="yo-card-tit">Mi información</div>
+      ${_yoDato('wa',p.telefono,'Sin teléfono')}
+      ${_yoDato('mail',emailGuardado,'Sin email')}
+      ${_yoDato('link',insta?'@'+insta:'','Sin Instagram')}
+      ${_yoDato('pin',p.zona,'Sin zona / lugar de trabajo')}
+      ${_yoDato('cash',alias,'Sin alias de pago','<small>alias</small>')}
+      ${p.bio?`<div class="yo-card-tit">Sobre mí</div><div class="yo-bio">${escaparHTML(p.bio)}</div>`:''}
+    </div>
+
+    <div class="yo-card">
+      <div class="yo-card-tit">Gestión</div>
+      <button type="button" class="yo-dato" onclick="showPage('finanzas')">${ic('chart')}<span>Finanzas</span>${ic('chev','i chev')}</button>
+      <button type="button" class="yo-dato" onclick="cargarDatos()">${ic('sync')}<span>Sincronizar datos</span>${ic('chev','i chev')}</button>
+      <button type="button" class="yo-dato" onclick="sincronizarTodosCalendar()">${ic('cal')}<span>Exportar a Calendar</span>${ic('chev','i chev')}</button>
+      <button type="button" class="yo-dato" onclick="alternarTema();renderMiPerfil()">${ic(temaCalma?'luna':'sol')}<span>Tema: ${temaCalma?'Calma':'Nocturno'}</span><small>cambiar</small></button>
+      <button type="button" class="yo-dato peligro" onclick="cerrarSesion()">${ic('logout')}<span>Cerrar sesión</span></button>
+    </div>
+  `;
+  _sincronizarTemaUI();
+  _actualizarIniYo();
+  // Mi Fuerza se precarga para que el atajo "Hoy toca…" aparezca igual que en la ficha
+  if(planParseUrl(a.carpetaDrive)) planAsegurar(a,'fuerza').then(()=>planRefrescarSiViejo(a,'fuerza'));
+  if(planParseUrl(a.mapeoUrl)) planAsegurar(a,'mapeo');
+  _planActualizarHoyToca(MI_ID);
+}
+function _yoAbrir(tipo){
+  const a=_miComoAlumno();
+  const url=(tipo==='fuerza'?a.carpetaDrive:tipo==='mapeo'?a.mapeoUrl:a.nutriDrive).trim();
+  if(!url){ toast(`Cargá el link de tu ${tipo==='fuerza'?'Fuerza':tipo==='mapeo'?'Mapeo':'Nutrición'}`); abrirModalMiPerfil(); return; }
+  if(tipo!=='nutri' && planParseUrl(url)) abrirPlan(MI_ID,tipo);
+  else window.open(url,'_blank','noopener');
+}
+
+function abrirModalMiPerfil(){
+  const p=miPerfil;
+  ['nombre','titulo','telefono','instagram','zona','alias','bio','fechaNac','estatura','pesoInicial','pesoActual','fuerzaUrl','mapeoUrl','nutriUrl'].forEach(k=>{
+    const el=document.getElementById('yo-'+k); if(el) el.value=p[k]||'';
+  });
+  const dias=_miDias(), hpd=stringToHorariosPorDia(p.horario||'');
+  document.querySelectorAll('#yo-dias-check .dia-check-label').forEach(l=>l.classList.toggle('checked',dias.includes(l.dataset.dia)));
+  document.getElementById('yo-horario').value=dias.map(d=>hpd[d]).find(Boolean)||'';
+  document.getElementById('modal-mi-perfil').classList.add('open');
+}
+async function guardarModalMiPerfil(){
+  const v=k=>(document.getElementById('yo-'+k).value||'').trim();
+  const dias=[...document.querySelectorAll('#yo-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
+  const hora=v('horario').replace(/\|/g,'');
+  const nuevo={};
+  ['nombre','titulo','telefono','instagram','zona','alias','bio','fechaNac','estatura','pesoInicial','pesoActual','fuerzaUrl','mapeoUrl','nutriUrl'].forEach(k=>nuevo[k]=v(k));
+  nuevo.dias=dias.join('|');
+  nuevo.horario=hora?horariosPorDiaToString(Object.fromEntries(dias.map(d=>[d,hora]))):'';
+  const btn=document.getElementById('yo-btn-guardar');
+  btn.disabled=true;
+  try{
+    await guardarMiPerfil(nuevo);
+    cerrarModal('modal-mi-perfil');
+    toast('Perfil guardado ✓');
+    renderMiPerfil();
+  }catch(e){
+    console.warn('Mi perfil:',e);
+    toast(_escrituraPermitida()?'No se pudo guardar el perfil':MSG_SIN_DATOS);
+  }finally{ btn.disabled=false; }
+}
+
 // ══ PLAN DEL ALUMNO DENTRO DE LA APP: Fuerza y Mapeo (handoff plan-en-la-app) ══
 // Lee y escribe las MISMAS planillas de Luca con la API de Sheets, con el scope
 // `spreadsheets` que ya usa la app. Las planillas no cambian: se siguen editando
@@ -5281,6 +5684,9 @@ function _planMapeoDe(alumnoId,nombre){
   return e.datos.filas.find(f=>_normTxt(f.ejercicio)===n)||null;
 }
 
+// Mi propio plan (Mi perfil) usa la misma vista que el de un alumno, con un id reservado
+function _planAlumno(id){ return id===MI_ID ? _miComoAlumno() : alumnos.find(x=>x.id===id); }
+
 // ── Entradas en memoria ──
 function planEntrada(alumnoId,tipo){ return (planCache[alumnoId]||{})[tipo]||null; }
 function planUrlDe(a,tipo){ return ((tipo==='fuerza'?a.carpetaDrive:a.mapeoUrl)||'').trim(); }
@@ -5380,10 +5786,11 @@ function _planSelDe(a,datos){
 
 // ── Atajo "Hoy toca Día N · Semana M" en la ficha ──
 function _planActualizarHoyToca(alumnoId){
-  const cont=document.getElementById('perfil-hoy-toca');
+  const esYo=alumnoId===MI_ID;
+  const cont=document.getElementById(esYo?'yo-hoy-toca':'perfil-hoy-toca');
   const pagina=document.getElementById('page-perfil');
-  if(!cont||!pagina||pagina.dataset.alumnoId!==alumnoId) return;
-  const a=alumnos.find(x=>x.id===alumnoId), e=a&&planEntrada(alumnoId,'fuerza');
+  if(!cont||(!esYo&&(!pagina||pagina.dataset.alumnoId!==alumnoId))) return;
+  const a=_planAlumno(alumnoId), e=a&&planEntrada(alumnoId,'fuerza');
   if(!a||!e||e.estado!=='ok'||!a.dias.includes(_planNombreHoy())){ cont.style.display='none'; return; }
   const sel=_planSelDe(a,e.datos);
   let ultimo='';
@@ -5406,7 +5813,7 @@ function planPrepararFicha(a){
 
 // ── Vista ──
 function abrirPlan(alumnoId,tipo){
-  const a=alumnos.find(x=>x.id===alumnoId); if(!a) return;
+  const a=_planAlumno(alumnoId); if(!a) return;
   if(!planParseUrl(planUrlDe(a,tipo))){ const u=planUrlDe(a,tipo); if(u) window.open(u,'_blank','noopener'); return; }
   planVista={alumnoId,tipo,busqueda:'',enfoque:'',expandidas:new Set(),guardados:new Set()};
   if(!_planAbierto){
@@ -5427,7 +5834,7 @@ function _planCargarVista(a){
   [v.prev,v.next].forEach(x=>{ if(x && planParseUrl(planUrlDe(x.a,tipo))) planAsegurar(x.a,tipo); });
 }
 function planIr(alumnoId){
-  const a=alumnos.find(x=>x.id===alumnoId); if(!a||!planVista) return;
+  const a=_planAlumno(alumnoId); if(!a||!planVista) return;
   planVista={alumnoId,tipo:planVista.tipo,busqueda:'',enfoque:'',expandidas:new Set(),guardados:new Set()};
   planRenderTodo();
   _planCargarVista(a);
@@ -5443,6 +5850,7 @@ function cerrarPlan(){
   else _planOcultar();
 }
 function planVecinos(alumnoId){
+  if(alumnoId===MI_ID) return {lista:[],prev:null,next:null};   // mi plan: sin navegación entre alumnos
   const lista=planAlumnosDeHoy();
   const i=lista.findIndex(x=>x.a.id===alumnoId);
   return {lista, prev:i>0?lista[i-1]:null, next:i===-1?(lista[0]||null):(lista[i+1]||null)};
@@ -5456,7 +5864,7 @@ function _pvEsqueleto(){ return '<div class="pv-esq"></div><div class="pv-esq"><
 
 function planRenderTodo(){
   if(!planVista) return;
-  const a=alumnos.find(x=>x.id===planVista.alumnoId);
+  const a=_planAlumno(planVista.alumnoId);
   const cont=document.getElementById('plan-vista');
   if(!a){ _planOcultar(); return; }
   const tipo=planVista.tipo, e=planEntrada(a.id,tipo), url=planUrlDe(a,tipo);
@@ -5486,11 +5894,11 @@ function planRenderTodo(){
       </div>${extra}
     </div>
     <div class="pv-body" id="pv-body"></div>
-    <div class="pv-barra">
+    ${a.id===MI_ID?'':`<div class="pv-barra">
       ${v.prev?`<button type="button" class="pv-ba" data-pv="ir" data-id="${escaparHTML(v.prev.a.id)}"><span class="pv-ba-lbl">‹ Anterior</span><span class="pv-ba-nombre">${corto(v.prev)}</span></button>`:'<span class="pv-ba vacio"></span>'}
       <button type="button" class="pv-lista-btn" data-pv="lista" aria-label="Lista de alumnos"><svg class="i"><use href="#i-menu"/></svg></button>
       ${v.next?`<button type="button" class="pv-ba sig" data-pv="ir" data-id="${escaparHTML(v.next.a.id)}"><span class="pv-ba-lbl">${finde?'Siguiente · lunes':'Siguiente de hoy'} ›</span><span class="pv-ba-nombre">${corto(v.next)}</span></button>`:'<span class="pv-ba vacio"></span>'}
-    </div>
+    </div>`}
   </div>`;
   planRenderBody();
 }
@@ -5498,7 +5906,7 @@ function planRenderTodo(){
 function planRenderBody(){
   const body=document.getElementById('pv-body');
   if(!body||!planVista) return;
-  const a=alumnos.find(x=>x.id===planVista.alumnoId); if(!a) return;
+  const a=_planAlumno(planVista.alumnoId); if(!a) return;
   const tipo=planVista.tipo, e=planEntrada(a.id,tipo), url=planUrlDe(a,tipo);
   if(!url){ body.innerHTML=_pvAviso(`${escaparHTML(a.nombre)} no tiene ${tipo==='fuerza'?'la planilla de Fuerza cargada':'el Mapeo cargado'}.`,a,tipo); return; }
   if(!planParseUrl(url)){ body.innerHTML=_pvAviso('Este link no es una planilla de Google Sheets.',a,tipo); return; }
@@ -5582,7 +5990,7 @@ async function _planEscribir(e,cel,valor){
 }
 function planGuardarInput(inp){
   if(!planVista || inp.readOnly) return;
-  const a=alumnos.find(x=>x.id===planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
+  const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
   if(!e||e.estado!=='ok') return;
   const nuevo=inp.value.trim();
   if(nuevo===(inp.dataset.orig||'')) return;
@@ -5622,7 +6030,7 @@ function planGuardarInput(inp){
   });
   vista.addEventListener('click',ev=>{
     const el=ev.target.closest('[data-pv]'); if(!el||!planVista) return;
-    const a=alumnos.find(x=>x.id===planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
+    const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
     switch(el.dataset.pv){
       case 'cerrar': cerrarPlan(); break;
       case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; s.sem=planSemanaDefault(e.datos,s.dia); planVista.expandidas=new Set(); planRenderTodo(); break; }
