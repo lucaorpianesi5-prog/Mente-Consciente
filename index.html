@@ -1320,6 +1320,17 @@ button.pv-e .res{font-size:0.74rem;color:var(--pd-text2);font-weight:600;font-va
 .pv-term{flex:1;height:48px;border-radius:12px;background:var(--pd-verde);color:var(--pd-sobre-acento);border:none;font-family:inherit;font-weight:800;font-size:0.86rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .pv-term:disabled{opacity:0.6}
 .pv-term.hecho{background:var(--pd-verde-dim);color:var(--pd-ok);border:1px solid color-mix(in srgb,var(--pd-ok) 40%,transparent);cursor:default}
+/* Solo lectura (portal del alumno) */
+.pv-ro{background:var(--pd-card2);border-radius:11px;padding:9px 11px}
+.pv-ro-tit{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--pd-text3);font-weight:700;margin-bottom:6px}
+.pv-ro-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pv-ro-g small{display:block;font-size:0.6rem;color:var(--pd-text3);text-transform:uppercase;letter-spacing:0.06em}
+.pv-ro-g b{font-size:1.15rem;font-weight:800;color:var(--pd-text);font-variant-numeric:tabular-nums}
+.pv-ro-g b.vacio{color:var(--pd-text3);font-weight:600}
+.pv-ro-g u{text-decoration:none;font-size:0.72rem;color:var(--pd-text2);margin-left:3px}
+.pv-e.ro .chk.on{background:var(--pd-ok);border-color:var(--pd-ok);color:var(--pd-sobre-acento)}
+.pv-term.ro{background:var(--pd-card);color:var(--pd-text3);border:1px solid var(--pd-border);font-weight:600;font-size:0.74rem;cursor:default;text-align:center;padding:0 10px}
+div.pv-mf.ro{cursor:default}
 /* ── Mapeo v2 ── */
 .pv-mg{display:flex;justify-content:space-between;align-items:center;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-crema);font-weight:700;margin-top:0.35rem;flex-shrink:0}
 .pv-mg small{color:var(--pd-text3);letter-spacing:0;font-weight:600}
@@ -2503,7 +2514,8 @@ function bloquePlanes(links,opts){
   return `<div class="bq-planes c${tipos.length}">${tipos.map(t=>{
     const url=(links[t]||'').trim();
     if(!url) return `<${o.sinLink?'button type="button"':'div'} class="bq-pl ${t} off"${o.sinLink?` onclick="${o.sinLink}"`:''}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${o.sinLink?'Sin link cargado':'Todavía no tenés plan'}</small></div><span class="ab">${o.sinLink?'Cargar link':'Consultalo con tu entrenador'}</span></${o.sinLink?'button':'div'}>`;
-    const accion=o.accion?` onclick="${o.accion}('${t}')"`:` data-open-url="${escaparHTML(url)}"`;
+    const usaAccion=o.accion&&(!o.accionTipos||o.accionTipos.includes(t));
+    const accion=usaAccion?` onclick="${o.accion}('${t}')"`:` data-open-url="${escaparHTML(url)}"`;
     return `<button type="button" class="bq-pl ${t}"${accion}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${SUB[t]}</small></div><span class="ab">Abrir ↗</span></button>`;
   }).join('')}</div>`;
 }
@@ -2560,6 +2572,7 @@ let _portalMenuAbierto=false, _portalCuotaAbierta=false;
 function _pintarPortal(el,data){
     // El proxy avisa si ya acepta la entrevista inicial (acción "perfil"): recién ahí se muestra
     if(data && data.perfilEditable) PORTAL_PERFIL_EDITABLE=true;
+    _portalDatosActual=data;
     const a = {
       ...data.alumno,
       dias: data.alumno.dias ? data.alumno.dias.split('|') : [],
@@ -2607,7 +2620,8 @@ function _pintarPortal(el,data){
     // Mapeo: solo si el proxy manda el campo (si no lo manda, el botón no aparece)
     const links={fuerza:a.carpetaDrive||'', nutri:a.nutriDrive||''};
     if(a.mapeoUrl!==undefined) links.mapeo=a.mapeoUrl||'';
-    const planes=bloquePlanes({fuerza:links.fuerza, mapeo:links.mapeo, nutri:links.nutri});
+    const enApp=data.planPortal?['fuerza','mapeo'].filter(t=>planParseUrl(links[t]||'')):[];
+    const planes=bloquePlanes({fuerza:links.fuerza, mapeo:links.mapeo, nutri:links.nutri},{accion:'_portalAbrirPlan',accionTipos:enApp});
 
     el.innerHTML = `
       <div class="portal-wrap">
@@ -6436,7 +6450,47 @@ function _planMapeoDe(alumnoId,nombre){
 }
 
 // Mi propio plan (Mi perfil) usa la misma vista que el de un alumno, con un id reservado
-function _planAlumno(id){ return id===MI_ID ? _miComoAlumno() : alumnos.find(x=>x.id===id); }
+function _planAlumno(id){ return id===MI_ID ? _miComoAlumno() : id===PORTAL_ID ? _portalComoAlumno() : alumnos.find(x=>x.id===id); }
+
+// ── Portal del alumno: su Fuerza y su Mapeo en el mismo visor, SOLO PARA VER ──
+// El alumno no tiene permiso de Google sobre las planillas: las lee el proxy del portal
+// (corre con la cuenta de Luca), solo las de SU fila y solo la pestaña de su link.
+const PORTAL_ID='__portal';
+const _pvRO=()=>!!(planVista&&planVista.alumnoId===PORTAL_ID);
+function _portalComoAlumno(){
+  const a=_portalAlumnoActual||{};
+  return {id:PORTAL_ID, nombre:a.nombre||'', dias:a.dias||[], horario:a.horario||'', frecuencia:a.frecuencia||'',
+    estado:a.estado||'activo', carpetaDrive:a.carpetaDrive||'', mapeoUrl:a.mapeoUrl||'', nutriDrive:a.nutriDrive||''};
+}
+function _portalAbrirPlan(tipo){ abrirPlan(PORTAL_ID,tipo); }
+async function _planPortalPedir(tipo){
+  let r;
+  try{ r=await fetch(`${PORTAL_API_URL}?alumno=${encodeURIComponent(_portalToken)}&plan=${tipo}`); }catch(e){ throw {tipo:'red'}; }
+  if(!r.ok) throw {tipo:'red'};
+  const d=await r.json();
+  if(d.error) throw {tipo:{acceso:'acceso',formato:'formato',pestana:'pestana',sin_planilla:'formato'}[d.error]||'red'};
+  return d;
+}
+const _gridDeFilas=filas=>(filas||[]).map(f=>f.map(t=>({t:String(t??''),f:false})));
+async function _planPortalFuerza(){
+  const d=await _planPortalPedir('fuerza');
+  planListos[PORTAL_ID]=d.listos||null;   // tildes que marcó el entrenador (pestaña Listos)
+  return {hoja:d.hoja||'', grid:_gridDeFilas(d.filas)};
+}
+async function _planPortalMapeo(){
+  const d=await _planPortalPedir('mapeo');
+  return (d.tabs||[]).map(t=>{
+    const grid=_gridDeFilas(t.filas);
+    let datos; try{ datos=planParseMapeo(grid); }catch(err){ datos=planParseTabla(grid); }
+    datos.mapa.forEach(c=>{ c.hoja=t.title; });
+    return {id:String(t.id), title:t.title, datos};
+  });
+}
+// Días terminados del alumno del portal: vienen en su respuesta (Asistencias con columna D)
+function _asistenciasDe(aid){
+  if(aid!==PORTAL_ID) return asistencias;
+  return ((_portalDatosActual&&_portalDatosActual.asistencias)||[]).map(r=>[PORTAL_ID,r[0],r[1],r[2]||'']);
+}
 
 // ── Entradas en memoria ──
 function planEntrada(alumnoId,tipo){ return (planCache[alumnoId]||{})[tipo]||null; }
@@ -6461,7 +6515,7 @@ function _planLeer(a,tipo,url,p,previa){
   e.promesa=(async()=>{
     try{
       if(tipo==='mapeo'){
-        const tabs=await planLeerMapeo(p.id);
+        const tabs=a.id===PORTAL_ID ? await _planPortalMapeo() : await planLeerMapeo(p.id);
         // Si Luca está tipeando o hay un guardado en curso, no se pisa: queda para la próxima
         if(!previa || !(e.pendientes>0 || _planEditando())){
           const selId=previa&&e.tabs&&e.tabs[e.sel]?e.tabs[e.sel].id:null;
@@ -6473,7 +6527,7 @@ function _planLeer(a,tipo,url,p,previa){
           e.estado='ok'; e.error=null; e.ts=Date.now();
         }
       } else {
-        const {hoja,grid}=await planLeerHoja(p.id,p.gid,tipo);
+        const {hoja,grid}=a.id===PORTAL_ID ? await _planPortalFuerza() : await planLeerHoja(p.id,p.gid,tipo);
         const datos=planParseFuerza(grid);
         datos.mapa.forEach(cel=>{ cel.hoja=hoja; });
         if(!previa || !(e.pendientes>0 || _planEditando())){ e.datos=datos; e.hoja=hoja; e.estado='ok'; e.error=null; e.ts=Date.now(); }
@@ -6544,7 +6598,7 @@ function planSemanaDefault(datos,diaN){
 function _planDetalle(mes,dia,sem){ return `${mes} · Día ${dia} · Semana ${sem}`; }
 function _planHechos(alumnoId,mes){
   const m=_normTxt(mes), out=[];
-  asistencias.forEach(r=>{
+  _asistenciasDe(alumnoId).forEach(r=>{
     if(r[0]!==alumnoId || !r[3]) return;
     const x=String(r[3]).match(/^(.*?)\s*·\s*D[ií]a (\d+)\s*·\s*Semana (\d+)/i);
     if(x && _normTxt(x[1])===m) out.push({dia:+x[2],sem:+x[3],fecha:r[1]});
@@ -6640,7 +6694,7 @@ function cerrarPlan(){
   else _planOcultar();
 }
 function planVecinos(alumnoId){
-  if(alumnoId===MI_ID) return {lista:[],prev:null,next:null};   // mi plan: sin navegación entre alumnos
+  if(alumnoId===MI_ID||alumnoId===PORTAL_ID) return {lista:[],prev:null,next:null};   // mi plan: sin navegación entre alumnos
   const lista=planAlumnosDeHoy();
   const i=lista.findIndex(x=>x.a.id===alumnoId);
   return {lista, prev:i>0?lista[i-1]:null, next:i===-1?(lista[0]||null):(lista[i+1]||null)};
@@ -6703,7 +6757,7 @@ function planRenderTodo(){
     </div>
     <div class="pv-body" id="pv-body"></div>
     ${ok&&esFuerza?_pvPieFuerza(a,e):''}
-    ${a.id===MI_ID?'':`<div class="pv-barra">
+    ${a.id===MI_ID||a.id===PORTAL_ID?'':`<div class="pv-barra">
       ${v.prev?`<button type="button" class="pv-ba" data-pv="ir" data-id="${escaparHTML(v.prev.a.id)}"><span class="pv-ba-lbl">‹ Anterior</span><span class="pv-ba-nombre">${corto(v.prev)}</span></button>`:'<span class="pv-ba vacio"></span>'}
       <button type="button" class="pv-lista-btn" data-pv="lista" aria-label="Lista de alumnos"><svg class="i"><use href="#i-menu"/></svg></button>
       ${v.next?`<button type="button" class="pv-ba sig" data-pv="ir" data-id="${escaparHTML(v.next.a.id)}"><span class="pv-ba-lbl">${finde?'Siguiente · lunes':'Siguiente de hoy'} ›</span><span class="pv-ba-nombre">${corto(v.next)}</span></button>`:'<span class="pv-ba vacio"></span>'}
@@ -6726,7 +6780,8 @@ function planRenderBody(){
   if(!planParseUrl(url)){ body.innerHTML=_pvAviso('Este link no es una planilla de Google Sheets.',a,tipo); return; }
   if(!e || e.estado==='cargando'){ body.innerHTML=_pvEsqueleto(); return; }
   if(e.estado==='error'){
-    const msg={pestana:'Esta planilla tiene varias pestañas y el link no dice cuál es el Mapeo. Abrí la pestaña del Mapeo en Sheets y copiá el link completo: tiene que terminar en #gid=…',excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:tipo==='mapeo'?'No reconozco el formato del Mapeo: la fila 2 tiene que tener, de la columna A a la E, Enfoque · Patrón · Ejercicio · Reps · KG.':'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
+    const msgRO={pestana:'Tu Mapeo todavía no se puede ver acá. Abrilo en Sheets o avisale a tu entrenador.',formato:'Tu planilla todavía no se puede ver acá. Abrila en Sheets.',acceso:'No se pudo abrir tu planilla. Avisale a tu entrenador.'};
+    const msg=(_pvRO()&&msgRO[e.error])||{pestana:'Esta planilla tiene varias pestañas y el link no dice cuál es el Mapeo. Abrí la pestaña del Mapeo en Sheets y copiá el link completo: tiene que terminar en #gid=…',excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:tipo==='mapeo'?'No reconozco el formato del Mapeo: la fila 2 tiene que tener, de la columna A a la E, Enfoque · Patrón · Ejercicio · Reps · KG.':'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
     body.innerHTML=_pvAviso(escaparHTML(msg),a,tipo)+((e.error==='red'||e.error==='sesion')?'<div class="pv-aviso" style="padding-top:0"><button type="button" data-pv="reintentar-plan">Reintentar</button></div>':'');
     return;
   }
@@ -6861,6 +6916,17 @@ function _pvBodyFuerza(a,e){
     const puedeRepetir=ref&&!c.r.formula&&!c.kg.formula;
     const ultimo=!dia.ejercicios.some((x,i)=>i!==ei&&!x.fija&&!_pvHecho(L,i));
     const listo=_pvHecho(L,ei);
+    if(_pvRO()){
+      const v=(t,u)=>t?`<b>${escaparHTML(t)}</b>${u?`<u>${u}</u>`:''}`:'<b class="vacio">—</b>';
+      return `<div class="pv-e act ro" data-pvcard="${ei}">
+      <div class="pv-e-h"><span class="chk${listo?' on':''}">${listo?'✓':''}</span><button type="button" class="n" data-pv="${ej.fija?'cerrar-fija':'cerrar-ej'}" data-ei="${ei}">${escaparHTML(ej.nombre)}<small>${escaparHTML((ej.letra||'')+(pos||''))}${ej.nombre&&ej.bloque?' · '+escaparHTML(ej.bloque):''}</small></button><button type="button" class="pv-min" data-pv="${ej.fija?'cerrar-fija':'cerrar-ej'}" data-ei="${ei}" aria-label="Minimizar">${ic('chev')}</button></div>
+      <div class="pv-ro"><div class="pv-ro-tit">Semana ${sel.sem}</div>
+        <div class="pv-ro-g"><div><small>Reps</small>${v(c.r.text)}</div><div><small>KG</small>${v(c.kg.text,c.kg.text?'kg':'')}</div><div><small>RIR</small>${v(c.rir.text)}</div></div></div>
+      ${ref?`<div class="pv-ref2"><div class="q"><small>${ref.j===si-1?'La semana pasada':'Semana '+ref.sem}</small><b>${escaparHTML(_pvRefTxt(ref.c))}</b>${otras.length?`<div class="otras">${otras.join(' · ').replace(/<button[^>]*>/g,'<span class="pv-reflink">').replace(/ ›<\/button>/g,'</span>').replace(/<\/button>/g,'</span>')}</div>`:''}</div></div>`:''}
+      <div class="pv-rir-tit"><span>RIR</span><button type="button" class="pv-i" data-pv="info" data-k="rir" aria-label="Qué es el RIR">i</button><span class="pv-rpe">${rpe?`RPE ${rpe}`:'RPE —'}</span><button type="button" class="pv-i" data-pv="info" data-k="rpe" aria-label="Qué es el RPE">i</button></div>
+      <p class="pv-info" data-info="rir" hidden>${PV_INFO.rir}</p><p class="pv-info" data-info="rpe" hidden>${PV_INFO.rpe}</p>
+    </div>`;
+    }
     return `<div class="pv-e act${planVista.guardados.has('f'+ej.fila)?' guardado':''}" data-pvcard="${ei}">
       <div class="pv-e-h">${ej.fija?'<span class="chk"></span>':`<button type="button" class="chk${listo?' on':''}" data-pv="toggle-listo" data-ei="${ei}" aria-label="${listo?'Desmarcar':'Marcar como listo'}">${listo?'✓':''}</button>`}<button type="button" class="n" data-pv="${ej.fija?'cerrar-fija':'cerrar-ej'}" data-ei="${ei}">${escaparHTML(ej.nombre)}<small>${escaparHTML((ej.letra||'')+(pos||''))}${ej.nombre&&ej.bloque?' · '+escaparHTML(ej.bloque):''}</small></button><span class="pv-ej-estado">✓ Guardado</span><button type="button" class="pv-min" data-pv="${ej.fija?'cerrar-fija':'cerrar-ej'}" data-ei="${ei}" aria-label="Minimizar">${ic('chev')}</button></div>
       ${ref?`<div class="pv-ref2"><div class="q"><small>${ref.j===si-1?'La semana pasada':'Semana '+ref.sem}</small><b>${escaparHTML(_pvRefTxt(ref.c))}</b>${otras.length?`<div class="otras">${otras.join(' · ')}</div>`:''}</div>${puedeRepetir?`<button type="button" class="pv-rep" data-pv="repetir" data-ei="${ei}">Repetir</button>`:''}</div>`
@@ -6912,7 +6978,7 @@ function _pvBodyFuerza(a,e){
     const sig=_planSiguiente(d,dia.n,sel.sem), sigTxt=sig?`Día ${sig.dia} · Semana ${sig.sem}`:'';
     html+=`<div class="pv-fin hecho">
       <div class="pv-fin-tit"><span class="pv-fin-check">✓</span><div><b>Día ${dia.n} · Semana ${sel.sem} terminado</b><small>${escaparHTML(hecho.fecha||'')}${sig?' · Próximo: '+sigTxt:' · ¡Plan del mes completo!'}</small></div></div>
-      <div class="pv-fin-acc">${sig?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button></div>
+      <div class="pv-fin-acc">${sig?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}${_pvRO()?'':'<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button>'}</div>
     </div>`;
   }
   return html;
@@ -6921,6 +6987,8 @@ function _pvBodyFuerza(a,e){
 function _pvPieFuerza(a,e){
   const d=e.datos, sel=_planSelDe(a,d);
   const hecho=_planHecho(a.id,d.mes,sel.dia,sel.sem);
+  if(_pvRO()) return `<div class="pv-pie"><button type="button" class="pv-timer${_pvDesc.fin>Date.now()?' corre':''}" data-pv="timer" id="pv-timer">${_pvTimerTxt()}</button>
+    <div class="pv-term ${hecho?'hecho':'ro'}">${hecho?`✓ Día ${sel.dia} terminado`:'Tu entrenador marca el día al terminar'}</div></div>`;
   return `<div class="pv-pie"><button type="button" class="pv-timer${_pvDesc.fin>Date.now()?' corre':''}" data-pv="timer" id="pv-timer">${_pvTimerTxt()}</button>
     ${hecho?`<div class="pv-term hecho">✓ Día ${sel.dia} terminado</div>`:`<button type="button" class="pv-term" data-pv="terminar-dia">✓ Terminé el Día ${sel.dia}</button>`}</div>`;
 }
@@ -6972,17 +7040,20 @@ function _pvBodyMapeo(a,e){
   const q=_normTxt(planVista.busqueda), enf=planVista.enfoque, hoy=_pvMapeoHoy(a);
   const esHoy=f=>!!(hoy&&hoy.set.has(_normTxt(f.ejercicio)));
   const filas=e.datos.filas.filter(f=>(enf==='__hoy'?esHoy(f):(!enf||f.enfoque===enf)) && (!q||_normTxt(f.ejercicio).includes(q)||_normTxt(f.patron).includes(q)||_normTxt(f.enfoque).includes(q)));
-  let html=enf==='__hoy'&&hoy?`<div class="pv-aviso2">Los ejercicios del <b>Día ${hoy.dia}</b> de la Fuerza que también están en el Mapeo. Tocá uno para actualizar su marca.</div>`:'';
+  let html=enf==='__hoy'&&hoy?`<div class="pv-aviso2">Los ejercicios del <b>Día ${hoy.dia}</b> de la Fuerza que también están en el Mapeo.${_pvRO()?'':' Tocá uno para actualizar su marca.'}</div>`:'';
   if(!filas.length) return html+'<div class="pv-nota">Sin resultados.</div>';
-  const fila=f=>`<button type="button" class="pv-mf" data-pv="mapeo-abrir" data-fila="${f.fila}">
+  const fila=f=>_pvRO()?`<div class="pv-mf ro">
+      <div class="n"><b>${escaparHTML(f.ejercicio)}${enf!=='__hoy'&&esHoy(f)?'<span class="hoyb">HOY</span>':''}</b><small>${escaparHTML([f.enfoque,f.patron].filter(Boolean).join(' · '))}</small></div>
+      <div class="val">${f.kg.text?`<b>${escaparHTML(f.kg.text)} kg</b>`:'<b class="vacio">—</b>'}<small>${f.reps.text?escaparHTML(f.reps.text)+' reps':''}</small></div></div>`
+    :`<button type="button" class="pv-mf" data-pv="mapeo-abrir" data-fila="${f.fila}">
       <div class="n"><b>${escaparHTML(f.ejercicio)}${enf!=='__hoy'&&esHoy(f)?'<span class="hoyb">HOY</span>':''}</b><small>${escaparHTML([f.enfoque,f.patron].filter(Boolean).join(' · '))}</small></div>
       <div class="val">${f.kg.text?`<b>${escaparHTML(f.kg.text)} kg</b>`:'<b class="vacio">—</b>'}<small>${f.reps.text?escaparHTML(f.reps.text)+' reps':'cargar'}</small></div>
       <svg class="i chev" aria-hidden="true"><use href="#i-chev"/></svg></button>`;
-  if(enf==='__hoy') return html+`<div class="pv-mlista">${filas.map(fila).join('')}</div><div class="pv-aviso2 gris">Tip: dentro de un ejercicio de la Fuerza, tocá su marca del <b>Mapeo</b> para editarla sin salir.</div>`;
+  if(enf==='__hoy') return html+`<div class="pv-mlista">${filas.map(fila).join('')}</div>${_pvRO()?'':'<div class="pv-aviso2 gris">Tip:'} dentro de un ejercicio de la Fuerza, tocá su marca del <b>Mapeo</b> para editarla sin salir.</div>'}`;
   const grupos=[];
   filas.forEach(f=>{ const g=[f.enfoque,f.patron].filter(Boolean).join(' · '); let gr=grupos[grupos.length-1]; if(!gr||gr.g!==g){ gr={g,items:[]}; grupos.push(gr); } gr.items.push(f); });
   return html+grupos.map(gr=>`${gr.g?`<div class="pv-mg">${escaparHTML(gr.g)}<small>${gr.items.length}</small></div>`:''}<div class="pv-mlista">${gr.items.map(fila).join('')}</div>`).join('')
-    +'<div class="pv-nota" style="margin-top:0.4rem">Tocá un ejercicio para cambiar Reps o KG. Para agregar o reordenar ejercicios, <b>Abrir en Sheets</b>.</div>';
+    +(_pvRO()?'':'<div class="pv-nota" style="margin-top:0.4rem">Tocá un ejercicio para cambiar Reps o KG. Para agregar o reordenar ejercicios, <b>Abrir en Sheets</b>.</div>');
 }
 // Hoja para editar una marca del Mapeo (desde el Mapeo o desde un ejercicio de la Fuerza)
 function _pvRenderSheet(){
@@ -7114,7 +7185,7 @@ async function _planEscribir(e,cel,valor){
   if(!r.ok) throw {tipo:'red'};
 }
 function planGuardarInput(inp){
-  if(!planVista || inp.readOnly) return;
+  if(!planVista || inp.readOnly || _pvRO()) return;
   const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
   if(!e||e.estado!=='ok') return;
   const nuevo=inp.value.trim();
@@ -7149,6 +7220,7 @@ function planGuardarInput(inp){
   });
   vista.addEventListener('click',ev=>{
     const el=ev.target.closest('[data-pv]'); if(!el||!planVista) return;
+    if(_pvRO() && ['paso','kgset','rir','repetir','siguiente','terminar-dia','deshacer-dia','toggle-listo','mapeo-abrir','ref-mapeo','sheet-guardar','spaso','skg','reintentar','igual'].includes(el.dataset.pv)) return;
     const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,planVista.tipo);
     switch(el.dataset.pv){
       case 'cerrar': cerrarPlan(); break;

@@ -7,6 +7,9 @@
 //   2. doPost() acepta la acción "perfil": el alumno guarda SU fecha de
 //      nacimiento, altura, peso, objetivo y molestia (entrevista inicial).
 //      Es la única escritura del portal; ver guardarPerfilAlumno_() al final.
+//   3. doGet(?alumno=TOKEN&plan=fuerza|mapeo) devuelve, SOLO PARA LEER, la
+//      planilla de Fuerza o de Mapeo de ESE alumno (ver planPortal_()).
+//      Asistencias suma la columna D (día del plan terminado).
 //   El login con Google queda exactamente igual.
 // ═══════════════════════════════════════════════════════════════════════
 
@@ -30,6 +33,7 @@ function doGet(e) {
     if (!token) {
       return _jsonOut({ error: 'missing_id' });
     }
+    if (e.parameter.plan) return planPortal_(token, String(e.parameter.plan));   // [24/11]
 
     // Cache por token: solo se usa para respuestas ya exitosas (ver más abajo)
     // — un token inválido o un error transitorio no queda pegado en caché.
@@ -84,7 +88,7 @@ function doGet(e) {
     const asistencias = [];
     for (let i = 1; i < asData.length; i++) {
       if (String(asData[i][0]) === id && asData[i][1]) {
-        asistencias.push([asData[i][1], asData[i][2] || '']);
+        asistencias.push([asData[i][1], asData[i][2] || '', asData[i][3] || '']);   // [24/11] D = día del plan
       }
     }
 
@@ -112,7 +116,7 @@ function doGet(e) {
 
     // [24/11] perfilEditable: avisa al portal que este proxy ya acepta la
     // entrevista inicial (acción "perfil" de doPost).
-    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true };
+    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true };
     const resultadoStr = JSON.stringify(resultado);
     try {
       cache.put(cacheKey, resultadoStr, CACHE_TTL_SEGUNDOS);
@@ -278,5 +282,81 @@ function guardarPerfilAlumno_(cuerpo) {
   } catch (err) {
     Logger.log(err);
     return _jsonOut({ ok: false, error: 'server_error' });
+  }
+}
+
+// ── [24/11] Fuerza y Mapeo del alumno, SOLO PARA LEER ─────────────────────
+// El alumno no tiene permiso de Google sobre las planillas; este proxy corre con
+// la cuenta de Luca y las lee por él. Reglas:
+//   - Solo la planilla de SU fila: Q (carpetaDrive) para Fuerza, U (mapeoUrl) para Mapeo.
+//   - Solo UNA pestaña: la del #gid del link. Sin #gid: en Fuerza la primera que no
+//     se llame "Notas"; en Mapeo, solo si el archivo tiene una única pestaña (un
+//     Mapeo con una pestaña por alumno nunca expone las de los demás).
+//   - Solo valores (lo que se ve en la celda), nunca fórmulas. No escribe nada.
+//   - Alumnos "inactivo": no.
+function planPortal_(token, tipo) {
+  try {
+    if (tipo !== 'fuerza' && tipo !== 'mapeo') return _jsonOut({ error: 'tipo' });
+    const cache = CacheService.getScriptCache();
+    const cacheKey = 'plan_' + tipo + '_' + token;
+    const cached = cache.get(cacheKey);
+    if (cached) return ContentService.createTextOutput(cached).setMimeType(ContentService.MimeType.JSON);
+
+    const ss = SpreadsheetApp.openById(SHEET_ID_PORTAL);
+    const alumnosData = ss.getSheetByName('Alumnos').getDataRange().getValues();
+    let fila = null;
+    for (let i = 1; i < alumnosData.length; i++) {
+      if (alumnosData[i][18] && String(alumnosData[i][18]) === token) { fila = alumnosData[i]; break; }
+    }
+    if (!fila) return _jsonOut({ error: 'not_found' });
+    if (String(fila[8]).trim() === 'inactivo') return _jsonOut({ error: 'not_found' });
+
+    const url = String((tipo === 'fuerza' ? fila[16] : fila[20]) || '').trim();
+    const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]{20,})/);
+    if (!m) return _jsonOut({ error: 'sin_planilla' });
+    const g = url.match(/[#?&]gid=(\d+)/);
+    const gid = g ? g[1] : null;
+
+    let plan;
+    try { plan = SpreadsheetApp.openById(m[1]); } catch (err) { return _jsonOut({ error: 'acceso' }); }
+    const hojas = plan.getSheets().filter(h => !h.isSheetHidden());
+    const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const leer = (h, maxF, maxC) => {
+      const nf = Math.min(h.getLastRow(), maxF), nc = Math.min(h.getLastColumn(), maxC);
+      if (nf < 1 || nc < 1) return [];
+      return h.getRange(1, 1, nf, nc).getDisplayValues();
+    };
+
+    let res;
+    if (tipo === 'fuerza') {
+      const h = (gid != null && hojas.find(x => String(x.getSheetId()) === gid && norm(x.getName()) !== 'notas'))
+        || hojas.find(x => norm(x.getName()) !== 'notas');
+      if (!h) return _jsonOut({ error: 'formato' });
+      res = { hoja: h.getName(), filas: leer(h, 120, 22) };
+      // Ejercicios que el entrenador marcó como listos (pestaña Listos, fila de este alumno)
+      res.listos = null;
+      const ls = ss.getSheetByName('Listos');
+      if (ls) {
+        const v = ls.getDataRange().getValues();
+        for (let i = 1; i < v.length; i++) {
+          if (String(v[i][0]) === String(fila[0])) {
+            let marcas = {}; try { marcas = JSON.parse(v[i][2] || '{}') || {}; } catch (e) {}
+            res.listos = { ciclo: String(v[i][1] || ''), marcas: marcas };
+            break;
+          }
+        }
+      }
+    } else {
+      const h = gid != null ? hojas.find(x => String(x.getSheetId()) === gid) : (hojas.length === 1 ? hojas[0] : null);
+      if (!h) return _jsonOut({ error: 'pestana' });
+      res = { tabs: [{ id: String(h.getSheetId()), title: h.getName(), filas: leer(h, 400, 26) }] };
+    }
+
+    const str = JSON.stringify(res);
+    if (str.length < 95000) { try { cache.put(cacheKey, str, CACHE_TTL_SEGUNDOS); } catch (e) {} }
+    return ContentService.createTextOutput(str).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    Logger.log(err);
+    return _jsonOut({ error: 'server_error' });
   }
 }
