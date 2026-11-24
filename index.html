@@ -71,7 +71,7 @@ html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista,
   --pd-crema:#D9B074; --pd-crema-dim:rgba(217,176,116,0.14);
   --pd-text:#ECF2EE; --pd-text2:#9DB3A6; --pd-text3:#6F877A;
   --pd-red:#EF6B6B; --pd-red-dim:rgba(239,107,107,0.12); --pd-amber:#F09A4A;
-  --pd-ok:#6CCB8A; --pd-sobre-acento:#06100C; --pd-acento-hover:#71CB90; --pd-barra:#09110D; --pd-tip-fin:#1E1A12; --pd-sobre-amber:#1E1206;
+  --pd-azul:#6FA8F0; --pd-ok:#6CCB8A; --pd-sobre-acento:#06100C; --pd-acento-hover:#71CB90; --pd-barra:#09110D; --pd-tip-fin:#1E1A12; --pd-sobre-amber:#1E1206;
   --pd-hueco:#070D0A; --pd-lleno:#1D3326; --pd-valor:#FFFFFF;
 }
 /* ── CALMA ── (el logo sobre papel: blanco cálido, verde hoja y dorado oscurecidos para que se lean) */
@@ -82,12 +82,13 @@ html[data-tema="calma"]{
   --crema:#EEF0EA; --crema-d:#FFFFFF;
   --bg:#F5F5F0; --blanco:#FFFFFF;
   --texto:#14201A; --suave:#4D5E55; --texto3:#627166; --borde:rgba(20,50,35,0.08);
-  --rojo:#B23B3B; --rojo-bg:rgba(178,59,59,0.08);
+  --rojo:#A9503F; --rojo-bg:rgba(169,80,63,0.09);
   --verde-ok:#23864B; --verde-ok-bg:rgba(35,134,75,0.10); --ok:#23864B;
-  --amarillo:#A8570A; --amarillo-bg:rgba(168,87,10,0.10);
+  --amarillo:#B0741F; --amarillo-bg:rgba(176,116,31,0.11);
   --sobre-acento:#FFFFFF; --acento-hover:#256B42; --barra:#FFFFFF; --tip-fin:#F6EEDD; --sobre-amber:#FFFFFF;
   --hueco:#EEF0EA; --lleno:#E3F0E7; --valor:#14201A;
-  --f1:#1F6FA8; --f2:#6E4FC2; --f3:#5A7A0A; --f4:#9A5B00; --f5:#B23E78; --f-alpha:10%;
+  /* frecuencias 1→5: pizarra · musgo · verde del logo · dorado · terracota (misma familia cálida) */
+  --f1:#5E8397; --f2:#86874A; --f3:#2E7D4F; --f4:#A07A2A; --f5:#A65A3E; --f-alpha:12%;
   --sombra:0 1px 2px rgba(20,40,30,.06),0 6px 20px rgba(20,40,30,.07);
 }
 html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno, html[data-tema="calma"] #yo-dark, html[data-tema="calma"] #entrevista{
@@ -96,8 +97,8 @@ html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[
   --pd-verde:#2E7D4F; --pd-verde-d:#1F5C3A; --pd-verde-dim:rgba(46,125,79,0.09);
   --pd-crema:#9A6B1F; --pd-crema-dim:rgba(184,140,70,0.14);
   --pd-text:#14201A; --pd-text2:#4D5E55; --pd-text3:#627166;
-  --pd-red:#B23B3B; --pd-red-dim:rgba(178,59,59,0.08); --pd-amber:#A8570A;
-  --pd-ok:#23864B; --pd-sobre-acento:#FFFFFF; --pd-acento-hover:#256B42; --pd-barra:#FFFFFF; --pd-tip-fin:#F6EEDD; --pd-sobre-amber:#FFFFFF;
+  --pd-red:#A9503F; --pd-red-dim:rgba(169,80,63,0.09); --pd-amber:#B0741F;
+  --pd-azul:#5E8397; --pd-ok:#23864B; --pd-sobre-acento:#FFFFFF; --pd-acento-hover:#256B42; --pd-barra:#FFFFFF; --pd-tip-fin:#F6EEDD; --pd-sobre-amber:#FFFFFF;
   --pd-hueco:#EEF0EA; --pd-lleno:#E3F0E7; --pd-valor:#14201A;
 }
 body{font-family:'Sora',system-ui,sans-serif;background:var(--bg);color:var(--texto);font-size:14px;line-height:1.5}
@@ -363,7 +364,7 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
   --pd-red-dim:  rgba(224,92,92,0.12);
   --pd-amber:    #E8A84A;
   /* Tokens nuevos (valores de Bosque; el portal los usa tal cual) */
-  --pd-ok:#4AB870; --pd-sobre-acento:#0D1A12; --pd-acento-hover:#3DAF65; --pd-barra:#0E1612;
+  --pd-azul:#6FA8F0; --pd-ok:#4AB870; --pd-sobre-acento:#0D1A12; --pd-acento-hover:#3DAF65; --pd-barra:#0E1612;
   --pd-tip-fin:#2A2318; --pd-sobre-amber:#1F1608;
   --pd-hueco:#0C140F; --pd-lleno:#2A4231; --pd-valor:#FFFFFF;
 }
@@ -1062,6 +1063,99 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .portal-footer{text-align:center;font-size:0.68rem;color:var(--pd-text3);padding-top:0.5rem}
 .portal-loading{text-align:center;padding:3rem;color:var(--pd-text2);font-size:0.9rem}
 .portal-error{text-align:center;padding:3rem;color:var(--pd-red);font-size:0.9rem}
+
+/* ── Bloques del portal y de Mi perfil ── */
+.bq-head{display:flex;align-items:center;gap:10px;padding:2px 0 4px;position:relative}
+.bq-head>img{width:32px;height:32px;border-radius:9px;object-fit:cover}
+.bq-sal{flex:1;min-width:0}
+.bq-sal small{display:block;font-size:0.74rem;color:var(--pd-text2)}
+.bq-sal b{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:1.5rem;font-weight:700;color:var(--pd-text);line-height:1.15}
+.bq-head .tema-btn.portal-tema{position:static}
+.bq-menu-wrap{position:relative}
+.bq-av{width:44px;height:44px;border-radius:50%;background:var(--pd-verde-dim);border:1.5px solid var(--pd-verde);color:var(--pd-verde);font-weight:700;font-size:0.88rem;cursor:pointer;font-family:inherit}
+.bq-menu{position:absolute;right:0;top:52px;z-index:20;background:var(--pd-card2);border:1px solid var(--pd-border2);border-radius:12px;padding:6px;min-width:200px;box-shadow:0 12px 30px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.bq-menu button{display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--pd-text);font-family:inherit;font-size:0.86rem;padding:11px 10px;border-radius:8px;cursor:pointer;text-align:left}
+.bq-menu button:active{background:var(--pd-bg3)}
+.bq-menu .i{width:17px;height:17px;color:var(--pd-text2)}
+.bq-eti{font-size:0.64rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--pd-text3);font-weight:700}
+.bq-card{background:var(--pd-card);border:1px solid var(--pd-border2);border-radius:14px;padding:14px}
+.bq-inst{display:flex;align-items:center;gap:10px;background:var(--pd-card2);border:1px solid var(--pd-border2);border-radius:12px;padding:10px 10px 10px 13px}
+.bq-inst div{flex:1;min-width:0} .bq-inst b{display:block;font-size:0.82rem;color:var(--pd-text)} .bq-inst small{font-size:0.72rem;color:var(--pd-text2)}
+.bq-inst-bt{background:var(--pd-verde);color:var(--pd-sobre-acento);border:none;border-radius:9px;padding:8px 13px;font-family:inherit;font-weight:700;font-size:0.78rem;cursor:pointer;white-space:nowrap}
+.bq-inst-x{background:none;border:none;color:var(--pd-text3);font-size:0.9rem;cursor:pointer;padding:6px}
+.bq-prox{background:linear-gradient(140deg,color-mix(in srgb,var(--pd-verde) 10%,var(--pd-card)) 0%,var(--pd-card) 65%);border:1px solid color-mix(in srgb,var(--pd-verde) 32%,transparent);border-radius:16px;padding:16px}
+.bq-prox.es-hoy{border-color:var(--pd-verde)}
+.bq-cuando{display:flex;align-items:baseline;gap:10px;margin-top:6px}
+.bq-cuando b{font-size:1.9rem;font-weight:800;letter-spacing:-0.02em;color:var(--pd-text);line-height:1.1}
+.bq-cuando b.chico{font-size:1.1rem}
+.bq-cuando span{font-size:0.95rem;color:var(--pd-text2);font-weight:600}
+.bq-hora{font-size:0.95rem;color:var(--pd-verde);font-weight:700;margin-top:3px}
+.bq-sem{display:flex;gap:5px;margin-top:14px}
+.bq-sem .sm{flex:1;min-width:0;text-align:center;padding:7px 0 6px;border-radius:10px;background:color-mix(in srgb,var(--pd-bg) 45%,transparent);border:1px solid var(--pd-border);font-size:0.72rem;color:var(--pd-text3);font-weight:700}
+.bq-sem .sm small{display:block;font-size:0.56rem;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bq-sem .sm.toca{color:var(--pd-text);border-color:var(--pd-border2)}
+.bq-sem .sm.ok{background:var(--pd-verde-dim);border-color:color-mix(in srgb,var(--pd-verde) 45%,transparent);color:var(--pd-verde)}
+.bq-sem .sm.hoy{box-shadow:0 0 0 1.5px var(--pd-crema)}
+.bq-sem .sm.prox{border-color:var(--pd-verde);color:var(--pd-verde)}
+.bq-planes{display:grid;gap:8px}
+.bq-planes.c3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.bq-planes.c2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.bq-pl{background:var(--pd-card);border:1px solid var(--pd-border2);border-radius:14px;padding:11px 10px;display:flex;flex-direction:column;align-items:flex-start;gap:8px;min-height:128px;font-family:inherit;text-align:left;color:var(--pd-text);cursor:pointer}
+.bq-pl:active{transform:scale(0.98)}
+.bq-pl .ic{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.bq-pl .ic .i{width:20px;height:20px}
+.bq-pl.fuerza .ic{background:color-mix(in srgb,var(--pd-azul) 15%,transparent);color:var(--pd-azul)}
+.bq-pl.mapeo .ic{background:var(--pd-crema-dim);color:var(--pd-crema)}
+.bq-pl.nutri .ic{background:var(--pd-verde-dim);color:var(--pd-verde)}
+.bq-pl b{font-size:0.82rem;display:block} .bq-pl small{display:block;font-size:0.64rem;color:var(--pd-text2);margin-top:2px;line-height:1.3}
+.bq-pl .ab{font-size:0.7rem;font-weight:700;color:var(--pd-verde);margin-top:auto}
+.bq-pl.off{background:transparent;border-style:dashed;border-color:var(--pd-border2);cursor:default}
+.bq-pl.off .ic{background:color-mix(in srgb,var(--pd-text3) 10%,transparent);color:var(--pd-text3)}
+.bq-pl.off b,.bq-pl.off small{color:var(--pd-text3)} .bq-pl.off .ab{color:var(--pd-text3);font-weight:600;font-size:0.62rem;line-height:1.3}
+button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
+.bq-cons{display:flex;gap:12px;align-items:center}
+.bq-cons .ic{width:46px;height:46px;border-radius:14px;background:var(--pd-verde-dim);color:var(--pd-crema);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.bq-cons .ic .i{width:26px;height:26px}
+.bq-cons b{font-size:1rem;color:var(--pd-text);display:block} .bq-cons small{display:block;font-size:0.72rem;color:var(--pd-text2);margin-top:2px;line-height:1.4}
+.bq-mapa{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:13px}
+.bq-mapa span{height:15px;border-radius:5px;background:color-mix(in srgb,var(--pd-text3) 14%,transparent)}
+.bq-mapa span.a{background:var(--pd-verde)}
+.bq-mapa span.x{background:transparent;border:1px dashed color-mix(in srgb,var(--pd-text3) 30%,transparent)}
+.bq-mapa span.f{opacity:0.4}
+.bq-mapa span.h{outline:1.5px solid var(--pd-crema);outline-offset:1px}
+.bq-mapa-l{display:flex;justify-content:space-between;font-size:0.62rem;color:var(--pd-text3);margin-top:6px}
+.bq-mapa-l i{display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--pd-verde);margin-right:5px}
+.bq-3{display:flex;margin-top:12px;border-top:1px solid var(--pd-border);padding-top:11px}
+.bq-3 div{flex:1;text-align:center} .bq-3 div+div{border-left:1px solid var(--pd-border)}
+.bq-3 b{display:block;font-size:1.05rem;color:var(--pd-text)} .bq-3 small{font-size:0.62rem;color:var(--pd-text3)}
+.bq-cuota{padding:0;overflow:hidden}
+.bq-cuota-top{width:100%;display:flex;align-items:center;gap:10px;padding:12px 14px;background:none;border:none;font-family:inherit;text-align:left;cursor:pointer;color:var(--pd-text)}
+.bq-cuota-top>div{flex:1;min-width:0}
+.bq-cuota-top .ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;background:color-mix(in srgb,var(--pd-text3) 14%,transparent);color:var(--pd-text2)}
+.bq-cuota.ok .ic{background:color-mix(in srgb,var(--pd-ok) 15%,transparent);color:var(--pd-ok)}
+.bq-cuota.aviso{border-color:color-mix(in srgb,var(--pd-amber) 45%,transparent);background:linear-gradient(135deg,var(--pd-card) 0%,var(--pd-tip-fin) 100%)}
+.bq-cuota.aviso .ic{background:color-mix(in srgb,var(--pd-amber) 16%,transparent);color:var(--pd-amber)}
+.bq-cuota-top b{display:block;font-size:0.88rem} .bq-cuota.ok b{color:var(--pd-ok)} .bq-cuota.aviso b{color:var(--pd-amber)}
+.bq-cuota-top small{display:block;font-size:0.68rem;color:var(--pd-text2);margin-top:1px}
+.bq-cuota-top .monto{font-size:0.95rem;font-weight:700;color:var(--pd-crema)}
+.bq-cuota-top .chev{width:14px;height:14px;color:var(--pd-text3);transition:transform 0.2s;transform:rotate(90deg)}
+.bq-cuota.abierta .chev{transform:rotate(-90deg)}
+.bq-cuota-pago{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-top:1px solid var(--pd-border)}
+.bq-cuota-pago small{display:block;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-text3)} .bq-cuota-pago b{font-size:0.88rem;color:var(--pd-text);word-break:break-all}
+.bq-nota{font-size:0.66rem;color:var(--pd-text2);padding:0 14px 12px}
+.bq-cuerpo-top{display:flex;justify-content:space-between;align-items:center}
+.bq-link{background:none;border:none;color:var(--pd-verde);font-family:inherit;font-weight:600;font-size:0.76rem;cursor:pointer;padding:4px}
+.bq-peso{display:flex;align-items:baseline;gap:8px;margin-top:8px;flex-wrap:wrap}
+.bq-peso b{font-size:1.75rem;font-weight:800;color:var(--pd-verde)}
+.bq-peso span{font-size:0.74rem;font-weight:700;padding:2px 8px;border-radius:20px}
+.bq-peso span.baja{color:var(--pd-verde);background:var(--pd-verde-dim)} .bq-peso span.sube{color:var(--pd-crema);background:var(--pd-crema-dim)}
+.bq-datos{display:flex;gap:8px;margin-top:12px}
+.bq-datos div{flex:1;background:color-mix(in srgb,var(--pd-bg) 45%,transparent);border-radius:10px;padding:8px 10px}
+.bq-datos small{display:block;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3)} .bq-datos b{font-size:0.9rem;color:var(--pd-text)}
+.bq-frase{font-size:0.84rem;font-style:italic;color:var(--pd-text2);text-align:center;padding:6px 18px 0;line-height:1.55}
+.yo-pro{display:flex;align-items:center;gap:12px}
+.yo-pro b{display:block;font-size:0.95rem;color:var(--pd-text)} .yo-pro small{display:block;font-size:0.74rem;color:var(--pd-text2)}
+#yo-dark .hoy-toca{margin-top:0}
 
 /* Entrevista inicial del alumno */
 #entrevista{position:fixed;inset:0;z-index:400;background:var(--pd-bg);color:var(--pd-text);display:none;justify-content:center}
@@ -2237,199 +2331,186 @@ async function cargarPortalAlumno(id){
   }
 }
 
+// ══ BLOQUES COMPARTIDOS: portal del alumno y Mi perfil (misma experiencia) ══
+const _SEM_NOMBRES=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const _SEM_LETRAS=['D','L','M','X','J','V','S'];
+function _saludoHora(){ const h=new Date().getHours(); return h<5?'Buenas noches':h<13?'Buenos días':h<20?'Buenas tardes':'Buenas noches'; }
+const _dmyFecha=s=>{ const p=String(s||'').split('/'); return p.length===3?new Date(+p[2],+p[1]-1,+p[0]):null; };
+const _mismoDia=(x,y)=>x.getFullYear()===y.getFullYear()&&x.getMonth()===y.getMonth()&&x.getDate()===y.getDate();
+// Registros [fecha, tipo] → fechas de entrenamientos (las recuperaciones y los "dia" extra no cuentan)
+function _fechasEntreno(regs){
+  return (regs||[]).filter(r=>!r[1]||r[1]==='asistencia').map(r=>_dmyFecha(r[0])).filter(d=>d&&!isNaN(d)).sort((a,b)=>a-b);
+}
+
+// Próximo entrenamiento + semana (D…S) con días que le tocan, hechos y hoy
+function bloqueProximo(a,regs){
+  const hpd=stringToHorariosPorDia(a.horario), hoy=new Date(); hoy.setHours(0,0,0,0);
+  const hecho=_fechasEntreno(regs);
+  let prox=null;
+  for(let off=0;off<7&&a.dias.length;off++){
+    const d=new Date(hoy); d.setDate(hoy.getDate()+off);
+    const n=_SEM_NOMBRES[d.getDay()];
+    if(a.dias.includes(n) && !(off===0 && hecho.some(x=>_mismoDia(x,d)))){ prox={off,d,n,hora:(hpd[n]||'').split('-')[0].trim()}; break; }
+  }
+  const ini=new Date(hoy); ini.setDate(hoy.getDate()-hoy.getDay());
+  const semana=_SEM_LETRAS.map((l,i)=>{
+    const d=new Date(ini); d.setDate(ini.getDate()+i);
+    const n=_SEM_NOMBRES[i], toca=a.dias.includes(n), ok=hecho.some(x=>_mismoDia(x,d));
+    const esHoy=_mismoDia(d,hoy), esProx=prox&&_mismoDia(d,prox.d);
+    const sub=ok?'✓':esHoy&&!toca?'hoy':toca?((hpd[n]||'').split('-')[0].trim()||'·'):d.getDate();
+    return `<div class="sm${toca?' toca':''}${ok?' ok':''}${esHoy?' hoy':''}${esProx?' prox':''}">${l}<small>${escaparHTML(String(sub))}</small></div>`;
+  }).join('');
+  let cuando='', dia='', hora='';
+  if(prox){
+    cuando=prox.off===0?'Hoy':prox.off===1?'Mañana':_SEM_NOMBRES[prox.d.getDay()];
+    dia=prox.off<=1?_SEM_NOMBRES[prox.d.getDay()].toLowerCase():`${prox.d.getDate()}/${prox.d.getMonth()+1}`;
+    hora=prox.hora;
+  }
+  return `<div class="bq-prox${prox&&prox.off===0?' es-hoy':''}">
+    <div class="bq-eti">${prox&&prox.off===0?'Hoy entrenás':'Tu próximo entrenamiento'}</div>
+    ${prox?`<div class="bq-cuando"><b>${escaparHTML(cuando)}</b><span>${escaparHTML(dia)}</span></div>${hora?`<div class="bq-hora">${escaparHTML(hora)} hs</div>`:''}`
+          :`<div class="bq-cuando"><b class="chico">Sin días asignados</b></div>`}
+    <div class="bq-sem">${semana}</div>
+  </div>`;
+}
+
+// Fuerza · Mapeo · Nutrición. Sin link: gris y sin acción (o, en Mi perfil, abre "Editar").
+// links: {fuerza, mapeo, nutri}; mapeo === undefined → el botón no se muestra (dato no disponible)
+function bloquePlanes(links,opts){
+  const o=opts||{};
+  const ICON={fuerza:'dumbbell',mapeo:'map',nutri:'apple'}, TIT={fuerza:'Fuerza',mapeo:'Mapeo',nutri:'Nutrición'};
+  const SUB={fuerza:'Tus ejercicios y cargas',mapeo:'Tus marcas por ejercicio',nutri:'Tu plan de alimentación'};
+  const tipos=['fuerza','mapeo','nutri'].filter(t=>links[t]!==undefined);
+  return `<div class="bq-planes c${tipos.length}">${tipos.map(t=>{
+    const url=(links[t]||'').trim();
+    if(!url) return `<${o.sinLink?'button type="button"':'div'} class="bq-pl ${t} off"${o.sinLink?` onclick="${o.sinLink}"`:''}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${o.sinLink?'Sin link cargado':'Todavía no tenés plan'}</small></div><span class="ab">${o.sinLink?'Cargar link':'Consultalo con tu entrenador'}</span></${o.sinLink?'button':'div'}>`;
+    const accion=o.accion?` onclick="${o.accion}('${t}')"`:` data-open-url="${escaparHTML(url)}"`;
+    return `<button type="button" class="bq-pl ${t}"${accion}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${SUB[t]}</small></div><span class="ab">Abrir ↗</span></button>`;
+  }).join('')}</div>`;
+}
+
+// Constancia: racha, mapa de las últimas 4 semanas y tres números
+function bloqueConstancia(a,regs,textoAyuda){
+  const fechas=_fechasEntreno(regs), racha=calcularRachaSemanal(regs||[]);
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  // Semanas seguidas: desde el primer entrenamiento de la racha actual
+  let semanas=0;
+  if(racha>0){ const ini=fechas[fechas.length-racha]; semanas=Math.max(1,Math.ceil((hoy-ini+86400000)/(7*86400000))); }
+  const icono=racha>=30?'tree':racha>=7?'leaf':'sprout';
+  const titulo=racha>=1?`${racha} entrenamiento${racha!==1?'s':''} seguido${racha!==1?'s':''}`:'Sin racha activa';
+  const sig=racha>=30?'Constancia sostenida: ¡nivel máximo!':racha>=7?`faltan ${30-racha} para el árbol`:racha>=1?`faltan ${7-racha} para la hoja`:(textoAyuda||'Tu próximo entrenamiento la reactiva');
+  const sub=racha>=1?`Venís constante hace ${semanas} semana${semanas!==1?'s':''} · ${sig}`:sig;
+  // Mapa: 4 filas (semanas, la actual abajo) × 7 columnas (D…S)
+  const iniSem=new Date(hoy); iniSem.setDate(hoy.getDate()-hoy.getDay()-21);
+  let celdas='';
+  for(let i=0;i<28;i++){
+    const d=new Date(iniSem); d.setDate(iniSem.getDate()+i);
+    const ok=fechas.some(x=>_mismoDia(x,d)), toca=a.dias.includes(_SEM_NOMBRES[d.getDay()]);
+    const cls=[ok?'a':(!toca?'x':''), _mismoDia(d,hoy)?'h':'', d>hoy?'f':''].filter(Boolean).join(' ');
+    celdas+=`<span class="${cls}" title="${d.getDate()}/${d.getMonth()+1}"></span>`;
+  }
+  const iniSemActual=new Date(hoy); iniSemActual.setDate(hoy.getDate()-hoy.getDay());
+  const estaSem=fechas.filter(x=>x>=iniSemActual).length;
+  const esteMes=fechas.filter(x=>x.getMonth()===hoy.getMonth()&&x.getFullYear()===hoy.getFullYear()).length;
+  const frec=parseInt(a.frecuencia)||a.dias.length||0;
+  return `<div class="bq-card">
+    <div class="bq-cons"><span class="ic">${ic(icono)}</span><div><b>${escaparHTML(titulo)}</b><small>${escaparHTML(sub)}</small></div></div>
+    <div class="bq-mapa">${celdas}</div>
+    <div class="bq-mapa-l"><span>Últimas 4 semanas</span><span><i></i>entrenaste</span></div>
+    <div class="bq-3"><div><b>${estaSem}${frec?'/'+frec:''}</b><small>esta semana</small></div><div><b>${esteMes}</b><small>en ${MESES[hoy.getMonth()].toLowerCase()}</small></div><div><b>${fechas.length}</b><small>en total</small></div></div>
+  </div>`;
+}
+
+// Tu cuerpo: peso grande con el cambio desde el inicio + IMC · Edad · Altura
+function bloqueCuerpo(a,editar){
+  const edad=calcularEdad(a.fechaNac);
+  const n=x=>parseFloat(String(x||'').replace(',','.'));
+  const imc=(a.pesoActual&&a.estatura)?(n(a.pesoActual)/Math.pow(n(a.estatura)/100,2)).toFixed(1).replace('.',','):null;
+  const diff=(a.pesoInicial&&a.pesoActual)?Math.round((n(a.pesoActual)-n(a.pesoInicial))*10)/10:null;
+  const kg=x=>String(x).replace('.',',');
+  if(!a.pesoActual&&!a.estatura&&!edad) return '';
+  return `<div class="bq-card">
+    <div class="bq-cuerpo-top"><span class="bq-eti">Tu cuerpo</span>${editar?`<button type="button" class="bq-link" onclick="${editar}">Editar</button>`:''}</div>
+    ${a.pesoActual?`<div class="bq-peso"><b>${escaparHTML(kg(a.pesoActual))} kg</b>${diff?`<span class="${diff<0?'baja':'sube'}">${diff<0?'↓':'↑'} ${kg(Math.abs(diff))} kg desde que empezaste</span>`:''}</div>`:''}
+    <div class="bq-datos"><div><small>IMC</small><b>${imc||'—'}</b></div><div><small>Edad</small><b>${edad||'—'}</b></div><div><small>Altura</small><b>${a.estatura?escaparHTML(a.estatura)+' cm':'—'}</b></div></div>
+  </div>`;
+}
+
+// ── Portal del alumno ──
+let _portalMenuAbierto=false, _portalCuotaAbierta=false;
 function _pintarPortal(el,data){
     const a = {
       ...data.alumno,
       dias: data.alumno.dias ? data.alumno.dias.split('|') : [],
     };
-
     const rowsAs = data.asistencias  || [];
     const rowsFr = data.frases       || [];
     // data.seguimiento / data.progresion / a.objetivos: el proxy los sigue
     // devolviendo, pero esta vista no los muestra (handoff visual 2026-07-22).
-    // No se borra el dato ni el backend; reincorporarlos sería decisión nueva.
+    // Frase: al azar entre las de la pestaña "Frases" (escapada; los saltos de línea reales → <br>)
+    const fraseDefault = 'Pequeños pasos hoy, una versión más fuerte de vos mañana.';
+    const frase = rowsFr.length ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)]).replace(/\n/g,'<br>') : fraseDefault;
+    const nombre1=(a.nombre||'').trim().split(/\s+/)[0]||'';
+    const iniciales=(a.nombre||'').split(' ').filter(Boolean).map(w=>w[0]).slice(0,2).join('').toUpperCase();
 
-    // Frase motivacional: al azar entre las cargadas en el Sheet (pestaña
-    // "Frases"), o la frase fija de respaldo si esa pestaña no existe o
-    // está vacía. Los saltos de línea reales de la celda (Enter en Sheets)
-    // se convierten en <br> DESPUÉS de escapar, así un salto de línea real
-    // se ve como corte de línea, pero un "<br>" tipeado como texto se
-    // muestra literal (no se reabre el vector de HTML sin sanitizar).
-    const fraseDefault = 'Pequeños pasos hoy,<br>una versión más fuerte de vos mañana.';
-    const frase = rowsFr.length
-      ? escaparHTML(rowsFr[Math.floor(Math.random()*rowsFr.length)]).replace(/\n/g,'<br>')
-      : fraseDefault;
-
-    // Racha de clases (se corta si pasa una semana sin asistencia).
-    // Retrocompatible: filas viejas sin columna 'tipo' cuentan como 'asistencia'.
-    const racha = calcularRachaSemanal(rowsAs);
-
-    const hpd = stringToHorariosPorDia(a.horario);
-    const iniciales = a.nombre.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
-
-    // Próxima sesión — frase corta para la línea .proxima-linea (estética ficha)
-    const DIAS_SEMANA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
-    const hoy = new Date();
-    const hoyNum = hoy.getDay();
-    let proximaLineaStr = '';
-    if(a.dias.length > 0){
-      // Buscar el próximo día de entrenamiento (hoy inclusive)
-      for(let offset = 0; offset < 7; offset++){
-        const d = new Date(hoy);
-        d.setDate(hoy.getDate() + offset);
-        const nombre = DIAS_SEMANA[d.getDay()];
-        if(a.dias.includes(nombre)){
-          const hora = hpd[nombre] || '';
-          if(offset === 0)      proximaLineaStr = `hoy${hora ? ' ' + hora : ''}`;
-          else if(offset === 1) proximaLineaStr = `mañana ${nombre.toLowerCase()}${hora ? ' ' + hora : ''}`;
-          else                  proximaLineaStr = `${nombre.toLowerCase()}${hora ? ' ' + hora : ''}`;
-          break;
-        }
-      }
-    }
-
-    // Días como pilares (D L M X J V S), igual que en la ficha del entrenador
-    const LETRAS = ['D','L','M','X','J','V','S'];
-    const pilaresHTML = LETRAS.map((l,i)=>{
-      const activo = a.dias.includes(DIAS_SEMANA[i]);
-      const cls = ['dia-pilar', activo?'activo':'', i===hoyNum?'hoy':''].filter(Boolean).join(' ');
-      return `<div class="${cls}">${l}</div>`;
-    }).join('');
-
-    // Racha como componente informativo (el alumno no marca su propia asistencia)
-    const rachaIcono = racha>=30 ? '<svg class="i"><use href="#i-tree"/></svg>' : racha>=7 ? '<svg class="i"><use href="#i-leaf"/></svg>' : '<svg class="i"><use href="#i-sprout"/></svg>';
-    const rachaTitulo = racha>=1 ? `${racha} día${racha!==1?'s':''} de constancia` : 'Sin racha activa';
-    const rachaSiguiente = racha>=30
-      ? 'Constancia sostenida — ¡nivel máximo!'
-      : racha>=7 ? `${30-racha} días más para el árbol`
-      : racha>=1 ? `${7-racha} días más para la hoja`
-      : 'Tu próxima clase la reactiva';
-
-    // Vitales
-    const edad = calcularEdad(a.fechaNac);
-    const imc  = (a.pesoActual && a.estatura) ? (parseFloat(a.pesoActual) / Math.pow(parseFloat(a.estatura)/100, 2)).toFixed(1) : null;
-    const pesoDiff = (a.pesoInicial && a.pesoActual) ? +(parseFloat(a.pesoActual) - parseFloat(a.pesoInicial)).toFixed(1) : null;
-    const hayVitales = a.pesoActual || imc || edad || a.estatura || a.pesoInicial;
-
-    // Card "Tu cuota" (handoff vencimiento-cuota-portal-y-ficha): solo si está
-    // activo (pausados/inactivos no ven la card, igual que Vencimientos no los
-    // lista) y si el proxy ya manda `pagos` — compatibilidad con el proxy
-    // viejo: si `data.pagos` no vino, no se renderiza nada en vez de mostrar a
-    // todos como "sin pagos".
-    let cuotaHTML = '';
+    // Cuota (mismo cálculo que Cobros → Vencimientos). Al día: una línea que se despliega.
+    // Vence pronto / vencida: sube arriba de todo, desplegada.
+    let cuotaHTML='', cuotaArriba=false;
     if(a.estado==='activo' && data.pagos!==undefined){
       const pagos=(data.pagos||[]).map(_parseFechaPago).filter(Boolean).sort((x,y)=>x-y);
       const hoyV=new Date(); hoyV.setHours(0,0,0,0);
       const venc=calcularVencimiento(a, hoyV, pagos);
-      const montoTxt = (a.monto && parseFloat(a.monto)>0) ? `$${parseFloat(a.monto).toLocaleString('es-AR')}` : '';
-      let estadoCls='neutro', estadoTxt='', subTxt='', mostrarAviso=false;
-      if(venc.categoria==='alDia'){
-        estadoCls='alDia'; estadoTxt='Al día ✓';
-        subTxt=`Próximo vencimiento: ${fmtFecha(venc.proximoVencimiento)} · último pago ${fmtFecha(venc.fechaUltimoPago)}`;
-      } else if(venc.categoria==='vencePronto'){
-        estadoCls='atencion'; mostrarAviso=true;
-        estadoTxt=venc.diasParaVencer<=0?'Vence hoy':(venc.diasParaVencer===1?'Vence mañana':`Vence en ${venc.diasParaVencer} días`);
-        subTxt=`El ${fmtFecha(venc.proximoVencimiento)} · último pago ${fmtFecha(venc.fechaUltimoPago)}`;
-      } else if(venc.categoria==='vencido'){
-        estadoCls='atencion'; mostrarAviso=true;
-        estadoTxt=`Venció el ${fmtFecha(venc.enMoraDesde)}`;
-        subTxt=`${venc.ciclosAdeudados} cuota${venc.ciclosAdeudados!==1?'s':''} pendiente${venc.ciclosAdeudados!==1?'s':''} · último pago ${fmtFecha(venc.fechaUltimoPago)}`;
-      } else {
-        estadoTxt='Mensual';
-        subTxt='Tu fecha de vencimiento se fija con tu primer pago';
-      }
-      cuotaHTML = `
-        <div class="portal-cuota ${estadoCls==='atencion'?'atencion':''}">
-          <div class="cuota-top">
-            <div>
-              <div class="cuota-label">Tu cuota</div>
-              <div class="cuota-estado ${estadoCls}">${escaparHTML(estadoTxt)}</div>
-              <div class="cuota-sub">${escaparHTML(subTxt)}</div>
-            </div>
-            ${montoTxt ? `<div class="cuota-monto">
-              <div class="cuota-label">Mensual</div>
-              <div class="cuota-monto-val">${escaparHTML(montoTxt)}</div>
-            </div>` : ''}
-          </div>
-          ${ALIAS_PAGO ? `<div class="cuota-pago">
-            <div style="min-width:0">
-              <div class="cuota-alias-label">Alias para transferir</div>
-              <div class="cuota-alias">${escaparHTML(ALIAS_PAGO)}</div>
-            </div>
-            <button type="button" class="cuota-copiar" id="portal-copiar-alias">Copiar</button>
-          </div>` : ''}
-          ${mostrarAviso ? `<p class="cuota-aviso">Si ya pagaste, puede tardar en verse hasta que se registre.</p>` : ''}
-        </div>`;
+      const montoTxt=(a.monto&&parseFloat(a.monto)>0)?`$${parseFloat(a.monto).toLocaleString('es-AR')}`:'';
+      let cls='neutro', tit='Cuota mensual', sub='Tu fecha de vencimiento se fija con tu primer pago';
+      if(venc.categoria==='alDia'){ cls='ok'; tit='Cuota al día'; sub=`Vence el ${fmtFecha(venc.proximoVencimiento)} · último pago ${fmtFecha(venc.fechaUltimoPago)}`; }
+      else if(venc.categoria==='vencePronto'){ cls='aviso'; cuotaArriba=true; tit=venc.diasParaVencer<=0?'Tu cuota vence hoy':venc.diasParaVencer===1?'Tu cuota vence mañana':`Tu cuota vence en ${venc.diasParaVencer} días`; sub=`El ${fmtFecha(venc.proximoVencimiento)} · último pago ${fmtFecha(venc.fechaUltimoPago)}`; }
+      else if(venc.categoria==='vencido'){ cls='aviso'; cuotaArriba=true; tit=`Tu cuota venció el ${fmtFecha(venc.enMoraDesde)}`; sub=`${venc.ciclosAdeudados} cuota${venc.ciclosAdeudados!==1?'s':''} pendiente${venc.ciclosAdeudados!==1?'s':''} · último pago ${fmtFecha(venc.fechaUltimoPago)}`; }
+      const abierta=cuotaArriba||_portalCuotaAbierta;
+      cuotaHTML=`<div class="bq-card bq-cuota ${cls}${abierta?' abierta':''}">
+        <button type="button" class="bq-cuota-top" onclick="${cuotaArriba?'':'_portalCuotaAbierta=!_portalCuotaAbierta;_portalRepintar()'}">
+          <span class="ic">${cls==='ok'?'✓':cls==='aviso'?'!':'$'}</span>
+          <div><b>${escaparHTML(tit)}</b><small>${escaparHTML(sub)}</small></div>
+          ${montoTxt?`<span class="monto">${escaparHTML(montoTxt)}</span>`:''}${cuotaArriba?'':`<svg class="i chev" aria-hidden="true"><use href="#i-chev"/></svg>`}
+        </button>
+        ${abierta&&ALIAS_PAGO?`<div class="bq-cuota-pago"><div><small>Alias para transferir</small><b>${escaparHTML(ALIAS_PAGO)}</b></div><button type="button" class="cuota-copiar" id="portal-copiar-alias">Copiar</button></div>${cls==='aviso'?'<p class="bq-nota">Si ya pagaste, puede tardar en verse hasta que se registre.</p>':''}`:''}
+      </div>`;
     }
+
+    let instCerrado=false; try{ instCerrado=!!localStorage.getItem('mc_inst_cerrado'); }catch(e){}
+    const instalarHTML=(!_esStandalone()&&!instCerrado)?`<div class="bq-inst"><div><b>Instalá la app</b><small>Se abre con un toque, como cualquier app.</small></div><button type="button" class="bq-inst-bt" onclick="abrirInstalar()">Instalar</button><button type="button" class="bq-inst-x" aria-label="Cerrar" onclick="try{localStorage.setItem('mc_inst_cerrado','1')}catch(e){};_portalRepintar()">✕</button></div>`:'';
+
+    const editarCuerpo=PORTAL_PERFIL_EDITABLE?'abrirEntrevista(_portalAlumnoActual,true)':'';
+    const cuerpoHTML=bloqueCuerpo(a,editarCuerpo);
+    const completarHTML=(PORTAL_PERFIL_EDITABLE&&!cuerpoHTML)
+      ?`<button type="button" class="portal-completar" onclick="abrirEntrevista(_portalAlumnoActual,false)"><span>${ic('sprout')}</span><div><b>Completá tu perfil</b><small>5 preguntas rápidas · menos de un minuto</small></div>${ic('chev')}</button>`:'';
+    // Mapeo: solo si el proxy manda el campo (si no lo manda, el botón no aparece)
+    const links={fuerza:a.carpetaDrive||'', nutri:a.nutriDrive||''};
+    if(a.mapeoUrl!==undefined) links.mapeo=a.mapeoUrl||'';
+    const planes=bloquePlanes({fuerza:links.fuerza, mapeo:links.mapeo, nutri:links.nutri});
 
     el.innerHTML = `
       <div class="portal-wrap">
-        <!-- Header: marca + saludo (vista propia del alumno) -->
-        <div class="portal-top">
-          <div class="portal-brand"><img src="Logo_App.png" alt="Mente Consciente"/><span>Mente Consciente</span></div>
-          <button type="button" class="tema-btn portal-tema" onclick="alternarTema()"></button>
-          <span class="portal-saludo">Hola de nuevo,</span>
-          <span class="portal-saludo-nombre">${escaparHTML(a.nombre)}</span>
-        </div>
-
-        <!-- Card principal (mismo patrón que pd-header-main de la ficha) -->
-        <div class="pd-header-main">
-          <div style="display:flex;align-items:center;gap:0.75rem">
-            <div class="pd-avatar">${escaparHTML(iniciales)}</div>
-            <div class="portal-freq">${escaparHTML(a.frecuencia)}x por semana</div>
-          </div>
-
-          <div class="dias-pilares">${pilaresHTML}</div>
-          ${proximaLineaStr ? `<div class="proxima-linea"><svg class="i s"><use href="#i-cal"/></svg> Próxima sesión: ${escaparHTML(proximaLineaStr)}</div>` : ''}
-
-          <div class="racha-accion">
-            <span class="racha-icono">${rachaIcono}</span>
-            <div class="racha-info">
-              <div class="racha-dias">${rachaTitulo}</div>
-              <div class="racha-siguiente">${rachaSiguiente}</div>
-            </div>
-          </div>
-
-          <!-- Materiales: botones circulares (Fuerza · Nutri) -->
-          ${(a.carpetaDrive || a.nutriDrive) ? `
-          <div class="acciones-dinamicas">
-            ${a.carpetaDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.carpetaDrive)}"><div class="accion-circulo drive"><svg class="i"><use href="#i-dumbbell"/></svg></div><span class="accion-label">Fuerza</span></button>` : ''}
-            ${a.nutriDrive ? `<button type="button" class="accion-circular" data-open-url="${escaparHTML(a.nutriDrive)}"><div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg></div><span class="accion-label">Nutri</span></button>` : ''}
-          </div>` : ''}
-        </div>
-
-        ${cuotaHTML}
-
-        <!-- Vitales: principales (peso con tendencia + IMC) + secundarios -->
-        ${hayVitales ? `
-        <div class="stats-principales">
-          <div class="stat-principal">
-            <div class="stat-principal-label">Peso actual</div>
-            <div class="stat-principal-val">${a.pesoActual ? escaparHTML(a.pesoActual)+' kg' : '—'}${pesoDiff ? ` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>` : ''}</div>
-            <div class="stat-principal-sub">${pesoDiff!==null ? 'desde el inicio' : '&nbsp;'}</div>
-          </div>
-          <div class="stat-principal">
-            <div class="stat-principal-label">IMC</div>
-            <div class="stat-principal-val">${imc || '—'}</div>
+        <div class="bq-head">
+          <img src="Logo_App.png" alt="Mente Consciente"/>
+          <div class="bq-sal"><small>${_saludoHora()},</small><b>${escaparHTML(nombre1)}</b></div>
+          <div class="bq-menu-wrap">
+            <button type="button" class="bq-av" onclick="_portalMenuAbierto=!_portalMenuAbierto;_portalRepintar()" aria-label="Menú">${escaparHTML(iniciales)}</button>
+            ${_portalMenuAbierto?`<div class="bq-menu">
+              <button type="button" onclick="alternarTema();_portalMenuAbierto=false;_portalRepintar()">${ic(document.documentElement.dataset.tema==='calma'?'luna':'sol')} Cambiar tema</button>
+              ${_esStandalone()?'':`<button type="button" onclick="_portalMenuAbierto=false;abrirInstalar()">${ic('download')} Instalar como app</button>`}
+              <button type="button" onclick="_portalSalir()">${ic('logout')} Salir</button>
+            </div>`:''}
           </div>
         </div>
-        <div class="stats-secundarios">
-          <div class="stat-secundario"><div class="stat-secundario-label">Edad</div><div class="stat-secundario-val">${edad ? edad+' años' : '—'}</div></div>
-          <div class="stat-secundario"><div class="stat-secundario-label">Altura</div><div class="stat-secundario-val">${a.estatura ? escaparHTML(a.estatura)+' cm' : '—'}</div></div>
-          <div class="stat-secundario"><div class="stat-secundario-label">Peso inicial</div><div class="stat-secundario-val">${a.pesoInicial ? escaparHTML(a.pesoInicial)+' kg' : '—'}</div></div>
-        </div>` : ''}
-
-        ${PORTAL_PERFIL_EDITABLE?(hayVitales
-          ?`<button type="button" class="portal-editar" onclick="abrirEntrevista(_portalAlumnoActual,true)">${ic('edit')} Editar mis datos</button>`
-          :`<button type="button" class="portal-completar" onclick="abrirEntrevista(_portalAlumnoActual,false)"><span>${ic('sprout')}</span><div><b>Completá tu perfil</b><small>5 preguntas rápidas · menos de un minuto</small></div>${ic('chev')}</button>`):''}
-
-        <!-- Frase motivacional -->
-        <div class="portal-frase-card">
-          <span class="portal-frase-comilla">&ldquo;</span>
-          <p class="portal-frase-texto">${frase}</p>
-        </div>
-
-        <p class="portal-footer">Tu entrenador personal · Mente Consciente<br>${_esStandalone()?'':'<button type="button" class="portal-salir" onclick="abrirInstalar()">Instalar como app</button> · '}<button type="button" class="portal-salir" onclick="_portalSalir()">Salir</button></p>
+        ${cuotaArriba?cuotaHTML:''}
+        ${instalarHTML}
+        ${bloqueProximo(a,rowsAs)}
+        ${planes}
+        ${bloqueConstancia(a,rowsAs)}
+        ${cuotaArriba?'':cuotaHTML}
+        ${completarHTML}${cuerpoHTML}
+        <p class="bq-frase">${frase}</p>
+        <p class="portal-footer">Tu entrenador personal · Mente Consciente</p>
       </div>
     `;
     el.querySelectorAll('[data-open-url]').forEach(btn=>{
@@ -2444,10 +2525,13 @@ function _pintarPortal(el,data){
         setTimeout(()=>{ copiarAliasBtn.textContent='Copiar'; copiarAliasBtn.classList.remove('copiado'); }, 1800);
       });
     }
-    _sincronizarTemaUI();   // el botón sol/luna del portal acaba de dibujarse
-    _portalAlumnoActual=a;
+    _sincronizarTemaUI();
+    _portalAlumnoActual=a; _portalDatosActual=data;
     if(_entPendiente(a) && !document.getElementById('entrevista')?.innerHTML) setTimeout(()=>abrirEntrevista(a,false),500);
 }
+let _portalDatosActual=null;
+function _portalRepintar(){ const el=document.getElementById('portal-alumno'); if(el&&_portalDatosActual) _pintarPortal(el,_portalDatosActual); }
+
 let _portalAlumnoActual=null;
 
 // ══ ENTREVISTA INICIAL DEL ALUMNO (portal) ══
@@ -5856,67 +5940,33 @@ function _yoDato(icono,valor,vacio,extra=''){
 function renderMiPerfil(){
   const cont=document.getElementById('yo-dark'); if(!cont) return;
   const a=_miComoAlumno(), p=miPerfil;
-  const DIAS_SEMANA=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'], LETRAS=['D','L','M','X','J','V','S'];
-  const hoyNum=new Date().getDay();
-  const pilares=LETRAS.map((l,i)=>`<div class="${['dia-pilar',a.dias.includes(DIAS_SEMANA[i])?'activo':'',i===hoyNum?'hoy':''].filter(Boolean).join(' ')}">${l}</div>`).join('');
-  const prox=_proximaSesionCorta(a);
-  const edad=calcularEdad(a.fechaNac);
-  const imc=(a.pesoActual&&a.estatura)?(parseFloat(a.pesoActual)/Math.pow(parseFloat(a.estatura)/100,2)).toFixed(1):null;
-  const pesoDiff=(a.pesoInicial&&a.pesoActual)?+(parseFloat(a.pesoActual)-parseFloat(a.pesoInicial)).toFixed(1):null;
+  const regs=asistencias.filter(x=>x[0]===MI_ID).map(x=>[x[1],x[2]]);
   const activos=alumnos.filter(x=>x.estado==='activo');
   const sesiones=activos.reduce((n,x)=>n+x.dias.length,0);
   const nutriN=clientesNutri.filter(c=>c.estado==='activo').length+activos.filter(x=>x.tieneNutri==='si'&&!clientesNutri.find(c=>c.id===x.id)).length;
   const alias=p.alias||ALIAS_PAGO;
   const insta=(p.instagram||'').replace(/^@/,'');
   const temaCalma=document.documentElement.dataset.tema==='calma';
+  const nombre1=((p.nombre||'').trim().split(/\s+/)[0])||'Luca';
 
   cont.innerHTML=`
-    <div class="portal-top">
-      <div class="portal-brand"><img src="Logo_App.png" alt="Mente Consciente"/><span>Mente Consciente</span></div>
+    <div class="bq-head">
+      <img src="Logo_App.png" alt="Mente Consciente"/>
+      <div class="bq-sal"><small>${_saludoHora()},</small><b>${escaparHTML(nombre1)}</b></div>
       <button type="button" class="tema-btn portal-tema" onclick="alternarTema();renderMiPerfil()"></button>
-      <span class="portal-saludo">Mi perfil profesional</span>
-      <span class="portal-saludo-nombre">${escaparHTML(a.nombre==='Mi entrenamiento'?'Luca':a.nombre)}</span>
     </div>
 
-    <div class="pd-header-main">
-      <div style="display:flex;align-items:center;gap:0.75rem">
-        <div class="pd-avatar">${escaparHTML(_miIniciales())}</div>
-        <div style="flex:1;min-width:0">
-          <div class="portal-freq" style="color:var(--pd-text)">${escaparHTML(p.titulo||'Entrenador personal')}</div>
-          <div class="yo-titulo">${a.dias.length?`Entreno ${a.dias.length}x por semana`:'Cargá tus días de entrenamiento'}</div>
-        </div>
-        <button type="button" class="yo-editar" onclick="abrirModalMiPerfil()" aria-label="Editar mi perfil" title="Editar mi perfil">${ic('edit')}</button>
-      </div>
-      <div class="dias-pilares">${pilares}</div>
-      ${prox?`<div class="proxima-linea"><svg class="i s"><use href="#i-cal"/></svg> Mi próximo entreno: ${escaparHTML(prox.txt.toLowerCase())}</div>`:''}
-      ${(()=>{ const r=calcularRachaSemanal(asistencias.filter(x=>x[0]===MI_ID).map(x=>[x[1],x[2]]));
-        return `<div class="racha-accion" style="cursor:default"><span class="racha-icono">${r>=30?ic('tree'):r>=7?ic('leaf'):ic('sprout')}</span><div class="racha-info"><div class="racha-dias">${r>=1?`${r} día${r!==1?'s':''} de constancia`:'Sin racha activa'}</div><div class="racha-siguiente">Se suma cada vez que tocás "Terminé el día" en tu Fuerza</div></div></div>`; })()}
-
-      <div class="acciones-dinamicas">
-        <button type="button" class="accion-circular" onclick="_yoAbrir('fuerza')"><div class="accion-circulo drive"><svg class="i"><use href="#i-dumbbell"/></svg></div><span class="accion-label">Fuerza</span></button>
-        <button type="button" class="accion-circular" onclick="_yoAbrir('mapeo')"><div class="accion-circulo biblio"><svg class="i"><use href="#i-map"/></svg></div><span class="accion-label">Mapeo</span></button>
-        ${p.nutriUrl?`<button type="button" class="accion-circular" onclick="_yoAbrir('nutri')"><div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg></div><span class="accion-label">Nutri</span></button>`:''}
-      </div>
-      <div class="hoy-toca" id="yo-hoy-toca" style="display:none"></div>
-      ${(!p.fuerzaUrl||!p.mapeoUrl)?`<p class="yo-aviso" style="margin-top:0.6rem">Cargá los links de tu ${!p.fuerzaUrl&&!p.mapeoUrl?'Fuerza y tu Mapeo':(!p.fuerzaUrl?'Fuerza':'Mapeo')} en <a onclick="abrirModalMiPerfil()">Editar perfil</a> para usarlos como tus alumnos.</p>`:''}
+    <div class="bq-card yo-pro">
+      <div class="pd-avatar">${escaparHTML(_miIniciales())}</div>
+      <div style="flex:1;min-width:0"><b>${escaparHTML((p.nombre||'').trim()||'Luca')}</b><small>${escaparHTML(p.titulo||'Entrenador personal')}</small></div>
+      <button type="button" class="yo-editar" onclick="abrirModalMiPerfil()" aria-label="Editar mi perfil" title="Editar mi perfil">${ic('edit')}</button>
     </div>
 
-    ${(a.pesoActual||a.estatura||a.pesoInicial||edad)?`
-    <div>
-      <div class="stats-principales">
-        <div class="stat-principal">
-          <div class="stat-principal-label">Peso actual</div>
-          <div class="stat-principal-val">${a.pesoActual?escaparHTML(a.pesoActual)+' kg':'—'}${pesoDiff?` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>`:''}</div>
-          <div class="stat-principal-sub">${pesoDiff!==null?'desde el inicio':'&nbsp;'}</div>
-        </div>
-        <div class="stat-principal"><div class="stat-principal-label">IMC</div><div class="stat-principal-val">${imc||'—'}</div></div>
-      </div>
-      <div class="stats-secundarios">
-        <div class="stat-secundario"><div class="stat-secundario-label">Edad</div><div class="stat-secundario-val">${edad?edad+' años':'—'}</div></div>
-        <div class="stat-secundario"><div class="stat-secundario-label">Altura</div><div class="stat-secundario-val">${a.estatura?escaparHTML(a.estatura)+' cm':'—'}</div></div>
-        <div class="stat-secundario"><div class="stat-secundario-label">Peso inicial</div><div class="stat-secundario-val">${a.pesoInicial?escaparHTML(a.pesoInicial)+' kg':'—'}</div></div>
-      </div>
-    </div>`:''}
+    ${bloqueProximo(a,regs)}
+    ${bloquePlanes({fuerza:p.fuerzaUrl||'',mapeo:p.mapeoUrl||'',nutri:p.nutriUrl||''},{accion:'_yoAbrir',sinLink:'abrirModalMiPerfil()'})}
+    <div class="hoy-toca" id="yo-hoy-toca" style="display:none"></div>
+    ${bloqueConstancia(a,regs,'Se suma cada vez que tocás "Terminé el día" en tu Fuerza')}
+    ${bloqueCuerpo(a,'abrirModalMiPerfil()')}
 
     <div class="yo-kpis">
       <div class="yo-kpi"><b>${activos.length}</b><small>Alumnos activos</small></div>
@@ -5944,7 +5994,6 @@ function renderMiPerfil(){
     </div>
   `;
   _sincronizarTemaUI();
-  _actualizarIniYo();
   // Mi Fuerza se precarga para que el atajo "Hoy toca…" aparezca igual que en la ficha
   if(planParseUrl(a.carpetaDrive)) planAsegurar(a,'fuerza').then(()=>planRefrescarSiViejo(a,'fuerza'));
   if(planParseUrl(a.mapeoUrl)) planAsegurar(a,'mapeo');
