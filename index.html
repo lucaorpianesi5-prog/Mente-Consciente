@@ -2207,57 +2207,55 @@ const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcB
 const ALIAS_PAGO = 'lucaorpianesi.mp';
 
 // CAL-07: Rangos de hojas centralizados — modificar aquí si cambia la estructura
+// Las lecturas (_READ / _KEYS / _ID_COL) van SIN última fila ('A2:D'): leen todo lo
+// que haya, sin tope (antes 1000 filas: Asistencias se llenaba en ~2027 y la app
+// dejaba de ver lo nuevo sin avisar). Los _WRITE de sheetsReplaceRange sí necesitan
+// la fila final (y que la grilla de la pestaña tenga esas filas: no achicarlas).
 const RANGO = {
   // T=diaPago (handoff vencimientos-cobros): día 1-31 del ciclo de cobro del
   // alumno, autocompletado con el día de su primer pago registrado.
   // U=mapeoUrl (handoff biblioteca-a-mapeo-externo): link al Sheet de Mapeo
   // propio de cada alumno, mismo patrón que carpetaDrive/nutriDrive.
-  ALUMNOS_READ:        'Alumnos!A2:V1000',
+  ALUMNOS_READ:        'Alumnos!A2:V',
   ALUMNOS_WRITE:       'Alumnos!A2:V1000',
   ALUMNOS_START:       'Alumnos!A2',
-  ALUMNOS_ID_COL:      'Alumnos!A2:A1000',
-  COBROS_READ:         'Cobros!A2:G1000',
+  ALUMNOS_ID_COL:      'Alumnos!A2:A',
+  COBROS_READ:         'Cobros!A2:G',
   COBROS_WRITE:        'Cobros!A2:G1000',
   COBROS_START:        'Cobros!A2',
-  COBROS_KEYS:         'Cobros!A2:B1000',
+  COBROS_KEYS:         'Cobros!A2:B',
   // E=chips (join '|'), F=origen ('manual'|'auto') — handoff ficha-alumno-optimizada
-  SEGUIMIENTO_READ:    'Seguimiento!A2:F10000',
+  SEGUIMIENTO_READ:    'Seguimiento!A2:F',
   SEGUIMIENTO_WRITE:   'Seguimiento!A2:F10000',
   SEGUIMIENTO_START:   'Seguimiento!A2',
-  SEGUIMIENTO_KEYS:    'Seguimiento!D2:D10000',
-  NUTRICION_READ:      'Nutricion!A2:E1000',
+  SEGUIMIENTO_KEYS:    'Seguimiento!D2:D',
+  NUTRICION_READ:      'Nutricion!A2:E',
   NUTRICION_WRITE:     'Nutricion!A2:E1000',
   NUTRICION_START:     'Nutricion!A2',
-  NUTRI_COBROS_READ:   'NutricionCobros!A2:D1000',
+  NUTRI_COBROS_READ:   'NutricionCobros!A2:D',
   NUTRI_COBROS_WRITE:  'NutricionCobros!A2:D1000',
   NUTRI_COBROS_START:  'NutricionCobros!A2',
-  NUTRI_COBROS_KEYS:   'NutricionCobros!A2:B1000',
-  GASTOS_READ:         'Gastos!A2:D1000',
+  NUTRI_COBROS_KEYS:   'NutricionCobros!A2:B',
+  GASTOS_READ:         'Gastos!A2:D',
   GASTOS_WRITE:        'Gastos!A2:D1000',
   GASTOS_START:        'Gastos!A2',
-  GASTOS_KEYS:         'Gastos!A2:A1000',
+  GASTOS_KEYS:         'Gastos!A2:A',
   // B7 (handoff ahorros-finanzas): repurposed. Antes era un log mensual
   // (mes,valor) que Luca tipeaba a mano; ahora es una única fila de
   // configuración: [SaldoInicialAhorro, FechaReferenciaSaldoInicial].
   CONFIG_FINANZAS_READ:  'Ahorros!A2:B2',
   CONFIG_FINANZAS_WRITE: 'Ahorros!A2:B2',
   // D = día del plan terminado ("Mes 2 · Día 1 · Semana 3"), vacío si la asistencia se marcó desde la ficha
-  ASISTENCIAS_READ:    'Asistencias!A2:D1000',
+  ASISTENCIAS_READ:    'Asistencias!A2:D',
   ASISTENCIAS_START:   'Asistencias!A2',
-  BIBLIOTECA_READ:     'Biblioteca!A2:D1000',
-  BIBLIOTECA_START:    'Biblioteca!A2',
-  PROGRESION_ACTUAL_READ: 'Progresion_Actual!A2:G10000',
-  PROGRESION_ACTUAL_KEYS: 'Progresion_Actual!A2:B10000',
-  PROGRESION_ACTUAL_START: 'Progresion_Actual!A2',
-  PROGRESION_HISTORIAL_START: 'Progresion_Historial!A2',
   // Mi perfil (entrenador): pares Clave/Valor; la pestaña se crea sola al guardar
   PERFIL_READ:         'Perfil!A2:B40',
   PERFIL_WRITE:        'Perfil!A2:B40',
   // Ejercicios marcados como listos en la Fuerza: UNA fila por alumno (A id, B ciclo,
   // C marcas JSON {"día-semana":[índices]}, D actualizado). Cuando el plan se renueva
   // (cambia "Mes N" o la planilla), la fila se reemplaza: las marcas no se acumulan.
-  LISTOS_READ:         'Listos!A2:D500',
-  LISTOS_KEYS:         'Listos!A2:A500',
+  LISTOS_READ:         'Listos!A2:D',
+  LISTOS_KEYS:         'Listos!A2:A',
   LISTOS_START:        'Listos!A2',
 };
 
@@ -3383,25 +3381,6 @@ async function cargarDatos(opts){
         try{
           asistencias = await sheetsGet(RANGO.ASISTENCIAS_READ);
         }catch(e){console.warn('Error cargando Asistencias:',e);fallo=true;asistencias=[];}
-      })(),
-
-      // Biblioteca de ejercicios
-      (async()=>{
-        try{
-          const rowsB = await sheetsGet(RANGO.BIBLIOTECA_READ);
-          biblioteca = rowsB.map(r=>({id:r[0]||'',ejercicio:r[1]||'',patron:r[2]||'',enfoque:r[3]||''})).filter(e=>e.id);
-        }catch(e){console.warn('Error cargando Biblioteca:',e);biblioteca=[];}
-      })(),
-
-      // Progresión actual (última carga por alumno+ejercicio; el historial completo no se lee acá)
-      (async()=>{
-        try{
-          const rowsP = await sheetsGet(RANGO.PROGRESION_ACTUAL_READ);
-          progresionActual = rowsP.map(r=>({
-            alumnoId:r[0]||'',ejercicioId:r[1]||'',fecha:r[2]||'',
-            reps:r[3]||'',series:r[4]||'',kg:r[5]||'',rir:r[6]||''
-          })).filter(p=>p.alumnoId&&p.ejercicioId);
-        }catch(e){console.warn('Error cargando Progresion_Actual:',e);progresionActual=[];}
       })(),
 
       // Ejercicios listos de la Fuerza (pestaña opcional, se crea al primer tilde)
@@ -4674,9 +4653,9 @@ async function eliminarMolestia(id,idx){
 }
 
 // Biblioteca/Progresión interna deshabilitada (handoff biblioteca-a-mapeo-externo,
-// reversión a Mapeo por alumno) — los datos de biblioteca/progresionActual se
-// siguen cargando (ver cargarDatos) por si se retoma en el futuro, pero ya no
-// se consumen desde ningún lado.
+// reversión a Mapeo por alumno). Desde el 24/11 las pestañas Biblioteca y
+// Progresion_* ya no se leen (Luca las puede borrar); las variables biblioteca y
+// progresionActual quedan vacías solo para no cambiar el formato de mc_cache.
 
 async function sincronizarTodosCalendar(){
   const activos=alumnos.filter(a=>a.estado==='activo');

@@ -15,6 +15,9 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 - [ ] **Fuerza sin `#gid`** — auditoría del 24/11 (BAJO) — el proxy muestra la primera pestaña que no se llame "Notas"; conviene pegar los links de Fuerza con el `#gid`.
 - [ ] **Dispositivo del entrenador** — auditoría del 24/11 (BAJO, riesgo aceptado) — `mc_cache` (todos los datos) y el permiso de Google (todas las planillas y el calendario, 1 h) quedan en el dispositivo hasta "Cerrar sesión". Mitigación: bloqueo de pantalla.
 
+- [ ] **Limpieza de la planilla (la hace Luca)** — revisión del 24/11: borrar las pestañas **Config**, **Biblioteca**, **Progresion_Historial** y **Progresion_Actual** (la app ya no las lee; bajar copia de Biblioteca si quiere la lista de ejercicios); borrar las 6 filas de Asistencias del alumno eliminado `1782763380670`; revisar los 2 cobros "pendiente" (jul y sep); opcional: títulos (Alumnos I "Estado", V "Email"; Asistencias C "Tipo", D "Día del plan"; Ahorros "Saldo inicial"/"Fecha"; Gastos B "Mes"). **No achicar filas/columnas vacías.**
+- [ ] **Eliminar alumno deja datos sueltos** — revisión del 24/11 (BAJO) — borra la fila de Alumnos pero no sus Asistencias/Seguimiento/Listos, y reescribe todo el rango de Alumnos (`guardarEnSheets`). Recomendación a Luca: usar "inactivo". Si se mantiene el borrado, limpiar sus filas en las otras pestañas.
+
 ---
 
 ## Features planificadas

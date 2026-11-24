@@ -39,7 +39,7 @@ Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, 
 | Perfil | clave/valor de Mi perfil (se crea sola) |
 | Listos A:D | **una fila por alumno**: id · ciclo (`mes n\|id planilla`) · marcas JSON `{"día-semana":[índices]}` · fecha. Cambia el ciclo → se reemplaza (se crea sola) |
 | Frases | frases del portal |
-| Biblioteca / Progresion_* | deshabilitadas (no tocar) |
+| Biblioteca / Progresion_* / Config | ya no se leen (desde 24/11); Luca las puede borrar |
 
 Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__portal'` (plan del alumno, solo lectura).
 
@@ -50,6 +50,7 @@ Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__porta
 - Todo dato que se pinta pasa por `escaparHTML()`. Íconos con `ic('nombre')` (sprite `<symbol id="i-…">`).
 - Fechas: strings `dd/mm/aaaa`; "hoy" con `_hoyISOLocal()`/`toLocaleDateString('es-AR')`, **nunca** `toISOString()` (UTC). IDs con `crypto.randomUUID()`.
 - No escribir si los datos no están frescos: `_escrituraPermitida()` (lo chequean `sheetsUpdate/Append`).
+- Lecturas en `RANGO` sin fila final (`'Asistencias!A2:D'`), así no hay tope. Los `_WRITE` de `sheetsReplaceRange` sí la llevan: no achicar la grilla de esas pestañas.
 - Escribir **por fila**, no reescribir rangos enteros. `guardarFilaAlumno()` hace fusión de 3 vías contra `_alumnoBase` (el alumno también escribe su fila desde el portal).
 - Pestañas nuevas del Sheet: crearlas solas con `_crearPestana()` y tolerar que no existan al leer (no marcar fallo de sincronización).
 - Proxy: `doGet` solo lee y filtra por token; la única escritura es `accion:'perfil'` (campos K/L/M/N + ítems `origen:"entrevista"` de G/H). Nunca devolver datos de otro alumno ni pestañas ajenas.
