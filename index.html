@@ -5602,7 +5602,7 @@ async function planLeerHoja(spreadsheetId, gid, tipo){
     hoja=(gid!=null && hojas.find(h=>String(h.sheetId)===String(gid) && _normTxt(h.title)!=='notas'))
       || hojas.find(h=>_normTxt(h.title)!=='notas');
   }
-  if(!hoja) throw {tipo:'formato'};
+  if(!hoja) throw {tipo:tipo==='mapeo'&&gid==null&&hojas.length>1?'pestana':'formato'};
   const rango=`'${hoja.title.replace(/'/g,"''")}'!A1:V${tipo==='mapeo'?400:120}`;
   const data=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?includeGridData=true&ranges=${encodeURIComponent(rango)}&fields=sheets(data(rowData(values(formattedValue,userEnteredValue))))`);
   const rows=(((data.sheets||[])[0]||{}).data||[])[0];
@@ -5917,7 +5917,7 @@ function planRenderBody(){
   if(!planParseUrl(url)){ body.innerHTML=_pvAviso('Este link no es una planilla de Google Sheets.',a,tipo); return; }
   if(!e || e.estado==='cargando'){ body.innerHTML=_pvEsqueleto(); return; }
   if(e.estado==='error'){
-    const msg={excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
+    const msg={pestana:'Esta planilla tiene varias pestañas y el link no dice cuál es el Mapeo. Abrí la pestaña del Mapeo en Sheets y copiá el link completo: tiene que terminar en #gid=…',excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:tipo==='mapeo'?'No reconozco el formato del Mapeo: la fila 2 tiene que tener, de la columna A a la E, Enfoque · Patrón · Ejercicio · Reps · KG.':'No reconozco el formato de esta planilla.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
     body.innerHTML=_pvAviso(escaparHTML(msg),a,tipo)+((e.error==='red'||e.error==='sesion')?'<div class="pv-aviso" style="padding-top:0"><button type="button" data-pv="reintentar-plan">Reintentar</button></div>':'');
     return;
   }
