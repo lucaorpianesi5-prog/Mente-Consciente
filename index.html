@@ -64,7 +64,7 @@ html[data-tema="nocturno"]{
   --f1:#62B2DE; --f2:#B39AEA; --f3:#C3D45A; --f4:#F2B45C; --f5:#E688B6; --f-alpha:14%;
   --sombra:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.25);
 }
-html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno, html[data-tema="nocturno"] #yo-dark{
+html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno, html[data-tema="nocturno"] #yo-dark, html[data-tema="nocturno"] #entrevista{
   --pd-bg:#0B1310; --pd-bg2:#121C17; --pd-bg3:#19251F; --pd-card:#121C17; --pd-card2:#19251F;
   --pd-border:rgba(140,200,160,0.09); --pd-border2:rgba(140,200,160,0.16);
   --pd-verde:#5BBE7E; --pd-verde-d:#3E9A5E; --pd-verde-dim:rgba(91,190,126,0.13);
@@ -90,7 +90,7 @@ html[data-tema="calma"]{
   --f1:#1F6FA8; --f2:#6E4FC2; --f3:#5A7A0A; --f4:#9A5B00; --f5:#B23E78; --f-alpha:10%;
   --sombra:0 1px 2px rgba(20,40,30,.06),0 6px 20px rgba(20,40,30,.07);
 }
-html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno, html[data-tema="calma"] #yo-dark{
+html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno, html[data-tema="calma"] #yo-dark, html[data-tema="calma"] #entrevista{
   --pd-bg:#F5F5F0; --pd-bg2:#FFFFFF; --pd-bg3:#EEF0EA; --pd-card:#FFFFFF; --pd-card2:#EEF0EA;
   --pd-border:rgba(20,50,35,0.08); --pd-border2:rgba(20,50,35,0.15);
   --pd-verde:#2E7D4F; --pd-verde-d:#1F5C3A; --pd-verde-dim:rgba(46,125,79,0.09);
@@ -343,7 +343,7 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
    que reutiliza las clases pd-* / dias-pilares / racha-accion / stats-*; sin
    esto los var(--pd-...) del portal resolverían a vacío y quedarían fondos y
    bordes sin color) */
-#perfil-dark, #portal-alumno, #plan-vista, #yo-dark{
+#perfil-dark, #portal-alumno, #plan-vista, #yo-dark, #entrevista{
   --pd-bg:       #111B16;
   --pd-bg2:       #1C2B20;
   --pd-bg3:       #223527;
@@ -628,8 +628,11 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .al-filtro.on{background:var(--verde);color:var(--sobre-acento);border-color:var(--verde)}
 .al-filtro .n{opacity:0.75;margin-left:0.25rem}
 
-/* Selector Alumnos · Nutrición (Nutrición vive dentro de Alumnos) */
-.seg-alumnos{max-width:360px}
+/* Secciones dentro de una pestaña de la barra (Alumnos · Nutrición, Cobros · Inversión) */
+.seg-sec{display:flex;gap:1.4rem;border-bottom:1px solid var(--borde);margin-bottom:1.1rem}
+.seg-sec button{background:none;border:none;font-family:inherit;font-size:0.92rem;font-weight:600;color:var(--suave);padding:0.55rem 0.1rem 0.65rem;cursor:pointer;position:relative}
+.seg-sec button.on{color:var(--texto)}
+.seg-sec button.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2.5px;border-radius:2px;background:var(--verde)}
 
 /* ── MI PERFIL (entrenador) — misma estética que la ficha y el portal ── */
 #yo-dark{max-width:560px;margin:0 auto;display:flex;flex-direction:column;gap:0.9rem;color:var(--pd-text)}
@@ -928,7 +931,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   #page-alumnos .page-header>div:last-child{width:100%}
   #filtro-alumnos{flex:1;width:auto!important;padding:0.65rem 0.9rem!important;border-radius:10px!important;font-size:0.9rem!important}
   #btn-nuevo-alumno{display:none}
-  .seg-alumnos{max-width:none}
+  #page-cobros>.page-header{display:none}
 
   /* ── Dashboard: "Esta semana" primero ── */
   #page-dashboard.active{display:flex;flex-direction:column}
@@ -1059,6 +1062,45 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 .portal-footer{text-align:center;font-size:0.68rem;color:var(--pd-text3);padding-top:0.5rem}
 .portal-loading{text-align:center;padding:3rem;color:var(--pd-text2);font-size:0.9rem}
 .portal-error{text-align:center;padding:3rem;color:var(--pd-red);font-size:0.9rem}
+
+/* Entrevista inicial del alumno */
+#entrevista{position:fixed;inset:0;z-index:400;background:var(--pd-bg);color:var(--pd-text);display:none;justify-content:center}
+.ent-caja{width:100%;max-width:520px;display:flex;flex-direction:column;padding:calc(14px + env(safe-area-inset-top)) 18px calc(18px + env(safe-area-inset-bottom))}
+.ent-top{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px}
+.ent-x{width:40px;height:40px;border-radius:12px;border:1px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text2);display:flex;align-items:center;justify-content:center;font-size:1rem;cursor:pointer;font-family:inherit;flex-shrink:0}
+.ent-x .i{width:18px;height:18px}
+.ent-prog{flex:1;display:flex;gap:5px;max-width:260px}
+.ent-prog i{flex:1;height:5px;border-radius:3px;background:var(--pd-border2)}
+.ent-prog i.on{background:var(--pd-verde)}
+.ent-cuerpo{flex:1;display:flex;flex-direction:column;gap:12px;padding-top:9vh}
+.ent-cuerpo h2{font-size:1.55rem;font-weight:700;letter-spacing:-0.02em;line-height:1.2}
+.ent-cuerpo>p{font-size:0.9rem;color:var(--pd-text2);line-height:1.5;margin-top:-4px}
+.ent-hola{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.ent-hola h2{font-family:Georgia,serif;font-style:italic;font-size:1.9rem}
+.ent-hola p{font-size:0.95rem;color:var(--pd-text2);line-height:1.55}
+.ent-hola .ent-nota{font-size:0.82rem;color:var(--pd-text3)}
+.ent-ico{width:64px;height:64px;border-radius:20px;background:var(--pd-verde-dim);color:var(--pd-verde);display:flex;align-items:center;justify-content:center}
+.ent-ico .i{width:34px;height:34px}
+.ent-input{width:100%;height:58px;border-radius:14px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:1.35rem;font-weight:600;padding:0 16px;outline:none;margin-top:10px;color-scheme:inherit}
+.ent-input:focus{border-color:var(--pd-verde)}
+.ent-input.chico{height:50px;font-size:0.95rem;font-weight:500}
+.ent-num{display:flex;align-items:center;gap:10px}
+.ent-num span{font-size:1.1rem;color:var(--pd-text2);font-weight:600;margin-top:10px}
+.ent-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.ent-chip{padding:0.65rem 0.95rem;border-radius:22px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:0.88rem;font-weight:600;cursor:pointer}
+.ent-chip.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
+.ent-error{color:var(--pd-red);font-size:0.84rem;font-weight:600}
+.ent-pie{display:flex;flex-direction:column;gap:8px;padding-top:16px}
+.ent-btn{height:54px;border-radius:14px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;border:none}
+.ent-btn.p{background:var(--pd-verde);color:var(--pd-sobre-acento)}
+.ent-btn.s{background:transparent;color:var(--pd-text2)}
+.ent-btn:disabled{opacity:0.6}
+.portal-editar{align-self:center;background:none;border:none;color:var(--pd-text2);font-family:inherit;font-size:0.78rem;font-weight:600;display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px}
+.portal-editar .i{width:14px;height:14px}
+.portal-completar{display:flex;align-items:center;gap:12px;background:var(--pd-verde-dim);border:1px solid color-mix(in srgb,var(--pd-verde) 30%,transparent);border-radius:12px;padding:12px 14px;font-family:inherit;text-align:left;cursor:pointer;color:var(--pd-text)}
+.portal-completar>span{color:var(--pd-verde)} .portal-completar>span .i{width:26px;height:26px}
+.portal-completar div{flex:1} .portal-completar b{display:block;font-size:0.92rem} .portal-completar small{font-size:0.74rem;color:var(--pd-text2)}
+.portal-completar>.i{width:16px;height:16px;color:var(--pd-text3)}
 
 /* "Tu cuota" (handoff vencimiento-cuota-portal-y-ficha) */
 .portal-cuota{background:var(--pd-card);border:0.5px solid var(--pd-border2);border-radius:10px;padding:1rem 1.1rem}
@@ -1303,11 +1345,7 @@ body.sesion-bar-on #plan-vista{top:34px}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Agenda semanal
     </a>
-    <a id="sb-cobros" onclick="showPage('cobros')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-      Cobros
-    </a>
-    <a id="sb-finanzas" onclick="showPage('finanzas')">
+    <a id="sb-finanzas" onclick="showPage('cobros')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       Finanzas
     </a>
@@ -1394,9 +1432,9 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- ALUMNOS -->
   <div class="page" id="page-alumnos">
-    <div class="venc-toggle-row seg-alumnos">
-      <button class="venc-toggle-btn active" onclick="showPage('alumnos')">Alumnos</button>
-      <button class="venc-toggle-btn" onclick="showPage('nutricion')">Nutrición</button>
+    <div class="seg-sec" role="tablist">
+      <button type="button" class="on" onclick="showPage('alumnos')">Alumnos</button>
+      <button type="button" class="" onclick="showPage('nutricion')">Nutrición</button>
     </div>
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap">
       <div><h2>Alumnos</h2><p>Gestioná tu lista de alumnos activos</p></div>
@@ -1431,6 +1469,10 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- COBROS -->
   <div class="page" id="page-cobros">
+    <div class="seg-sec" role="tablist">
+      <button type="button" class="on" onclick="showPage('cobros')">Cobros</button>
+      <button type="button" class="" onclick="showPage('finanzas')">Inversión</button>
+    </div>
     <div class="page-header"><h2>Cobros</h2><p>Seguimiento de pagos mensuales</p></div>
 
     <div class="venc-toggle-row">
@@ -1453,9 +1495,9 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- NUTRICIÓN -->
   <div class="page" id="page-nutricion">
-    <div class="venc-toggle-row seg-alumnos">
-      <button class="venc-toggle-btn" onclick="showPage('alumnos')">Alumnos</button>
-      <button class="venc-toggle-btn active" onclick="showPage('nutricion')">Nutrición</button>
+    <div class="seg-sec" role="tablist">
+      <button type="button" class="" onclick="showPage('alumnos')">Alumnos</button>
+      <button type="button" class="on" onclick="showPage('nutricion')">Nutrición</button>
     </div>
     <div class="page-header" style="display:flex;justify-content:space-between;align-items:flex-start">
       <div><h2>Nutrición</h2><p>Seguimiento de clientes nutricionales</p></div>
@@ -1474,8 +1516,12 @@ body.sesion-bar-on #plan-vista{top:34px}
 
   <!-- FINANZAS -->
   <div class="page" id="page-finanzas">
+    <div class="seg-sec" role="tablist">
+      <button type="button" class="" onclick="showPage('cobros')">Cobros</button>
+      <button type="button" class="on" onclick="showPage('finanzas')">Inversión</button>
+    </div>
     <div class="page-header fin-head">
-      <div><h2>Finanzas</h2><p>Ingresos, gastos y disponible</p></div>
+      <div><h2>Inversión</h2><p>Disponible, ingresos y gastos</p></div>
     </div>
     <div class="fin-anios" id="fin-anios"></div>
     <select id="fin-anio-select" onchange="renderFinanzas()" hidden></select>
@@ -1688,8 +1734,8 @@ body.sesion-bar-on #plan-vista{top:34px}
       </svg>
     </span>
   </a>
-  <a id="bn-cobros" onclick="showPage('cobros')" title="Cobros">
-    <span class="pill"><svg class="i"><use href="#i-cash"/></svg></span>Cobros
+  <a id="bn-finanzas" onclick="showPage('cobros')" title="Finanzas">
+    <span class="pill"><svg class="i"><use href="#i-cash"/></svg></span>Finanzas
   </a>
   <a id="bn-alumnos" onclick="showPage('alumnos')" title="Alumnos">
     <span class="pill"><svg class="i"><use href="#i-users"/></svg></span>Alumnos
@@ -2164,6 +2210,7 @@ function _portalCacheLeer(token){
 }
 
 async function cargarPortalAlumno(id){
+  _portalToken=id;
   const el = document.getElementById('portal-alumno');
   el.style.display = 'block';
   // Apertura instantánea: se pinta la última respuesta mientras se refresca. El portal
@@ -2358,7 +2405,7 @@ function _pintarPortal(el,data){
         <div class="stats-principales">
           <div class="stat-principal">
             <div class="stat-principal-label">Peso actual</div>
-            <div class="stat-principal-val">${a.pesoActual ? escaparHTML(a.pesoActual)+' kg' : '—'}${pesoDiff!==null ? ` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>` : ''}</div>
+            <div class="stat-principal-val">${a.pesoActual ? escaparHTML(a.pesoActual)+' kg' : '—'}${pesoDiff ? ` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>` : ''}</div>
             <div class="stat-principal-sub">${pesoDiff!==null ? 'desde el inicio' : '&nbsp;'}</div>
           </div>
           <div class="stat-principal">
@@ -2371,6 +2418,10 @@ function _pintarPortal(el,data){
           <div class="stat-secundario"><div class="stat-secundario-label">Altura</div><div class="stat-secundario-val">${a.estatura ? escaparHTML(a.estatura)+' cm' : '—'}</div></div>
           <div class="stat-secundario"><div class="stat-secundario-label">Peso inicial</div><div class="stat-secundario-val">${a.pesoInicial ? escaparHTML(a.pesoInicial)+' kg' : '—'}</div></div>
         </div>` : ''}
+
+        ${PORTAL_PERFIL_EDITABLE?(hayVitales
+          ?`<button type="button" class="portal-editar" onclick="abrirEntrevista(_portalAlumnoActual,true)">${ic('edit')} Editar mis datos</button>`
+          :`<button type="button" class="portal-completar" onclick="abrirEntrevista(_portalAlumnoActual,false)"><span>${ic('sprout')}</span><div><b>Completá tu perfil</b><small>5 preguntas rápidas · menos de un minuto</small></div>${ic('chev')}</button>`):''}
 
         <!-- Frase motivacional -->
         <div class="portal-frase-card">
@@ -2394,6 +2445,146 @@ function _pintarPortal(el,data){
       });
     }
     _sincronizarTemaUI();   // el botón sol/luna del portal acaba de dibujarse
+    _portalAlumnoActual=a;
+    if(_entPendiente(a) && !document.getElementById('entrevista')?.innerHTML) setTimeout(()=>abrirEntrevista(a,false),500);
+}
+let _portalAlumnoActual=null;
+
+// ══ ENTREVISTA INICIAL DEL ALUMNO (portal) ══
+// 5 preguntas cortas para completar su perfil; cada una se puede saltear y todo
+// se puede editar después ("Editar mis datos"). Se guarda a través del Apps Script
+// del portal (acción "perfil", ver apps-script/portal-perfil.gs): el alumno solo
+// puede tocar SU fila y solo estos campos. Mientras esa acción no esté publicada,
+// PORTAL_PERFIL_EDITABLE queda en false y el portal no muestra nada de esto.
+let PORTAL_PERFIL_EDITABLE=false;
+let _portalToken='';
+let _ent=null;
+const ENT_OBJETIVOS=['Ganar fuerza','Ganar músculo','Bajar de peso','Salud y bienestar','Rendimiento deportivo','Movilidad y menos dolor'];
+const ENT_PASOS=5;
+const _entISO=dmy=>{ const p=String(dmy||'').split('/'); return p.length===3?`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`:''; };
+const _entDMY=iso=>{ const p=String(iso||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:''; };
+
+function _entPendiente(a){
+  if(!PORTAL_PERFIL_EDITABLE||!_portalToken) return false;
+  let visto=false; try{ visto=!!localStorage.getItem('mc_entrevista_'+_portalToken); }catch(e){}
+  return !visto && !a.fechaNac && !a.estatura && !a.pesoActual;
+}
+function abrirEntrevista(a,editar){
+  if(!PORTAL_PERFIL_EDITABLE) return;
+  _ent={paso:editar?1:0, editar:!!editar, nombre:(a.nombre||'').split(' ')[0], d:{
+    fechaNac:a.fechaNac||'', estatura:a.estatura||'', pesoActual:a.pesoActual||'',
+    objetivo:'', objetivoTxt:'', zona:'', molestiaTxt:'', sinMolestias:false }, saltados:new Set(), guardando:false, error:''};
+  let el=document.getElementById('entrevista');
+  if(!el){ el=document.createElement('div'); el.id='entrevista'; document.body.appendChild(el); }
+  el.style.display='flex';
+  _entRender();
+}
+function cerrarEntrevista(marcarVista){
+  if(marcarVista){ try{ localStorage.setItem('mc_entrevista_'+_portalToken,'1'); }catch(e){} }
+  const el=document.getElementById('entrevista'); if(el){ el.style.display='none'; el.innerHTML=''; }
+  _ent=null;
+}
+function _entLeerPaso(){
+  const v=id=>{ const x=document.getElementById(id); return x?x.value.trim():''; };
+  const d=_ent.d;
+  if(_ent.paso===1) d.fechaNac=_entDMY(v('ent-fecha'));
+  if(_ent.paso===2) d.estatura=v('ent-altura');
+  if(_ent.paso===3) d.pesoActual=v('ent-peso');
+  if(_ent.paso===4) d.objetivoTxt=v('ent-obj-txt');
+  if(_ent.paso===5) d.molestiaTxt=v('ent-mol-txt');
+}
+function _entValido(){
+  const d=_ent.d, n=x=>parseFloat(String(x).replace(',','.'));
+  if(_ent.paso===1 && d.fechaNac){ const y=+d.fechaNac.split('/')[2], hoy=new Date().getFullYear(); if(!(y>hoy-100&&y<=hoy-8)) return 'Revisá la fecha de nacimiento'; }
+  if(_ent.paso===2 && d.estatura && !(n(d.estatura)>=100&&n(d.estatura)<=230)) return 'La altura va en centímetros, por ejemplo 168';
+  if(_ent.paso===3 && d.pesoActual && !(n(d.pesoActual)>=30&&n(d.pesoActual)<=250)) return 'El peso va en kilos, por ejemplo 64,5';
+  return '';
+}
+function entSiguiente(saltear){
+  if(!_ent||_ent.guardando) return;
+  if(_ent.paso>0){
+    _entLeerPaso();
+    if(saltear) _ent.saltados.add(_ent.paso); else _ent.saltados.delete(_ent.paso);
+    if(!saltear){ const err=_entValido(); if(err){ _ent.error=err; _entRender(); return; } }
+  }
+  _ent.error='';
+  if(_ent.paso<ENT_PASOS){ _ent.paso++; _entRender(); return; }
+  _entGuardar();
+}
+function entAtras(){ if(!_ent||_ent.paso<=(_ent.editar?1:0)) return; _entLeerPaso(); _ent.error=''; _ent.paso--; _entRender(); }
+function entElegir(campo,valor){
+  _entLeerPaso();
+  const d=_ent.d;
+  if(campo==='objetivo') d.objetivo=d.objetivo===valor?'':valor;
+  if(campo==='zona'){ d.sinMolestias=false; d.zona=d.zona===valor?'':valor; }
+  if(campo==='sin'){ d.sinMolestias=!d.sinMolestias; if(d.sinMolestias){ d.zona=''; d.molestiaTxt=''; } }
+  _entRender();
+}
+async function _entGuardar(){
+  const d=_ent.d, sk=_ent.saltados, datos={};
+  if(!sk.has(1)&&d.fechaNac) datos.fechaNac=d.fechaNac;
+  if(!sk.has(2)&&d.estatura) datos.estatura=String(d.estatura).replace(',','.');
+  if(!sk.has(3)&&d.pesoActual) datos.pesoActual=String(d.pesoActual).replace(',','.');
+  if(!sk.has(4)&&(d.objetivo||d.objetivoTxt)) datos.objetivo={texto:d.objetivoTxt||d.objetivo,categoria:d.objetivo||''};
+  if(!sk.has(5)&&!d.sinMolestias&&(d.zona||d.molestiaTxt)) datos.molestia={texto:d.molestiaTxt||('Molestia en '+d.zona.toLowerCase()),zona:d.zona||''};
+  if(!Object.keys(datos).length){ cerrarEntrevista(true); return; }
+  _ent.guardando=true; _ent.error=''; _entRender();
+  try{
+    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'perfil',token:_portalToken,datos})});
+    const j=await r.json();
+    if(!j||!j.ok) throw new Error((j&&j.error)||'sin_ok');
+    cerrarEntrevista(true);
+    cargarPortalAlumno(_portalToken);
+  }catch(e){
+    _ent.guardando=false;
+    _ent.error=navigator.onLine===false?'Sin conexión. Probá de nuevo cuando tengas señal.':'No se pudo guardar. Probá de nuevo en un momento.';
+    _entRender();
+  }
+}
+function _entRender(){
+  const el=document.getElementById('entrevista'); if(!_ent||!el) return;
+  const d=_ent.d, p=_ent.paso;
+  const chip=(campo,v,on)=>`<button type="button" class="ent-chip${on?' on':''}" onclick="entElegir('${campo}','${escaparHTML(v)}')">${escaparHTML(v)}</button>`;
+  let cuerpo='';
+  if(p===0){
+    cuerpo=`<div class="ent-hola"><div class="ent-ico">${ic('sprout')}</div>
+      <h2>¡Hola${_ent.nombre?', '+escaparHTML(_ent.nombre):''}!</h2>
+      <p>Antes de empezar, 5 preguntas rápidas para armar tu perfil. Tu entrenador las usa para planificar mejor.</p>
+      <p class="ent-nota">Te lleva menos de un minuto. Podés saltear cualquier pregunta y cambiar todo cuando quieras.</p></div>`;
+  } else if(p===1){
+    cuerpo=`<h2>¿Cuándo naciste?</h2><p>Para calcular tu edad.</p>
+      <input class="ent-input" id="ent-fecha" type="date" value="${_entISO(d.fechaNac)}" max="${_hoyISOLocal()}">`;
+  } else if(p===2){
+    cuerpo=`<h2>¿Cuánto medís?</h2><p>En centímetros.</p>
+      <div class="ent-num"><input class="ent-input" id="ent-altura" type="number" inputmode="numeric" placeholder="168" value="${escaparHTML(d.estatura)}"><span>cm</span></div>`;
+  } else if(p===3){
+    cuerpo=`<h2>¿Cuánto pesás hoy?</h2><p>Un número aproximado alcanza. Sirve para ver tu progreso.</p>
+      <div class="ent-num"><input class="ent-input" id="ent-peso" type="number" inputmode="decimal" step="0.1" placeholder="64,5" value="${escaparHTML(d.pesoActual)}"><span>kg</span></div>`;
+  } else if(p===4){
+    cuerpo=`<h2>¿Qué querés lograr?</h2><p>Elegí el que más te represente.</p>
+      <div class="ent-chips">${ENT_OBJETIVOS.map(o=>chip('objetivo',o,d.objetivo===o)).join('')}</div>
+      <input class="ent-input chico" id="ent-obj-txt" type="text" maxlength="140" placeholder="Contalo con tus palabras (opcional)" value="${escaparHTML(d.objetivoTxt)}">`;
+  } else if(p===5){
+    cuerpo=`<h2>¿Tenés alguna molestia o lesión?</h2><p>Así se tiene en cuenta en tus entrenamientos.</p>
+      <div class="ent-chips">${chip('sin','No tengo',d.sinMolestias)}${MOLESTIA_ZONAS.map(z=>chip('zona',z,d.zona===z)).join('')}</div>
+      ${d.sinMolestias?'':`<input class="ent-input chico" id="ent-mol-txt" type="text" maxlength="140" placeholder="¿Qué te pasa? (opcional)" value="${escaparHTML(d.molestiaTxt)}">`}`;
+  }
+  const ultimo=p===ENT_PASOS;
+  el.innerHTML=`<div class="ent-caja">
+    <div class="ent-top">
+      ${p>(_ent.editar?1:0)?`<button type="button" class="ent-x" onclick="entAtras()" aria-label="Atrás">${ic('chev-l')}</button>`:'<span></span>'}
+      ${p>0?`<div class="ent-prog">${Array.from({length:ENT_PASOS},(_,i)=>`<i class="${i<p?'on':''}"></i>`).join('')}</div>`:'<span></span>'}
+      <button type="button" class="ent-x" onclick="cerrarEntrevista(true)" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="ent-cuerpo">${cuerpo}${_ent.error?`<p class="ent-error">${escaparHTML(_ent.error)}</p>`:''}</div>
+    <div class="ent-pie">
+      ${p===0
+        ?`<button type="button" class="ent-btn p" onclick="entSiguiente(false)">Empezar</button><button type="button" class="ent-btn s" onclick="cerrarEntrevista(true)">Ahora no</button>`
+        :`<button type="button" class="ent-btn p" onclick="entSiguiente(false)"${_ent.guardando?' disabled':''}>${_ent.guardando?'Guardando…':(ultimo?'Guardar':'Siguiente')}</button><button type="button" class="ent-btn s" onclick="entSiguiente(true)"${_ent.guardando?' disabled':''}>Saltear</button>`}
+    </div>
+  </div>`;
+  const inp=el.querySelector('.ent-input'); if(inp && p>0 && p<4) setTimeout(()=>{ try{ inp.focus(); }catch(e){} },50);
+  el.querySelectorAll('.ent-input').forEach(x=>x.addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); entSiguiente(false); } }));
 }
 
 // B4: racha real — se corta sola si pasa una semana (7+ días) sin registrar
@@ -3099,11 +3290,12 @@ async function guardarCobroFila(mk, aid){
 function _navDe(id){
   if(id==='perfil') return _navDe(perfilOrigen);
   if(id==='nutricion') return 'alumnos';
+  if(id==='cobros') return 'finanzas';
   return id;
 }
 function showPage(id){
   const _ah=document.getElementById('apphead-m');
-  if(_ah){ _ah.classList.toggle('sin',id==='perfil'||id==='yo'); const _t=document.getElementById('apphead-txt'); if(_t) _t.textContent=({dashboard:'Hola, '+_miNombreCorto(),alumnos:'Alumnos',agenda:'Agenda',cobros:'Cobros',nutricion:'Nutrición',finanzas:'Finanzas'})[id]||''; }
+  if(_ah){ _ah.classList.toggle('sin',id==='perfil'||id==='yo'); const _t=document.getElementById('apphead-txt'); if(_t) _t.textContent=({dashboard:'Hola, '+_miNombreCorto(),alumnos:'Alumnos',agenda:'Agenda',cobros:'Finanzas',nutricion:'Alumnos',finanzas:'Finanzas'})[id]||''; }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
   syncBottomNav(id);
@@ -3572,7 +3764,7 @@ function verAlumno(id){
   document.getElementById('perfil-stats-principales').innerHTML=`
     <div class="stat-principal">
       <div class="stat-principal-label">Peso actual</div>
-      <div class="stat-principal-val">${a.pesoActual||'—'}${a.pesoActual?' kg':''}${pesoDiff!==null?` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>`:''}</div>
+      <div class="stat-principal-val">${a.pesoActual||'—'}${a.pesoActual?' kg':''}${pesoDiff?` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>`:''}</div>
       <div class="stat-principal-sub">${pesoDiff!==null?'vs. peso inicial':'&nbsp;'}</div>
     </div>
     <div class="stat-principal">
@@ -3949,7 +4141,7 @@ function _parseObjetivosLineas(raw){
   return raw.split('\n').filter(l=>l.trim()).map(linea=>{
     try{
       const o=JSON.parse(linea);
-      if(o&&typeof o==='object'&&'texto' in o) return {texto:o.texto||'',categoria:o.categoria||'',estado:o.estado||'activo',fecha:o.fecha||''};
+      if(o&&typeof o==='object'&&'texto' in o) return {texto:o.texto||'',categoria:o.categoria||'',estado:o.estado||'activo',fecha:o.fecha||'',...(o.origen?{origen:o.origen}:{})};
     }catch(e){}
     return {texto:linea.trim(),categoria:'',estado:'activo',fecha:''};
   });
@@ -4069,7 +4261,7 @@ function getMolestias(id){
   return a.notas.split('\n').filter(l=>l.trim()).map(linea=>{
     try{
       const o=JSON.parse(linea);
-      if(o&&typeof o==='object'&&'texto' in o) return {texto:o.texto||'',zona:o.zona||'',estado:o.estado||'activa',fecha:o.fecha||''};
+      if(o&&typeof o==='object'&&'texto' in o) return {texto:o.texto||'',zona:o.zona||'',estado:o.estado||'activa',fecha:o.fecha||'',...(o.origen?{origen:o.origen}:{})};
     }catch(e){}
     return {texto:linea.trim(),zona:'',estado:'activa',fecha:''};
   });
@@ -5714,7 +5906,7 @@ function renderMiPerfil(){
       <div class="stats-principales">
         <div class="stat-principal">
           <div class="stat-principal-label">Peso actual</div>
-          <div class="stat-principal-val">${a.pesoActual?escaparHTML(a.pesoActual)+' kg':'—'}${pesoDiff!==null?` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>`:''}</div>
+          <div class="stat-principal-val">${a.pesoActual?escaparHTML(a.pesoActual)+' kg':'—'}${pesoDiff?` <span class="stat-trend ${pesoDiff<=0?'down':'up'}">${pesoDiff<=0?'↓':'↑'}${Math.abs(pesoDiff)}</span>`:''}</div>
           <div class="stat-principal-sub">${pesoDiff!==null?'desde el inicio':'&nbsp;'}</div>
         </div>
         <div class="stat-principal"><div class="stat-principal-label">IMC</div><div class="stat-principal-val">${imc||'—'}</div></div>
@@ -5745,7 +5937,6 @@ function renderMiPerfil(){
     <div class="yo-card">
       <div class="yo-card-tit">Gestión</div>
       ${_esStandalone()?'':`<button type="button" class="yo-dato destacado" onclick="abrirInstalar()">${ic('download')}<span>Instalar como app</span>${ic('chev','i chev')}</button>`}
-      <button type="button" class="yo-dato" onclick="showPage('finanzas')">${ic('chart')}<span>Finanzas</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="cargarDatos()">${ic('sync')}<span>Sincronizar datos</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="sincronizarTodosCalendar()">${ic('cal')}<span>Exportar a Calendar</span>${ic('chev','i chev')}</button>
       <button type="button" class="yo-dato" onclick="alternarTema();renderMiPerfil()">${ic(temaCalma?'luna':'sol')}<span>Tema: ${temaCalma?'Calma':'Nocturno'}</span><small>cambiar</small></button>
