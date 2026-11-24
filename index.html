@@ -1239,6 +1239,109 @@ body.sesion-bar-on #plan-vista{top:34px}
 .pv-sem.on.llena::after{background:var(--pd-sobre-acento)}
 .pv-body{flex:1;overflow-y:auto;padding:0.75rem 14px 1rem;display:flex;flex-direction:column;gap:0.55rem;-webkit-overflow-scrolling:touch}
 .pv-bloque{display:flex;align-items:center;gap:0.5rem;margin-top:0.35rem}
+/* ── Fuerza v2 ── */
+.pv-sel{display:flex;gap:8px;align-items:stretch}
+.pv-dias{display:flex;gap:4px;flex:1;min-width:0;background:var(--pd-card);border:1px solid var(--pd-border);border-radius:11px;padding:3px}
+.pv-dias button{flex:1;min-width:0;border:none;background:none;font-family:inherit;font-size:0.76rem;font-weight:700;padding:7px 2px;border-radius:8px;color:var(--pd-text2);cursor:pointer;white-space:nowrap}
+.pv-dias button.on{background:var(--pd-verde);color:var(--pd-sobre-acento)} .pv-dias button.ok:not(.on){color:var(--pd-ok)}
+.pv-semst{display:flex;align-items:center;background:var(--pd-card);border:1px solid var(--pd-border);border-radius:11px;flex-shrink:0}
+.pv-semst button{width:30px;align-self:stretch;border:none;background:none;color:var(--pd-text2);font-size:1.1rem;cursor:pointer;font-family:inherit}
+.pv-semst button:disabled{opacity:0.25;cursor:default}
+.pv-semst div{text-align:center;line-height:1.1;min-width:52px}.pv-semst b{font-size:0.8rem;display:block;color:var(--pd-text)}.pv-semst small{font-size:0.58rem;color:var(--pd-text3)}
+.pv-prog{display:flex;align-items:center;gap:9px;font-size:0.7rem;color:var(--pd-text2)}
+.pv-prog .pb{flex:1;height:6px;border-radius:3px;background:color-mix(in srgb,var(--pd-text3) 18%,transparent);overflow:hidden}
+.pv-prog .pb i{display:block;height:100%;background:var(--pd-verde);border-radius:3px;transition:width 0.3s}
+.pv-bt{display:flex;align-items:center;gap:8px;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-crema);font-weight:700;margin-top:0.35rem;flex-shrink:0}
+.pv-bt .l{min-width:22px;height:22px;padding:0 4px;border-radius:7px;background:var(--pd-crema);color:var(--pd-bg);display:flex;align-items:center;justify-content:center;font-size:0.7rem}
+.pv-bt.ok .l{background:var(--pd-ok);color:var(--pd-sobre-acento)}
+.pv-bt small{margin-left:auto;color:var(--pd-text3);letter-spacing:0;text-transform:none;font-weight:600;font-size:0.68rem}
+.pv-e{background:var(--pd-card);border:1px solid var(--pd-border);border-radius:14px;flex-shrink:0;font-family:inherit;color:var(--pd-text);text-align:left;width:100%}
+button.pv-e{display:flex;align-items:center;gap:10px;padding:11px 12px;cursor:pointer;min-height:48px}
+.pv-e .chk{width:24px;height:24px;border-radius:50%;border:2px solid var(--pd-text3);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.74rem;font-weight:900}
+.pv-e.hecho .chk{background:var(--pd-ok);border-color:var(--pd-ok);color:var(--pd-sobre-acento)}
+button.pv-e .n{flex:1;min-width:0;font-size:0.86rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button.pv-e .res{font-size:0.74rem;color:var(--pd-text2);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pv-e.pend .res{color:var(--pd-text3);font-weight:500}
+.pv-e.fija{background:transparent;border-style:dashed}
+.pv-e.fija .n{color:var(--pd-text2);font-weight:600}
+.pv-e.act{border-color:color-mix(in srgb,var(--pd-verde) 50%,transparent);padding:13px 12px;box-shadow:0 6px 22px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:10px}
+.pv-e.act.guardado{border-color:color-mix(in srgb,var(--pd-ok) 55%,transparent)}
+.pv-e.act.error{border-color:var(--pd-red)}
+.pv-e-h{display:flex;align-items:flex-start;gap:10px}
+.pv-e-h .n{flex:1;font-size:1rem;font-weight:800;line-height:1.25}
+.pv-e-h .n small{display:block;font-size:0.68rem;color:var(--pd-text3);font-weight:600;margin-top:2px}
+.pv-e.act .pv-ej-estado{opacity:0} .pv-e.act.guardado .pv-ej-estado{opacity:1}
+.pv-e.act .pv-ej-err{display:none} .pv-e.act.error .pv-ej-err{display:flex;align-items:center;gap:0.5rem}
+.pv-ref2{background:var(--pd-card2);border-radius:11px;padding:9px 11px;display:flex;align-items:center;gap:10px}
+.pv-ref2 .q{flex:1;min-width:0}
+.pv-ref2 small{display:block;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--pd-text3);font-weight:700}
+.pv-ref2 b{font-size:0.92rem;font-variant-numeric:tabular-nums;color:var(--pd-text)}
+.pv-ref2 .otras{font-size:0.66rem;color:var(--pd-text3);margin-top:2px;line-height:1.5}
+.pv-reflink{background:none;border:none;padding:0;font:inherit;color:var(--pd-crema);font-weight:700;cursor:pointer}
+.pv-rep{font-size:0.72rem;font-weight:700;color:var(--pd-verde);background:none;border:1px solid color-mix(in srgb,var(--pd-verde) 45%,transparent);border-radius:9px;padding:8px 10px;white-space:nowrap;cursor:pointer;font-family:inherit}
+.pv-campos2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:8px}
+.pv-campos2>.cp{min-width:0}
+.pv-campos2 label{display:block;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--pd-text3);font-weight:700;margin-bottom:5px}
+.pv-step{display:flex;height:48px;border-radius:12px;border:1.5px solid var(--pd-border2);overflow:hidden;background:var(--pd-bg)}
+.pv-step:focus-within{border-color:var(--pd-verde)}
+.pv-step button{width:40px;border:none;background:var(--pd-card2);color:var(--pd-verde);font-size:1.2rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.pv-step button:active{background:var(--pd-verde-dim)}
+.pv-step input{flex:1;min-width:0;width:0;border:none;background:transparent;color:var(--pd-text);font-family:inherit;font-size:1.08rem;font-weight:700;text-align:center;outline:none}
+.pv-step input::placeholder{color:var(--pd-text3);font-weight:500}
+.pv-step.ro{opacity:0.6} .pv-step.ro button{color:var(--pd-text3)}
+.pv-sug{display:flex;gap:6px;flex-wrap:wrap}
+.pv-sug button{font-size:0.7rem;font-weight:600;padding:6px 10px;border-radius:20px;border:1px solid var(--pd-border2);color:var(--pd-text2);background:none;cursor:pointer;font-family:inherit}
+.pv-sug button.on{border-color:var(--pd-verde);color:var(--pd-verde);background:var(--pd-verde-dim)}
+.pv-rir{border-top:1px solid var(--pd-border);padding-top:10px;display:flex;flex-direction:column;gap:8px}
+.pv-rir-tit{display:flex;align-items:center;gap:6px;font-size:0.74rem;color:var(--pd-text2)}
+.pv-rir-tit b{color:var(--pd-text)}
+.pv-rpe{margin-left:auto;font-weight:700;color:var(--pd-crema);font-size:0.74rem}
+.pv-i{width:18px;height:18px;border-radius:50%;border:1px solid var(--pd-text3);background:none;color:var(--pd-text2);font-size:0.62rem;font-weight:700;font-style:italic;font-family:Georgia,serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0}
+.pv-info{font-size:0.7rem;color:var(--pd-text2);line-height:1.5;background:var(--pd-card2);border-radius:9px;padding:8px 10px;margin:0}
+.pv-info b{color:var(--pd-text)}
+.pv-rir-chips{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.pv-rir-chips button{height:38px;border-radius:10px;border:1.5px solid var(--pd-border2);background:var(--pd-bg);color:var(--pd-text);font-family:inherit;font-weight:700;font-size:0.88rem;cursor:pointer}
+.pv-rir-chips button.on{background:var(--pd-verde);border-color:var(--pd-verde);color:var(--pd-sobre-acento)}
+.pv-sig{height:44px;border-radius:11px;border:1px solid var(--pd-verde);background:var(--pd-verde-dim);color:var(--pd-verde);font-family:inherit;font-weight:700;font-size:0.84rem;cursor:pointer}
+.pv-pie{border-top:1px solid var(--pd-border);background:var(--pd-barra);padding:10px 12px;display:flex;gap:8px;align-items:center;flex-shrink:0}
+.pv-timer{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:92px;height:48px;border-radius:12px;background:var(--pd-card);border:1px solid var(--pd-border2);color:var(--pd-text2);font-family:inherit;font-weight:800;font-size:0.92rem;font-variant-numeric:tabular-nums;cursor:pointer;line-height:1.1}
+.pv-timer small{font-size:0.56rem;font-weight:600;color:var(--pd-text3)}
+.pv-timer.corre{background:var(--pd-crema-dim);border-color:color-mix(in srgb,var(--pd-crema) 40%,transparent);color:var(--pd-crema)}
+.pv-timer.listo{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
+.pv-term{flex:1;height:48px;border-radius:12px;background:var(--pd-verde);color:var(--pd-sobre-acento);border:none;font-family:inherit;font-weight:800;font-size:0.86rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.pv-term:disabled{opacity:0.6}
+.pv-term.hecho{background:var(--pd-verde-dim);color:var(--pd-ok);border:1px solid color-mix(in srgb,var(--pd-ok) 40%,transparent);cursor:default}
+/* ── Mapeo v2 ── */
+.pv-mg{display:flex;justify-content:space-between;align-items:center;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--pd-crema);font-weight:700;margin-top:0.35rem;flex-shrink:0}
+.pv-mg small{color:var(--pd-text3);letter-spacing:0;font-weight:600}
+.pv-mlista{background:var(--pd-card);border:1px solid var(--pd-border);border-radius:14px;overflow:hidden;flex-shrink:0}
+.pv-mf{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;border-top:1px solid var(--pd-border);background:none;font-family:inherit;text-align:left;color:var(--pd-text);cursor:pointer;min-height:54px}
+.pv-mf:first-child{border-top:none}
+.pv-mf:active{background:var(--pd-verde-dim)}
+.pv-mf .n{flex:1;min-width:0}.pv-mf .n b{font-size:0.86rem;display:block}.pv-mf .n small{font-size:0.66rem;color:var(--pd-text3)}
+.hoyb{font-size:0.56rem;font-weight:800;color:var(--pd-verde);background:var(--pd-verde-dim);padding:2px 6px;border-radius:10px;margin-left:6px;vertical-align:2px}
+.pv-mf .val{text-align:right;font-variant-numeric:tabular-nums;flex-shrink:0}.pv-mf .val b{font-size:0.92rem}.pv-mf .val b.vacio{color:var(--pd-text3)}.pv-mf .val small{display:block;font-size:0.62rem;color:var(--pd-text3)}
+.pv-mf .chev{width:14px;height:14px;color:var(--pd-text3);flex-shrink:0}
+.pv-aviso2{font-size:0.74rem;color:var(--pd-text);background:var(--pd-verde-dim);border-radius:11px;padding:10px 12px;line-height:1.45;flex-shrink:0}
+.pv-aviso2.gris{background:var(--pd-card2);color:var(--pd-text2)}
+.pv-velo{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:30;animation:pvFade .2s}
+.pv-sheet{position:absolute;left:0;right:0;bottom:0;z-index:31;background:var(--pd-card2);border-radius:22px 22px 0 0;border-top:1px solid var(--pd-border2);padding:12px 16px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;max-width:560px;margin:0 auto;animation:pvSube .22s ease-out}
+@keyframes pvSube{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes pvFade{from{opacity:0}to{opacity:1}}
+.pv-sheet .asa{width:40px;height:4px;border-radius:2px;background:var(--pd-text3);opacity:.5;align-self:center}
+.pv-sheet h3{font-size:1.1rem;font-weight:800;color:var(--pd-text)}.pv-sheet h3 small{display:block;font-size:0.72rem;color:var(--pd-text2);font-weight:600;margin-top:2px}
+.pv-dos{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.pv-big{min-width:0}
+.pv-big{border:1.5px solid var(--pd-border2);border-radius:14px;padding:9px 10px;background:var(--pd-bg)}
+.pv-big:focus-within{border-color:var(--pd-verde)}
+.pv-big label{font-size:0.6rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--pd-text3);font-weight:700}
+.pv-big .st{display:flex;align-items:center;gap:4px;margin-top:5px}
+.pv-big .st button{width:38px;height:38px;border-radius:10px;border:none;background:var(--pd-card2);color:var(--pd-verde);font-size:1.25rem;font-weight:700;cursor:pointer;font-family:inherit;flex-shrink:0}
+.pv-big .st input{flex:1;min-width:0;width:0;border:none;background:none;color:var(--pd-text);font-family:inherit;font-size:1.35rem;font-weight:800;text-align:center;outline:none}
+.pv-uso{font-size:0.7rem;color:var(--pd-text2);background:var(--pd-card);border-radius:10px;padding:9px 11px;line-height:1.45}
+.pv-uso b{color:var(--pd-text)}
+.pv-gd{height:50px;border-radius:13px;background:var(--pd-verde);color:var(--pd-sobre-acento);border:none;font-family:inherit;font-weight:800;font-size:0.92rem;cursor:pointer}
+#plan-vista .pv-col{position:relative}
 /* Bloques del día como desplegables */
 .pv-blq{border:1px solid var(--pd-border);border-radius:14px;background:color-mix(in srgb,var(--pd-card) 55%,transparent);overflow:hidden;flex-shrink:0}
 .pv-blq.abierto{border-color:var(--pd-border2)}
@@ -6423,6 +6526,7 @@ function _planCargarVista(a){
   const tipo=planVista.tipo;
   planAsegurar(a,tipo).then(()=>planRefrescarSiViejo(a,tipo));
   if(tipo==='fuerza' && planParseUrl(a.mapeoUrl)) planAsegurar(a,'mapeo');
+  if(tipo==='mapeo' && planParseUrl(a.carpetaDrive)) planAsegurar(a,'fuerza').then(()=>{ if(planVista&&planVista.alumnoId===a.id&&planVista.tipo==='mapeo'&&!_planEditando()) planRenderTodo(); });
   const v=planVecinos(a.id);
   [v.prev,v.next].forEach(x=>{ if(x && planParseUrl(planUrlDe(x.a,tipo))) planAsegurar(x.a,tipo); });
 }
@@ -6470,9 +6574,13 @@ function planRenderTodo(){
     const semOk=sn=>e.datos.dias.every(d=>diaOk(d.n,sn));
     const nHechosSem=e.datos.dias.filter(d=>diaOk(d.n,sel.sem)).length;
     meta=`Fuerza · ${e.datos.mes} · Semana ${sel.sem}: ${nHechosSem}/${e.datos.dias.length} días`;
-    const llena=s=>dia.ejercicios.some(x=>!x.fija && (x.celdas[s.n-1].r.text||x.celdas[s.n-1].rir.text||x.celdas[s.n-1].kg.text));
-    extra=`<div class="pv-tabs">${e.datos.dias.map(d=>`<button type="button" class="pv-tab${d.n===sel.dia?' on':''}${diaOk(d.n,sel.sem)?' hecho':''}" data-pv="dia" data-n="${d.n}">${diaOk(d.n,sel.sem)?'✓ ':''}Día ${d.n}</button>`).join('')}</div>
-      <div class="pv-semanas"><span class="pv-semanas-lbl">Semana</span>${e.datos.semanas.map(s=>`<button type="button" class="pv-sem${s.n===sel.sem?' on':''}${semOk(s.n)?' hecha':(llena(s)?' llena':'')}" data-pv="sem" data-n="${s.n}">${semOk(s.n)?'✓':s.n}</button>`).join('')}</div>`;
+    const ws=e.datos.semanas, wi=ws.findIndex(w=>w.n===sel.sem), prevW=ws[wi-1], nextW=ws[wi+1];
+    const pr=_pvProgresoDia(e.datos,sel), pct=pr.total?Math.round(pr.hechos/pr.total*100):0;
+    extra=`<div class="pv-sel">
+        <div class="pv-dias">${e.datos.dias.map(d=>{ const on=d.n===sel.dia, ok=diaOk(d.n,sel.sem); return `<button type="button" class="${on?'on':''}${ok?' ok':''}" data-pv="dia" data-n="${d.n}">${ok&&!on?'✓ ':''}${on||e.datos.dias.length<=3?'Día '+d.n:'D'+d.n}</button>`; }).join('')}</div>
+        <div class="pv-semst"><button type="button" data-pv="sem" data-n="${prevW?prevW.n:''}"${prevW?'':' disabled'} aria-label="Semana anterior">‹</button><div><b>${semOk(sel.sem)?'✓ ':''}Sem ${sel.sem}</b><small>de ${ws.length}</small></div><button type="button" data-pv="sem" data-n="${nextW?nextW.n:''}"${nextW?'':' disabled'} aria-label="Semana siguiente">›</button></div>
+      </div>
+      ${pr.total?`<div class="pv-prog"><span>${pr.hechos} de ${pr.total} ejercicios</span><div class="pb"><i style="width:${pct}%"></i></div><span>${pct}%</span></div>`:''}`;
   } else if(ok){
     const tab=e.tabs&&e.tabs[e.sel];
     const barra=(e.tabs&&e.tabs.length>1)?`<div class="pv-hojas" id="pv-hojas">${e.tabs.map((t,i)=>`<button type="button" class="pv-hoja${i===e.sel?' on':''}" data-pv="hoja" data-i="${i}">${escaparHTML(t.title)}</button>`).join('')}</div>`:'';
@@ -6483,7 +6591,7 @@ function planRenderTodo(){
     meta=`Mapeo · ${e.tabs&&e.tabs.length>1&&tab?tab.title+' · ':''}${e.datos.filas.length} ejercicios`;
     const enfoques=[...new Set(e.datos.filas.map(f=>f.enfoque).filter(Boolean))];
     extra=barra+`<input class="pv-buscar" id="pv-buscar" type="search" placeholder="Buscar ejercicio o patrón…" value="${escaparHTML(planVista.busqueda)}" autocomplete="off">
-      <div class="pv-chips"><button type="button" class="pv-chip${!planVista.enfoque?' on':''}" data-pv="enfoque" data-e="">Todos</button>${enfoques.map(f=>`<button type="button" class="pv-chip${planVista.enfoque===f?' on':''}" data-pv="enfoque" data-e="${escaparHTML(f)}">${escaparHTML(f)}</button>`).join('')}</div>`;
+      <div class="pv-chips"><button type="button" class="pv-chip${!planVista.enfoque?' on':''}" data-pv="enfoque" data-e="">Todos</button>${(()=>{ const h=_pvMapeoHoy(a); const n=h?e.datos.filas.filter(f=>h.set.has(_normTxt(f.ejercicio))).length:0; return n?`<button type="button" class="pv-chip${planVista.enfoque==='__hoy'?' on':''}" data-pv="enfoque" data-e="__hoy">Día ${h.dia} · ${n}</button>`:''; })()}${enfoques.map(f=>`<button type="button" class="pv-chip${planVista.enfoque===f?' on':''}" data-pv="enfoque" data-e="${escaparHTML(f)}">${escaparHTML(f)}</button>`).join('')}</div>`;
     }
   }
   const tabVista=ok&&!esFuerza&&e.tabs&&e.tabs[e.sel];
@@ -6501,12 +6609,15 @@ function planRenderTodo(){
       </div>${extra}
     </div>
     <div class="pv-body" id="pv-body"></div>
+    ${ok&&esFuerza?_pvPieFuerza(a,e):''}
     ${a.id===MI_ID?'':`<div class="pv-barra">
       ${v.prev?`<button type="button" class="pv-ba" data-pv="ir" data-id="${escaparHTML(v.prev.a.id)}"><span class="pv-ba-lbl">‹ Anterior</span><span class="pv-ba-nombre">${corto(v.prev)}</span></button>`:'<span class="pv-ba vacio"></span>'}
       <button type="button" class="pv-lista-btn" data-pv="lista" aria-label="Lista de alumnos"><svg class="i"><use href="#i-menu"/></svg></button>
       ${v.next?`<button type="button" class="pv-ba sig" data-pv="ir" data-id="${escaparHTML(v.next.a.id)}"><span class="pv-ba-lbl">${finde?'Siguiente · lunes':'Siguiente de hoy'} ›</span><span class="pv-ba-nombre">${corto(v.next)}</span></button>`:'<span class="pv-ba vacio"></span>'}
     </div>`}
+    <div id="pv-sheet"></div>
   </div>`;
+  _pvRenderSheet();
   // La pestaña elegida queda a la vista en la barra
   const hb=document.getElementById('pv-hojas');
   if(hb){ hb.scrollLeft=hojasScroll; const on=hb.querySelector('.on'); if(on) on.scrollIntoView({block:'nearest',inline:'center'}); }
@@ -6527,6 +6638,7 @@ function planRenderBody(){
     return;
   }
   body.innerHTML=tipo==='fuerza'?_pvBodyFuerza(a,e):(e.datos.tipo==='tabla'?_pvBodyTabla(e):_pvBodyMapeo(a,e));
+  if(tipo==='fuerza' && planVista.centrar){ planVista.centrar=false; const ac=body.querySelector('.pv-e.act'); if(ac) setTimeout(()=>ac.scrollIntoView({block:'center',behavior:'smooth'}),30); }
 }
 function _pvBodyTabla(e){
   const f=e.datos.filas;
@@ -6552,108 +6664,236 @@ function _pvCampo(cel,etq,inputmode,ph){
   const ro=cel.formula;
   return `<div class="pv-campo"><label>${etq}${ro?' <span class="pv-formula" title="Fórmula: solo lectura">ƒ</span>':''}</label><input type="text" inputmode="${inputmode}" data-fila="${cel.fila}" data-col="${cel.col}" data-orig="${escaparHTML(cel.text)}" value="${escaparHTML(cel.text)}" placeholder="${escaparHTML(ph||'—')}"${ro?' readonly':''} autocomplete="off"></div>`;
 }
-// Un ejercicio "cuenta" si es editable (no fijo); está cargado con R x 3S o KG de la semana
+// ══ FUERZA (v2): un ejercicio a la vez, referencia de la semana pasada, − / +, RIR con RPE ══
 function _pvEjCargado(c){ return !!(c.r.text||c.kg.text); }
+const _pvNum=t=>{ const v=parseFloat(String(t||'').replace(',','.')); return isNaN(v)?null:v; };
+// Formato de kilos igual al que ya usa la planilla (coma o punto)
+function _pvFmtKg(datos,n){
+  if(datos.coma===undefined){ let c=null; datos.mapa.forEach(x=>{ if(c===null&&/\d[.,]\d/.test(x.text)) c=x.text.includes(','); }); datos.coma=c!==false; }
+  const s=String(Math.round(n*100)/100);
+  return datos.coma?s.replace('.',','):s;
+}
+const _pvRpe=rir=>{ const v=parseInt(rir,10); return isNaN(v)?null:Math.max(1,10-v); };
+const PV_INFO={
+  rir:'<b>RIR · repeticiones en reserva.</b> Cuántas repeticiones más podrías haber hecho con buena técnica al terminar la serie. 0 = no te quedaba ninguna; 3 = te sobraban 3.',
+  rpe:'<b>RPE · esfuerzo percibido</b>, de 1 a 10: qué tan dura se sintió la serie. Se calcula del RIR (RPE ≈ 10 − RIR): RPE 10 es el máximo esfuerzo; RPE 7, que te quedaban unas 3.'
+};
+function _pvClaveDia(sel){ return `${sel.dia}-${sel.sem}`; }
+function _pvHecho(ej,ei,si,k){ return _pvEjCargado(ej.celdas[si]) || !!(planVista.listos&&planVista.listos.has(`${k}-${ei}`)); }
+function _pvProgresoDia(datos,sel){
+  const dia=datos.dias.find(x=>x.n===sel.dia)||datos.dias[0], si=Math.max(0,datos.semanas.findIndex(s=>s.n===sel.sem)), k=_pvClaveDia(sel);
+  const ed=dia.ejercicios.map((ej,ei)=>({ej,ei})).filter(x=>!x.ej.fija);
+  return {total:ed.length, hechos:ed.filter(x=>_pvHecho(x.ej,x.ei,si,k)).length};
+}
+// Referencia: la semana anterior con datos
+function _pvRef(ej,si,semanas){
+  for(let j=si-1;j>=0;j--){ const x=ej.celdas[j]; if(x.r.text||x.kg.text) return {j,sem:semanas[j].n,c:x}; }
+  return null;
+}
+const _pvRefTxt=c=>[c.r.text?`${c.r.text} reps`:'', c.kg.text?`${c.kg.text} kg`:'', c.rir.text?`RIR ${c.rir.text}`:''].filter(Boolean).join(' · ');
+
+function _pvStep(cel,c,mode,ph){
+  const ro=cel.formula;
+  return `<div class="pv-step${ro?' ro':''}"><button type="button" data-pv="paso" data-c="${c}" data-d="-1" aria-label="Menos"${ro?' disabled':''}>−</button><input type="text" inputmode="${mode}" data-fila="${cel.fila}" data-col="${cel.col}" data-orig="${escaparHTML(cel.text)}" value="${escaparHTML(cel.text)}" placeholder="${escaparHTML(ph||'—')}"${ro?' readonly title="Fórmula: solo lectura"':''} autocomplete="off"><button type="button" data-pv="paso" data-c="${c}" data-d="1" aria-label="Más"${ro?' disabled':''}>+</button></div>`;
+}
+
 function _pvBodyFuerza(a,e){
   const d=e.datos, sel=_planSelDe(a,d);
   const dia=d.dias.find(x=>x.n===sel.dia)||d.dias[0];
-  const idx=d.semanas.findIndex(s=>s.n===sel.sem), si=idx<0?0:idx;
-  // Agrupar por bloque (letra + nombre), respetando el orden de la planilla
+  const si=Math.max(0,d.semanas.findIndex(s=>s.n===sel.sem));
+  if(!planVista.listos) planVista.listos=new Set();
+  if(!planVista.activo) planVista.activo=new Map();
+  const k=_pvClaveDia(sel);
+  if(!planVista.activo.has(k)) planVista.activo.set(k,dia.ejercicios.findIndex((ej,ei)=>!ej.fija&&!_pvHecho(ej,ei,si,k)));
+  const act=planVista.activo.get(k);
+
   const bloques=[];
   dia.ejercicios.forEach((ej,ei)=>{
-    const k=ej.bloque+'|'+ej.letra;
-    let b=bloques[bloques.length-1];
-    if(!b||b.k!==k){ b={k,letra:ej.letra,nombre:ej.bloque,items:[]}; bloques.push(b); }
+    const kb=ej.bloque+'|'+ej.letra; let b=bloques[bloques.length-1];
+    if(!b||b.k!==kb){ b={k:kb,letra:ej.letra,nombre:ej.bloque,items:[]}; bloques.push(b); }
     b.items.push({ej,ei});
   });
-  bloques.forEach(b=>{
-    const ed=b.items.filter(x=>!x.ej.fija);
-    b.total=ed.length; b.hechos=ed.filter(x=>_pvEjCargado(x.ej.celdas[si])).length;
-    b.completo=b.total>0 && b.hechos===b.total;
-  });
-  // Qué bloques están abiertos (por día y semana). La primera vez: el primero sin completar.
-  if(!planVista.bloques) planVista.bloques=new Map();
-  const clave=`${dia.n}-${sel.sem}`;
-  if(!planVista.bloques.has(clave)){
-    const primero=bloques.length===1?bloques[0]:bloques.find(b=>b.total&&!b.completo);
-    planVista.bloques.set(clave,new Set(primero?[primero.k]:[]));
-  }
-  const abiertos=planVista.bloques.get(clave);
 
-  const ejHTML=({ej,ei})=>{
-    const c=ej.celdas[si];
-    if(ej.fija && !planVista.expandidas.has(`${dia.n}-${ei}`)){
-      const todas=ej.celdas.every(x=>x.r.text===ej.celdas[0].r.text);
-      return `<div class="pv-ej"><div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span></div><div class="pv-fija" data-pv="expandir" data-ei="${ei}">${todas?'Todas las semanas':'Semana '+sel.sem}: <b>${escaparHTML(c.r.text||'—')}</b></div></div>`;
-    }
-    // Referencia: las 2 semanas anteriores con datos, y el Mapeo si el nombre coincide exacto
-    const refs=[];
-    for(let j=si-1;j>=0 && refs.length<2;j--){
-      const x=ej.celdas[j];
-      // La referencia más reciente (primera del loop) va resaltada con class="ult"
-      if(x.r.text||x.kg.text) refs.push(`<span${refs.length?'':' class="ult"'}><i>Sem ${d.semanas[j].n}</i><b>${escaparHTML(x.r.text||'—')}${x.kg.text?' · '+escaparHTML(x.kg.text)+' <u>kg</u>':''}</b></span>`);
-    }
+  const tarjeta=(ej,ei,pos)=>{
+    const c=ej.celdas[si], ref=_pvRef(ej,si,d.semanas);
+    const refKg=ref&&_pvNum(ref.c.kg.text), refR=ref&&parseInt(ref.c.r.text,10);
     const mp=_planMapeoDe(a.id,ej.nombre);
-    if(mp && (mp.reps.text||mp.kg.text)) refs.push(`<span class="mapeo"><i>Mapeo</i><b>${escaparHTML(mp.reps.text||'—')}${mp.kg.text?' · '+escaparHTML(mp.kg.text)+' <u>kg</u>':''}</b></span>`);
-    const prev=si>0?ej.celdas[si-1]:null;                       // solo para "= Sem N": el placeholder ya no repite la semana anterior
-    const hayPrev=prev && (prev.r.text||prev.kg.text) && !c.r.formula && !c.kg.formula;
-    const guardado=planVista.guardados.has('f'+ej.fila);
-    return `<div class="pv-ej${guardado?' guardado':''}" data-pvcard="${ei}"${ej.fija?'':' data-cuenta="1"'}>
-      <div class="pv-ej-top"><span class="pv-ej-nombre">${escaparHTML(ej.nombre)}</span><span class="pv-ej-estado">✓ Guardado</span></div>
-      ${refs.length?`<div class="pv-ref">${refs.join('')}</div>`:''}
-      <div class="pv-campos">${_pvCampo(c.r,'R x 3S','text','—')}${_pvCampo(c.rir,'RIR','numeric','—')}${_pvCampo(c.kg,'KG','decimal','—')}${hayPrev?`<button type="button" class="pv-igual" data-pv="igual" data-ei="${ei}">= Sem ${d.semanas[si-1].n}</button>`:'<span></span>'}</div>
+    const otras=[];
+    if(ref){ const r2=_pvRef(ej,ref.j,d.semanas); if(r2) otras.push(`Sem ${r2.sem}: ${escaparHTML(_pvRefTxt(r2.c))}`); }
+    if(mp && (mp.reps.text||mp.kg.text)) otras.push(`<button type="button" class="pv-reflink" data-pv="ref-mapeo" data-ei="${ei}">Mapeo: ${escaparHTML([mp.reps.text&&mp.reps.text+' reps',mp.kg.text&&mp.kg.text+' kg'].filter(Boolean).join(' · '))} ›</button>`);
+    const sugs=refKg!=null&&!c.kg.formula?[0,2.5,5].map(s=>{ const v=_pvFmtKg(d,refKg+s); return `<button type="button" class="${c.kg.text===v?'on':''}" data-pv="kgset" data-v="${escaparHTML(v)}">${s?'+'+_pvFmtKg(d,s):'='} ${s?'kg':v+' kg'}</button>`; }).join(''):'';
+    const rpe=_pvRpe(c.rir.text);
+    const rirChips=[0,1,2,3,4,5].map(v=>`<button type="button" class="${c.rir.text!==''&&parseInt(c.rir.text,10)===v?'on':''}" data-pv="rir" data-v="${v}"${c.rir.formula?' disabled':''}>${v===5?'5+':v}</button>`).join('');
+    const puedeRepetir=ref&&!c.r.formula&&!c.kg.formula;
+    const ultimo=!dia.ejercicios.some((x,i)=>i!==ei&&!x.fija&&!_pvHecho(x,i,si,k));
+    return `<div class="pv-e act${planVista.guardados.has('f'+ej.fila)?' guardado':''}" data-pvcard="${ei}">
+      <div class="pv-e-h"><span class="chk"></span><div class="n">${escaparHTML(ej.nombre)}<small>${escaparHTML((ej.letra||'')+(pos||''))}${ej.nombre&&ej.bloque?' · '+escaparHTML(ej.bloque):''}</small></div><span class="pv-ej-estado">✓ Guardado</span></div>
+      ${ref?`<div class="pv-ref2"><div class="q"><small>${ref.j===si-1?'La semana pasada':'Semana '+ref.sem}</small><b>${escaparHTML(_pvRefTxt(ref.c))}</b>${otras.length?`<div class="otras">${otras.join(' · ')}</div>`:''}</div>${puedeRepetir?`<button type="button" class="pv-rep" data-pv="repetir" data-ei="${ei}">Repetir</button>`:''}</div>`
+           :(otras.length?`<div class="pv-ref2"><div class="q"><div class="otras">${otras.join(' · ')}</div></div></div>`:'')}
+      <div class="pv-campos2">
+        <div class="cp"><label>Reps</label>${_pvStep(c.r,'r','numeric',refR?String(refR):'—')}</div>
+        <div class="cp"><label>KG</label>${_pvStep(c.kg,'kg','decimal',ref&&ref.c.kg.text||'—')}</div>
+      </div>
+      ${sugs?`<div class="pv-sug">${sugs}</div>`:''}
+      <div class="pv-rir">
+        <div class="pv-rir-tit"><span>¿Cuántas te quedaban? <b>RIR</b></span><button type="button" class="pv-i" data-pv="info" data-k="rir" aria-label="Qué es el RIR">i</button>
+          <span class="pv-rpe">${rpe?`RPE ${rpe}`:'RPE —'}</span><button type="button" class="pv-i" data-pv="info" data-k="rpe" aria-label="Qué es el RPE">i</button></div>
+        <p class="pv-info" data-info="rir" hidden>${PV_INFO.rir}</p><p class="pv-info" data-info="rpe" hidden>${PV_INFO.rpe}</p>
+        <div class="pv-rir-chips">${rirChips}</div>
+        <input type="hidden" class="pv-rir-in" data-fila="${c.rir.fila}" data-col="${c.rir.col}" data-orig="${escaparHTML(c.rir.text)}" value="${escaparHTML(c.rir.text)}">
+      </div>
       <div class="pv-ej-err"><span>No se guardó · </span><button type="button" data-pv="reintentar">reintentar</button></div>
+      <button type="button" class="pv-sig" data-pv="siguiente" data-ei="${ei}">${ultimo?'Listo ✓':'Listo · siguiente ›'}</button>
     </div>`;
   };
 
-  let html=bloques.map(b=>{
-    const ab=abiertos.has(b.k);
-    const meta=`${b.items.length} ejercicio${b.items.length!==1?'s':''}${b.total?` · <b>${b.hechos}/${b.total}</b> cargados`:''}`;
-    return `<div class="pv-blq${ab?' abierto':''}${b.completo?' completo':''}">
-      <button type="button" class="pv-blq-head" data-pv="bloque" data-k="${escaparHTML(b.k)}" aria-expanded="${ab}">
-        <span class="pv-letra">${escaparHTML(b.letra||'•')}</span>
-        <span class="pv-blq-tit"><span class="pv-bnombre">${escaparHTML(b.nombre||'Ejercicios')}</span><small class="pv-blq-meta">${meta}</small></span>
-        <span class="pv-blq-ok" aria-hidden="true">✓</span>
-        <svg class="i pv-blq-chev" aria-hidden="true"><use href="#i-chev"/></svg>
-      </button>
-      <div class="pv-blq-body"><div class="pv-blq-in">${b.items.map(ejHTML).join('')}</div></div>
-    </div>`;
-  }).join('');
+  let html='';
+  bloques.forEach(b=>{
+    const ed=b.items.filter(x=>!x.ej.fija), h=ed.filter(x=>_pvHecho(x.ej,x.ei,si,k)).length;
+    const completo=ed.length>0&&h===ed.length;
+    html+=`<div class="pv-bt${completo||!ed.length?' ok':''}"><span class="l">${escaparHTML(b.letra||'•')}</span>${escaparHTML(b.nombre||'Ejercicios')}<small>${completo||!ed.length?'✓ listo':`${h} de ${ed.length}`}</small></div>`;
+    let pos=0;
+    b.items.forEach(({ej,ei})=>{
+      pos++;
+      const c=ej.celdas[si];
+      if(ej.fija && !planVista.expandidas.has(`${dia.n}-${ei}`)){
+        const todas=ej.celdas.every(x=>x.r.text===ej.celdas[0].r.text);
+        html+=`<button type="button" class="pv-e fija" data-pv="expandir" data-ei="${ei}"><span class="n">${escaparHTML(ej.nombre)}</span><span class="res">${escaparHTML(c.r.text||'—')} · ${todas?'todas las semanas':'semana '+sel.sem}</span></button>`;
+        return;
+      }
+      if(ei===act || ej.fija){ html+=tarjeta(ej,ei,pos); return; }
+      if(_pvHecho(ej,ei,si,k)){
+        html+=`<button type="button" class="pv-e hecho" data-pv="ej" data-ei="${ei}"><span class="chk">✓</span><span class="n">${escaparHTML(ej.nombre)}</span><span class="res">${escaparHTML([c.r.text,c.kg.text&&c.kg.text+' kg'].filter(Boolean).join(' · ')||'listo')}</span></button>`;
+      } else {
+        const ref=_pvRef(ej,si,d.semanas);
+        html+=`<button type="button" class="pv-e pend" data-pv="ej" data-ei="${ei}"><span class="chk"></span><span class="n">${escaparHTML(ej.nombre)}</span><span class="res">${ref?`Sem ${ref.sem}: ${escaparHTML([ref.c.r.text,ref.c.kg.text&&ref.c.kg.text+' kg'].filter(Boolean).join(' · '))}`:''}</span></button>`;
+      }
+    });
+  });
 
-  // Cierre del día: suma a la constancia y deja lista la próxima sesión
+  // Día ya terminado: tarjeta con "Ver siguiente" y "Deshacer" (el botón principal vive en la barra de abajo)
   const hecho=_planHecho(a.id,d.mes,dia.n,sel.sem);
-  const sig=_planSiguiente(d,dia.n,sel.sem);
-  const sigTxt=sig?`Día ${sig.dia} · Semana ${sig.sem}`:'';
   if(hecho){
+    const sig=_planSiguiente(d,dia.n,sel.sem), sigTxt=sig?`Día ${sig.dia} · Semana ${sig.sem}`:'';
     html+=`<div class="pv-fin hecho">
       <div class="pv-fin-tit"><span class="pv-fin-check">✓</span><div><b>Día ${dia.n} · Semana ${sel.sem} terminado</b><small>${escaparHTML(hecho.fecha||'')}${sig?' · Próximo: '+sigTxt:' · ¡Plan del mes completo!'}</small></div></div>
       <div class="pv-fin-acc">${sig?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button></div>
     </div>`;
-  } else {
-    const pend=bloques.reduce((n,b)=>n+(b.total-b.hechos),0);
-    html+=`<div class="pv-fin">
-      <button type="button" class="pv-terminar" data-pv="terminar-dia"><span class="pv-fin-check">✓</span> Terminé el Día ${dia.n} · Semana ${sel.sem}</button>
-      <small>${pend?`Quedan ${pend} ejercicio${pend!==1?'s':''} sin cargar. `:''}Suma a la constancia${sig?` y la próxima sesión arranca en ${sigTxt}`:''}.</small>
-    </div>`;
   }
   return html;
 }
-// Recalcula "x/y cargados" y el ✓ de un bloque después de guardar (sin redibujar todo)
-function _pvRefrescarBloque(blq){
-  const cards=[...blq.querySelectorAll('[data-pvcard][data-cuenta]')];
-  const hechos=cards.filter(c=>{ const i=c.querySelectorAll('input[data-fila]'); return !!((i[0]&&i[0].dataset.orig)||(i[2]&&i[2].dataset.orig)); }).length;
-  const b=blq.querySelector('.pv-blq-meta b'); if(b) b.textContent=`${hechos}/${cards.length}`;
-  blq.classList.toggle('completo',cards.length>0&&hechos===cards.length);
+// Barra fija de abajo en Fuerza: descanso + Terminé el día
+function _pvPieFuerza(a,e){
+  const d=e.datos, sel=_planSelDe(a,d);
+  const hecho=_planHecho(a.id,d.mes,sel.dia,sel.sem);
+  return `<div class="pv-pie"><button type="button" class="pv-timer${_pvDesc.fin>Date.now()?' corre':''}" data-pv="timer" id="pv-timer">${_pvTimerTxt()}</button>
+    ${hecho?`<div class="pv-term hecho">✓ Día ${sel.dia} terminado</div>`:`<button type="button" class="pv-term" data-pv="terminar-dia">✓ Terminé el Día ${sel.dia}</button>`}</div>`;
 }
-function _pvToggleBloque(btn){
-  const blq=btn.closest('.pv-blq'); if(!blq||!planVista) return;
-  const a=_planAlumno(planVista.alumnoId), e=a&&planEntrada(a.id,'fuerza'); if(!e||!e.datos) return;
-  const sel=_planSelDe(a,e.datos), set=planVista.bloques&&planVista.bloques.get(`${sel.dia}-${sel.sem}`);
-  const abrir=!blq.classList.contains('abierto');
-  blq.classList.toggle('abierto',abrir);
-  btn.setAttribute('aria-expanded',abrir);
-  if(set){ if(abrir) set.add(btn.dataset.k); else set.delete(btn.dataset.k); }
-  if(abrir) setTimeout(()=>{ const r=btn.getBoundingClientRect(), body=document.getElementById('pv-body'); if(body){ const br=body.getBoundingClientRect(); if(r.top<br.top||r.top>br.bottom-120) body.scrollTo({top:body.scrollTop+r.top-br.top-8,behavior:'smooth'}); } },60);
+// ── Cronómetro de descanso (90 s; arranca solo con "Listo · siguiente") ──
+const PV_DESCANSO_S=90;
+let _pvDesc={fin:0,int:null,aviso:0};
+function _pvTimerTxt(){
+  const r=Math.ceil((_pvDesc.fin-Date.now())/1000);
+  if(r>0) return `⏱ ${Math.floor(r/60)}:${String(r%60).padStart(2,'0')}<small>descanso</small>`;
+  if(Date.now()<_pvDesc.aviso) return `¡Dale!<small>siguiente serie</small>`;
+  return `⏱ ${Math.floor(PV_DESCANSO_S/60)}:${String(PV_DESCANSO_S%60).padStart(2,'0')}<small>descanso</small>`;
+}
+function _pvTimerPintar(){ const t=document.getElementById('pv-timer'); if(t){ t.innerHTML=_pvTimerTxt(); t.classList.toggle('corre',_pvDesc.fin>Date.now()); t.classList.toggle('listo',Date.now()<_pvDesc.aviso); } }
+function _pvDescanso(iniciar){
+  clearInterval(_pvDesc.int);
+  if(!iniciar){ _pvDesc.fin=0; _pvDesc.aviso=0; _pvTimerPintar(); return; }
+  _pvDesc.fin=Date.now()+PV_DESCANSO_S*1000; _pvDesc.aviso=0;
+  _pvDesc.int=setInterval(()=>{
+    if(Date.now()>=_pvDesc.fin && _pvDesc.fin){
+      _pvDesc.fin=0; _pvDesc.aviso=Date.now()+5000;
+      try{ navigator.vibrate&&navigator.vibrate([200,100,200]); }catch(e){}
+    }
+    if(!_pvDesc.fin && Date.now()>=_pvDesc.aviso){ clearInterval(_pvDesc.int); _pvDesc.aviso=0; }
+    _pvTimerPintar();
+  },500);
+  _pvTimerPintar();
+}
+
+// ── Guardado de una celda (cola por planilla; usado por los campos y por la hoja de Mapeo) ──
+function _planGuardarCelda(e,cel,nuevo,cb){
+  e.pendientes++;
+  e.cola=e.cola.then(async()=>{
+    try{ await _planEscribir(e,cel,nuevo); cel.text=nuevo; cb&&cb(true); }
+    catch(err){ cb&&cb(false,err); toast(err&&err.tipo==='sesion'?'Tu sesión venció: reconectá para guardar':'No se guardó el cambio'); }
+    e.pendientes--;
+  });
+  return e.cola;
+}
+function _pvGuardarPronto(inp){ clearTimeout(inp._t); inp._t=setTimeout(()=>planGuardarInput(inp),700); }
+
+// ══ MAPEO (v2): lista de solo lectura; para editar se toca y sube una hoja ══
+function _pvMapeoHoy(a){
+  const ef=planEntrada(a.id,'fuerza');
+  if(!ef||ef.estado!=='ok') return null;
+  const sel=_planSelDe(a,ef.datos), dia=ef.datos.dias.find(d=>d.n===sel.dia);
+  return dia?{dia:dia.n,set:new Set(dia.ejercicios.map(x=>_normTxt(x.nombre)))}:null;
+}
+function _pvBodyMapeo(a,e){
+  const q=_normTxt(planVista.busqueda), enf=planVista.enfoque, hoy=_pvMapeoHoy(a);
+  const esHoy=f=>!!(hoy&&hoy.set.has(_normTxt(f.ejercicio)));
+  const filas=e.datos.filas.filter(f=>(enf==='__hoy'?esHoy(f):(!enf||f.enfoque===enf)) && (!q||_normTxt(f.ejercicio).includes(q)||_normTxt(f.patron).includes(q)||_normTxt(f.enfoque).includes(q)));
+  let html=enf==='__hoy'&&hoy?`<div class="pv-aviso2">Los ejercicios del <b>Día ${hoy.dia}</b> de la Fuerza que también están en el Mapeo. Tocá uno para actualizar su marca.</div>`:'';
+  if(!filas.length) return html+'<div class="pv-nota">Sin resultados.</div>';
+  const fila=f=>`<button type="button" class="pv-mf" data-pv="mapeo-abrir" data-fila="${f.fila}">
+      <div class="n"><b>${escaparHTML(f.ejercicio)}${enf!=='__hoy'&&esHoy(f)?'<span class="hoyb">HOY</span>':''}</b><small>${escaparHTML([f.enfoque,f.patron].filter(Boolean).join(' · '))}</small></div>
+      <div class="val">${f.kg.text?`<b>${escaparHTML(f.kg.text)} kg</b>`:'<b class="vacio">—</b>'}<small>${f.reps.text?escaparHTML(f.reps.text)+' reps':'cargar'}</small></div>
+      <svg class="i chev" aria-hidden="true"><use href="#i-chev"/></svg></button>`;
+  if(enf==='__hoy') return html+`<div class="pv-mlista">${filas.map(fila).join('')}</div><div class="pv-aviso2 gris">Tip: dentro de un ejercicio de la Fuerza, tocá su marca del <b>Mapeo</b> para editarla sin salir.</div>`;
+  const grupos=[];
+  filas.forEach(f=>{ const g=[f.enfoque,f.patron].filter(Boolean).join(' · '); let gr=grupos[grupos.length-1]; if(!gr||gr.g!==g){ gr={g,items:[]}; grupos.push(gr); } gr.items.push(f); });
+  return html+grupos.map(gr=>`${gr.g?`<div class="pv-mg">${escaparHTML(gr.g)}<small>${gr.items.length}</small></div>`:''}<div class="pv-mlista">${gr.items.map(fila).join('')}</div>`).join('')
+    +'<div class="pv-nota" style="margin-top:0.4rem">Tocá un ejercicio para cambiar Reps o KG. Para agregar o reordenar ejercicios, <b>Abrir en Sheets</b>.</div>';
+}
+// Hoja para editar una marca del Mapeo (desde el Mapeo o desde un ejercicio de la Fuerza)
+function _pvRenderSheet(){
+  const cont=document.getElementById('pv-sheet'); if(!cont) return;
+  const sh=planVista&&planVista.sheet;
+  if(!sh){ cont.innerHTML=''; return; }
+  const a=_planAlumno(planVista.alumnoId), f=sh.f, me=planEntrada(a.id,'mapeo');
+  const ro=c=>c.formula?' readonly title="Fórmula: solo lectura"':'';
+  // Dónde aparece en la Fuerza y qué se cargó la última vez
+  let uso='';
+  const ef=planEntrada(a.id,'fuerza');
+  if(ef&&ef.estado==='ok'){
+    const n=_normTxt(f.ejercicio), donde=[]; let ult=null;
+    ef.datos.dias.forEach(dd=>dd.ejercicios.forEach(ej=>{
+      if(_normTxt(ej.nombre)!==n) return;
+      donde.push(`Día ${dd.n}${ej.letra?' · bloque '+escaparHTML(ej.letra):''}`);
+      for(let j=ej.celdas.length-1;j>=0;j--){ const x=ej.celdas[j]; if((x.r.text||x.kg.text)&&(!ult||j>ult.j)){ ult={j,c:x}; break; } }
+    }));
+    if(donde.length) uso=`En la Fuerza de este mes: <b>${donde.join(', ')}</b>.${ult?` La última vez cargaste <b>${escaparHTML([ult.c.r.text&&ult.c.r.text+' reps',ult.c.kg.text&&ult.c.kg.text+' kg'].filter(Boolean).join(' · '))}</b> (semana ${ef.datos.semanas[ult.j].n}).`:''}`;
+  }
+  const tabTit=(me&&me.tabs&&me.tabs.length>1)?(f.reps.hoja||''):'';
+  cont.innerHTML=`<div class="pv-velo" data-pv="sheet-cerrar"></div>
+    <div class="pv-sheet" role="dialog" aria-label="Editar ${escaparHTML(f.ejercicio)}">
+      <div class="asa"></div>
+      <h3>${escaparHTML(f.ejercicio)}<small>${escaparHTML([f.enfoque,f.patron,tabTit].filter(Boolean).join(' · '))}</small></h3>
+      <div class="pv-dos">
+        <div class="pv-big"><label>Reps</label><div class="st"><button type="button" data-pv="spaso" data-c="reps" data-d="-1">−</button><input id="pv-s-reps" type="text" inputmode="numeric" value="${escaparHTML(f.reps.text)}" placeholder="—"${ro(f.reps)} autocomplete="off"><button type="button" data-pv="spaso" data-c="reps" data-d="1">+</button></div></div>
+        <div class="pv-big"><label>KG</label><div class="st"><button type="button" data-pv="spaso" data-c="kg" data-d="-1">−</button><input id="pv-s-kg" type="text" inputmode="decimal" value="${escaparHTML(f.kg.text)}" placeholder="—"${ro(f.kg)} autocomplete="off"><button type="button" data-pv="spaso" data-c="kg" data-d="1">+</button></div></div>
+      </div>
+      ${_pvNum(f.kg.text)!=null?`<div class="pv-sug">${[-2,2,4].map(s=>`<button type="button" data-pv="skg" data-d="${s}">${s>0?'+':'−'}${Math.abs(s)} kg</button>`).join('')}</div>`:''}
+      ${uso?`<div class="pv-uso">${uso}</div>`:''}
+      <button type="button" class="pv-gd" data-pv="sheet-guardar">Guardar</button>
+    </div>`;
+}
+function _pvAbrirSheet(f){ planVista.sheet={f}; _pvRenderSheet(); }
+function _pvCerrarSheet(){ if(planVista) planVista.sheet=null; _pvRenderSheet(); }
+function _pvGuardarSheet(){
+  const a=_planAlumno(planVista.alumnoId), me=planEntrada(a.id,'mapeo'), f=planVista.sheet&&planVista.sheet.f;
+  if(!me||!f) return _pvCerrarSheet();
+  const cambios=[[f.reps,document.getElementById('pv-s-reps').value.trim()],[f.kg,document.getElementById('pv-s-kg').value.trim()]].filter(([c,v])=>!c.formula&&v!==c.text);
+  _pvCerrarSheet();
+  if(!cambios.length) return;
+  let ok=true;
+  cambios.forEach(([c,v])=>_planGuardarCelda(me,c,v,b=>{ if(!b) ok=false; }));
+  me.cola.then(()=>{ if(ok) toast('Mapeo actualizado ✓'); if(planVista && !_planEditando()) planRenderBody(); });
+  planRenderBody();
 }
 
 // "Terminé el día": registra la asistencia de hoy con el día del plan (columna D de Asistencias)
@@ -6722,20 +6962,6 @@ function _planTrasCambioAsistencia(id){
   if(pf && pf.dataset.alumnoId===id && typeof renderRachaAccion==='function'){ try{ renderRachaAccion(id); }catch(e){} }
   if(id===MI_ID && document.getElementById('page-yo').classList.contains('active')) renderMiPerfil();
 }
-function _pvBodyMapeo(a,e){
-  const q=_normTxt(planVista.busqueda), enf=planVista.enfoque;
-  const filas=e.datos.filas.filter(f=>(!enf||f.enfoque===enf) && (!q||_normTxt(f.ejercicio).includes(q)||_normTxt(f.patron).includes(q)||_normTxt(f.enfoque).includes(q)));
-  if(!filas.length) return '<div class="pv-nota">Sin resultados.</div>';
-  let html='<div class="pv-map-head"><span>Ejercicio</span><span>Reps</span><span>KG</span></div>', grupo=null;
-  filas.forEach(f=>{
-    const g=`${f.enfoque} · ${f.patron}`;
-    if(g!==grupo){ grupo=g; html+=`<div class="pv-map-grupo">${escaparHTML(g)}</div>`; }
-    const mk=c=>`<input type="text" inputmode="${c===f.kg?'decimal':'text'}" data-fila="${c.fila}" data-col="${c.col}" data-orig="${escaparHTML(c.text)}" value="${escaparHTML(c.text)}" placeholder="—"${c.formula?' readonly title="Fórmula: solo lectura"':''} autocomplete="off">`;
-    html+=`<div class="pv-map-row${planVista.guardados.has('m'+f.fila)?' guardado':''}" data-pvcard="m${f.fila}"><span class="pv-map-ej">${escaparHTML(f.ejercicio)}<small>${escaparHTML(f.patron)}</small></span>${mk(f.reps)}${mk(f.kg)}</div>`;
-  });
-  return html+'<div class="pv-nota" style="margin-top:0.6rem">Cambiar Reps o KG guarda en la misma fila del Mapeo. Para agregar o reordenar ejercicios, <b>Abrir en Sheets</b>.</div>';
-}
-
 // ── Guardado: una celda por vez, al salir del campo, solo si el valor cambió ──
 // USER_ENTERED a propósito (igual que tipear en la celda): "25" queda número y
 // "27,5-27,5-12,5" queda texto. Excepción: algo como "7-7-14" o "8-8" Sheets lo
@@ -6763,22 +6989,16 @@ function planGuardarInput(inp){
   const card=inp.closest('[data-pvcard]');
   const clave=planVista.tipo==='fuerza'?'f'+cel.fila:'m'+(e.tabs&&e.tabs[e.sel]?e.tabs[e.sel].id+'-':'')+cel.fila;
   if(card) card.classList.remove('guardado','error');
-  e.pendientes++;
-  e.cola=e.cola.then(async()=>{
-    try{
-      await _planEscribir(e,cel,nuevo);
-      cel.text=nuevo; inp.dataset.orig=nuevo;
+  _planGuardarCelda(e,cel,nuevo,(ok,err)=>{
+    if(ok){
+      inp.dataset.orig=nuevo;
       if(planVista) planVista.guardados.add(clave);
-      if(card && card.isConnected){ card.classList.remove('error'); card.classList.add('guardado'); const blq=card.closest('.pv-blq'); if(blq) _pvRefrescarBloque(blq); }
-    }catch(err){
+      if(card && card.isConnected){ card.classList.remove('error'); card.classList.add('guardado'); }
+    } else if(card && card.isConnected){
       // El valor tipeado NO se pierde: queda en el campo y se puede reintentar
-      if(card && card.isConnected){
-        card.classList.add('error');
-        const sp=card.querySelector('.pv-ej-err span'); if(sp) sp.textContent=(err&&err.tipo==='sesion'?'Sesión vencida · ':'No se guardó · ');
-      }
-      toast(err&&err.tipo==='sesion'?'Tu sesión venció: reconectá para guardar':'No se guardó el cambio');
+      card.classList.add('error');
+      const sp=card.querySelector('.pv-ej-err span'); if(sp) sp.textContent=(err&&err.tipo==='sesion'?'Sesión vencida · ':'No se guardó · ');
     }
-    e.pendientes--;
   });
 }
 
@@ -6798,7 +7018,76 @@ function planGuardarInput(inp){
     switch(el.dataset.pv){
       case 'cerrar': cerrarPlan(); break;
       case 'hoja': _planIrPestana(+el.dataset.i); break;
-      case 'bloque': _pvToggleBloque(el); break;
+      case 'ej': { const sel=planSel[a.id]; planVista.activo.set(_pvClaveDia(sel),+el.dataset.ei); planVista.centrar=true; planRenderBody(); break; }
+      case 'paso': {
+        const inp=el.parentNode.querySelector('input'); if(!inp||inp.readOnly) break;
+        const esKg=el.dataset.c==='kg', d=+el.dataset.d;
+        const base=esKg?(_pvNum(inp.value)??_pvNum(inp.placeholder)??0):(parseInt(inp.value,10)||parseInt(inp.placeholder,10)||0);
+        const n=Math.max(0,base+(inp.value?d:0)*(esKg?2.5:1));
+        inp.value=esKg?_pvFmtKg(e.datos,n):String(n);
+        _pvGuardarPronto(inp); break;
+      }
+      case 'kgset': {
+        const card=el.closest('[data-pvcard]'), inp=card&&card.querySelectorAll('.pv-step input')[1]; if(!inp||inp.readOnly) break;
+        inp.value=el.dataset.v; planGuardarInput(inp);
+        el.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===el)); break;
+      }
+      case 'rir': {
+        const card=el.closest('[data-pvcard]'), inp=card.querySelector('.pv-rir-in');
+        inp.value=el.dataset.v; planGuardarInput(inp);
+        el.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===el));
+        const r=card.querySelector('.pv-rpe'); if(r) r.textContent='RPE '+_pvRpe(el.dataset.v); break;
+      }
+      case 'info': {
+        const card=el.closest('[data-pvcard]'), p=card&&card.querySelector(`.pv-info[data-info="${el.dataset.k}"]`);
+        if(p){ const abrir=p.hidden; card.querySelectorAll('.pv-info').forEach(x=>x.hidden=true); p.hidden=!abrir; }
+        break;
+      }
+      case 'repetir': {
+        const sel=planSel[a.id], dia=e.datos.dias.find(d=>d.n===sel.dia), ej=dia.ejercicios[+el.dataset.ei];
+        const si=e.datos.semanas.findIndex(w=>w.n===sel.sem), ref=_pvRef(ej,si,e.datos.semanas);
+        const ins=el.closest('[data-pvcard]').querySelectorAll('.pv-step input');
+        if(ref) [[ref.c.r,ins[0]],[ref.c.kg,ins[1]]].forEach(([o,inp])=>{ if(o.text&&inp&&!inp.readOnly&&inp.value!==o.text){ inp.value=o.text; planGuardarInput(inp); } });
+        break;
+      }
+      case 'siguiente': {
+        if(document.activeElement&&document.activeElement.blur) document.activeElement.blur();
+        const card=el.closest('[data-pvcard]'), ins=card.querySelectorAll('.pv-step input');
+        ins.forEach(inp=>{ clearTimeout(inp._t); planGuardarInput(inp); });
+        const sel=planSel[a.id], k=_pvClaveDia(sel), ei=+el.dataset.ei;
+        const dia=e.datos.dias.find(d=>d.n===sel.dia), si=e.datos.semanas.findIndex(w=>w.n===sel.sem);
+        if([...ins].some(x=>x.value.trim())) planVista.listos.add(`${k}-${ei}`);
+        const libre=i=>{ const x=dia.ejercicios[i]; return x&&!x.fija&&!_pvHecho(x,i,si,k); };
+        let sig=-1;
+        for(let i=ei+1;i<dia.ejercicios.length&&sig<0;i++) if(libre(i)) sig=i;
+        for(let i=0;i<ei&&sig<0;i++) if(libre(i)) sig=i;
+        planVista.activo.set(k,sig); planVista.centrar=true;
+        if(sig>=0) _pvDescanso(true);
+        planRenderTodo();
+        e.cola.then(()=>{ if(planVista&&planVista.tipo==='fuerza'&&!_planEditando()) planRenderTodo(); });
+        break;
+      }
+      case 'timer': _pvDescanso(!(_pvDesc.fin>Date.now())); break;
+      case 'mapeo-abrir': { const f=e.datos.filas.find(x=>x.fila===+el.dataset.fila); if(f) _pvAbrirSheet(f); break; }
+      case 'ref-mapeo': {
+        const sel=planSel[a.id], dia=e.datos.dias.find(d=>d.n===sel.dia), ej=dia.ejercicios[+el.dataset.ei];
+        const f=ej&&_planMapeoDe(a.id,ej.nombre); if(f) _pvAbrirSheet(f); break;
+      }
+      case 'sheet-cerrar': _pvCerrarSheet(); break;
+      case 'sheet-guardar': _pvGuardarSheet(); break;
+      case 'spaso': {
+        const inp=document.getElementById(el.dataset.c==='kg'?'pv-s-kg':'pv-s-reps'); if(!inp||inp.readOnly) break;
+        const esKg=el.dataset.c==='kg', me=planEntrada(a.id,'mapeo');
+        const base=esKg?(_pvNum(inp.value)??0):(parseInt(inp.value,10)||0);
+        const n=Math.max(0,base+(+el.dataset.d)*(esKg?2:1));
+        inp.value=esKg&&me?_pvFmtKg(me.datos,n):String(n); break;
+      }
+      case 'skg': {
+        const inp=document.getElementById('pv-s-kg'), f=planVista.sheet&&planVista.sheet.f, me=planEntrada(a.id,'mapeo');
+        if(!inp||inp.readOnly||!f) break;
+        const base=_pvNum(f.kg.text)??0; inp.value=_pvFmtKg(me.datos,Math.max(0,base+(+el.dataset.d)));
+        el.parentNode.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===el)); break;
+      }
       case 'terminar-dia': planTerminarDia(el); break;
       case 'deshacer-dia': planDeshacerDia(el); break;
       case 'ir-prox': { const sel=planSel[a.id], sig=sel&&_planSiguiente(e.datos,sel.dia,sel.sem); if(sig){ sel.dia=sig.dia; sel.sem=sig.sem; planVista.expandidas=new Set(); planRenderTodo(); const b=document.getElementById('pv-body'); if(b) b.scrollTop=0; } break; }
@@ -6845,6 +7134,7 @@ function planGuardarInput(inp){
   },{passive:true});
   // Botón atrás de Android: cierra la vista y vuelve a la ficha
   window.addEventListener('popstate',()=>{ if(_planAbierto) _planOcultar(); });
+  document.addEventListener('keydown',ev=>{ if(ev.key==='Escape'&&planVista&&planVista.sheet) _pvCerrarSheet(); });
 })();
 
 // Botón de lista: primero los de hoy, después todos con buscador. Pasar de alumno mantiene la vista (Fuerza o Mapeo)
