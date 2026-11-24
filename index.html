@@ -2553,6 +2553,8 @@ function bloqueCuerpo(a,editar){
 // ── Portal del alumno ──
 let _portalMenuAbierto=false, _portalCuotaAbierta=false;
 function _pintarPortal(el,data){
+    // El proxy avisa si ya acepta la entrevista inicial (acción "perfil"): recién ahí se muestra
+    if(data && data.perfilEditable) PORTAL_PERFIL_EDITABLE=true;
     const a = {
       ...data.alumno,
       dias: data.alumno.dias ? data.alumno.dias.split('|') : [],
@@ -2651,9 +2653,10 @@ let _portalAlumnoActual=null;
 // ══ ENTREVISTA INICIAL DEL ALUMNO (portal) ══
 // 5 preguntas cortas para completar su perfil; cada una se puede saltear y todo
 // se puede editar después ("Editar mis datos"). Se guarda a través del Apps Script
-// del portal (acción "perfil", ver apps-script/portal-perfil.gs): el alumno solo
+// del portal (acción "perfil", ver apps-script/portal-proxy.gs): el alumno solo
 // puede tocar SU fila y solo estos campos. Mientras esa acción no esté publicada,
-// PORTAL_PERFIL_EDITABLE queda en false y el portal no muestra nada de esto.
+// PORTAL_PERFIL_EDITABLE queda en false y el portal no muestra nada de esto. Se activa
+// solo cuando la respuesta del proxy trae perfilEditable:true.
 let PORTAL_PERFIL_EDITABLE=false;
 let _portalToken='';
 let _ent=null;
