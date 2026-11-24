@@ -2238,6 +2238,12 @@ const RANGO = {
   // Mi perfil (entrenador): pares Clave/Valor; la pestaña se crea sola al guardar
   PERFIL_READ:         'Perfil!A2:B40',
   PERFIL_WRITE:        'Perfil!A2:B40',
+  // Ejercicios marcados como listos en la Fuerza: UNA fila por alumno (A id, B ciclo,
+  // C marcas JSON {"día-semana":[índices]}, D actualizado). Cuando el plan se renueva
+  // (cambia "Mes N" o la planilla), la fila se reemplaza: las marcas no se acumulan.
+  LISTOS_READ:         'Listos!A2:D500',
+  LISTOS_KEYS:         'Listos!A2:A500',
+  LISTOS_START:        'Listos!A2',
 };
 
 const DIAS  = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
@@ -2279,7 +2285,8 @@ function montoCobro(a,c){
 let accessToken = null;
 let alumnos = [];
 const MI_ID = "__yo";       // id reservado: mi propio perfil en el visor de planes (nunca es un alumno real)
-let miPerfil = {};           // Mi perfil (pestaña "Perfil" del Sheet, clave/valor)
+let miPerfil = {};
+let planListos = {};         // alumnoId → {ciclo, marcas:{'día-semana':[índices]}} (pestaña "Listos")           // Mi perfil (pestaña "Perfil" del Sheet, clave/valor)
 let cobros  = {};
 let seguimiento = {};
 let asistencias = [];
@@ -2854,7 +2861,7 @@ function _authInvalidar(){
 
 function _cacheGuardar(){
   const ts=Date.now();
-  if(_lsSet(CACHE_KEY, JSON.stringify({v:1, ts, alumnos, cobros, seguimiento, asistencias, clientesNutri, cobrosNutri, gastos, configFinanzas, biblioteca, progresionActual, miPerfil}))){
+  if(_lsSet(CACHE_KEY, JSON.stringify({v:1, ts, alumnos, cobros, seguimiento, asistencias, clientesNutri, cobrosNutri, gastos, configFinanzas, biblioteca, progresionActual, miPerfil, planListos}))){
     cacheTs=ts;
   }
 }
@@ -2867,6 +2874,7 @@ function _cacheRestaurar(){
     configFinanzas=c.configFinanzas||{saldoInicial:0,fechaReferencia:''};
     biblioteca=c.biblioteca||[]; progresionActual=c.progresionActual||[];
     miPerfil=(c.miPerfil && typeof c.miPerfil==='object')?c.miPerfil:{};
+    planListos=(c.planListos && typeof c.planListos==='object')?c.planListos:{};
     cacheTs=c.ts||0;
     return true;
   }catch(e){ return false; }
@@ -3128,7 +3136,7 @@ function cerrarSesion(){
   planCache={}; planSel={}; if(_planAbierto) _planOcultar();
   alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];configFinanzas={saldoInicial:0,fechaReferencia:''};
-  biblioteca=[];progresionActual=[];miPerfil={};
+  biblioteca=[];progresionActual=[];miPerfil={};planListos={};
   document.getElementById('app').style.display='none';
   document.getElementById('login-screen').style.display='flex';
   _actualizarBotonLogin();
@@ -3212,7 +3220,7 @@ async function cargarDatos(opts){
   }
   // Foto del estado actual: si una lectura falla (sin conexión, 401…) se vuelve
   // a esto en vez de dejar en blanco lo que ya se estaba mostrando (copia guardada).
-  const antes={alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil};
+  const antes={alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil,planListos};
   const habiaDatos=alumnos.length>0;
   let fallo=false;
   _actualizando=true;
@@ -3355,6 +3363,15 @@ async function cargarDatos(opts){
         }catch(e){console.warn('Error cargando Progresion_Actual:',e);progresionActual=[];}
       })(),
 
+      // Ejercicios listos de la Fuerza (pestaña opcional, se crea al primer tilde)
+      (async()=>{
+        try{
+          const rowsL=await sheetsGet(RANGO.LISTOS_READ);
+          planListos={};
+          rowsL.forEach(r=>{ if(!r[0]) return; let m={}; try{ m=JSON.parse(r[2]||'{}')||{}; }catch(e){} planListos[r[0]]={ciclo:r[1]||'',marcas:m}; });
+        }catch(e){ console.warn('Sin pestaña Listos (se crea al primer tilde):',e); }
+      })(),
+
       // Mi perfil (pestaña opcional: si todavía no existe queda vacío, no es un fallo)
       (async()=>{
         try{ miPerfil=_perfilDesdeFilas(await sheetsGet(RANGO.PERFIL_READ)); }
@@ -3366,7 +3383,7 @@ async function cargarDatos(opts){
       // Una lectura falló: si ya había datos en pantalla (la copia guardada), se
       // conservan tal cual y no se da por actualizado ni se pisa la copia.
       if(habiaDatos){
-        ({alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil}=antes);
+        ({alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil,planListos}=antes);
       }
       toast(habiaDatos ? 'No se pudo actualizar. Mostrando los últimos datos guardados' : 'No se pudieron cargar los datos. Tocá Sincronizar para reintentar');
     } else {
@@ -6015,16 +6032,19 @@ function _miIniciales(){
 }
 function _actualizarIniYo(){}   // la barra muestra el brote; las iniciales quedan en Mi perfil
 
-async function _crearPestanaPerfil(){
+// Crea una pestaña nueva en el Sheet con su fila de títulos
+async function _crearPestana(nombre,titulos){
   if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   const r=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}:batchUpdate`,{
     method:'POST',
     headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
-    body:JSON.stringify({requests:[{addSheet:{properties:{title:'Perfil'}}}]})
+    body:JSON.stringify({requests:[{addSheet:{properties:{title:nombre}}}]})
   });
-  if(!r.ok) throw new Error('No se pudo crear la pestaña Perfil');
-  await sheetsUpdate('Perfil!A1:B1',[['Clave','Valor']]);
+  if(!r.ok) throw new Error('No se pudo crear la pestaña '+nombre);
+  const fin=String.fromCharCode(64+titulos.length);
+  await sheetsUpdate(`${nombre}!A1:${fin}1`,[titulos]);
 }
+function _crearPestanaPerfil(){ return _crearPestana('Perfil',['Clave','Valor']); }
 async function guardarMiPerfil(nuevo){
   const filas=PERFIL_CAMPOS.map(k=>[k,nuevo[k]||'']);
   try{
@@ -6685,20 +6705,44 @@ const PV_INFO={
 function _pvClaveDia(sel){ return `${sel.dia}-${sel.sem}`; }
 // Un ejercicio está LISTO solo cuando se toca "Listo" (o el día entero con "Terminé el día").
 // Tener valores cargados no alcanza: la planilla puede traer de antemano lo que hay que hacer.
-// Las marcas por ejercicio quedan en este dispositivo; el día terminado vive en el Sheet (Asistencias).
-const PV_LISTOS_KEY='mc_pv_listos';
-function _pvListosTodos(){ try{ return JSON.parse(_lsGet(PV_LISTOS_KEY)||'{}')||{}; }catch(e){ return {}; } }
-function _pvListosClave(aid,mes,sel){ return `${aid}|${_normTxt(mes)}|${sel.dia}|${sel.sem}`; }
+// Las marcas viven en la pestaña "Listos" del Sheet, una fila por alumno con su CICLO
+// ("Mes N" + planilla de Fuerza). Si el ciclo cambió, las marcas viejas no cuentan y la
+// fila se reemplaza con el primer tilde del ciclo nuevo.
+function _pvCiclo(aid,mes){ const e=planEntrada(aid,'fuerza'); return `${_normTxt(mes)}|${(e&&e.spreadsheetId)||''}`; }
 function _pvListos(aid,mes,sel){
-  const L=new Set(_pvListosTodos()[_pvListosClave(aid,mes,sel)]||[]);
+  const r=planListos[aid];
+  const L=new Set(r&&r.ciclo===_pvCiclo(aid,mes)?((r.marcas||{})[`${sel.dia}-${sel.sem}`]||[]):[]);
   if(_planHecho(aid,mes,sel.dia,sel.sem)) L.add('*');
   return L;
 }
 function _pvMarcarListo(aid,mes,sel,ei,on){
-  const t=_pvListosTodos(), k=_pvListosClave(aid,mes,sel), L=new Set(t[k]||[]);
+  const ciclo=_pvCiclo(aid,mes);
+  let r=planListos[aid];
+  if(!r||r.ciclo!==ciclo) r=planListos[aid]={ciclo,marcas:{}};
+  const k=`${sel.dia}-${sel.sem}`, L=new Set(r.marcas[k]||[]);
   if(on) L.add(ei); else L.delete(ei);
-  if(L.size) t[k]=[...L]; else delete t[k];
-  _lsSet(PV_LISTOS_KEY,JSON.stringify(t));
+  if(L.size) r.marcas[k]=[...L].sort((x,y)=>x-y); else delete r.marcas[k];
+  _cacheGuardar();
+  _pvGuardarListos(aid);
+}
+const _pvListosTimers={};
+function _pvGuardarListos(aid){
+  clearTimeout(_pvListosTimers[aid]);
+  _pvListosTimers[aid]=setTimeout(async()=>{
+    const r=planListos[aid]; if(!r) return;
+    const fila=[aid,r.ciclo,JSON.stringify(r.marcas),_hoyISOLocal()];
+    try{
+      let keys;
+      try{ keys=await sheetsGet(RANGO.LISTOS_KEYS); }
+      catch(e){ await _crearPestana('Listos',['Alumno','Ciclo','Marcas','Actualizado']); keys=[]; }
+      const idx=keys.findIndex(x=>x[0]===aid);
+      if(idx===-1) await sheetsAppend(RANGO.LISTOS_START,[fila]);
+      else await sheetsUpdate(`Listos!A${idx+2}:D${idx+2}`,[fila]);
+    }catch(e){
+      console.warn('Listos:',e);
+      toast(_escrituraPermitida()?'No se pudo guardar el tilde en el Sheet':MSG_SIN_DATOS);
+    }
+  },800);
 }
 function _pvHecho(L,ei){ return L.has('*')||L.has(ei); }
 function _pvProgresoDia(a,datos,sel){
