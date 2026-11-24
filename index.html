@@ -2726,7 +2726,8 @@ async function _entGuardar(){
   if(!sk.has(1)&&d.fechaNac) datos.fechaNac=d.fechaNac;
   if(!sk.has(2)&&d.estatura) datos.estatura=String(d.estatura).replace(',','.');
   if(!sk.has(3)&&d.pesoActual) datos.pesoActual=String(d.pesoActual).replace(',','.');
-  if(!sk.has(4)&&(d.objetivo||d.objetivoTxt)) datos.objetivo={texto:d.objetivoTxt||d.objetivo,categoria:d.objetivo||''};
+  const CAT_FICHA={'Ganar fuerza':'Fuerza','Ganar músculo':'Composición corporal','Bajar de peso':'Composición corporal','Rendimiento deportivo':'Resistencia','Movilidad y menos dolor':'Movilidad'};
+  if(!sk.has(4)&&(d.objetivo||d.objetivoTxt)) datos.objetivo={texto:d.objetivoTxt||d.objetivo,categoria:CAT_FICHA[d.objetivo]||''};
   if(!sk.has(5)&&!d.sinMolestias&&(d.zona||d.molestiaTxt)) datos.molestia={texto:d.molestiaTxt||('Molestia en '+d.zona.toLowerCase()),zona:d.zona||''};
   if(!Object.keys(datos).length){ cerrarEntrevista(true); return; }
   _ent.guardando=true; _ent.error=''; _entRender();
@@ -2872,7 +2873,7 @@ function _cacheRestaurar(){
   try{
     const c=JSON.parse(_lsGet(CACHE_KEY)||'null');
     if(!c || c.v!==1 || !Array.isArray(c.alumnos) || !c.cobros || typeof c.cobros!=='object') return false;
-    alumnos=c.alumnos; cobros=c.cobros; seguimiento=c.seguimiento||{}; asistencias=c.asistencias||[];
+    alumnos=c.alumnos; _alumnoBaseTomar(); cobros=c.cobros; seguimiento=c.seguimiento||{}; asistencias=c.asistencias||[];
     clientesNutri=c.clientesNutri||[]; cobrosNutri=c.cobrosNutri||{}; gastos=c.gastos||[];
     configFinanzas=c.configFinanzas||{saldoInicial:0,fechaReferencia:''};
     biblioteca=c.biblioteca||[]; progresionActual=c.progresionActual||[];
@@ -3260,6 +3261,7 @@ async function cargarDatos(opts){
             mapeoUrl:     r[20]||'',
             email:        (r[21]||'').trim().toLowerCase(),
           })).filter(a=>a.id);
+          _alumnoBaseTomar();
         }catch(e){console.warn('Error cargando Alumnos:',e);fallo=true;alumnos=[];}
       })(),
 
@@ -3452,12 +3454,53 @@ async function guardarEnSheets(){
 // coincide con la fila física. Esto tolera huecos/filas en blanco insertadas
 // manualmente en la hoja. Costo: una llamada de lectura extra (columna A)
 // antes de cada escritura de fila única.
+// Fila de Alumnos tal como se leyó del Sheet en la última sincronización (o en el último
+// guardado), por alumno. Sirve de "base" para no pisar lo que otro escribió en el medio:
+// desde el 24/11 el alumno también escribe su fila desde el portal (entrevista inicial).
+let _alumnoBase={};
+function _alumnoBaseTomar(){ _alumnoBase={}; alumnos.forEach(a=>{ _alumnoBase[a.id]=_alumnoAFila(a).map(x=>String(x??'')); }); }
+function _filaAAlumnoObj(r){
+  return {
+    id:r[0]||'', nombre:r[1]||'', horario:r[2]||'', dias:r[3]?(r[3].split('|')):[], frecuencia:r[4]||'2',
+    monto:r[5]||'0', objetivos:r[6]||'', notas:r[7]||'', estado:r[8]||'activo', telefono:r[9]||'',
+    fechaNac:r[10]||'', estatura:r[11]||'', pesoInicial:r[12]||'', pesoActual:r[13]||'', historialFis:r[14]||'',
+    tieneNutri:r[15]||'no', carpetaDrive:r[16]||'', nutriDrive:r[17]||'', portalToken:r[18]||'', diaPago:r[19]||'',
+    mapeoUrl:r[20]||'', email:(r[21]||'').trim().toLowerCase(),
+  };
+}
+// Objetivos/Molestias cambiados de los dos lados: lo mío, salvo el ítem de la entrevista, que es del alumno
+function _fusionarItemsEntrevista(mio,sheet){
+  const deEntrevista=l=>{ try{ const o=JSON.parse(l); return !!(o&&o.origen==='entrevista'); }catch(e){ return false; } };
+  const L=String(mio||'').split('\n').filter(x=>x.trim()), S=String(sheet||'').split('\n').filter(x=>x.trim());
+  return [...L.filter(x=>!deEntrevista(x)), ...S.filter(deEntrevista)].join('\n');
+}
 async function guardarFilaAlumno(alumno){
   const colA = await sheetsGet(RANGO.ALUMNOS_ID_COL);
   const idx = colA.findIndex(row=>row[0]===alumno.id);
   if(idx===-1) throw new Error('No se encontró al alumno en la hoja (ID no coincide con ninguna fila) — no se guardó nada');
   const fila = idx + 2; // fila 1 = encabezados, los datos arrancan en fila 2
-  await sheetsUpdate(`Alumnos!A${fila}:V${fila}`, [_alumnoAFila(alumno)]);
+  let valores=_alumnoAFila(alumno).map(x=>String(x??''));
+  // Fusión de 3 vías contra lo que hay HOY en el Sheet: un campo que yo no toqué toma el
+  // valor del Sheet (p. ej. lo que el alumno cargó en la entrevista después de mi última
+  // sincronización); uno que solo cambié yo, el mío. Si los dos cambiaron Objetivos o
+  // Molestias, se juntan; cualquier otro campo cambiado de los dos lados: gana el mío.
+  const base=_alumnoBase[alumno.id];
+  if(base){
+    let enSheet=null;
+    try{ enSheet=(await sheetsGet(`Alumnos!A${fila}:V${fila}`))[0]||[]; }catch(e){ console.warn('No se pudo releer la fila; se guarda sin fusionar',e); }
+    if(enSheet){
+      valores=valores.map((mio,c)=>{
+        const b=base[c]??'', sh=String(enSheet[c]??'');
+        if(mio===b) return sh;
+        if(sh===b) return mio;
+        if(c===6||c===7) return _fusionarItemsEntrevista(mio,sh);
+        return mio;
+      });
+      Object.assign(alumno,_filaAAlumnoObj(valores));
+    }
+  }
+  await sheetsUpdate(`Alumnos!A${fila}:V${fila}`, [valores]);
+  _alumnoBase[alumno.id]=valores.slice();
 }
 
 async function agregarEntradaSeguimiento(alumnoId, texto, fechaISO, chips=[], origen='manual'){

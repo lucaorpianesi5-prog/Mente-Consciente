@@ -224,26 +224,28 @@ function guardarPerfilAlumno_(cuerpo) {
       if (datos.fechaNac !== undefined) {
         const m = String(datos.fechaNac).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
         const anio = new Date().getFullYear();
-        if (m && +m[1] >= 1 && +m[1] <= 31 && +m[2] >= 1 && +m[2] <= 12 && +m[3] > anio - 100 && +m[3] <= anio - 8) {
+        const f = m ? new Date(+m[3], +m[2] - 1, +m[1]) : null;   // fecha real (rechaza 31/02)
+        if (f && f.getDate() === +m[1] && f.getMonth() === +m[2] - 1 && +m[3] > anio - 100 && +m[3] <= anio - 8) {
           hoja.getRange(fila, COL_PERFIL.fechaNac).setNumberFormat('@')
             .setValue(('0' + m[1]).slice(-2) + '/' + ('0' + m[2]).slice(-2) + '/' + m[3]);
         }
       }
       if (datos.estatura !== undefined) {
         const h = parseFloat(String(datos.estatura).replace(',', '.'));
-        if (h >= 100 && h <= 230) hoja.getRange(fila, COL_PERFIL.estatura).setValue(String(Math.round(h)));
+        if (h >= 100 && h <= 230) hoja.getRange(fila, COL_PERFIL.estatura).setNumberFormat('@').setValue(String(Math.round(h)));
       }
       if (datos.pesoActual !== undefined) {
         const p = parseFloat(String(datos.pesoActual).replace(',', '.'));
         if (p >= 30 && p <= 250) {
           const pTxt = String(Math.round(p * 10) / 10);
-          hoja.getRange(fila, COL_PERFIL.pesoActual).setValue(pTxt);
-          if (!String(actual[COL_PERFIL.pesoInicial - 1]).trim()) hoja.getRange(fila, COL_PERFIL.pesoInicial).setValue(pTxt);
+          // Como texto con punto, igual que lo guarda la app (un número quedaría "64,5" y la app lee 64)
+          hoja.getRange(fila, COL_PERFIL.pesoActual).setNumberFormat('@').setValue(pTxt);
+          if (!String(actual[COL_PERFIL.pesoInicial - 1]).trim()) hoja.getRange(fila, COL_PERFIL.pesoInicial).setNumberFormat('@').setValue(pTxt);
         }
       }
 
       // ── Objetivo y molestia: un ítem "de la entrevista" que se reemplaza al editar ──
-      const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd');
+      const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');   // mismo formato que la ficha
       const recortar = (s, n) => String(s || '').replace(/[\r\n]+/g, ' ').trim().slice(0, n);
       const ponerItem = (col, item) => {
         const lineas = String(actual[col - 1] || '').split('\n').filter(l => l.trim());
