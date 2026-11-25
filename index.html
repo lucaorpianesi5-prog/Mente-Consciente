@@ -173,7 +173,7 @@ html{-webkit-tap-highlight-color:transparent}
 #sesion-bar-btn{flex:0 1 auto;min-width:0;max-width:78%;background:var(--verde);color:var(--sobre-acento);border:none;border-radius:20px;padding:0.28rem 0.8rem;font-size:0.72rem;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.sesion-bar-on{padding-top:34px}
 body.sesion-bar-on aside{top:34px;height:calc(100vh - 34px)}
-.shell{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+.shell{display:grid;grid-template-columns:72px 1fr;min-height:100vh}
 
 /* SIDEBAR */
 aside{background:var(--bg);color:var(--texto);padding:1.5rem 0;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;border-right:1px solid var(--borde)}
@@ -184,6 +184,23 @@ aside{background:var(--bg);color:var(--texto);padding:1.5rem 0;display:flex;flex
 nav a{display:flex;align-items:center;gap:0.75rem;padding:0.7rem 1.5rem;color:var(--suave);text-decoration:none;font-size:0.85rem;border-left:3px solid transparent;transition:all 0.2s;cursor:pointer}
 nav a:hover,nav a.active{color:var(--texto);background:color-mix(in srgb,var(--verde) 8%,transparent);border-left-color:var(--verde)}
 nav a svg{width:16px;height:16px;flex-shrink:0}
+/* Barra lateral de íconos (opción B, 25/11): lo de todos los días a un clic; Instalar, Calendar,
+   tema y Cerrar sesión viven en Mi perfil → Gestión. Los nombres salen al pasar el mouse. */
+aside{padding:1rem 0;align-items:center}
+aside .logo{padding:0 0 0.9rem;margin-bottom:0.6rem;border-bottom:none;text-align:center}
+aside .logo h1,aside .logo p{display:none}
+aside .logo::before{content:'MC';display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:var(--verde-bg);color:var(--verde);font-weight:800;font-size:0.85rem}
+aside nav{display:flex;flex-direction:column;gap:0.35rem;align-items:center}
+aside nav a{width:46px;height:46px;padding:0;justify-content:center;border-left:none;border-radius:12px;position:relative}
+aside nav a svg{width:19px;height:19px}
+aside nav a:hover,aside nav a.active{background:var(--verde-bg);color:var(--verde)}
+aside nav a .sb-txt{position:absolute;left:54px;top:50%;transform:translateY(-50%);background:var(--crema);color:var(--texto);border:1px solid var(--borde);padding:0.3rem 0.6rem;border-radius:7px;font-size:0.76rem;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:50}
+aside nav a:hover .sb-txt{opacity:1}
+aside .sidebar-bottom{padding:0.6rem 0 0;border-top:none;align-items:center}
+aside .sidebar-bottom>*:not(.sb-sync):not(.version){display:none}
+aside .sb-sync{width:46px;height:46px;padding:0;font-size:0;border-radius:12px}
+aside .sb-sync svg{width:18px;height:18px}
+aside .sidebar-bottom .version{font-size:0.6rem;text-align:center;padding:0.2rem 0 0;line-height:1.3}
 .sidebar-bottom{margin-top:auto;padding:1rem 1.5rem;border-top:1px solid color-mix(in srgb,var(--verde) 12%,transparent);display:flex;flex-direction:column;gap:0.5rem}
 .sidebar-btn{width:100%;background:color-mix(in srgb,var(--verde) 8%,transparent);border:1px solid color-mix(in srgb,var(--verde) 15%,transparent);color:var(--suave);padding:0.6rem 1rem;border-radius:6px;font-size:0.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.5rem;transition:all 0.2s}
 .sidebar-btn:hover{background:color-mix(in srgb,var(--verde) 15%,transparent);color:var(--texto)}
@@ -226,13 +243,20 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .badge-amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
 
 /* AGENDA */
-.semana-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--borde);border:1px solid var(--borde);border-radius:8px;overflow:hidden}
-.dia-col{background:var(--blanco);min-height:400px}
-.dia-header{background:var(--crema);padding:0.75rem 1rem;text-align:center;border-bottom:1px solid var(--borde)}
-.dia-header .dia-nombre{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--suave);font-weight:600}
-.dia-header .dia-count{font-size:0.9rem;font-weight:600;color:var(--verde);margin-top:0.1rem}
-.dia-body{padding:0.75rem}
-.turno-card{border-left:3px solid var(--verde);border-radius:4px;padding:0.5rem 0.6rem;margin-bottom:0.5rem;cursor:grab;transition:all 0.2s;user-select:none}
+.semana-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.6rem}
+.dia-col{display:flex;flex-direction:column;min-height:320px;background:var(--blanco);border:1px solid var(--borde);border-radius:10px;overflow:hidden}
+.dia-header{display:flex;justify-content:space-between;align-items:baseline;background:var(--crema);padding:0.55rem 0.75rem;border-bottom:1px solid var(--borde)}
+.dia-header .dia-nombre{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--texto);font-weight:700}
+.dia-header .dia-fecha{font-size:0.72rem;color:var(--texto3)}
+.dia-header .dia-count{font-size:0.7rem;color:var(--texto3)}
+.dia-col.hoy .dia-header{background:var(--verde)}
+.dia-col.hoy .dia-header *{color:var(--sobre-acento)}
+.dia-col.hoy .dia-fecha,.dia-col.hoy .dia-count{opacity:0.75}
+.dia-body{padding:0.4rem;flex:1;display:flex;flex-direction:column;gap:0.3rem}
+.dia-libre{color:var(--texto3);font-size:0.76rem;padding:0.4rem}
+.turno-card{display:grid;grid-template-columns:2.6rem minmax(0,1fr) auto;align-items:center;gap:0.4rem;border-left:3px solid var(--verde);border-radius:6px;padding:0.4rem 0.55rem;cursor:grab;transition:all 0.2s;user-select:none}
+.turno-card.pasado{opacity:0.45}
+.turno-card.ahora{outline:1.5px solid var(--verde);box-shadow:0 0 0 3px var(--verde-bg)}
 .turno-card:hover{filter:brightness(1.1)}
 .turno-card.dragging{opacity:0.4;cursor:grabbing;transform:scale(0.97)}
 .turno-card.freq-1{background:color-mix(in srgb,var(--f1) var(--f-alpha),transparent);border-left-color:var(--f1)}
@@ -246,9 +270,16 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .turno-card.freq-5{background:color-mix(in srgb,var(--f5) var(--f-alpha),transparent);border-left-color:var(--f5)}
 .turno-card.freq-5 .turno-hora{color:var(--f5)}
 .dia-body.drag-over{background:color-mix(in srgb,var(--verde) 8%,transparent);border-radius:4px}
-.turno-hora{font-size:0.7rem;font-weight:600}
-.turno-nombre{font-size:0.82rem;font-weight:500;color:var(--texto);margin-top:0.1rem}
-.turno-freq{font-size:0.7rem;color:var(--suave)}
+.turno-hora{font-size:0.74rem;font-weight:700;font-variant-numeric:tabular-nums}
+.turno-nombre{font-size:0.8rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.turno-fin{font-size:0.68rem;color:var(--texto3);white-space:nowrap}
+.turno-fin.ok{color:var(--verde);font-weight:700}
+.agenda-top{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.agenda-leyenda{display:flex;gap:0.8rem;flex-wrap:wrap;font-size:0.72rem;color:var(--texto3);align-items:center}
+.agenda-leyenda span{display:inline-flex;align-items:center;gap:0.3rem}
+.agenda-leyenda .leyenda-muestra{width:10px;height:10px}
+.agenda-pie{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;font-size:0.76rem;color:var(--texto3)}
+.agenda-pie b{color:var(--suave)}
 
 /* ── RESUMEN: mini agenda semanal (handoff mini-agenda-resumen) — misma
    info que Agenda pero solo lectura, sin drag ni modal de edición ── */
@@ -1556,25 +1587,25 @@ div.pv-mf.ro{cursor:default}
     <p class="logo-user" id="user-email"></p>
   </div>
   <nav>
-    <a class="active" id="sb-dashboard" onclick="showPage('dashboard')">
+    <a class="active" id="sb-dashboard" onclick="showPage('dashboard')" title="Resumen">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-      Resumen
+      <span class="sb-txt">Resumen</span>
     </a>
-    <a id="sb-alumnos" onclick="showPage('alumnos')">
+    <a id="sb-alumnos" onclick="showPage('alumnos')" title="Alumnos">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
-      Alumnos
+      <span class="sb-txt">Alumnos</span>
     </a>
-    <a id="sb-agenda" onclick="showPage('agenda')">
+    <a id="sb-agenda" onclick="showPage('agenda')" title="Agenda">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Agenda semanal
+      <span class="sb-txt">Agenda</span>
     </a>
-    <a id="sb-finanzas" onclick="showPage('cobros')">
+    <a id="sb-finanzas" onclick="showPage('cobros')" title="Finanzas">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-      Finanzas
+      <span class="sb-txt">Finanzas</span>
     </a>
-    <a id="sb-yo" onclick="showPage('yo')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg>
-      Mi perfil
+    <a id="sb-yo" onclick="showPage('yo')" title="Mi perfil">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-sprout"/></svg>
+      <span class="sb-txt">Mi perfil</span>
     </a>
   </nav>
   <div class="sidebar-bottom">
@@ -1590,7 +1621,7 @@ div.pv-mf.ro{cursor:default}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Exportar a Calendar
     </button>
-    <button class="sidebar-btn" onclick="cargarDatos()">
+    <button class="sidebar-btn sb-sync" onclick="cargarDatos()" title="Sincronizar datos">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.36"/></svg>
       Sincronizar
     </button>
@@ -1680,15 +1711,12 @@ div.pv-mf.ro{cursor:default}
 
   <!-- AGENDA -->
   <div class="page" id="page-agenda">
-    <div class="page-header"><h2>Agenda semanal</h2><p>Tus turnos de lunes a viernes · Tocá un turno para cambiar días u horario<span class="solo-compu"> (en la compu también podés arrastrarlo a otro día)</span></p></div>
-    <div class="semana-grid" id="semana-grid"></div>
-    <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap">
-      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-1"></span><span style="font-size:0.78rem;color:var(--suave)">1x por semana</span></div>
-      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-2"></span><span style="font-size:0.78rem;color:var(--suave)">2x por semana</span></div>
-      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-3"></span><span style="font-size:0.78rem;color:var(--suave)">3x por semana</span></div>
-      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-4"></span><span style="font-size:0.78rem;color:var(--suave)">4x por semana</span></div>
-      <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-5"></span><span style="font-size:0.78rem;color:var(--suave)">5x por semana</span></div>
+    <div class="page-header agenda-top">
+      <div><h2>Agenda</h2><p id="agenda-sub">Tus turnos de lunes a viernes</p></div>
+      <div class="agenda-leyenda"><span><i class="leyenda-muestra freq-1"></i>1x</span><span><i class="leyenda-muestra freq-2"></i>2x</span><span><i class="leyenda-muestra freq-3"></i>3x</span><span><i class="leyenda-muestra freq-4"></i>4x</span><span><i class="leyenda-muestra freq-5"></i>5x por semana</span></div>
     </div>
+    <div class="semana-grid" id="semana-grid"></div>
+    <div class="agenda-pie"><span>Tocá un turno para cambiar días u horario<span class="solo-compu"> · también podés arrastrarlo a otro día</span></span><span id="agenda-online"></span></div>
   </div>
 
   <!-- COBROS -->
@@ -2214,7 +2242,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.0 · 25/11/2026';
+const VERSION_APP='1.1 · 25/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -5546,48 +5574,76 @@ function renderResumenHoy(){
   }).join('');
 }
 
+// Agenda (opción A, 25/11): un turno por línea (hora · nombre · duración) para que la semana
+// entre sin scroll en la compu; lo que ya pasó se apaga, el turno en curso se resalta y ✓ marca
+// a quien ya se le tomó asistencia ese día. Los online (sin turno) se nombran abajo.
+function _rangoHora(txt){
+  const m=String(txt||'').match(/(\d{1,2})[:.](\d{2})\s*(?:-|a|–)\s*(\d{1,2})[:.](\d{2})/);
+  if(!m) { const u=String(txt||'').match(/(\d{1,2})[:.](\d{2})/); return u?{ini:+u[1]*60+ +u[2],fin:null,txt:`${+u[1]}:${u[2]}`}:null; }
+  return {ini:+m[1]*60+ +m[2], fin:+m[3]*60+ +m[4], txt:`${+m[1]}:${m[2]}`};
+}
+function _duracionTxt(r){
+  if(!r||r.fin==null||r.fin<=r.ini) return '';
+  const d=r.fin-r.ini, h=Math.floor(d/60), m=d%60;
+  return m?`${h}:${String(m).padStart(2,'0')}`:`${h} h`;
+}
 function renderAgenda(){
   const grid=document.getElementById('semana-grid');
   const activos=alumnos.filter(a=>a.estado==='activo');
   const semana=getSemanaActual();
-  const hoyStr=new Date().toLocaleDateString('es-AR',{day:'numeric',month:'numeric'});
-
-  // PERF-03: parsear horarios una sola vez por alumno, reutilizar en sort y render
+  const ahora=new Date(), hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
+  const minAhora=ahora.getHours()*60+ahora.getMinutes();
+  const lunes=new Date(hoy0); lunes.setDate(hoy0.getDate()-((hoy0.getDay()+6)%7));   // mismo lunes que getSemanaActual()
+  // Asistencias tomadas esta semana: "id|dd/mm/aaaa"
+  const vino=new Set(asistencias.filter(r=>!r[2]||r[2]==='asistencia'||r[2]==='dia').map(r=>r[0]+'|'+r[1]));
   const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
+  const total=semana.reduce((n,{nombre})=>n+activos.filter(a=>a.dias.includes(nombre)).length,0);
+  const sub=document.getElementById('agenda-sub');
+  if(sub){
+    const l=semana[0].fechaStr, v=semana[semana.length-1].fechaStr;
+    sub.textContent=`Semana del ${l} al ${v} · ${total} turno${total===1?'':'s'}`;
+  }
+  const onl=document.getElementById('agenda-online');
+  if(onl){
+    const online=activos.filter(a=>_esOnline(a)).map(a=>a.nombre);
+    onl.innerHTML=online.length?`Online, sin turno: <b>${online.map(escaparHTML).join(' · ')}</b>`:'';
+  }
 
-  grid.innerHTML=semana.map(({nombre,fechaStr})=>{
-    const turnos=activos.filter(a=>a.dias.includes(nombre)).sort((a,b)=>{
-      const hpdA=hpdCache.get(a.id);
-      const hpdB=hpdCache.get(b.id);
-      const horaA=(hpdA[nombre]||'99:99').split(':')[0].padStart(2,'0')+(hpdA[nombre]||'99:99').split(':')[1];
-      const horaB=(hpdB[nombre]||'99:99').split(':')[0].padStart(2,'0')+(hpdB[nombre]||'99:99').split(':')[1];
-      return horaA.localeCompare(horaB);
-    });
-    const esHoy=fechaStr===hoyStr;
-    return `<div class="dia-col" ${esHoy?'style="background:var(--crema)"':''}>
-      <div class="dia-header" ${esHoy?'style="background:var(--verde);color:var(--sobre-acento)"':''}>
-        <div class="dia-nombre" ${esHoy?'style="color:color-mix(in srgb,var(--sobre-acento) 80%,transparent)"':''}>${nombre}</div>
-        <div class="dia-count" ${esHoy?'style="color:var(--sobre-acento);font-size:0.9rem"':''}>${fechaStr}</div>
+  grid.innerHTML=semana.map(({nombre},k)=>{
+    const fecha=new Date(lunes); fecha.setDate(lunes.getDate()+k);
+    const fechaDMY=fecha.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const cmp=fecha-hoy0;   // <0 día pasado · 0 hoy · >0 futuro
+    const esHoy=cmp===0;
+    const turnos=activos.filter(a=>a.dias.includes(nombre))
+      .map(a=>({a,r:_rangoHora(hpdCache.get(a.id)[nombre])}))
+      .sort((x,y)=>((x.r?x.r.ini:9999)-(y.r?y.r.ini:9999))||x.a.nombre.localeCompare(y.a.nombre,'es'));
+    return `<div class="dia-col${esHoy?' hoy':''}">
+      <div class="dia-header">
+        <div><span class="dia-nombre">${nombre.slice(0,3)}</span> <span class="dia-fecha">${esHoy?'hoy':`${fecha.getDate()}/${fecha.getMonth()+1}`}</span></div>
+        <span class="dia-count">${turnos.length||''}</span>
       </div>
       <div class="dia-body" data-dia="${nombre}"
         ondragover="dragOver(event)"
         ondragleave="dragLeave(event)"
         ondrop="drop(event,'${nombre}')">
-        ${turnos.length===0?'<p style="color:var(--suave);font-size:0.78rem;margin-top:0.5rem">Libre</p>':
-          turnos.map(a=>{
-            const hpd=hpdCache.get(a.id);
-            const hora=hpd[nombre]||'Sin horario';
+        ${turnos.length===0?'<p class="dia-libre">Libre</p>':
+          turnos.map(({a,r})=>{
             const freq=parseInt(a.frecuencia, 10)||2;
-            return `<div class="turno-card freq-${freq}"
+            const yaVino=vino.has(a.id+'|'+fechaDMY);
+            const pasado=cmp<0 || (esHoy && r && (r.fin??r.ini+60)<=minAhora);
+            const enCurso=esHoy && r && r.ini<=minAhora && minAhora<(r.fin??r.ini+60);
+            const fin=yaVino?'✓':enCurso?'ahora':_duracionTxt(r);
+            return `<div class="turno-card freq-${freq}${pasado?' pasado':''}${enCurso?' ahora':''}"
               draggable="true"
               data-id="${a.id}"
               data-dia-origen="${nombre}"
+              title="${escaparHTML(a.nombre)} · ${escaparHTML(hpdCache.get(a.id)[nombre]||'sin horario')} · ${freq}x por semana"
               onclick="abrirQuickAgenda('${a.id}','${nombre}')"
               ondragstart="dragStart(event,'${a.id}','${nombre}')"
               ondragend="dragEnd(event)">
-              <div class="turno-hora">${escaparHTML(hora)}</div>
-              <div class="turno-nombre">${escaparHTML(a.nombre)}</div>
-              <div class="turno-freq">${freq}x/sem</div>
+              <span class="turno-hora">${r?escaparHTML(r.txt):'—'}</span>
+              <span class="turno-nombre">${escaparHTML(a.nombre)}</span>
+              <span class="turno-fin${yaVino?' ok':''}">${escaparHTML(fin)}</span>
             </div>`;
           }).join('')}
       </div>
