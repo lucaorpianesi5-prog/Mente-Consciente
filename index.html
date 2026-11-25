@@ -1155,6 +1155,9 @@ button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
 .bq-datos{display:flex;gap:8px;margin-top:12px}
 .bq-datos div{flex:1;background:color-mix(in srgb,var(--pd-bg) 45%,transparent);border-radius:10px;padding:8px 10px}
 .bq-datos small{display:block;font-size:0.58rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3)} .bq-datos b{font-size:0.9rem;color:var(--pd-text)}
+.version{font-size:0.68rem;color:var(--pd-text3,var(--texto3,#888));text-align:center;line-height:1.6;padding:0.6rem 0 0.2rem;font-variant-numeric:tabular-nums}
+.version b{font-weight:600;color:var(--pd-text2,var(--texto2,#aaa))}
+.sidebar-bottom .version{padding:0.4rem 0 0;text-align:left}
 .bq-frase{font-size:0.84rem;font-style:italic;color:var(--pd-text2);text-align:center;padding:6px 18px 0;line-height:1.55}
 .yo-pro{display:flex;align-items:center;gap:12px}
 .yo-pro b{display:block;font-size:0.95rem;color:var(--pd-text)} .yo-pro small{display:block;font-size:0.74rem;color:var(--pd-text2)}
@@ -1595,6 +1598,7 @@ div.pv-mf.ro{cursor:default}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       Cerrar sesión
     </button>
+    <p class="version" id="sb-version"></p>
   </div>
 </aside>
 
@@ -2208,6 +2212,13 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 // Único email autorizado a operar el panel del entrenador — cualquier otra
 // cuenta de Google que complete el login de OAuth queda rechazada en iniciarSesion().
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
+// Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
+// para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
+const VERSION_APP='1.0 · 25/11/2026';
+function versionHTML(proxy){
+  const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
+  return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
+}
 // S1: URL del Apps Script proxy para el portal público (ver portal-proxy.gs).
 // Reemplazar por la URL real que te da Google al desplegar (termina en /exec).
 const PORTAL_API_URL = 'https://script.google.com/macros/s/AKfycbyIS1jOg7mRmLwcBqIaiXBtl1yFxW1tyKmHdpPcWd5-VilVan7y2iEx_W164ieY_teU/exec';
@@ -2378,6 +2389,7 @@ function _modoPortalCSS(){
 // depende de la URL, así que la app instalada de un alumno abre su portal.
 function _registrarPWA(){
   _pintarInstalar();
+  const v=document.getElementById('sb-version'); if(v) v.outerHTML=versionHTML().replace('class="version"','class="version" id="sb-version"');
   try{
     const l=document.createElement('link'); l.rel='manifest'; l.href='manifest.webmanifest';
     document.head.appendChild(l);
@@ -2651,6 +2663,7 @@ function _pintarPortal(el,data){
         ${completarHTML}${cuerpoHTML}
         <p class="bq-frase">${frase}</p>
         <p class="portal-footer">Tu entrenador personal · Mente Consciente</p>
+        ${versionHTML(data.version||'')}
       </div>
     `;
     el.querySelectorAll('[data-open-url]').forEach(btn=>{
@@ -6282,6 +6295,7 @@ function renderMiPerfil(){
       <button type="button" class="yo-dato" onclick="alternarTema();renderMiPerfil()">${ic(temaCalma?'luna':'sol')}<span>Tema: ${temaCalma?'Calma':'Nocturno'}</span><small>cambiar</small></button>
       <button type="button" class="yo-dato peligro" onclick="cerrarSesion()">${ic('logout')}<span>Cerrar sesión</span></button>
     </div>
+    ${versionHTML()}
   `;
   _sincronizarTemaUI();
   // Mi Fuerza se precarga para que el atajo "Hoy toca…" aparezca igual que en la ficha

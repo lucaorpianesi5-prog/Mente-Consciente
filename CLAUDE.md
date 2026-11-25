@@ -9,6 +9,7 @@ App de gestión para **Luca**, entrenador personal (único desarrollador y quien
 - Usa mucho el **celu** y a veces no tiene compu: las instrucciones (Apps Script, Sheets, instalar) tienen que servir en el teléfono, o avisale que conviene la compu.
 - Cuando dice **"mostrame cómo quedaría"**: maqueta (HTML suelto → captura con Playwright) **antes** de tocar `index.html`. Aplicá cuando lo confirma.
 - Ante una ambigüedad que cambia datos o el formato de sus planillas, preguntá antes (p. ej. "RER" resultó ser RPE).
+- **Versión**: en cada cambio que se publica, subí `VERSION_APP` (index.html, "1.1 · dd/mm/aaaa"); si tocás el proxy, también `VERSION_PROXY` (portal-proxy.gs). Se ven al pie de Mi perfil, en la barra lateral y en el portal: así Luca confirma que el celu ya tiene lo último. Después del push a `main`, chequeá que el deploy de Pages haya terminado bien (`gh api repos/lucaorpianesi5-prog/mente-consciente/actions/runs?per_page=1`); si falló por un error de GitHub, relanzalo con `rerun-failed-jobs`.
 - Al terminar un cambio: commit, push a la rama de la sesión **y a `main`** (así se publica; Luca lo pidió así en esta etapa), y anotá en `HISTORIAL.md` (y en `PENDIENTES.md` lo que quede abierto).
 - No inventes funciones que los datos no soportan (p. ej. "actualizado hace X" en el Mapeo: no hay historial).
 - Protocolo de roles (Diseño, Programación, Auditoría…): `protocolo-trabajo-mente-consciente.md`. Si Auditoría no está disponible, Luca puede pedirte que hagas ese rol: informe con hallazgos por severidad, archivo/función, y corregí.

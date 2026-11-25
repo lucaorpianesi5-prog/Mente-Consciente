@@ -19,6 +19,10 @@
 //      alumno online dice "Entrenás online, a tu ritmo" en vez de "Sin días asignados".
 // ═══════════════════════════════════════════════════════════════════════
 
+// Versión del proxy: el portal la muestra al pie ("Proxy 1.0 · 25/11/2026") para saber si ya se publicó.
+// SUBIRLA CADA VEZ QUE SE CAMBIA ESTE ARCHIVO.
+const VERSION_PROXY = '1.0 · 25/11/2026';
+
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 
 // Cuánto tiempo (segundos) se sirve una respuesta ya calculada para un mismo
@@ -125,7 +129,7 @@ function doGet(e) {
 
     // [24/11] perfilEditable: avisa al portal que este proxy ya acepta la
     // entrevista inicial (acción "perfil" de doPost).
-    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true };
+    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, version: VERSION_PROXY };
     const resultadoStr = JSON.stringify(resultado);
     try {
       cache.put(cacheKey, resultadoStr, CACHE_TTL_SEGUNDOS);
