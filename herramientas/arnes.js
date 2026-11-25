@@ -45,8 +45,14 @@ async function simularSheets(page, { planillas = {}, valores = {} } = {}) {
     // Como el Sheets real: si se pide una fila puntual ('Alumnos!A7:W7'), devolver solo esas filas
     const pedido = (u.split('/values/')[1] || '').split('?')[0].match(/![A-Z]+(\d+)(?::[A-Z]+(\d+))?/);
     const base = +((rango.match(/![A-Z]+(\d+)/) || [])[1] || 1);
-    if (pedido && +pedido[1] > base) return json({ values: valores[rango].slice(+pedido[1] - base, pedido[2] ? +pedido[2] - base + 1 : undefined) });
-    return json({ values: valores[rango] });
+    let filas = valores[rango];
+    if (pedido && +pedido[1] > base) filas = filas.slice(+pedido[1] - base, pedido[2] ? +pedido[2] - base + 1 : undefined);
+    // Y si se piden columnas a partir de otra letra ('Seguimiento!D2:D'), correrlas igual que el Sheets real
+    const col = l => [...l].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0);
+    const cPed = ((u.split('/values/')[1] || '').match(/!([A-Z]+)\d/) || [])[1], cBase = (rango.match(/!([A-Z]+)/) || [])[1];
+    const cFin = ((u.split('/values/')[1] || '').split('?')[0].match(/:([A-Z]+)\d*$/) || [])[1];
+    if (cPed && cBase && col(cPed) > col(cBase)) filas = filas.map(f => f.slice(col(cPed) - col(cBase), cFin ? col(cFin) - col(cBase) + 1 : undefined));
+    return json({ values: filas });
   });
   return escrituras;
 }

@@ -968,6 +968,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
 
   /* ── Forms ── */
   .form-grid{grid-template-columns:minmax(0,1fr)}
+  .solo-compu{display:none}
 
   /* ── Barra inferior ── */
   .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--barra);z-index:150;border-top:1px solid var(--borde);padding:6px 4px calc(14px + env(safe-area-inset-bottom))}
@@ -1675,7 +1676,7 @@ div.pv-mf.ro{cursor:default}
 
   <!-- AGENDA -->
   <div class="page" id="page-agenda">
-    <div class="page-header"><h2>Agenda semanal</h2><p>Vista de tus turnos de lunes a viernes · Arrastrá las tarjetas para cambiar de día</p></div>
+    <div class="page-header"><h2>Agenda semanal</h2><p>Tus turnos de lunes a viernes · Tocá un turno para cambiar días u horario<span class="solo-compu"> (en la compu también podés arrastrarlo a otro día)</span></p></div>
     <div class="semana-grid" id="semana-grid"></div>
     <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap">
       <div style="display:flex;align-items:center;gap:0.5rem"><span class="leyenda-muestra freq-1"></span><span style="font-size:0.78rem;color:var(--suave)">1x por semana</span></div>
@@ -2880,6 +2881,9 @@ let _appIniciada=false;
 let _ultimoBloqueo=0, _ultimoMsgBloqueo='';
 const MSG_ESPERA='Esperá un segundo, estoy actualizando los datos';
 const MSG_SIN_DATOS='Los datos no están actualizados. Tocá Sincronizar e intentá de nuevo';
+const MSG_SESION='Tu sesión de Google venció: tocá el botón de la barra de arriba para reconectar y repetí el cambio';
+const MSG_SIN_RED='Sin conexión: no se guardó. Cuando vuelva la señal, repetilo';
+const MSG_FALLO='No se pudo guardar en la planilla. Vuelvo a leerla para que veas lo que quedó';
 
 // Todo acceso a localStorage va protegido (modo privado, datos bloqueados, cuota llena…)
 function _lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
@@ -3170,11 +3174,35 @@ async function fetchConRenovacion(url, opciones={}){
 // mostrando la copia guardada, los cambios quedan bloqueados para no pisar
 // datos más nuevos con una versión vieja. La navegación no se frena.
 function _escrituraPermitida(){
+  // Sesión de Google vencida: avisar ANTES de intentar (si no, falla con un error genérico)
+  if(!accessToken || tokenExp<=Date.now()){ _avisoBloqueo(MSG_SESION); _trasFalloEscritura(); return false; }
   if(datosFrescos) return true;
-  _ultimoBloqueo=Date.now();
-  _ultimoMsgBloqueo=_actualizando ? MSG_ESPERA : MSG_SIN_DATOS;
-  toast(_ultimoMsgBloqueo);
+  _avisoBloqueo(_actualizando ? MSG_ESPERA : MSG_SIN_DATOS);
   return false;
+}
+function _avisoBloqueo(msg){ _ultimoBloqueo=Date.now(); _ultimoMsgBloqueo=msg; toast(msg); }
+// 25/11: si una escritura al Sheet falla (sesión vencida, sin señal, error de Google), lo que
+// quedó en pantalla puede no estar guardado (las funciones cambian la memoria antes de escribir).
+// Entonces: se bloquean los cambios y se vuelve a leer la planilla (si hay sesión; si no, al
+// reconectar, porque _alRecibirToken relee cuando !datosFrescos). Lo que se ve = lo guardado.
+function _trasFalloEscritura(){
+  if(!datosFrescos) return;
+  datosFrescos=false;
+  actualizarBarraSesion();
+  setTimeout(()=>{
+    if(!datosFrescos && !_actualizando && accessToken && tokenExp>Date.now() && navigator.onLine!==false) cargarDatos({silencioso:true});
+  },1200);
+}
+async function _escribirSheets(url, opciones){
+  let r;
+  try{ r=await fetchConRenovacion(url, opciones); }
+  catch(e){ _avisoBloqueo(navigator.onLine===false?MSG_SIN_RED:MSG_FALLO); _trasFalloEscritura(); throw e; }
+  if(!r.ok){
+    _avisoBloqueo(r.status===401?MSG_SESION:MSG_FALLO);
+    _trasFalloEscritura();
+    throw new Error('Error guardando en Sheets ('+r.status+')');
+  }
+  return r;
 }
 
 function cerrarSesion(){
@@ -3208,25 +3236,21 @@ async function sheetsGet(range, unformatted=false){
 async function sheetsUpdate(range, values){
   if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}?valueInputOption=RAW`;
-  const r=await fetchConRenovacion(url,{
+  return _escribirSheets(url,{
     method:'PUT',
     headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
     body:JSON.stringify({range,majorDimension:'ROWS',values})
   });
-  if(!r.ok) throw new Error('Error guardando en Sheets');
-  return r;
 }
 
 async function sheetsAppend(range, values){
   if(!_escrituraPermitida()) throw new Error('Datos sin actualizar: escritura bloqueada');
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`;
-  const r=await fetchConRenovacion(url,{
+  return _escribirSheets(url,{
     method:'POST',
     headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
     body:JSON.stringify({range,majorDimension:'ROWS',values})
   });
-  if(!r.ok) throw new Error('Error agregando fila en Sheets');
-  return r;
 }
 
 // B3: reemplaza el patrón clear()+update() (2 llamadas, no atómico) por una sola
@@ -5160,7 +5184,8 @@ async function _editarPagoNutriBase(mk,id,valorActual,renderFn){
   // SEG-03: rechazar cancelación, no numérico y negativos
   if(nuevo===null) return;
   if(isNaN(nuevo)||nuevo.trim()===''||parseFloat(nuevo)<=0){toast('Ingresá un monto válido mayor a cero');return;}
-  cobrosNutri[mk][id]={monto:nuevo,fecha:new Date().toLocaleDateString('es-AR')};
+  const prev=(cobrosNutri[mk]&&cobrosNutri[mk][id])||{};
+  cobrosNutri[mk][id]={monto:nuevo,fecha:prev.fecha||new Date().toLocaleDateString('es-AR')};   // corregir el monto no es un pago nuevo
   try{await guardarCobroNutriFila(mk,id);toast('Pago actualizado ✓');renderFn();}
   catch(e){toast('Error al guardar');}
 }
@@ -5660,9 +5685,11 @@ async function drop(e, diaDestino){
   if(!dragAlumnoId||diaDestino===dragDiaOrigen) return;
   const i=alumnos.findIndex(a=>a.id===dragAlumnoId);
   if(i===-1) return;
+  // Si ya entrena ese día, mover juntaría dos turnos en uno (perdería un día y su horario)
+  if(alumnos[i].dias.includes(diaDestino)){ toast(`${alumnos[i].nombre} ya entrena el ${diaDestino.toLowerCase()}`); dragAlumnoId=null; dragDiaOrigen=null; return; }
   // Reemplazar día origen por día destino
   const dias=alumnos[i].dias.filter(d=>d!==dragDiaOrigen);
-  if(!dias.includes(diaDestino)) dias.push(diaDestino);
+  dias.push(diaDestino);
   alumnos[i].dias=dias;
   // Mover horario también
   const hpd=stringToHorariosPorDia(alumnos[i].horario);
@@ -6297,7 +6324,7 @@ async function guardarModalMiPerfil(){
     renderMiPerfil();
   }catch(e){
     console.warn('Mi perfil:',e);
-    toast(_escrituraPermitida()?'No se pudo guardar el perfil':MSG_SIN_DATOS);
+    toast('No se pudo guardar el perfil');
   }finally{ btn.disabled=false; }
 }
 
@@ -6931,7 +6958,7 @@ function _pvGuardarListos(aid){
       else await sheetsUpdate(`Listos!A${idx+2}:D${idx+2}`,[fila]);
     }catch(e){
       console.warn('Listos:',e);
-      toast(_escrituraPermitida()?'No se pudo guardar el tilde en el Sheet':MSG_SIN_DATOS);
+      toast('No se pudo guardar el tilde en el Sheet');
     }
   },800);
 }
@@ -7205,7 +7232,7 @@ async function planTerminarDia(btn){
     _planTrasCambioAsistencia(a.id);
   }catch(err){
     console.warn('Terminar día:',err);
-    toast(_escrituraPermitida()?'No se pudo registrar el día':MSG_SIN_DATOS);
+    toast('No se pudo registrar el día');
     btn.disabled=false;
   }
 }
@@ -7226,7 +7253,7 @@ async function planDeshacerDia(btn){
     planRenderTodo();
     _planActualizarHoyToca(a.id);
   }catch(err){
-    toast(_escrituraPermitida()?'No se pudo deshacer':MSG_SIN_DATOS);
+    toast('No se pudo deshacer');
     btn.disabled=false;
   }
 }

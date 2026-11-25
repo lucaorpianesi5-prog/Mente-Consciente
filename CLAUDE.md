@@ -49,7 +49,7 @@ Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__porta
 ## Reglas de código (no negociables)
 - Todo dato que se pinta pasa por `escaparHTML()`. Íconos con `ic('nombre')` (sprite `<symbol id="i-…">`).
 - Fechas: strings `dd/mm/aaaa`; "hoy" con `_hoyISOLocal()`/`toLocaleDateString('es-AR')`, **nunca** `toISOString()` (UTC). IDs con `crypto.randomUUID()`.
-- No escribir si los datos no están frescos: `_escrituraPermitida()` (lo chequean `sheetsUpdate/Append`).
+- No escribir si los datos no están frescos o la sesión venció: `_escrituraPermitida()` (lo chequean `sheetsUpdate/Append`). Si una escritura falla, `_escribirSheets` → `_trasFalloEscritura()` marca los datos como no frescos y relee la planilla (las funciones cambian la memoria antes de escribir: así lo que se ve vuelve a ser lo guardado).
 - Lecturas en `RANGO` sin fila final (`'Asistencias!A2:D'`), así no hay tope. Los `_WRITE` de `sheetsReplaceRange` sí la llevan: no achicar la grilla de esas pestañas.
 - Escribir **por fila**, no reescribir rangos enteros. `guardarFilaAlumno()` hace fusión de 3 vías contra `_alumnoBase` (el alumno también escribe su fila desde el portal).
 - Pestañas nuevas del Sheet: crearlas solas con `_crearPestana()` y tolerar que no existan al leer (no marcar fallo de sincronización).
