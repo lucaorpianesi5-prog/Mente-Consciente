@@ -242,6 +242,64 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .badge-rojo{background:var(--rojo-bg);color:var(--rojo)}
 .badge-amarillo{background:var(--amarillo-bg);color:var(--amarillo)}
 
+/* RESUMEN COMPU (25/11): entre semana = turnos de hoy + para atender + proyecto;
+   sábado y domingo = planes para actualizar. En el celu sigue el Resumen de antes. */
+.rc{display:none}
+@media(min-width:769px){
+  #page-dashboard>.page-header,#page-dashboard>.top-row,#page-dashboard>.resumen-semana-wrap{display:none}
+  .rc{display:block}
+}
+.rc-top h2{font-size:1.55rem;font-weight:700}
+.rc-top p{color:var(--suave);margin-top:0.2rem;font-size:0.9rem}
+.rc-cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1rem;margin-top:1.1rem;align-items:start}
+.rc-der{display:flex;flex-direction:column;gap:1rem;min-width:0}
+.rc-card{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:1rem 1.1rem}
+.rc-card h3{font-size:0.95rem;font-weight:700;display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.75rem}
+.rc-card h3 small{font-size:0.75rem;color:var(--texto3);font-weight:500}
+.rc-vacio{color:var(--texto3);font-size:0.85rem;padding:0.3rem 0}
+.rc-turno{display:grid;grid-template-columns:3.4rem minmax(0,1fr) auto;gap:0.7rem;align-items:center;padding:0.6rem 0.75rem;border-radius:10px;background:var(--crema);margin-bottom:0.4rem;border:1px solid transparent}
+.rc-turno .h{font-weight:700;font-variant-numeric:tabular-nums}
+.rc-turno .h small{display:block;color:var(--texto3);font-weight:400;font-size:0.72rem}
+.rc-turno .n{min-width:0}
+.rc-turno .n b{font-size:0.95rem}
+.rc-turno .n small{display:block;color:var(--suave);font-size:0.76rem;margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-turno.hecho{opacity:0.6}
+.rc-turno.ahora{border-color:color-mix(in srgb,var(--verde) 50%,transparent);background:color-mix(in srgb,var(--verde) 9%,var(--crema))}
+.rc-acc{display:flex;gap:0.35rem;align-items:center}
+.rc-btn{border:1px solid var(--borde);background:var(--blanco);color:var(--texto);border-radius:8px;padding:0.35rem 0.65rem;font:inherit;font-size:0.78rem;cursor:pointer;white-space:nowrap}
+.rc-btn:hover{border-color:var(--verde)}
+.rc-btn.v{background:var(--verde);color:var(--sobre-acento);border-color:transparent;font-weight:600}
+.rc-ok{color:var(--verde);font-weight:700;font-size:0.8rem;white-space:nowrap}
+.rc-tag{font-size:0.66rem;padding:0.05rem 0.4rem;border-radius:6px;background:color-mix(in srgb,var(--amarillo) 16%,transparent);color:var(--amarillo);margin-left:0.4rem;font-weight:700;vertical-align:2px}
+.rc-item{display:flex;gap:0.65rem;padding:0.55rem 0.7rem;border-radius:10px;background:var(--crema);margin-bottom:0.4rem;align-items:center}
+.rc-item .dot{width:8px;height:8px;border-radius:50%;flex:none}
+.rc-item>div{min-width:0}
+.rc-item b{font-size:0.85rem}.rc-item small{display:block;color:var(--suave);font-size:0.74rem;margin-top:0.05rem}
+.rc-item .rc-btn{margin-left:auto}
+.rc-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem;margin-bottom:0.7rem}
+.rc-nums div{background:var(--crema);border-radius:9px;padding:0.55rem 0.7rem;min-width:0}
+.rc-nums small{color:var(--texto3);font-size:0.7rem;display:block}
+.rc-nums b{display:block;font-size:1.05rem;margin-top:0.1rem;white-space:nowrap}
+.rc-nums em{font-style:normal;font-size:0.7rem;color:var(--texto3);display:block;margin-top:0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-nums em.sube{color:var(--verde)} .rc-nums em.baja{color:var(--rojo)}
+.rc-graf{display:grid;grid-template-columns:repeat(6,1fr);gap:0.4rem;align-items:end;height:96px}
+.rc-graf .m{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:0.2rem;position:relative}
+.rc-graf .bars{display:flex;gap:3px;align-items:flex-end;height:74px}
+.rc-graf .bars i{width:11px;border-radius:3px 3px 0 0;display:block;min-height:2px}
+.rc-graf .in{background:var(--verde)} .rc-graf .ga{background:color-mix(in srgb,var(--rojo) 70%,transparent)}
+.rc-graf .ga.tope{background:repeating-linear-gradient(180deg,color-mix(in srgb,var(--rojo) 70%,transparent) 0 6px,transparent 6px 8px)}
+.rc-graf .m small{font-size:0.68rem;color:var(--texto3)}
+.rc-graf .m.sel small{color:var(--texto);font-weight:700}
+.rc-ley{display:flex;gap:0.8rem;flex-wrap:wrap;font-size:0.7rem;color:var(--texto3);margin-top:0.45rem}
+.rc-ley i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:0.25rem;vertical-align:-1px}
+.rc-grupo{font-size:0.68rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--texto3);font-weight:700;margin:0.7rem 0.15rem 0.4rem}
+.rc-grupo:first-of-type{margin-top:0.1rem}
+.rc-plan{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:0.6rem;align-items:center;padding:0.55rem 0.75rem;border-radius:10px;background:var(--crema);margin-bottom:0.4rem}
+.rc-plan b{font-size:0.9rem}.rc-plan small{display:block;color:var(--suave);font-size:0.75rem;margin-top:0.05rem}
+.rc-plan.listo{opacity:0.55}
+.rc-prog{display:flex;gap:3px}.rc-prog i{width:15px;height:6px;border-radius:3px;background:var(--borde)}.rc-prog i.on{background:var(--verde)}
+.rc-cargando{color:var(--texto3);font-size:0.76rem;margin:0.2rem 0 0.5rem}
+
 /* AGENDA */
 .semana-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.6rem}
 .dia-col{display:flex;flex-direction:column;min-height:320px;background:var(--blanco);border:1px solid var(--borde);border-radius:10px;overflow:hidden}
@@ -1683,6 +1741,7 @@ div.pv-mf.ro{cursor:default}
       <div class="mini-semana" id="resumen-semana"></div>
       <div class="hoy-lista" id="resumen-hoy"></div>
     </div>
+    <div id="rc" class="rc"></div>
   </div>
 
   <!-- ALUMNOS -->
@@ -2242,7 +2301,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.1 · 25/11/2026';
+const VERSION_APP='1.2 · 25/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -3773,7 +3832,177 @@ function renderDashboard(){
   }
   renderResumenSemana();
   renderResumenHoy();
+  renderResumenCompu();
 }
+
+// ══ RESUMEN COMPU (25/11, armado con Luca) ══
+// Entre semana: turnos de hoy (asistencia + Fuerza a un clic, semana/día que le toca, etiqueta de
+// última semana) · Para atender (cuotas, últimas semanas, datos faltantes) · Cómo viene el proyecto.
+// Sábado y domingo: Planes para actualizar (plan nuevo / cargar la semana siguiente).
+// Para la semana de Fuerza lee las planillas de los activos (una vez; quedan en planCache).
+const _esCompu=()=>matchMedia('(min-width:769px)').matches;
+let _rcCargando=false;
+function _rcFuerzas(activos){
+  const conLink=activos.filter(a=>planParseUrl(a.carpetaDrive));
+  const pend=conLink.filter(a=>{ const e=planEntrada(a.id,'fuerza'); return !e || (e.estado!=='ok' && !e.promesa && e.estado!=='error'); });
+  if(pend.length && !_rcCargando && accessToken){
+    _rcCargando=true;
+    Promise.allSettled(pend.map(a=>planAsegurar(a,'fuerza'))).then(()=>{ _rcCargando=false; if(document.getElementById('page-dashboard').classList.contains('active')) renderResumenCompu(); });
+  }
+  const info={};
+  conLink.forEach(a=>{
+    const e=planEntrada(a.id,'fuerza');
+    if(e && e.estado==='ok' && e.datos){
+      const d=e.datos, act=planSemanaActiva(d), ult=d.semanas[d.semanas.length-1].n;
+      info[a.id]={d, act, ult, url:a.carpetaDrive.trim()};
+    }
+  });
+  const leyendo=conLink.filter(a=>{ const e=planEntrada(a.id,'fuerza'); return e && e.estado==='cargando'; }).length;
+  return {info, leyendo, total:conLink.length};
+}
+// "Terminé el día" de esta semana (lunes a domingo) de un alumno: [{mes,dia,sem,fecha}]
+function _rcHechosSemana(aid, lunes){
+  const fin=new Date(lunes); fin.setDate(lunes.getDate()+7);
+  const out=[];
+  asistencias.forEach(r=>{
+    if(r[0]!==aid || !r[3]) return;
+    const f=_dmyFecha(r[1]); if(!f || f<lunes || f>=fin) return;
+    const x=String(r[3]).match(/^(.*?)\s*·\s*D[ií]a (\d+)\s*·\s*Semana (\d+)/i);
+    if(x) out.push({mes:x[1],dia:+x[2],sem:+x[3],fecha:f});
+  });
+  return out.sort((x,y)=>x.fecha-y.fecha);
+}
+function _rcAsistio(aid, fechaDMY){ return asistencias.some(r=>r[0]===aid && r[1]===fechaDMY && (!r[2]||r[2]==='asistencia'||r[2]==='dia')); }
+async function _rcAsistencia(aid){
+  const fecha=new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  if(_rcAsistio(aid,fecha)) return;
+  try{ await _appendAsistencia(aid, fecha, 'asistencia'); toast('Asistencia registrada ✓'); }
+  catch(e){ toast('No se pudo registrar la asistencia'); }
+  renderResumenCompu();
+}
+function _rcFuerza(aid){
+  const a=alumnos.find(x=>x.id===aid); if(!a) return;
+  if(planParseUrl(a.carpetaDrive)) abrirPlan(aid,'fuerza'); else if(a.carpetaDrive) window.open(a.carpetaDrive.trim(),'_blank','noopener');
+}
+function _rcSheets(aid){ const a=alumnos.find(x=>x.id===aid); if(a&&a.carpetaDrive) window.open(a.carpetaDrive.trim(),'_blank','noopener'); }
+
+function _rcAtender(activos, fz, finde){
+  const hoy0=new Date(); hoy0.setHours(0,0,0,0);
+  const mk=mesKey(), items=[];
+  activos.map(a=>calcularVencimiento(a,hoy0)).filter(r=>r.categoria==='vencido'||r.categoria==='vencePronto')
+    .sort((x,y)=>(x.categoria==='vencido'?0:1)-(y.categoria==='vencido'?0:1))
+    .forEach(r=>{
+      const a=r.alumno, pago=(cobros[mk]||{})[a.id], yaPago=pago&&pago.estado==='pagado';
+      const txt=r.categoria==='vencido'
+        ? `cuota vencida${r.ciclosAdeudados>1?` · ${r.ciclosAdeudados} ciclos`:''}`
+        : (r.diasParaVencer<=0?'cuota vence hoy':`cuota vence en ${r.diasParaVencer} día${r.diasParaVencer===1?'':'s'}`);
+      const monto=parseFloat(a.monto||0);
+      items.push(`<div class="rc-item"><span class="dot" style="background:var(--${r.categoria==='vencido'?'rojo':'amarillo'})"></span><div><b>${escaparHTML(a.nombre)} · ${txt}</b><small>Día de pago ${escaparHTML(String(r.diaPago||'—'))}${monto?` · $${monto.toLocaleString('es-AR')}`:''}</small></div>${yaPago?`<button class="rc-btn" onclick="irAVencimientos()">Ver</button>`:`<button class="rc-btn" onclick="marcarPagado('${mk}','${a.id}')">✓ Pagó</button>`}</div>`);
+    });
+  if(!finde){
+    const ult=activos.filter(a=>fz.info[a.id] && fz.info[a.id].act===fz.info[a.id].ult);
+    if(ult.length) items.push(`<div class="rc-item"><span class="dot" style="background:var(--verde)"></span><div><b>${ult.map(a=>escaparHTML(a.nombre)).join(', ')} · en su última semana</b><small>Plan nuevo para la semana que viene</small></div></div>`);
+  }
+  activos.forEach(a=>{
+    const falta=[];
+    if(!(a.carpetaDrive||'').trim()) falta.push('sin link de Fuerza');
+    if(!(parseFloat(a.monto)>0)) falta.push('sin monto de cuota');
+    if(falta.length) items.push(`<div class="rc-item"><span class="dot" style="background:var(--suave)"></span><div><b>${escaparHTML(a.nombre)} · ${falta.join(' y ')}</b><small>Dato faltante</small></div><button class="rc-btn" onclick="abrirModalAlumno('${a.id}')">Editar</button></div>`);
+  });
+  return `<div class="rc-card"><h3>Para atender <small>${items.length||''}</small></h3>${items.join('')||'<p class="rc-vacio">Nada pendiente ✓</p>'}</div>`;
+}
+
+function _rcProyecto(){
+  const hoy=new Date(), meses=[];
+  for(let i=5;i>=0;i--){ const d=new Date(hoy.getFullYear(),hoy.getMonth()-i,1); meses.push(_finMes(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`)); }
+  const act=meses[5], ant=meses[4];
+  const varPct=ant.ingresos>0?Math.round((act.ingresos-ant.ingresos)/ant.ingresos*100):null;
+  const gMes=gastos.filter(g=>g.fecha===act.mkey).sort((x,y)=>parseFloat(y.monto||0)-parseFloat(x.monto||0));
+  const {saldoInicial,totalCobrado,totalGastado}=calcularDisponible();
+  const recup=totalGastado>0?Math.floor((saldoInicial+totalCobrado)/totalGastado*100):null;
+  const falta=totalGastado-(saldoInicial+totalCobrado);
+  const tope=Math.max(1,...meses.map(m=>m.ingresos))*1.3;
+  const alto=v=>Math.max(v>0?3:0,Math.min(100,Math.round(v/tope*100)));
+  const MES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const cortados=meses.filter(m=>m.gastos>tope).map(m=>`${MES[+m.mkey.slice(5)-1]}: ${_$corto(m.gastos)}`);
+  return `<div class="rc-card"><h3>Cómo viene el proyecto <small>últimos 6 meses</small></h3>
+    <div class="rc-nums">
+      <div><small>Ingresos ${MES[hoy.getMonth()]}</small><b>${_$(act.ingresos)}</b><em class="${varPct==null?'':varPct>=0?'sube':'baja'}">${varPct==null?'—':`${varPct>=0?'↑':'↓'} ${Math.abs(varPct)}% vs ${MES[(hoy.getMonth()+11)%12]}`}</em></div>
+      <div><small>Inversión ${MES[hoy.getMonth()]}</small><b>${_$(act.gastos)}</b><em>${gMes.length?escaparHTML(gMes[0].desc||''):'sin gastos'}</em></div>
+      <div><small>Inversión recuperada</small><b>${recup==null?'—':Math.min(recup,999)+'%'}</b><em>${recup==null?'':falta>0?`faltan ${_$(falta)}`:`✓ y ${_$(-falta)} de más`}</em></div>
+    </div>
+    <div class="rc-graf">${meses.map((m,i)=>`<div class="m${i===5?' sel':''}" title="${MES[+m.mkey.slice(5)-1]}: ingresos ${_$(m.ingresos)} · gastos ${_$(m.gastos)}"><div class="bars"><i class="in" style="height:${alto(m.ingresos)}%"></i><i class="ga${m.gastos>tope?' tope':''}" style="height:${alto(m.gastos)}%"></i></div><small>${MES[+m.mkey.slice(5)-1]}</small></div>`).join('')}</div>
+    <div class="rc-ley"><span><i class="in" style="background:var(--verde)"></i>Ingresos (cuotas, bonos y nutrición)</span><span><i style="background:color-mix(in srgb,var(--rojo) 70%,transparent)"></i>Gastos de inversión</span>${cortados.length?`<span style="margin-left:auto">${cortados.join(' · ')}</span>`:''}</div>
+  </div>`;
+}
+
+function _rcHoy(activos, fz){
+  const ahora=new Date(), min=ahora.getHours()*60+ahora.getMinutes();
+  const nombreHoy=_DIAS_SEM[ahora.getDay()];
+  const fechaDMY=ahora.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const turnos=activos.filter(a=>a.dias.includes(nombreHoy)).map(a=>({a,r:_rangoHora(stringToHorariosPorDia(a.horario)[nombreHoy])}))
+    .sort((x,y)=>((x.r?x.r.ini:9999)-(y.r?y.r.ini:9999))||x.a.nombre.localeCompare(y.a.nombre,'es'));
+  const con=turnos.filter(t=>_rcAsistio(t.a.id,fechaDMY)).length;
+  const filas=turnos.map(({a,r})=>{
+    const vino=_rcAsistio(a.id,fechaDMY);
+    const fin=r?(r.fin??r.ini+60):null, enCurso=r&&r.ini<=min&&min<fin;
+    const f=fz.info[a.id]; let plan='', tag='';
+    if(f){ const sel=_planSelDe(a,f.d); plan=`Fuerza · Semana ${sel.sem} · Día ${sel.dia}`; if(f.act===f.ult) tag='<span class="rc-tag">última semana</span>'; }
+    else if(!(a.carpetaDrive||'').trim()) plan='Sin link de Fuerza';
+    else plan=fz.leyendo?'Leyendo su Fuerza…':'Fuerza';
+    const finTxt=r&&r.fin!=null?`${Math.floor(r.fin/60)}:${String(r.fin%60).padStart(2,'0')}`:'';
+    return `<div class="rc-turno${vino?' hecho':''}${enCurso&&!vino?' ahora':''}">
+      <div class="h">${r?escaparHTML(r.txt):'—'}<small>${finTxt}</small></div>
+      <div class="n"><b>${escaparHTML(a.nombre)}</b>${tag}<small>${escaparHTML(plan)}${enCurso?' · ahora':''}</small></div>
+      <div class="rc-acc">${vino?'<span class="rc-ok">✓ Asistencia</span>':`<button class="rc-btn${enCurso?' v':''}" onclick="_rcAsistencia('${a.id}')">✓ Asistencia</button>`}${(a.carpetaDrive||'').trim()?`<button class="rc-btn" onclick="_rcFuerza('${a.id}')">Fuerza</button>`:''}</div>
+    </div>`;
+  }).join('');
+  return `<div class="rc-card"><h3>Hoy <small>${turnos.length?`${con} de ${turnos.length} con asistencia`:''}</small></h3>${filas||'<p class="rc-vacio">Hoy no tenés turnos.</p>'}</div>`;
+}
+
+function _rcPlanes(activos, fz){
+  const hoy0=new Date(); hoy0.setHours(0,0,0,0);
+  const lunes=new Date(hoy0); lunes.setDate(hoy0.getDate()-((hoy0.getDay()+6)%7));
+  const g={nuevo:[],cargar:[],revisar:[],listo:[]};
+  const prog=f=>`<span class="rc-prog">${f.d.semanas.map(w=>`<i class="${w.n<=f.act?'on':''}"></i>`).join('')}</span>`;
+  const fila=(a,f,txt,boton=true)=>`<div class="rc-plan"><div><b>${escaparHTML(a.nombre)}</b><small>${escaparHTML(txt)}</small></div>${prog(f)}${boton?`<button class="rc-btn" onclick="_rcSheets('${a.id}')">Abrir en Sheets ↗</button>`:'<span></span>'}</div>`;
+  activos.forEach(a=>{
+    const f=fz.info[a.id]; if(!f) return;
+    const H=_rcHechosSemana(a.id,lunes), ult=H[H.length-1];
+    const mesSig=(()=>{ const m=String(f.d.mes).match(/(\d+)/); return m?`Mes ${+m[1]+1}`:'el plan nuevo'; })();
+    if(ult){
+      if(_normTxt(ult.mes)!==_normTxt(f.d.mes)) g.listo.push([a,f,`Plan nuevo cargado (${f.d.mes})`]);
+      else if(ult.sem>=f.ult) g.nuevo.push([a,f,`${f.d.mes} terminado · armar ${mesSig}`]);
+      else if(f.act>ult.sem) g.listo.push([a,f,`Semana ${f.act} ya cargada`]);
+      else g.cargar.push([a,f,`${f.d.mes} · hizo la Semana ${ult.sem} · cargar la Semana ${ult.sem+1}`]);
+    } else if(f.act===f.ult) g.nuevo.push([a,f,`${f.d.mes} · está en su última semana (sin días marcados)`]);
+    else g.revisar.push([a,f,`${f.d.mes} · cargada hasta la Semana ${f.act} · sin días marcados esta semana`]);
+  });
+  const total=Object.values(g).reduce((n,x)=>n+x.length,0);
+  const bloque=(tit,arr,boton=true)=>arr.length?`<div class="rc-grupo">${tit}</div>${arr.map(([a,f,t])=>boton?fila(a,f,t):fila(a,f,t,false).replace('class="rc-plan"','class="rc-plan listo"')).join('')}`:'';
+  const cuerpo=bloque('1 · Plan nuevo (terminan su última semana)',g.nuevo)+bloque('2 · Cargar la semana siguiente',g.cargar)
+    +bloque('Sin días marcados: revisá vos',g.revisar)+bloque('✓ Listos',g.listo,false);
+  return `<div class="rc-card"><h3>Planes para actualizar <small>${total?`${g.listo.length} de ${total} listos`:''}</small></h3>
+    ${fz.leyendo?`<p class="rc-cargando">Leyendo las planillas de Fuerza… (${fz.total-fz.leyendo} de ${fz.total})</p>`:''}
+    ${cuerpo||'<p class="rc-vacio">No hay planillas de Fuerza para revisar.</p>'}
+    <p class="rc-cargando" style="margin-top:0.6rem">Cuando cargues una semana en la planilla, tocá Sincronizar (abajo a la izquierda) para que se actualice esta lista.</p></div>`;
+}
+
+function renderResumenCompu(){
+  const el=document.getElementById('rc'); if(!el || !_esCompu()) return;
+  const activos=alumnos.filter(a=>a.estado==='activo');
+  const fz=_rcFuerzas(activos);
+  const hoy=new Date(), finde=hoy.getDay()===6||hoy.getDay()===0;
+  const n=activos.filter(a=>a.dias.includes(_DIAS_SEM[hoy.getDay()])).length;
+  const fechaTxt=hoy.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+  el.innerHTML=`<div class="rc-top"><h2>Hola, ${escaparHTML(_miNombreCorto())}</h2><p>${escaparHTML(fechaTxt.charAt(0).toUpperCase()+fechaTxt.slice(1))} · ${finde?'planes para la semana que viene':`${n} turno${n===1?'':'s'} hoy`}</p></div>
+    <div class="rc-cols">
+      <div>${finde?_rcPlanes(activos,fz):_rcHoy(activos,fz)}</div>
+      <div class="rc-der">${_rcAtender(activos,fz,finde)}${_rcProyecto()}</div>
+    </div>`;
+}
+let _rcResizeT=0;
+addEventListener('resize',()=>{ clearTimeout(_rcResizeT); _rcResizeT=setTimeout(()=>{ const pg=document.getElementById('page-dashboard'); if(pg&&pg.classList.contains('active')) renderResumenCompu(); },200); });
 
 // ── ALUMNOS ──
 function badgeEstado(e){

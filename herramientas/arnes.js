@@ -37,7 +37,10 @@ async function simularSheets(page, { planillas = {}, valores = {} } = {}) {
     const json = b => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(b) });
     if (m !== 'GET') { escrituras.push({ metodo: m, url: u, cuerpo: r.request().postData() }); return json({}); }
     const id = (u.match(/spreadsheets\/([^/?:]+)/) || [])[1];
-    const tabs = planillas[id];
+    let tabs = planillas[id];
+    // Como el Sheets real: con ranges=<pestaña>!A1:… devuelve solo esa pestaña
+    const rq = (u.match(/[?&]ranges=([^&]+)/) || [])[1];
+    if (tabs && rq) { const t = rq.split('!')[0].replace(/^'|'$/g, '').replace(/''/g, "'"); const f = tabs.filter(x => x.title === t); if (f.length) tabs = f; }
     if (tabs && u.includes('includeGridData')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title }, data: [{ rowData: t.filas.map(f => ({ values: f.map(cel) })) }] })) });
     if (tabs && u.includes('sheets.properties')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title } })) });
     const rango = Object.keys(valores).find(k => u.includes('/values/' + k.split('!')[0] + '!'));   // con el '!': 'Nutricion' no confunde a 'NutricionCobros'
