@@ -40,7 +40,7 @@ async function simularSheets(page, { planillas = {}, valores = {} } = {}) {
     const tabs = planillas[id];
     if (tabs && u.includes('includeGridData')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title }, data: [{ rowData: t.filas.map(f => ({ values: f.map(cel) })) }] })) });
     if (tabs && u.includes('sheets.properties')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title } })) });
-    const rango = Object.keys(valores).find(k => u.includes('/values/' + k.split('!')[0]));
+    const rango = Object.keys(valores).find(k => u.includes('/values/' + k.split('!')[0] + '!'));   // con el '!': 'Nutricion' no confunde a 'NutricionCobros'
     return json({ values: rango ? valores[rango] : [] });
   });
   return escrituras;
