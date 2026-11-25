@@ -17,7 +17,6 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 - [ ] **Fuerza de Agus no se ve en la app** — 25/11 — su planilla ("Road To:", pestaña "Agus") no tiene el formato Mes N / Semana N (A1 dice "Verticales"), así que el visor solo ofrece "Abrir en Sheets". Decisión de Luca: dejarlo así por ahora.
 - [ ] **Andrés sin link de Fuerza** — 25/11 — dato a cargar por Luca cuando tenga planilla.
-- [ ] **Eliminar alumno deja datos sueltos** — revisión del 24/11 (BAJO) — borra la fila de Alumnos pero no sus Asistencias/Seguimiento/Listos, y reescribe todo el rango de Alumnos (`guardarEnSheets`). Recomendación a Luca: usar "inactivo". Si se mantiene el borrado, limpiar sus filas en las otras pestañas.
 
 ---
 

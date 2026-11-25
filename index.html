@@ -2227,7 +2227,6 @@ const RANGO = {
   // propio de cada alumno, mismo patrón que carpetaDrive/nutriDrive.
   // W=modalidad (25/11): 'online' o vacío (= presencial). Online = sin días ni horario.
   ALUMNOS_READ:        'Alumnos!A2:W',
-  ALUMNOS_WRITE:       'Alumnos!A2:W1000',
   ALUMNOS_START:       'Alumnos!A2',
   ALUMNOS_ID_COL:      'Alumnos!A2:A',
   COBROS_READ:         'Cobros!A2:G',
@@ -3471,9 +3470,55 @@ function _alumnoAFila(a){
   ];
 }
 
-async function guardarEnSheets(){
-  const values=alumnos.map(_alumnoAFila);
-  await sheetsReplaceRange(RANGO.ALUMNOS_WRITE, values);
+// ── ELIMINAR ALUMNO (25/11) ──
+// Antes se reescribía la pestaña Alumnos ENTERA desde memoria (podía pisar lo que un
+// alumno acababa de guardar desde el portal) y quedaban sueltas sus asistencias,
+// seguimiento y tildes. Ahora: se borran SOLO sus filas en Alumnos, Asistencias,
+// Seguimiento y Listos, en un único batchUpdate (todo o nada), y se agregan al final
+// tantas filas vacías como se borraron, para que la grilla no se achique (los _WRITE
+// de sheetsReplaceRange necesitan ese alto). Los Cobros (y NutricionCobros) quedan:
+// son plata que entró y Finanzas los sigue contando.
+const _PESTANAS_DEL_ALUMNO=['Alumnos','Asistencias','Seguimiento','Listos'];
+async function eliminarAlumno(id){
+  const a=alumnos.find(x=>x.id===id); if(!a) return;
+  if(!_escrituraPermitida()) return;
+  const nAsis=asistencias.filter(r=>r[0]===id).length, nSeg=(seguimiento[id]||[]).length;
+  const detalle=[nAsis?`${nAsis} asistencia${nAsis===1?'':'s'}`:'', nSeg?`${nSeg} nota${nSeg===1?'':'s'} de seguimiento`:''].filter(Boolean).join(' y ');
+  if(!confirm(`¿Eliminar a ${a.nombre}?\n\nSe borra su ficha${detalle?', '+detalle:''} y sus turnos de Calendar. Sus cobros quedan, para que Finanzas no cambie.\n\nSi solo dejó de venir, mejor ponelo "Inactivo" en Editar: no se borra nada.`)) return;
+  try{
+    // Qué pestañas existen (y su sheetId) para armar los borrados
+    const rm=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?fields=sheets.properties(sheetId,title)`,{headers:{Authorization:'Bearer '+accessToken}});
+    if(!rm.ok) throw new Error('No se pudo leer la planilla');
+    const hojas=((await rm.json()).sheets||[]).map(x=>x.properties);
+    const requests=[];
+    for(const titulo of _PESTANAS_DEL_ALUMNO){
+      const h=hojas.find(x=>x.title===titulo); if(!h) continue;
+      const col=await sheetsGet(`${titulo}!A2:A`);
+      const filas=col.map((r,i)=>r[0]===id?i+1:-1).filter(i=>i>=0);   // índice 0 = fila 1 (títulos)
+      if(titulo==='Alumnos' && filas.length!==1) throw new Error('No encontré al alumno en la planilla (o aparece más de una vez): no se borró nada');
+      filas.sort((x,y)=>y-x).forEach(i=>requests.push({deleteDimension:{range:{sheetId:h.sheetId,dimension:'ROWS',startIndex:i,endIndex:i+1}}}));
+      if(filas.length) requests.push({appendDimension:{sheetId:h.sheetId,dimension:'ROWS',length:filas.length}});
+    }
+    if(!_escrituraPermitida()) return;
+    const r=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}:batchUpdate`,{
+      method:'POST', headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({requests})
+    });
+    if(!r.ok) throw new Error('Error borrando en Sheets');
+    // Memoria y copia local
+    alumnos=alumnos.filter(x=>x.id!==id);
+    asistencias=asistencias.filter(r=>r[0]!==id);
+    delete seguimiento[id]; delete planListos[id]; delete _alumnoBase[id];
+    _cacheGuardar();
+    try{ await eliminarEventosAlumno(id); }
+    catch(e){ console.warn('Calendar al eliminar:',e); toast('Alumno eliminado. No se pudieron borrar sus turnos de Calendar'); }
+    toast(`${a.nombre} eliminado`);
+    showPage('alumnos',null);
+    renderTablaAlumnos();renderDashboard();
+  }catch(e){
+    console.warn('Eliminar alumno:',e);
+    toast(String(e&&e.message||'').startsWith('No encontré')?e.message:'Error al eliminar el alumno: no se borró nada');
+  }
 }
 
 // B-2: escribe solo la fila de UN alumno, en vez de reescribir las ~999 filas
@@ -4039,20 +4084,7 @@ function verAlumno(id){
 
   // Botones
   document.getElementById('perfil-btn-editar').onclick=()=>abrirModalAlumno(id);
-  document.getElementById('perfil-btn-eliminar').onclick=async()=>{
-    if(confirm('¿Eliminar a '+a.nombre+'?')){
-      try{
-        await eliminarEventosAlumno(id);
-        alumnos=alumnos.filter(x=>x.id!==id);
-        await guardarEnSheets();
-        toast('Alumno eliminado');
-        showPage('alumnos',null);
-        renderTablaAlumnos();renderDashboard();
-      }catch(e){
-        toast('Error al eliminar el alumno');
-      }
-    }
-  };
+  document.getElementById('perfil-btn-eliminar').onclick=()=>eliminarAlumno(id);
   const fechaHoy = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'});
 
   // Racha + marcar asistencia (componente fusionado)
