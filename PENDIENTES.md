@@ -29,7 +29,6 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
-- **Resumen nuevo en el celu** — 25/11: el Resumen nuevo (Hoy / Para atender / Proyecto; planes el fin de semana) está solo en la compu. Luca quiere probarlo ahí primero y después ver cómo quedaría en el celu.
 - **Marcar "Terminé el día" siempre** — Luca empieza a hacerlo: con eso el Resumen del fin de semana sabe qué semana hizo cada alumno y qué falta cargar (sin marcas solo puede decir "cargada hasta la Semana N").
 
 - **Proxy: publicar la versión del 25/11 (opcional)** — suma la modalidad al portal: un alumno online ve "Entrenás online, a tu ritmo" en vez de "Sin días asignados". Sin publicarlo todo funciona igual.

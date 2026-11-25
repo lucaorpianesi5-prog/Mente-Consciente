@@ -244,11 +244,7 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 
 /* RESUMEN COMPU (25/11): entre semana = turnos de hoy + para atender + proyecto;
    sábado y domingo = planes para actualizar. En el celu sigue el Resumen de antes. */
-.rc{display:none}
-@media(min-width:769px){
-  #page-dashboard>.page-header,#page-dashboard>.top-row,#page-dashboard>.resumen-semana-wrap{display:none}
-  .rc{display:block}
-}
+#page-dashboard>.page-header,#page-dashboard>.top-row,#page-dashboard>.resumen-semana-wrap{display:none}
 .rc-top h2{font-size:1.55rem;font-weight:700}
 .rc-top p{color:var(--suave);margin-top:0.2rem;font-size:0.9rem}
 .rc-cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1rem;margin-top:1.1rem;align-items:start}
@@ -299,6 +295,38 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .rc-plan.listo{opacity:0.55}
 .rc-prog{display:flex;gap:3px}.rc-prog i{width:15px;height:6px;border-radius:3px;background:var(--borde)}.rc-prog i.on{background:var(--verde)}
 .rc-cargando{color:var(--texto3);font-size:0.76rem;margin:0.2rem 0 0.5rem}
+
+/* Resumen nuevo en el celu (25/11): una columna, botones apilados, grupos que no piden trabajo plegados */
+@media(max-width:768px){
+  .rc-top h2{display:none}
+  .rc-top p{font-size:0.86rem;margin-top:0}
+  .rc-cols{grid-template-columns:1fr;gap:0.85rem;margin-top:0.7rem}
+  .rc-der{gap:0.85rem}
+  .rc-card{padding:0.85rem 0.8rem;border-radius:14px}
+  .rc-turno{grid-template-columns:2.9rem minmax(0,1fr) auto;gap:0.55rem;padding:0.6rem}
+  .rc-turno .n b{font-size:0.92rem}
+  .rc-turno .n small{white-space:normal;font-size:0.72rem}
+  .rc-acc{flex-direction:column;align-items:stretch;gap:0.3rem}
+  .rc-btn{padding:0.42rem 0.6rem;font-size:0.76rem;text-align:center}
+  .rc-ok{font-size:0.74rem;text-align:center}
+  .rc-item{padding:0.55rem 0.6rem}
+  .rc-item b{font-size:0.82rem}
+  .rc-nums{gap:0.4rem}
+  .rc-nums div{padding:0.5rem 0.55rem}
+  .rc-nums b{font-size:0.92rem}
+  .rc-nums small,.rc-nums em{font-size:0.64rem}
+  .rc-plan{grid-template-columns:minmax(0,1fr) auto;gap:0.5rem;padding:0.6rem}
+  .rc-plan .rc-prog{grid-column:1;grid-row:2}
+  .rc-plan .rc-btn{grid-column:2;grid-row:1/3;align-self:center}
+  .rc-plan small{font-size:0.72rem}
+}
+.rc-pleg{margin-top:0.5rem}
+.rc-pleg>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:0.55rem 0.7rem;border-radius:10px;background:var(--crema);color:var(--suave);font-size:0.82rem;font-weight:600}
+.rc-pleg>summary::-webkit-details-marker{display:none}
+.rc-pleg>summary::after{content:'›';font-size:1.1rem;transition:transform .15s}
+.rc-pleg[open]>summary::after{transform:rotate(90deg)}
+.rc-pleg[open]>summary{margin-bottom:0.4rem}
+.apphead-m .head-acc{display:flex;gap:0.45rem}
 
 /* AGENDA */
 .semana-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0.6rem}
@@ -1694,7 +1722,10 @@ div.pv-mf.ro{cursor:default}
 <main>
   <div class="apphead-m" id="apphead-m">
     <div class="marca"><img src="Logo_App.png" alt=""><span id="apphead-txt">Hola, Luca</span></div>
-    <button type="button" class="tema-btn" id="tema-btn" onclick="alternarTema()"></button>
+    <div class="head-acc">
+      <button type="button" class="tema-btn sync-btn" onclick="cargarDatos()" aria-label="Sincronizar datos" title="Sincronizar datos"><svg class="i"><use href="#i-sync"/></svg></button>
+      <button type="button" class="tema-btn" id="tema-btn" onclick="alternarTema()"></button>
+    </div>
   </div>
   <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
@@ -2301,7 +2332,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.2 · 25/11/2026';
+const VERSION_APP='1.3 · 25/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -3033,7 +3064,7 @@ function _cacheRestaurar(){
 // Preferencia del DISPOSITIVO en localStorage (mc_tema): cerrarSesion() no la borra.
 function _sincronizarTemaUI(){
   const t=document.documentElement.dataset.tema==='calma'?'calma':'nocturno';
-  document.querySelectorAll('.tema-btn').forEach(b=>{       // Resumen del entrenador y portal del alumno
+  document.querySelectorAll('.tema-btn:not(.sync-btn)').forEach(b=>{       // Resumen del entrenador y portal del alumno
     b.innerHTML=t==='calma'?ic('luna'):ic('sol');
     const msg=t==='calma'?'Cambiar a tema Nocturno':'Cambiar a tema Calma';
     b.title=msg; b.setAttribute('aria-label',msg);
@@ -3773,7 +3804,7 @@ function _syncBottomNavFromPerfil(){ syncBottomNav('perfil'); }
 function _fabActualizar(id){
   const f=document.getElementById('fab'); if(!f) return;
   f.dataset.pagina=id;
-  f.style.visibility=(id==='yo'||id==='perfil')?'hidden':'';
+  f.style.visibility=(id==='alumnos'||id==='nutricion')?'':'hidden';   // Luca 25/11: el "+" solo en Alumnos
   f.setAttribute('aria-label',id==='nutricion'?'Nuevo cliente de nutrición':id==='finanzas'?'Nuevo gasto':'Nuevo alumno');
 }
 function _fabAccion(){
@@ -3979,17 +4010,20 @@ function _rcPlanes(activos, fz){
     else g.revisar.push([a,f,`${f.d.mes} · cargada hasta la Semana ${f.act} · sin días marcados esta semana`]);
   });
   const total=Object.values(g).reduce((n,x)=>n+x.length,0);
-  const bloque=(tit,arr,boton=true)=>arr.length?`<div class="rc-grupo">${tit}</div>${arr.map(([a,f,t])=>boton?fila(a,f,t):fila(a,f,t,false).replace('class="rc-plan"','class="rc-plan listo"')).join('')}`:'';
+  const filas=(arr,boton=true)=>arr.map(([a,f,t])=>boton?fila(a,f,t):fila(a,f,t,false).replace('class="rc-plan"','class="rc-plan listo"')).join('');
+  const bloque=(tit,arr,boton=true)=>arr.length?`<div class="rc-grupo">${tit}</div>${filas(arr,boton)}`:'';
+  // Los que no piden trabajo seguro van plegados en el celu (en la compu, abiertos)
+  const pleg=(tit,arr,boton=true)=>arr.length?`<details class="rc-pleg"${_esCompu()?' open':''}><summary>${tit} (${arr.length})</summary>${filas(arr,boton)}</details>`:'';
   const cuerpo=bloque('1 · Plan nuevo (terminan su última semana)',g.nuevo)+bloque('2 · Cargar la semana siguiente',g.cargar)
-    +bloque('Sin días marcados: revisá vos',g.revisar)+bloque('✓ Listos',g.listo,false);
+    +pleg('Sin días marcados: revisá vos',g.revisar)+pleg('✓ Listos',g.listo,false);
   return `<div class="rc-card"><h3>Planes para actualizar <small>${total?`${g.listo.length} de ${total} listos`:''}</small></h3>
     ${fz.leyendo?`<p class="rc-cargando">Leyendo las planillas de Fuerza… (${fz.total-fz.leyendo} de ${fz.total})</p>`:''}
     ${cuerpo||'<p class="rc-vacio">No hay planillas de Fuerza para revisar.</p>'}
-    <p class="rc-cargando" style="margin-top:0.6rem">Cuando cargues una semana en la planilla, tocá Sincronizar (abajo a la izquierda) para que se actualice esta lista.</p></div>`;
+    <p class="rc-cargando" style="margin-top:0.6rem">Cuando cargues una semana en la planilla, tocá ${_esCompu()?'Sincronizar (abajo a la izquierda)':'⟳ arriba'} para que se actualice esta lista.</p></div>`;
 }
 
 function renderResumenCompu(){
-  const el=document.getElementById('rc'); if(!el || !_esCompu()) return;
+  const el=document.getElementById('rc'); if(!el) return;
   const activos=alumnos.filter(a=>a.estado==='activo');
   const fz=_rcFuerzas(activos);
   const hoy=new Date(), finde=hoy.getDay()===6||hoy.getDay()===0;
