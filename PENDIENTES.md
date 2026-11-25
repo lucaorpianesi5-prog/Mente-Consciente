@@ -30,7 +30,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
-- **Alumnos online** — pedido de Luca 25/11: Ampi, Cinde, Noe y Jorge (y Andrés) no tienen horario porque entrenan online. Sumar la modalidad (presencial/online) como dato del alumno. Falta definir con Luca dónde se guarda y cómo se comportan (Agenda, Calendar, "sesiones esta semana", próxima sesión, asistencia).
+- **Proxy: publicar la versión del 25/11 (opcional)** — suma la modalidad al portal: un alumno online ve "Entrenás online, a tu ritmo" en vez de "Sin días asignados". Sin publicarlo todo funciona igual.
 
 - **Reinicio de los tildes de Fuerza entre ciclos** — hoy el ciclo se reconoce por el "Mes N" de la planilla + qué planilla es: si Luca renueva el plan duplicando la planilla y cambiando "Mes N", o usando una planilla nueva, los tildes arrancan de cero solos. Caso que NO cubre: reutilizar la MISMA planilla sin cambiar el "Mes N" (los tildes del ciclo anterior seguirían visibles). Si eso pasa en la práctica, sumar un botón "Empezar ciclo nuevo" en la Fuerza o reconocer el ciclo por la fecha.
 

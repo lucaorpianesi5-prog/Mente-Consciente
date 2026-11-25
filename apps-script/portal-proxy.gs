@@ -15,6 +15,8 @@
 //   4. Un alumno "inactivo" ya no ve NADA del portal: doGet responde not_found
 //      (el portal borra la sesión y vuelve al login) y el login con Google
 //      responde 'inactivo' en vez de entregar el token.
+//   5. [25/11] doGet devuelve también la modalidad (columna W): el portal de un
+//      alumno online dice "Entrenás online, a tu ritmo" en vez de "Sin días asignados".
 // ═══════════════════════════════════════════════════════════════════════
 
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
@@ -86,6 +88,7 @@ function doGet(e) {
       nutriDrive:   fila[17] || '',
       diaPago:      fila[19] || '',
       mapeoUrl:     fila[20] || '',   // [24/11] columna U: botón Mapeo del portal
+      modalidad:    fila[22] || '',   // [25/11] columna W: 'online' o vacío (presencial)
     };
 
     // ── Asistencias: solo registros de este alumno ──

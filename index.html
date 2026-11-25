@@ -324,7 +324,8 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .modal-footer{padding:1rem 1.5rem;border-top:1px solid var(--borde);display:flex;gap:0.75rem;justify-content:flex-end}
 
 /* FORM */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:1rem}
+.form-grid>*{min-width:0}   /* un contenido ancho no estira el formulario fuera de la pantalla */
 .field{display:flex;flex-direction:column;gap:0.35rem}
 .field label{font-size:0.78rem;font-weight:500;color:var(--suave)}
 .field input,.field select,.field textarea{padding:0.55rem 0.75rem;border:1px solid var(--borde);border-radius:5px;font-size:0.88rem;background:var(--crema);color:var(--texto);outline:none;transition:border 0.2s;font-family:inherit}
@@ -613,6 +614,7 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .al-sub .al-dias{letter-spacing:0.04em;font-weight:600;color:var(--texto3)}
 .al-sub .al-prox{overflow:hidden;text-overflow:ellipsis}
 .al-sub .al-prox.hoy{color:var(--verde);font-weight:600}
+.al-sub .al-online{font-weight:600;color:var(--verde)}
 .al-der{display:flex;align-items:center;gap:0.45rem;flex-shrink:0}
 .al-cuota{font-size:0.66rem;font-weight:700;padding:0.2rem 0.5rem;border-radius:20px;white-space:nowrap}
 .al-cuota.alDia{color:var(--ok);background:var(--verde-ok-bg)}
@@ -965,7 +967,7 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   .bono-input-wrap{flex:1;justify-content:flex-end}
 
   /* ── Forms ── */
-  .form-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:minmax(0,1fr)}
 
   /* ── Barra inferior ── */
   .bottom-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:var(--barra);z-index:150;border-top:1px solid var(--borde);padding:6px 4px calc(14px + env(safe-area-inset-bottom))}
@@ -2066,7 +2068,14 @@ div.pv-mf.ro{cursor:default}
           <span class="email-ayuda">Con este mail entra con "Continuar con Google". Dejalo vacío si no querés darle acceso.</span>
           <span class="email-estado" id="a-email-estado"></span>
         </div>
-        <div class="field" style="grid-column:1/-1">
+        <div class="field" style="grid-column:1/-1"><label>Modalidad</label>
+          <select id="a-modalidad" onchange="_modalidadUI()">
+            <option value="">Presencial</option>
+            <option value="online">Online</option>
+          </select>
+          <span class="email-ayuda" id="a-modalidad-ayuda" style="display:none">Online no tiene días ni horario: no aparece en la Agenda ni en Calendar.</span>
+        </div>
+        <div class="field" style="grid-column:1/-1" id="a-dias-wrap">
           <label>Días de entrenamiento</label>
           <div class="dias-check" id="a-dias-check">
             <span class="dia-check-label" onclick="toggleDia(this)" data-dia="Lunes">Lunes</span>
@@ -2100,11 +2109,11 @@ div.pv-mf.ro{cursor:default}
         </div>
         <div style="grid-column:1/-1;border-top:1px solid var(--borde);padding-top:1rem;margin-top:0.25rem">
           <p style="font-size:0.75rem;font-weight:600;color:var(--suave);margin-bottom:0.75rem;text-transform:uppercase;letter-spacing:0.06em">Datos personales</p>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
-            <div class="field"><label>Fecha de nacimiento</label><input type="text" id="a-fechaNac" placeholder="dd/mm/aaaa"/></div>
-            <div class="field"><label>Estatura (cm)</label><input type="number" id="a-estatura" placeholder="175"/></div>
-            <div class="field"><label>Peso inicial (kg)</label><input type="number" id="a-pesoInicial" placeholder="75"/></div>
-            <div class="field"><label>Peso actual (kg)</label><input type="number" id="a-pesoActual" placeholder="72"/></div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0.75rem">
+            <div class="field" style="min-width:0"><label>Fecha de nacimiento</label><input type="text" id="a-fechaNac" placeholder="dd/mm/aaaa"/></div>
+            <div class="field" style="min-width:0"><label>Estatura (cm)</label><input type="number" id="a-estatura" placeholder="175"/></div>
+            <div class="field" style="min-width:0"><label>Peso inicial (kg)</label><input type="number" id="a-pesoInicial" placeholder="75"/></div>
+            <div class="field" style="min-width:0"><label>Peso actual (kg)</label><input type="number" id="a-pesoActual" placeholder="72"/></div>
           </div>
           <div class="field" style="margin-top:0.75rem"><label>Carpeta Drive (URL)</label><input type="url" id="a-carpetaDrive" placeholder="https://drive.google.com/drive/folders/..."/></div>
           <div class="field" style="margin-top:0.75rem"><label>Sheet Nutrición (URL)</label><input type="url" id="a-nutriDrive" placeholder="https://docs.google.com/spreadsheets/..."/></div>
@@ -2216,8 +2225,9 @@ const RANGO = {
   // alumno, autocompletado con el día de su primer pago registrado.
   // U=mapeoUrl (handoff biblioteca-a-mapeo-externo): link al Sheet de Mapeo
   // propio de cada alumno, mismo patrón que carpetaDrive/nutriDrive.
-  ALUMNOS_READ:        'Alumnos!A2:V',
-  ALUMNOS_WRITE:       'Alumnos!A2:V1000',
+  // W=modalidad (25/11): 'online' o vacío (= presencial). Online = sin días ni horario.
+  ALUMNOS_READ:        'Alumnos!A2:W',
+  ALUMNOS_WRITE:       'Alumnos!A2:W1000',
   ALUMNOS_START:       'Alumnos!A2',
   ALUMNOS_ID_COL:      'Alumnos!A2:A',
   COBROS_READ:         'Cobros!A2:G',
@@ -2493,7 +2503,7 @@ function bloqueProximo(a,regs){
   return `<div class="bq-prox${prox&&prox.off===0?' es-hoy':''}">
     <div class="bq-eti">${prox&&prox.off===0?'Hoy entrenás':'Tu próximo entrenamiento'}</div>
     ${prox?`<div class="bq-cuando"><b>${escaparHTML(cuando)}</b><span>${escaparHTML(dia)}</span></div>${hora?`<div class="bq-hora">${escaparHTML(hora)} hs</div>`:''}`
-          :`<div class="bq-cuando"><b class="chico">Sin días asignados</b></div>`}
+          :`<div class="bq-cuando"><b class="chico">${_esOnline(a)?'Entrenás online, a tu ritmo':'Sin días asignados'}</b></div>`}
     <div class="bq-sem">${semana}</div>
   </div>`;
 }
@@ -2570,6 +2580,7 @@ function _pintarPortal(el,data){
     const a = {
       ...data.alumno,
       dias: data.alumno.dias ? data.alumno.dias.split('|') : [],
+      modalidad: _normModalidad(data.alumno.modalidad),   // solo si el proxy lo manda (versión del 25/11)
     };
     const rowsAs = data.asistencias  || [];
     const rowsFr = data.frases       || [];
@@ -3294,6 +3305,7 @@ async function cargarDatos(opts){
             diaPago:      r[19]||'',
             mapeoUrl:     r[20]||'',
             email:        (r[21]||'').trim().toLowerCase(),
+            modalidad:    _normModalidad(r[22]),
           })).filter(a=>a.id);
           _alumnoBaseTomar();
         }catch(e){console.warn('Error cargando Alumnos:',e);fallo=true;alumnos=[];}
@@ -3446,13 +3458,16 @@ function _renderPaginaActual(){
 }
 
 // ── GUARDAR ALUMNO EN SHEETS ──
+// Modalidad (columna W): 'online' o '' (presencial). Tolera que Luca escriba "Online" a mano.
+function _normModalidad(v){ return /online/i.test(String(v||''))?'online':''; }
+const _esOnline=a=>!!a&&a.modalidad==='online';
 function _alumnoAFila(a){
   return [
     a.id,a.nombre,a.horario,a.dias.join('|'),a.frecuencia,a.monto,
     a.objetivos,a.notas,a.estado,a.telefono||'',
     a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
     a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||'',
-    a.portalToken||'',a.diaPago||'',a.mapeoUrl||'',a.email||''
+    a.portalToken||'',a.diaPago||'',a.mapeoUrl||'',a.email||'',a.modalidad||''
   ];
 }
 
@@ -3480,7 +3495,7 @@ function _filaAAlumnoObj(r){
     monto:r[5]||'0', objetivos:r[6]||'', notas:r[7]||'', estado:r[8]||'activo', telefono:r[9]||'',
     fechaNac:r[10]||'', estatura:r[11]||'', pesoInicial:r[12]||'', pesoActual:r[13]||'', historialFis:r[14]||'',
     tieneNutri:r[15]||'no', carpetaDrive:r[16]||'', nutriDrive:r[17]||'', portalToken:r[18]||'', diaPago:r[19]||'',
-    mapeoUrl:r[20]||'', email:(r[21]||'').trim().toLowerCase(),
+    mapeoUrl:r[20]||'', email:(r[21]||'').trim().toLowerCase(), modalidad:_normModalidad(r[22]),
   };
 }
 // Objetivos/Molestias cambiados de los dos lados: lo mío, salvo el ítem de la entrevista, que es del alumno
@@ -3502,7 +3517,7 @@ async function guardarFilaAlumno(alumno){
   const base=_alumnoBase[alumno.id];
   if(base){
     let enSheet=null;
-    try{ enSheet=(await sheetsGet(`Alumnos!A${fila}:V${fila}`))[0]||[]; }catch(e){ console.warn('No se pudo releer la fila; se guarda sin fusionar',e); }
+    try{ enSheet=(await sheetsGet(`Alumnos!A${fila}:W${fila}`))[0]||[]; }catch(e){ console.warn('No se pudo releer la fila; se guarda sin fusionar',e); }
     if(enSheet){
       valores=valores.map((mio,c)=>{
         const b=base[c]??'', sh=String(enSheet[c]??'');
@@ -3514,7 +3529,7 @@ async function guardarFilaAlumno(alumno){
       Object.assign(alumno,_filaAAlumnoObj(valores));
     }
   }
-  await sheetsUpdate(`Alumnos!A${fila}:V${fila}`, [valores]);
+  await sheetsUpdate(`Alumnos!A${fila}:W${fila}`, [valores]);
   _alumnoBase[alumno.id]=valores.slice();
 }
 
@@ -3701,7 +3716,7 @@ function renderTablaAlumnos(){
   const filas=alumnos.map(a=>({a,cuota:_cuotaCorta(a,hoy0),prox:a.estado==='activo'?_proximaSesionCorta(a):null,hoy:a.estado==='activo'&&a.dias.includes(hoyNombre)}))
     .sort((x,y)=>((ordenEstado[x.a.estado]??3)-(ordenEstado[y.a.estado]??3))||x.a.nombre.localeCompare(y.a.nombre,'es'));
   const debe=f=>f.cuota.cls==='vencido'||f.cuota.cls==='vencePronto';
-  const pasa={todos:()=>true,hoy:f=>f.hoy,deben:debe,pausados:f=>f.a.estado!=='activo'};
+  const pasa={todos:()=>true,hoy:f=>f.hoy,deben:debe,online:f=>_esOnline(f.a)&&f.a.estado==='activo',pausados:f=>f.a.estado!=='activo'};
   const cuenta={}; Object.keys(pasa).forEach(k=>cuenta[k]=filas.filter(pasa[k]).length);
   if(!pasa[filtroAlumnosRapido]) filtroAlumnosRapido='todos';
   const lista=filas.filter(pasa[filtroAlumnosRapido]).filter(f=>!filtro||f.a.nombre.toLowerCase().includes(filtro));
@@ -3709,7 +3724,7 @@ function renderTablaAlumnos(){
   const filtrosEl=document.getElementById('alumnos-filtros');
   if(filtrosEl){
     const chip=(k,lbl)=>`<button type="button" class="al-filtro${filtroAlumnosRapido===k?' on':''}" onclick="setFiltroAlumnos('${k}')">${lbl}<span class="n">${cuenta[k]}</span></button>`;
-    filtrosEl.innerHTML=alumnos.length?chip('todos','Todos')+chip('hoy','Entrenan hoy')+chip('deben','Cuota por cobrar')+(cuenta.pausados?chip('pausados','Pausados'):''):'';
+    filtrosEl.innerHTML=alumnos.length?chip('todos','Todos')+chip('hoy','Entrenan hoy')+chip('deben','Cuota por cobrar')+(cuenta.online?chip('online','Online'):'')+(cuenta.pausados?chip('pausados','Pausados'):''):'';
   }
   const resumenEl=document.getElementById('alumnos-resumen');
   if(resumenEl){
@@ -3741,7 +3756,7 @@ function renderTablaAlumnos(){
       <div class="al-av${hoy?' hoy':''}">${escaparHTML(ini)}</div>
       <div class="al-info">
         <div class="al-nombre">${escaparHTML(a.nombre)}</div>
-        <div class="al-sub">${letras?`<span class="al-dias">${escaparHTML(letras)}</span>`:'<span>Sin días</span>'}${prox?`<span class="al-prox${prox.hoy?' hoy':''}">· ${escaparHTML(prox.txt)}</span>`:''}</div>
+        <div class="al-sub">${letras?`<span class="al-dias">${escaparHTML(letras)}</span>`:(_esOnline(a)?'<span class="al-online">Online</span>':'<span>Sin días</span>')}${prox?`<span class="al-prox${prox.hoy?' hoy':''}">· ${escaparHTML(prox.txt)}</span>`:''}</div>
       </div>
       <div class="al-der">
         <span class="al-cuota ${cuota.cls}">${escaparHTML(cuota.txt)}</span>
@@ -3756,7 +3771,13 @@ function _actualizarEstadoEmail(){
   const el=document.getElementById('a-email-estado'); if(!el) return;
   const hay=document.getElementById('a-email').value.trim();
   el.className='email-estado '+(hay?'ok':'sin');
-  el.textContent=hay?'● Acceso al portal habilitado':'● Sin email: solo entra por link';
+  el.textContent=hay?'● Acceso al portal habilitado':'● Sin email: no puede entrar al portal';
+}
+// Online: se ocultan días y horarios (al guardar se vacían: queda fuera de Agenda y Calendar)
+function _modalidadUI(){
+  const on=document.getElementById('a-modalidad').value==='online';
+  document.getElementById('a-dias-wrap').style.display=on?'none':'';
+  document.getElementById('a-modalidad-ayuda').style.display=on?'':'none';
 }
 function abrirModalAlumno(id=null){
   editandoId=id;
@@ -3764,6 +3785,7 @@ function abrirModalAlumno(id=null){
   ['a-nombre','a-telefono','a-monto','a-diaPago','a-objetivos','a-notas','a-fechaNac','a-estatura','a-pesoInicial','a-pesoActual','a-carpetaDrive','a-nutriDrive','a-mapeoUrl','a-email'].forEach(f=>document.getElementById(f).value='');
   document.getElementById('a-frecuencia').value='2';
   document.getElementById('a-estado').value='activo';
+  document.getElementById('a-modalidad').value='';
   document.getElementById('a-tieneNutri').checked=false;
   document.querySelectorAll('#a-dias-check .dia-check-label').forEach(l=>l.classList.remove('checked'));
   document.getElementById('dia-horario-lista').innerHTML='';
@@ -3785,6 +3807,7 @@ function abrirModalAlumno(id=null){
     document.getElementById('a-diaPago').value=a.diaPago||'';
     document.getElementById('a-frecuencia').value=a.frecuencia||'2';
     document.getElementById('a-estado').value=a.estado||'activo';
+    document.getElementById('a-modalidad').value=a.modalidad||'';
     document.getElementById('a-fechaNac').value=a.fechaNac||'';
     document.getElementById('a-estatura').value=a.estatura||'';
     document.getElementById('a-pesoInicial').value=a.pesoInicial||'';
@@ -3798,8 +3821,10 @@ function abrirModalAlumno(id=null){
       if(a.dias.includes(l.dataset.dia)) l.classList.add('checked');
     });
     renderDiaHorarios(hpd);
+    _modalidadUI();
   }
   _actualizarEstadoEmail();
+  _modalidadUI();
   document.getElementById('modal-alumno').classList.add('open');
   // Live age calculation
   const fnInput=document.getElementById('a-fechaNac');
@@ -3824,8 +3849,10 @@ async function guardarAlumno(){
     const otro=alumnos.find(x=>x.id!==editandoId && x.email===email);
     if(otro){ toast(`Ese mail ya está en el perfil de ${otro.nombre}`); return; }
   }
-  const dias=[...document.querySelectorAll('#a-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
-  const hpd=getDiaHorarios();
+  const modalidad=_normModalidad(document.getElementById('a-modalidad').value);
+  // Online: sin días ni horario → queda fuera de Agenda, Calendar y "Sesiones esta semana"
+  const dias=modalidad?[]:[...document.querySelectorAll('#a-dias-check .dia-check-label.checked')].map(l=>l.dataset.dia);
+  const hpd=modalidad?{}:getDiaHorarios();
   const alumno={
     id: editandoId||crypto.randomUUID(),
     nombre,
@@ -3853,6 +3880,7 @@ async function guardarAlumno(){
     nutriDrive:   document.getElementById('a-nutriDrive').value.trim(),
     mapeoUrl:     document.getElementById('a-mapeoUrl').value.trim(),
     email,
+    modalidad,
   };
   // Con mail hace falta el token: el proxy responde con él cuando el alumno entra
   // con Google. Lo genera la app acá (no el proxy: la app reescribe la fila
@@ -3956,7 +3984,7 @@ function verAlumno(id){
 
   // Header
   document.getElementById('perfil-nombre').textContent=a.nombre;
-  document.getElementById('perfil-badge').innerHTML=pdBadge(a.estado);
+  document.getElementById('perfil-badge').innerHTML=pdBadge(a.estado)+(_esOnline(a)?' <span class="pd-badge-activo">Online</span>':'');
 
   // Cuota (handoff vencimiento-cuota-portal-y-ficha): mismo cálculo que
   // Cobros → Vencimientos (diaPago + historial), no el mes calendario —
@@ -4150,7 +4178,7 @@ function renderDiasPilares(a){
 
   const proximaEl=document.getElementById('perfil-proxima-sesion');
   if(!a.dias.length){
-    proximaEl.textContent='Sin días asignados';
+    proximaEl.textContent=_esOnline(a)?'Online · sin días fijos':'Sin días asignados';
     return;
   }
   const hpd=stringToHorariosPorDia(a.horario);

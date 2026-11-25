@@ -41,7 +41,12 @@ async function simularSheets(page, { planillas = {}, valores = {} } = {}) {
     if (tabs && u.includes('includeGridData')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title }, data: [{ rowData: t.filas.map(f => ({ values: f.map(cel) })) }] })) });
     if (tabs && u.includes('sheets.properties')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title } })) });
     const rango = Object.keys(valores).find(k => u.includes('/values/' + k.split('!')[0] + '!'));   // con el '!': 'Nutricion' no confunde a 'NutricionCobros'
-    return json({ values: rango ? valores[rango] : [] });
+    if (!rango) return json({ values: [] });
+    // Como el Sheets real: si se pide una fila puntual ('Alumnos!A7:W7'), devolver solo esas filas
+    const pedido = (u.split('/values/')[1] || '').split('?')[0].match(/![A-Z]+(\d+)(?::[A-Z]+(\d+))?/);
+    const base = +((rango.match(/![A-Z]+(\d+)/) || [])[1] || 1);
+    if (pedido && +pedido[1] > base) return json({ values: valores[rango].slice(+pedido[1] - base, pedido[2] ? +pedido[2] - base + 1 : undefined) });
+    return json({ values: valores[rango] });
   });
   return escrituras;
 }

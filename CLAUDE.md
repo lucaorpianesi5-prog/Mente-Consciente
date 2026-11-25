@@ -29,7 +29,7 @@ Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, 
 ## Modelo de datos (pestañas del Sheet)
 | Pestaña | Columnas |
 |---|---|
-| **Alumnos** A:V | A id · B nombre · C horario (`Día:hora\|…`) · D días (`Lunes\|…`) · E frecuencia · F monto · G objetivos (una línea JSON por ítem `{texto,categoria,estado,fecha[,origen]}`) · H molestias (`{texto,zona,estado,fecha[,origen]}`) · I estado (activo/pausado/inactivo) · J teléfono · K fechaNac `dd/mm/aaaa` · L estatura · M pesoInicial · N pesoActual · O historialFis · P tieneNutri · Q **Fuerza** (link) · R nutriDrive · S **portalToken** · T diaPago · U **Mapeo** (link, con `#gid`) · V email |
+| **Alumnos** A:W | A id · B nombre · C horario (`Día:hora\|…`) · D días (`Lunes\|…`) · E frecuencia · F monto · G objetivos (una línea JSON por ítem `{texto,categoria,estado,fecha[,origen]}`) · H molestias (`{texto,zona,estado,fecha[,origen]}`) · I estado (activo/pausado/inactivo) · J teléfono · K fechaNac `dd/mm/aaaa` · L estatura · M pesoInicial · N pesoActual · O historialFis · P tieneNutri · Q **Fuerza** (link) · R nutriDrive · S **portalToken** · T diaPago · U **Mapeo** (link, con `#gid`) · V email · W modalidad (`online` o vacío = presencial; online = sin días ni horario, fuera de Agenda/Calendar) |
 | Cobros A:G | mes `yyyy-mm` · alumnoId · estado · fecha · bono · fechaBono · monto |
 | Seguimiento A:F | alumnoId · fecha · texto · id · chips (`\|`) · origen |
 | Nutricion / NutricionCobros | clientes · pagos por mes |
