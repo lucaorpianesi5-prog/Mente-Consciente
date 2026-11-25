@@ -6365,8 +6365,12 @@ function planParseFuerza(grid){
     if(txt(r,1)) bloque=txt(r,1);
     if(txt(r,2)) letra=txt(r,2);
     const celdas=semanas.map(s=>({r:_planCelda(grid,mapa,r,s.col), rir:_planCelda(grid,mapa,r,s.col+1), kg:_planCelda(grid,mapa,r,s.col+2)}));
-    // Fila fija (Activación/Movilidad): R x 3S cargado en todas las semanas y nada de RIR ni KG
-    const fija=celdas.every(x=>x.r.text) && celdas.every(x=>!x.rir.text && !x.kg.text);
+    // Fila fija (no se tilda ni cuenta en el progreso): la decide el NOMBRE del bloque,
+    // Activación o Movilidad (Luca 25/11; Core sí se tilda). Antes era "reps en todas las
+    // semanas y sin RIR ni KG", pero con las semanas precargadas eso atrapaba ejercicios de
+    // peso corporal. Sin nombre de bloque queda la regla vieja (planillas sin columna B).
+    const fija=bloque ? /activacion|movilidad/.test(_normTxt(bloque))
+      : (celdas.every(x=>x.r.text) && celdas.every(x=>!x.rir.text && !x.kg.text));
     cur.ejercicios.push({fila:r+1,nombre,bloque,letra,celdas,fija});
   }
   if(!dias.length || dias.some(d=>!d.ejercicios.length)) throw {tipo:'formato'};
@@ -6578,15 +6582,17 @@ function planDiaDefault(a,datos){
   }
   return datos.dias[0].n;
 }
-// Primera semana con todos los "R x 3S" vacíos en las filas editables; si están todas cargadas, la última
-function planSemanaDefault(datos,diaN){
-  const dia=datos.dias.find(d=>d.n===diaN)||datos.dias[0];
-  const ed=dia.ejercicios.filter(e=>!e.fija);
-  const ult=datos.semanas[datos.semanas.length-1].n;
-  if(!ed.length) return ult;
-  for(const s of datos.semanas){ if(ed.every(e=>!e.celdas[s.n-1].r.text)) return s.n; }
-  return ult;
+// Semana ACTIVA = la última que tiene algún "R x 3S" cargado (en cualquier día, sin contar
+// las filas fijas). Luca carga cada semana el fin de semana anterior: la última cargada es la
+// que toca hacer. Las semanas siguientes (sin cargar) no se pueden abrir. Sin nada cargado: la 1.
+function planSemanaActiva(datos){
+  let act=datos.semanas[0].n;
+  datos.semanas.forEach((s,si)=>{
+    if(datos.dias.some(d=>d.ejercicios.some(e=>!e.fija&&e.celdas[si]&&e.celdas[si].r.text))) act=s.n;
+  });
+  return act;
 }
+function planSemanaDefault(datos){ return planSemanaActiva(datos); }
 // ── Días terminados ("Terminé el día"): viven en Asistencias, columna D ──
 function _planDetalle(mes,dia,sem){ return `${mes} · Día ${dia} · Semana ${sem}`; }
 function _planHechos(alumnoId,mes){
@@ -6600,10 +6606,14 @@ function _planHechos(alumnoId,mes){
 }
 function _planHecho(alumnoId,mes,dia,sem){ return _planHechos(alumnoId,mes).find(h=>h.dia===dia&&h.sem===sem)||null; }
 // Lo que sigue después de un día: el próximo día de la misma semana, o el Día 1 de la siguiente
+// Si lo que sigue es una semana todavía sin cargar, vuelve {…, sinCargar:true} (no se puede ir)
 function _planSiguiente(datos,dia,sem){
   const di=datos.dias.findIndex(d=>d.n===dia), wi=datos.semanas.findIndex(w=>w.n===sem);
   if(di>=0 && di<datos.dias.length-1) return {dia:datos.dias[di+1].n,sem};
-  if(wi>=0 && wi<datos.semanas.length-1) return {dia:datos.dias[0].n,sem:datos.semanas[wi+1].n};
+  if(wi>=0 && wi<datos.semanas.length-1){
+    const n=datos.semanas[wi+1].n;
+    return {dia:datos.dias[0].n,sem:n,sinCargar:n>planSemanaActiva(datos)};
+  }
   return null;   // último día de la última semana: plan terminado
 }
 function _planSelDe(a,datos){
@@ -6613,10 +6623,13 @@ function _planSelDe(a,datos){
     const hechos=_planHechos(a.id,datos.mes);
     const ult=hechos[hechos.length-1];
     const sig=ult && datos.dias.some(d=>d.n===ult.dia) && datos.semanas.some(w=>w.n===ult.sem) ? _planSiguiente(datos,ult.dia,ult.sem) : null;
-    if(sig) s=planSel[a.id]={dia:sig.dia,sem:sig.sem};
+    if(sig && !sig.sinCargar) s=planSel[a.id]={dia:sig.dia,sem:sig.sem};
     else if(ult) s=planSel[a.id]={dia:ult.dia,sem:ult.sem};
-    else { const dia=planDiaDefault(a,datos); s=planSel[a.id]={dia,sem:planSemanaDefault(datos,dia)}; }
+    else { const dia=planDiaDefault(a,datos); s=planSel[a.id]={dia,sem:planSemanaDefault(datos)}; }
   }
+  // Nunca más allá de la semana activa (p. ej. si la planilla se recargó con menos semanas cargadas)
+  const act=planSemanaActiva(datos);
+  if(s.sem>act) s.sem=act;
   return s;
 }
 
@@ -6714,7 +6727,8 @@ function planRenderTodo(){
     const semOk=sn=>e.datos.dias.every(d=>diaOk(d.n,sn));
     const nHechosSem=e.datos.dias.filter(d=>diaOk(d.n,sel.sem)).length;
     meta=`Fuerza · ${e.datos.mes} · Semana ${sel.sem}: ${nHechosSem}/${e.datos.dias.length} días`;
-    const ws=e.datos.semanas, wi=ws.findIndex(w=>w.n===sel.sem), prevW=ws[wi-1], nextW=ws[wi+1];
+    const ws=e.datos.semanas, wi=ws.findIndex(w=>w.n===sel.sem), prevW=ws[wi-1], sigW=ws[wi+1];
+    const nextW=sigW&&sigW.n<=planSemanaActiva(e.datos)?sigW:null;   // las semanas sin cargar no se abren
     const pr=_pvProgresoDia(a,e.datos,sel), pct=pr.total?Math.round(pr.hechos/pr.total*100):0;
     extra=`<div class="pv-sel">
         <div class="pv-dias">${e.datos.dias.map(d=>{ const on=d.n===sel.dia, ok=diaOk(d.n,sel.sem); return `<button type="button" class="${on?'on':''}${ok?' ok':''}" data-pv="dia" data-n="${d.n}">${ok&&!on?'✓ ':''}${on||e.datos.dias.length<=3?'Día '+d.n:'D'+d.n}</button>`; }).join('')}</div>
@@ -6969,9 +6983,10 @@ function _pvBodyFuerza(a,e){
   const hecho=_planHecho(a.id,d.mes,dia.n,sel.sem);
   if(hecho){
     const sig=_planSiguiente(d,dia.n,sel.sem), sigTxt=sig?`Día ${sig.dia} · Semana ${sig.sem}`:'';
+    const prox=!sig?' · ¡Plan del mes completo!':sig.sinCargar?` · Semana ${sig.sem}: todavía sin cargar`:' · Próximo: '+sigTxt;
     html+=`<div class="pv-fin hecho">
-      <div class="pv-fin-tit"><span class="pv-fin-check">✓</span><div><b>Día ${dia.n} · Semana ${sel.sem} terminado</b><small>${escaparHTML(hecho.fecha||'')}${sig?' · Próximo: '+sigTxt:' · ¡Plan del mes completo!'}</small></div></div>
-      <div class="pv-fin-acc">${sig?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}${_pvRO()?'':'<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button>'}</div>
+      <div class="pv-fin-tit"><span class="pv-fin-check">✓</span><div><b>Día ${dia.n} · Semana ${sel.sem} terminado</b><small>${escaparHTML(hecho.fecha||'')}${prox}</small></div></div>
+      <div class="pv-fin-acc">${sig&&!sig.sinCargar?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}${_pvRO()?'':'<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button>'}</div>
     </div>`;
   }
   return html;
@@ -7124,7 +7139,7 @@ async function planTerminarDia(btn){
     }
     _cacheGuardar();
     const sig=_planSiguiente(d,sel.dia,sel.sem);
-    toast(sig?`¡Día ${sel.dia} terminado! Próximo: Día ${sig.dia} · Semana ${sig.sem}`:'¡Último día del mes terminado! 🎉');
+    toast(!sig?'¡Último día del mes terminado! 🎉':sig.sinCargar?`¡Semana ${sel.sem} completa! La semana ${sig.sem} todavía no está cargada`:`¡Día ${sel.dia} terminado! Próximo: Día ${sig.dia} · Semana ${sig.sem}`);
     planRenderTodo();
     _planActualizarHoyToca(a.id);
     _planTrasCambioAsistencia(a.id);
@@ -7298,9 +7313,9 @@ function planGuardarInput(inp){
       }
       case 'terminar-dia': planTerminarDia(el); break;
       case 'deshacer-dia': planDeshacerDia(el); break;
-      case 'ir-prox': { const sel=planSel[a.id], sig=sel&&_planSiguiente(e.datos,sel.dia,sel.sem); if(sig){ sel.dia=sig.dia; sel.sem=sig.sem; planVista.expandidas=new Set(); planRenderTodo(); const b=document.getElementById('pv-body'); if(b) b.scrollTop=0; } break; }
-      case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; s.sem=planSemanaDefault(e.datos,s.dia); planVista.expandidas=new Set(); planRenderTodo(); break; }
-      case 'sem': planSel[a.id].sem=+el.dataset.n; planRenderTodo(); break;
+      case 'ir-prox': { const sel=planSel[a.id], sig=sel&&_planSiguiente(e.datos,sel.dia,sel.sem); if(sig&&!sig.sinCargar){ sel.dia=sig.dia; sel.sem=sig.sem; planVista.expandidas=new Set(); planRenderTodo(); const b=document.getElementById('pv-body'); if(b) b.scrollTop=0; } break; }
+      case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; planVista.expandidas=new Set(); planRenderTodo(); break; }
+      case 'sem': { const n=+el.dataset.n; if(n&&n<=planSemanaActiva(e.datos)){ planSel[a.id].sem=n; planRenderTodo(); } break; }
       case 'enfoque': planVista.enfoque=el.dataset.e||''; planRenderTodo(); break;
       case 'expandir': planVista.expandidas.add(`${planSel[a.id].dia}-${el.dataset.ei}`); planRenderBody(); break;
       case 'ir': planIr(el.dataset.id); break;

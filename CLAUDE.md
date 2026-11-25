@@ -43,7 +43,7 @@ Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, 
 
 Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__portal'` (plan del alumno, solo lectura).
 
-**Planilla de Fuerza** (formato estricto, ver `planParseFuerza`): A1 "Mes N"; fila 1 desde E "Semana 1/2/…" cada 3 columnas; por día una fila "Día N | Ejercicios | R x 3S | RIR | KG…"; ejercicios con B bloque, C letra, D nombre. Los valores de una semana pueden venir **cargados de antemano** (planificación): "listo" = solo lo que se marca, nunca lo cargado.
+**Planilla de Fuerza** (formato estricto, ver `planParseFuerza`): A1 "Mes N"; fila 1 desde E "Semana 1/2/…" cada 3 columnas; por día una fila "Día N | Ejercicios | R x 3S | RIR | KG…"; ejercicios con B bloque, C letra, D nombre. Los valores de una semana pueden venir **cargados de antemano** (planificación): "listo" = solo lo que se marca, nunca lo cargado. Luca carga cada semana el fin de semana anterior: la **semana activa** es la última con algún "R x 3S" cargado (`planSemanaActiva`) y no se puede ir a las siguientes. Filas **fijas** (no se tildan): las de los bloques Activación y Movilidad, por nombre (Core sí se tilda).
 **Planilla de Mapeo**: títulos (Ejercicio, Reps, KG; opcionales Enfoque, Patrón) en cualquiera de las primeras 10 filas; varias pestañas; las que no tienen esos títulos se ven como tabla de solo lectura.
 
 ## Reglas de código (no negociables)
