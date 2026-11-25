@@ -15,8 +15,8 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 - [ ] **Fuerza sin `#gid`** — auditoría del 24/11 (BAJO) — el proxy muestra la primera pestaña que no se llame "Notas"; conviene pegar los links de Fuerza con el `#gid`.
 - [ ] **Dispositivo del entrenador** — auditoría del 24/11 (BAJO, riesgo aceptado) — `mc_cache` (todos los datos) y el permiso de Google (todas las planillas y el calendario, 1 h) quedan en el dispositivo hasta "Cerrar sesión". Mitigación: bloqueo de pantalla.
 
-- [ ] **Limpieza de la planilla (la hace Luca)** — pestañas viejas ya borradas (25/11). Falta: borrar las 6 filas de Asistencias del alumno eliminado `1782763380670` (filas 15, 30, 39, 48, 53, 70 en la copia del 24/11; de abajo hacia arriba). Los 2 cobros "pendiente" (Axel jul, Bruno sep) **quedan así a propósito**: esos meses faltaron y pagaron al volver (no es plata que entró en esa fecha). Vencimientos no los cuenta como deuda.
-- [ ] **Recorrida 25/11 — datos para corregir (Luca)**: (1) **Repeticiones convertidas en fecha** en las Fuerzas (se ven como "5/5/2026"): Movilidad de Cinde, Dave, Jorge, Noe y Vero (filas 9–12 del Día 1, y Noe también Día 2 filas 19–21); Ampi Día 1 fila 4 y Día 2 filas 14–15; Antonio Día 2 fila 14 (Grip Reaper); Gemma Día 1 fila 6 (Press banca, también en KG); Fede (ya corregido por Luca, confirmar que se ven bien). Pasa al tipear "5-5": poner la hoja en texto sin formato y **volver a escribir** esas celdas (si solo se cambia el formato, la fecha queda como un número). (2) **Mapeo de Axel y de Santi**: tienen 2 pestañas y el link no tiene `#gid` → ni la app ni el portal saben cuál mostrar; volver a copiar el link desde la pestaña correcta. (3) **Fuerza de Agus** ("Road To:"): no tiene el formato Mes/Semana, la app no la puede mostrar (solo "Abrir en Sheets"). (4) Sin horario cargado: Ampi, Cinde, Noe, Jorge (y Andrés sin hora): no aparecen bien en Agenda ni en "Próxima sesión". (5) Andrés no tiene link de Fuerza.
+- [ ] **Fuerza de Agus no se ve en la app** — 25/11 — su planilla ("Road To:", pestaña "Agus") no tiene el formato Mes N / Semana N (A1 dice "Verticales"), así que el visor solo ofrece "Abrir en Sheets". Decisión de Luca: dejarlo así por ahora.
+- [ ] **Andrés sin link de Fuerza** — 25/11 — dato a cargar por Luca cuando tenga planilla.
 - [ ] **Eliminar alumno deja datos sueltos** — revisión del 24/11 (BAJO) — borra la fila de Alumnos pero no sus Asistencias/Seguimiento/Listos, y reescribe todo el rango de Alumnos (`guardarEnSheets`). Recomendación a Luca: usar "inactivo". Si se mantiene el borrado, limpiar sus filas en las otras pestañas.
 
 ---
@@ -29,6 +29,8 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 ---
 
 ## Decisiones pendientes
+
+- **Alumnos online** — pedido de Luca 25/11: Ampi, Cinde, Noe y Jorge (y Andrés) no tienen horario porque entrenan online. Sumar la modalidad (presencial/online) como dato del alumno. Falta definir con Luca dónde se guarda y cómo se comportan (Agenda, Calendar, "sesiones esta semana", próxima sesión, asistencia).
 
 - **Reinicio de los tildes de Fuerza entre ciclos** — hoy el ciclo se reconoce por el "Mes N" de la planilla + qué planilla es: si Luca renueva el plan duplicando la planilla y cambiando "Mes N", o usando una planilla nueva, los tildes arrancan de cero solos. Caso que NO cubre: reutilizar la MISMA planilla sin cambiar el "Mes N" (los tildes del ciclo anterior seguirían visibles). Si eso pasa en la práctica, sumar un botón "Empezar ciclo nuevo" en la Fuerza o reconocer el ciclo por la fecha.
 
