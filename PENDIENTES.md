@@ -28,7 +28,6 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
-- **Publicar el proxy 1.2 (26/11)** — necesario para que los alumnos online marquen "Terminé el día" desde el portal (hasta publicarlo ven "Tu entrenador marca el día").
 - **"Terminé el día" en el portal: probar con los online** (desde 26/11) y después decidir si se suma a los presenciales.
 - **Próximo paso del portal online** (pedido de Luca 26/11, después de probar "Terminé el día"): que el alumno cargue el **RIR al terminar cada ejercicio** (se escribe en su planilla de Fuerza) y, al terminar la sesión, el **RPE de la sesión** y un **comentario** para Luca (definir dónde se guardan: Seguimiento o una columna nueva de Asistencias).
 
