@@ -162,7 +162,6 @@ html{-webkit-tap-highlight-color:transparent}
 .apphead-m .marca{display:flex;align-items:center;gap:10px;font-size:0.86rem;font-weight:650}
 .apphead-m .marca img{width:30px;height:30px;border-radius:9px;object-fit:cover}
 /* Selector de tema: botón redondo en el Resumen (celu) y segmentado en la barra lateral (compu) */
-#page-dashboard .page-header{position:relative}
 .tema-btn{display:flex;width:40px;height:40px;border-radius:12px;border:1px solid var(--borde);background:var(--blanco);color:var(--texto);cursor:pointer;align-items:center;justify-content:center;font-size:1rem;font-family:inherit;padding:0}
 .tema-seg{display:flex;gap:0.25rem;background:var(--verde-bg);border:1px solid var(--borde);border-radius:8px;padding:0.2rem}
 .tema-seg button{flex:1;border:none;background:transparent;color:var(--suave);padding:0.4rem 0.3rem;border-radius:6px;font-size:0.74rem;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
@@ -244,7 +243,6 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 
 /* RESUMEN COMPU (25/11): entre semana = turnos de hoy + para atender + proyecto;
    sábado y domingo = planes para actualizar. En el celu sigue el Resumen de antes. */
-#page-dashboard>.page-header,#page-dashboard>.top-row,#page-dashboard>.resumen-semana-wrap{display:none}
 .rc-top h2{font-size:1.55rem;font-weight:700}
 .rc-top p{color:var(--suave);margin-top:0.2rem;font-size:0.9rem}
 .rc-cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1rem;margin-top:1.1rem;align-items:start}
@@ -386,68 +384,12 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .agenda-pie{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:0.8rem;font-size:0.76rem;color:var(--texto3)}
 .agenda-pie b{color:var(--suave)}
 
-/* ── RESUMEN: mini agenda semanal (handoff mini-agenda-resumen) — misma
-   info que Agenda pero solo lectura, sin drag ni modal de edición ── */
-.resumen-semana-wrap{background:var(--blanco);border:1px solid var(--borde);border-radius:8px;overflow:hidden;padding:1rem 1.25rem}
-.resumen-semana-wrap .seccion-label{margin-bottom:0.85rem}
-.resumen-semana-wrap .seccion-label a{font-size:0.68rem;color:var(--verde);text-decoration:none;font-weight:600;margin-left:auto;text-transform:none;letter-spacing:0;cursor:pointer}
-.mini-semana{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--borde);border:1px solid var(--borde);border-radius:10px;overflow:hidden}
-.mini-dia{background:var(--blanco);min-height:150px;padding:0.6rem 0.5rem}
-.mini-dia.hoy{background:color-mix(in srgb,var(--verde) 8%,transparent)}
-.mini-dia-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;padding-bottom:0.4rem;border-bottom:1px solid var(--borde)}
-.mini-dia-nombre{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.03em;color:var(--suave)}
-.mini-dia.hoy .mini-dia-nombre{color:var(--verde)}
-.mini-dia-fecha{font-size:0.66rem;color:var(--suave)}
-.mini-turno{display:flex;align-items:center;gap:0.4rem;padding:0.3rem 0.15rem;border-radius:5px;cursor:pointer;transition:background 0.15s}
-.mini-turno:hover{background:var(--crema)}
-.mini-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.mini-dot.freq-1{background:var(--f1)}
-.mini-dot.freq-2{background:var(--f2)}
-.mini-dot.freq-3{background:var(--f3)}
-.mini-dot.freq-4{background:var(--f4)}
-.mini-dot.freq-5{background:var(--f5)}
 .leyenda-muestra{width:12px;height:12px;border-radius:2px;display:inline-block;border-left:3px solid}
 .leyenda-muestra.freq-1{background:color-mix(in srgb,var(--f1) var(--f-alpha),transparent);border-left-color:var(--f1)}
 .leyenda-muestra.freq-2{background:color-mix(in srgb,var(--f2) var(--f-alpha),transparent);border-left-color:var(--f2)}
 .leyenda-muestra.freq-3{background:color-mix(in srgb,var(--f3) var(--f-alpha),transparent);border-left-color:var(--f3)}
 .leyenda-muestra.freq-4{background:color-mix(in srgb,var(--f4) var(--f-alpha),transparent);border-left-color:var(--f4)}
 .leyenda-muestra.freq-5{background:color-mix(in srgb,var(--f5) var(--f-alpha),transparent);border-left-color:var(--f5)}
-.mini-turno-txt{min-width:0}
-.mini-hora{font-size:0.66rem;color:var(--suave);font-variant-numeric:tabular-nums}
-.mini-nombre{font-size:0.76rem;font-weight:600;color:var(--texto);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini-libre{font-size:0.7rem;color:var(--suave);padding:0.3rem 0.15rem}
-
-/* Resumen: estados de turno compartidos entre la semana (desktop) y la lista
-   del día (mobile) — handoff resumen-mobile-y-desktop, 2026-09-28. */
-.mini-turno.pasado{opacity:0.45}
-.mini-turno.pasado:hover{opacity:0.8}
-.mini-turno.en-curso{background:color-mix(in srgb,var(--verde) 12%,transparent)}
-.mini-turno.en-curso .mini-hora{color:var(--verde);font-weight:600}
-.mini-ahora{display:inline-block;font-size:0.56rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--sobre-acento);background:var(--verde);padding:0 0.35rem;border-radius:20px;margin-left:0.3rem;vertical-align:1px}
-.titulo-proxima{color:var(--suave)}
-
-/* Resumen: lista del día, solo mobile (≤768px) — reemplaza la grilla semanal ahí */
-.resumen-lbl-mobile, #resumen-hoy{display:none}
-@media(max-width:768px){
-  #resumen-semana, .resumen-lbl-desktop{display:none}
-  .resumen-lbl-mobile{display:inline}
-  #resumen-hoy{display:flex}
-}
-.hoy-titulo-dia{color:var(--verde)}
-.hoy-titulo-dia.proximo{color:var(--suave)}
-.hoy-lista{flex-direction:column}
-.hoy-turno{display:flex;align-items:center;gap:0.7rem;min-height:46px;padding:0.35rem 0.25rem;border-bottom:1px solid var(--borde);cursor:pointer}
-.hoy-turno:last-child{border-bottom:none}
-.hoy-hora{font-size:0.8rem;font-weight:600;color:var(--suave);font-variant-numeric:tabular-nums;width:3.2rem;flex-shrink:0}
-.hoy-nombre{font-size:0.92rem;font-weight:600;color:var(--texto);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.hoy-chevron{color:var(--suave);font-size:0.9rem;flex-shrink:0}
-.hoy-ahora{font-size:0.62rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;color:var(--sobre-acento);background:var(--verde);padding:0.15rem 0.5rem;border-radius:20px;flex-shrink:0}
-.hoy-turno.en-curso{background:color-mix(in srgb,var(--verde) 8%,transparent);border-radius:8px;border-bottom-color:transparent}
-.hoy-turno.en-curso .hoy-hora{color:var(--verde)}
-.hoy-turno.pasado{opacity:0.45}
-.hoy-vacio{font-size:0.82rem;color:var(--suave);padding:0.5rem 0.25rem}
-.hoy-sinhora .hoy-hora{font-size:0.66rem;font-weight:500}
-#resumen-hoy .mini-dot{width:8px;height:8px}
 
 /* MODAL */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center}
@@ -898,33 +840,8 @@ button.yo-dato.destacado .i{color:var(--pd-verde)}
 .bono-input-wrap{display:none;align-items:center;gap:0.4rem}
 .bono-input-wrap input{width:90px;padding:0.32rem 0.5rem;border:1px solid var(--borde);border-radius:4px;font-size:0.8rem;background:var(--bg);color:var(--texto);font-family:inherit}
 
-/* ── RESUMEN / DASHBOARD: KPIs operativos + card financiera (reutiliza .barra/.barra-fill/.seccion-label de Cobros) ── */
-.top-row{display:grid;grid-template-columns:180px 180px 1fr;gap:1.2rem;align-items:stretch;margin-bottom:1.5rem}
-.top-row .seccion-label{display:none}
-.kpi-row{display:contents}
-.fin-wrap{display:contents}
-.kpi-card{background:var(--blanco);border:1px solid var(--borde);border-radius:12px;padding:0.9rem 1rem}
-.kpi-icon{width:30px;height:30px;border-radius:8px;background:var(--verde-bg);color:var(--verde);display:flex;align-items:center;justify-content:center;margin-bottom:0.55rem}
-.kpi-icon svg{width:16px;height:16px}
-.kpi-val{font-size:1.4rem;font-weight:700;color:var(--texto)}
-.kpi-label{font-size:0.72rem;color:var(--suave);margin-top:0.1rem}
-
 .fin-card{background:var(--blanco);border:1px solid var(--borde);border-radius:14px;padding:1.1rem 1.15rem}
-.fin-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.7rem}
-.fin-total{font-size:1.4rem;font-weight:700;color:var(--texto)}
-.fin-total span{font-size:0.82rem;font-weight:500;color:var(--suave)}
-.fin-pct{font-size:0.82rem;font-weight:700;color:var(--ok)}
 .fin-card .barra{margin-bottom:0.9rem}
-.fin-alerta{display:flex;align-items:center;justify-content:space-between;background:var(--amarillo-bg);border:1px solid color-mix(in srgb,var(--amarillo) 25%,transparent);border-radius:9px;padding:0.6rem 0.8rem;cursor:pointer}
-.fin-alerta-txt{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;font-weight:600;color:var(--amarillo)}
-.fin-alerta-txt svg{width:15px;height:15px;flex-shrink:0}
-.fin-alerta-chevron{width:14px;height:14px;color:var(--amarillo);transition:transform 0.2s;flex-shrink:0}
-.fin-alerta.open .fin-alerta-chevron{transform:rotate(180deg)}
-.fin-chips{display:none;flex-wrap:wrap;gap:0.45rem;margin-top:0.65rem}
-.fin-chip{background:var(--bg);border:1px solid color-mix(in srgb,var(--amarillo) 25%,transparent);padding:0.28rem 0.7rem;border-radius:20px;font-size:0.76rem;cursor:pointer;transition:background 0.2s;color:var(--texto)}
-.fin-chip:hover{background:var(--amarillo-bg)}
-.fin-chip-ciclos{color:var(--amarillo);font-weight:600}
-.fin-chips-link{flex-basis:100%;font-size:0.72rem;color:var(--verde);font-weight:600;margin-top:0.15rem;cursor:pointer}
 
 /* ── FINANZAS (desktop only): KPIs con namespace propio (-fin) para no chocar con .kpi-card/.kpi-val/.kpi-label de Resumen ── */
 .kpi-row-fin{display:grid;grid-template-columns:repeat(3,1fr);gap:0.9rem;margin-bottom:1.4rem}
@@ -1072,18 +989,6 @@ tr.total td{background:var(--crema);font-weight:700;border-top:2px solid var(--b
   #btn-nuevo-alumno{display:none}
   #page-cobros>.page-header{display:none}
 
-  /* ── Dashboard: "Esta semana" primero ── */
-  #page-dashboard.active{display:flex;flex-direction:column}
-  #page-dashboard .top-row{order:2}
-  #page-dashboard .resumen-semana-wrap{order:1;margin-bottom:1rem}
-  #page-dashboard .page-header{order:0}
-
-  /* ── Resumen: KPIs + financiero apilados, en una columna ── */
-  .top-row{display:flex;flex-direction:column;gap:1.3rem}
-  .top-row .seccion-label{display:block}
-  .kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem}
-  .kpi-row .seccion-label{grid-column:1/-1}
-  .fin-wrap{display:block}
 
   /* ── Agenda: scroll horizontal en lugar de colapsar ── */
   .semana-grid{grid-template-columns:repeat(5,minmax(160px,1fr));overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -1783,49 +1688,6 @@ div.pv-mf.ro{cursor:default}
   </div>
   <!-- DASHBOARD -->
   <div class="page active" id="page-dashboard">
-    <div class="page-header">
-      <h2>Resumen</h2>
-      <p id="fecha-hoy"></p>
-    </div>
-    <div class="top-row">
-      <div class="kpi-row">
-        <div class="seccion-label">Operativo</div>
-        <div class="kpi-card">
-          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-          <div class="kpi-val" id="stat-alumnos">—</div>
-          <div class="kpi-label">Alumnos activos</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-          <div class="kpi-val" id="stat-sesiones">—</div>
-          <div class="kpi-label">Sesiones esta semana</div>
-        </div>
-      </div>
-      <div class="fin-wrap">
-        <div class="seccion-label">Financiero</div>
-        <div class="fin-card">
-          <div class="fin-top">
-            <div class="fin-total" id="fin-total">—</div>
-            <div class="fin-pct" id="fin-pct">—</div>
-          </div>
-          <div class="barra"><div class="barra-fill" id="fin-barra-fill"></div></div>
-          <div class="fin-alerta" id="fin-alerta" onclick="toggleFinAlerta()" style="display:none">
-            <span class="fin-alerta-txt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span id="fin-alerta-count"></span></span>
-            <svg class="fin-alerta-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-          </div>
-          <div class="fin-chips" id="fin-chips" style="display:none"></div>
-        </div>
-      </div>
-    </div>
-    <div class="resumen-semana-wrap">
-      <div class="seccion-label">
-        <span class="resumen-lbl-desktop" id="resumen-semana-titulo">Esta semana</span>
-        <span class="resumen-lbl-mobile" id="resumen-hoy-titulo"></span>
-        <a onclick="showPage('agenda')">Ver agenda completa →</a>
-      </div>
-      <div class="mini-semana" id="resumen-semana"></div>
-      <div class="hoy-lista" id="resumen-hoy"></div>
-    </div>
     <div id="rc" class="rc"></div>
   </div>
 
@@ -2389,7 +2251,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.6 · 26/11/2026';
+const VERSION_APP='1.7 · 26/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -3994,9 +3856,6 @@ function _fabAccion(){
 }
 
 // ── FECHA ──
-function fechaHoy(){
-  return new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-}
 function mesKey(){
   const d=new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
@@ -4004,44 +3863,6 @@ function mesKey(){
 
 // ── DASHBOARD ──
 function renderDashboard(){
-  document.getElementById('fecha-hoy').textContent=fechaHoy();
-  const activos=alumnos.filter(a=>a.estado==='activo');
-  document.getElementById('stat-alumnos').textContent=activos.length;
-  let sesiones=0; activos.forEach(a=>sesiones+=a.dias.length);
-  document.getElementById('stat-sesiones').textContent=sesiones;
-  const mk=mesKey(); const cm=cobros[mk]||{};
-  let totalCuotas=0, totalEsperado=0;
-  activos.forEach(a=>{
-    const c=cm[a.id];
-    totalEsperado+=parseFloat(a.monto||0);
-    if(c&&c.estado==='pagado') totalCuotas+=montoCobro(a,c);
-  });
-  const pct=totalEsperado>0?Math.min(100,Math.round((totalCuotas/totalEsperado)*100)):0;
-  document.getElementById('fin-total').innerHTML=`$${totalCuotas.toLocaleString('es-AR')} <span>/ $${totalEsperado.toLocaleString('es-AR')}</span>`;
-  document.getElementById('fin-pct').textContent=pct+'%';
-  document.getElementById('fin-barra-fill').style.width=pct+'%';
-
-  // Alerta de cuota vencida — colapsada dentro de fin-card. Mismo cálculo que
-  // Cobros → Vencimientos (no el mes calendario, que podía contradecirlo —
-  // handoff seguimiento-y-alerta-cobros). No llama a asegurarDiaPago(): abrir
-  // Resumen no debe escribir en el Sheet.
-  const alertaEl=document.getElementById('fin-alerta');
-  const chipsEl=document.getElementById('fin-chips');
-  const hoy0Alerta=new Date(); hoy0Alerta.setHours(0,0,0,0);
-  const vencidos=activos.map(a=>calcularVencimiento(a,hoy0Alerta))
-    .filter(r=>r.categoria==='vencido')
-    .sort((x,y)=>y.ciclosAdeudados-x.ciclosAdeudados);
-  if(vencidos.length===0){
-    alertaEl.style.display='none';
-    chipsEl.style.display='none';
-  } else {
-    alertaEl.style.display='flex';
-    document.getElementById('fin-alerta-count').textContent=`${vencidos.length} alumno${vencidos.length>1?'s':''} con cuota vencida`;
-    chipsEl.innerHTML=vencidos.map(r=>`<span class="fin-chip" onclick="verAlumno('${r.alumno.id}')">${escaparHTML(r.alumno.nombre)} · <span class="fin-chip-ciclos">${r.ciclosAdeudados} ciclo${r.ciclosAdeudados!==1?'s':''}</span></span>`).join('')
-      + `<span class="fin-chips-link" onclick="irAVencimientos()">Ver vencimientos →</span>`;
-  }
-  renderResumenSemana();
-  renderResumenHoy();
   renderResumenCompu();
 }
 
@@ -5924,145 +5745,6 @@ function getSemanaActual(){
   });
 }
 
-// Resumen (handoff resumen-mobile-y-desktop, 2026-09-28): lógica compartida
-// entre la semana de desktop (renderResumenSemana) y la lista del día en
-// mobile (renderResumenHoy). No reemplaza a getSemanaActual(), que sigue
-// usando Agenda — Agenda queda fuera de alcance y el fin de semana ahí sigue
-// mostrando la semana que ya terminó.
-const DURACION_TURNO_MIN=60; // supuesto de duración de sesión, ajustable
-
-// Semana que muestra Resumen: la que está en curso de lunes a viernes, o —el
-// fin de semana— la PRÓXIMA (para no mostrar una semana que ya terminó).
-function getSemanaResumen(hoy){
-  const dow=hoy.getDay(); // 0=domingo, 6=sábado
-  const lunes=new Date(hoy);
-  if(dow===0) lunes.setDate(hoy.getDate()+1);       // domingo → mañana
-  else if(dow===6) lunes.setDate(hoy.getDate()+2);  // sábado → pasado mañana
-  else lunes.setDate(hoy.getDate()-(dow-1));        // lunes de esta semana
-  lunes.setHours(0,0,0,0);
-  return DIAS.map((nombre,idx)=>{
-    const fecha=new Date(lunes); fecha.setDate(lunes.getDate()+idx);
-    return {nombre, fecha, fechaStr:fecha.toLocaleDateString('es-AR',{day:'numeric',month:'numeric'})};
-  });
-}
-
-// 'pasado' | 'en-curso' | 'proximo' para un turno de un día dado. fechaDia va
-// a medianoche (00:00); un día anterior a hoy es todo pasado (aunque no tenga
-// horario, porque ya terminó); un día futuro o sin horario es "proximo" (no
-// se puede saber si ya pasó); hoy se compara contra la duración supuesta.
-function estadoTurno(fechaDia, hora, ahora){
-  const hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
-  if(fechaDia<hoy0) return 'pasado';
-  if(fechaDia>hoy0 || !hora) return 'proximo';
-  const [h,m]=hora.split(':').map(Number);
-  const inicio=new Date(ahora); inicio.setHours(h,m,0,0);
-  const fin=new Date(inicio.getTime()+DURACION_TURNO_MIN*60000);
-  if(ahora>=fin) return 'pasado';
-  if(ahora>=inicio) return 'en-curso';
-  return 'proximo';
-}
-
-// Mini agenda semanal de Resumen (handoff mini-agenda-resumen, extendida por
-// resumen-mobile-y-desktop): mismos 5 días y datos que renderAgenda(), pero
-// de solo lectura — sin drag ni modal de edición. El click en un turno
-// navega directo a verAlumno(id). Solo visible en desktop (≥769px); en
-// mobile la reemplaza renderResumenHoy().
-function renderResumenSemana(){
-  const grid=document.getElementById('resumen-semana');
-  const tituloEl=document.getElementById('resumen-semana-titulo');
-  const activos=alumnos.filter(a=>a.estado==='activo');
-  const ahora=new Date();
-  const esFinDeSemana=ahora.getDay()===0||ahora.getDay()===6;
-  const semana=getSemanaResumen(ahora);
-  const hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
-  const nombresCortos={Lunes:'Lun',Martes:'Mar',Miércoles:'Mié',Jueves:'Jue',Viernes:'Vie'};
-
-  tituloEl.textContent=esFinDeSemana?'Próxima semana':'Esta semana';
-  tituloEl.classList.toggle('titulo-proxima', esFinDeSemana);
-
-  // Mismo cache que renderAgenda(): parsear horarios una sola vez por alumno
-  const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
-
-  grid.innerHTML=semana.map(({nombre,fecha,fechaStr})=>{
-    const esHoy=!esFinDeSemana && fecha.getTime()===hoy0.getTime();
-    const turnos=activos.filter(a=>a.dias.includes(nombre)).sort((a,b)=>{
-      const horaA=hpdCache.get(a.id)[nombre]||'99:99';
-      const horaB=hpdCache.get(b.id)[nombre]||'99:99';
-      return horaA.localeCompare(horaB);
-    });
-
-    let cuerpo;
-    if(turnos.length===0){
-      cuerpo='<div class="mini-libre">Libre</div>';
-    } else {
-      cuerpo=turnos.map(a=>{
-        const hora=hpdCache.get(a.id)[nombre]||'Sin horario';
-        const freq=parseInt(a.frecuencia,10)||2;
-        const estado=estadoTurno(fecha, hpdCache.get(a.id)[nombre], ahora);
-        const horaTxt=estado==='en-curso'?`${escaparHTML(hora)}<span class="mini-ahora">Ahora</span>`:escaparHTML(hora);
-        const clases=['mini-turno', estado==='pasado'?'pasado':'', estado==='en-curso'?'en-curso':''].filter(Boolean).join(' ');
-        return `<div class="${clases}" onclick="verAlumno('${a.id}')">
-          <span class="mini-dot freq-${freq}"></span>
-          <div class="mini-turno-txt"><div class="mini-hora">${horaTxt}</div><div class="mini-nombre">${escaparHTML(a.nombre)}</div></div>
-        </div>`;
-      }).join('');
-    }
-
-    return `<div class="mini-dia${esHoy?' hoy':''}">
-      <div class="mini-dia-header"><span class="mini-dia-nombre">${nombresCortos[nombre]}</span><span class="mini-dia-fecha">${fechaStr}</span></div>
-      ${cuerpo}
-    </div>`;
-  }).join('');
-}
-
-// Lista del día en mobile (≤768px, CSS decide cuál de las dos se ve): mismo
-// filtro/orden/estado que la semana de desktop, para un solo día. Entre
-// semana muestra hoy; el fin de semana, el próximo lunes (primer elemento de
-// getSemanaResumen(), que ya devuelve la semana siguiente ese caso).
-function renderResumenHoy(){
-  const cont=document.getElementById('resumen-hoy');
-  const tituloEl=document.getElementById('resumen-hoy-titulo');
-  const activos=alumnos.filter(a=>a.estado==='activo');
-  const ahora=new Date();
-  const esFinDeSemana=ahora.getDay()===0||ahora.getDay()===6;
-  const hoy0=new Date(ahora); hoy0.setHours(0,0,0,0);
-  const semana=getSemanaResumen(ahora);
-  const dia=esFinDeSemana?semana[0]:semana.find(d=>d.fecha.getTime()===hoy0.getTime());
-
-  const tituloDia=`${dia.nombre} ${dia.fechaStr}`;
-  tituloEl.innerHTML=esFinDeSemana
-    ? `Próximo · <span class="hoy-titulo-dia proximo">${escaparHTML(tituloDia)}</span>`
-    : `Hoy · <span class="hoy-titulo-dia">${escaparHTML(tituloDia)}</span>`;
-
-  const hpdCache=new Map(activos.map(a=>[a.id, stringToHorariosPorDia(a.horario)]));
-  const turnos=activos.filter(a=>a.dias.includes(dia.nombre)).sort((a,b)=>{
-    const horaA=hpdCache.get(a.id)[dia.nombre]||'99:99';
-    const horaB=hpdCache.get(b.id)[dia.nombre]||'99:99';
-    return horaA.localeCompare(horaB);
-  });
-
-  if(turnos.length===0){
-    cont.innerHTML=esFinDeSemana
-      ? `<div class="hoy-vacio">No tenés turnos el ${escaparHTML(dia.nombre.toLowerCase())}.</div>`
-      : `<div class="hoy-vacio">Hoy no tenés turnos.</div>`;
-    return;
-  }
-
-  cont.innerHTML=turnos.map(a=>{
-    const hora=hpdCache.get(a.id)[dia.nombre];
-    const freq=parseInt(a.frecuencia,10)||2;
-    const estado=estadoTurno(dia.fecha, hora, ahora);
-    const clases=['hoy-turno', estado==='pasado'?'pasado':'', estado==='en-curso'?'en-curso':'', hora?'':'hoy-sinhora'].filter(Boolean).join(' ');
-    const derecha=estado==='en-curso'?'<span class="hoy-ahora">Ahora</span>':'<span class="hoy-chevron">›</span>';
-    return `<div class="${clases}" onclick="verAlumno('${a.id}')">
-      <span class="mini-dot freq-${freq}"></span>
-      <span class="hoy-hora">${escaparHTML(hora||'Sin horario')}</span>
-      <span class="hoy-nombre">${escaparHTML(a.nombre)}</span>
-      ${derecha}
-    </div>`;
-  }).join('');
-}
-
 // Agenda (opción A, 25/11): un turno por línea (hora · nombre · duración) para que la semana
 // entre sin scroll en la compu; lo que ya pasó se apaga, el turno en curso se resalta y ✓ marca
 // a quien ya se le tomó asistencia ese día. Los online (sin turno) se nombran abajo.
@@ -6623,12 +6305,6 @@ function toggleBono(el){
   input.style.display=input.style.display==='flex'?'none':'flex';
 }
 
-function toggleFinAlerta(){
-  const alerta=document.getElementById('fin-alerta');
-  const chips=document.getElementById('fin-chips');
-  chips.style.display=chips.style.display==='flex'?'none':'flex';
-  alerta.classList.toggle('open');
-}
 
 async function registrarBono(mk,id){
   const input=document.getElementById(`bono-${id}`);
