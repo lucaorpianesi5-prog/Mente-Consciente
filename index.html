@@ -266,12 +266,22 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .rc-btn:hover{border-color:var(--verde)}
 .rc-btn.v{background:var(--verde);color:var(--sobre-acento);border-color:transparent;font-weight:600}
 .rc-ok{color:var(--verde);font-weight:700;font-size:0.8rem;white-space:nowrap}
+.rc-turno.toca{cursor:pointer;transition:filter .15s}
+.rc-turno.toca:hover{filter:brightness(1.08)}
+.rc-turno.toca:active{filter:brightness(1.15)}
+.rc-card h3 .rc-ayuda{margin-left:auto;font-weight:400}
+.rc-ib{width:42px;height:42px;border-radius:12px;border:1px solid var(--borde);background:var(--blanco);color:var(--texto);display:grid;place-items:center;cursor:pointer;padding:0;flex:none}
+.rc-ib svg{width:19px;height:19px}
+.rc-ib:hover{border-color:var(--verde)}
+.rc-ib.ok{background:var(--verde);border-color:transparent;color:var(--sobre-acento);cursor:default}
+.rc-ib.v{border-color:var(--verde);color:var(--verde)}
 .rc-tag{font-size:0.66rem;padding:0.05rem 0.4rem;border-radius:6px;background:color-mix(in srgb,var(--amarillo) 16%,transparent);color:var(--amarillo);margin-left:0.4rem;font-weight:700;vertical-align:2px}
 .rc-item{display:flex;gap:0.65rem;padding:0.55rem 0.7rem;border-radius:10px;background:var(--crema);margin-bottom:0.4rem;align-items:center}
 .rc-item .dot{width:8px;height:8px;border-radius:50%;flex:none}
 .rc-item>div{min-width:0}
 .rc-item b{font-size:0.85rem}.rc-item small{display:block;color:var(--suave);font-size:0.74rem;margin-top:0.05rem}
 .rc-item .rc-btn{margin-left:auto}
+.ef-nada{font-size:0.8rem;color:var(--pd-text3);padding:0 0.2rem 0.8rem}
 .ef .ef-fecha{font-weight:500;color:var(--pd-text3);font-size:0.8em}
 .ef-siempre{padding:0 1rem 0.75rem;display:flex;flex-direction:column;gap:0.3rem;font-size:0.82rem}
 .ef-salud{color:var(--pd-amber)} .ef-salud b{color:var(--pd-text)}
@@ -314,7 +324,8 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
   .rc-turno{grid-template-columns:2.9rem minmax(0,1fr) auto;gap:0.55rem;padding:0.6rem}
   .rc-turno .n b{font-size:0.92rem}
   .rc-turno .n small{white-space:normal;font-size:0.72rem}
-  .rc-acc{flex-direction:column;align-items:stretch;gap:0.3rem}
+  .rc-acc{gap:0.35rem}
+  .rc-card h3{flex-wrap:wrap}
   .rc-btn{padding:0.42rem 0.6rem;font-size:0.76rem;text-align:center}
   .rc-ok{font-size:0.74rem;text-align:center}
   .rc-item{padding:0.55rem 0.6rem}
@@ -2378,7 +2389,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.5 · 26/11/2026';
+const VERSION_APP='1.6 · 26/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -4146,6 +4157,7 @@ function _rcProyecto(){
   </div>`;
 }
 
+const _RC_CHECK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
 function _rcHoy(activos, fz){
   const ahora=new Date(), min=ahora.getHours()*60+ahora.getMinutes();
   const nombreHoy=_DIAS_SEM[ahora.getDay()];
@@ -4161,13 +4173,13 @@ function _rcHoy(activos, fz){
     else if(!(a.carpetaDrive||'').trim()) plan='Sin link de Fuerza';
     else plan=fz.leyendo?'Leyendo su Fuerza…':'Fuerza';
     const finTxt=r&&r.fin!=null?`${Math.floor(r.fin/60)}:${String(r.fin%60).padStart(2,'0')}`:'';
-    return `<div class="rc-turno${vino?' hecho':''}${enCurso&&!vino?' ahora':''}">
+    return `<div class="rc-turno toca${vino?' hecho':''}${enCurso&&!vino?' ahora':''}" onclick="verAlumno('${a.id}')" role="button" title="Abrir el perfil de ${escaparHTML(a.nombre)}">
       <div class="h">${r?escaparHTML(r.txt):'—'}<small>${finTxt}</small></div>
       <div class="n"><b>${escaparHTML(a.nombre)}</b>${tag}<small>${escaparHTML(plan)}${enCurso?' · ahora':''}</small></div>
-      <div class="rc-acc">${vino?'<span class="rc-ok">✓ Asistencia</span>':`<button class="rc-btn${enCurso?' v':''}" onclick="_rcAsistencia('${a.id}')">✓ Asistencia</button>`}${(a.carpetaDrive||'').trim()?`<button class="rc-btn" onclick="_rcFuerza('${a.id}')">Fuerza</button>`:''}</div>
+      <div class="rc-acc" onclick="event.stopPropagation()">${(a.carpetaDrive||'').trim()?`<button class="rc-ib" onclick="_rcFuerza('${a.id}')" title="Abrir su Fuerza" aria-label="Abrir la Fuerza de ${escaparHTML(a.nombre)}">${ic('dumbbell')}</button>`:''}${vino?`<span class="rc-ib ok" title="Asistencia tomada" aria-label="Asistencia tomada">${_RC_CHECK}</span>`:`<button class="rc-ib${enCurso?' v':''}" onclick="_rcAsistencia('${a.id}')" title="Marcar asistencia" aria-label="Marcar la asistencia de ${escaparHTML(a.nombre)}">${_RC_CHECK}</button>`}</div>
     </div>`;
   }).join('');
-  return `<div class="rc-card"><h3>Hoy <small>${turnos.length?`${con} de ${turnos.length} con asistencia`:''}</small></h3>${filas||'<p class="rc-vacio">Hoy no tenés turnos.</p>'}</div>`;
+  return `<div class="rc-card"><h3>Hoy <small>${turnos.length?`${con} de ${turnos.length} con asistencia`:''}</small>${turnos.length?'<small class="rc-ayuda">Tocá un alumno para abrir su perfil</small>':''}</h3>${filas||'<p class="rc-vacio">Hoy no tenés turnos.</p>'}</div>`;
 }
 
 function _rcPlanes(activos, fz){
@@ -4477,7 +4489,7 @@ function pdBadge(estado){
 function _renderEntrevistaFicha(a){
   const el=document.getElementById('perfil-entrevista'); if(!el) return;
   const e=_entDe(a);
-  if(!e){ el.innerHTML=''; return; }
+  if(!e){ el.innerHTML=`<div class="ef-nada">Entrevista: todavía no la completó${a.email?'':' (sin mail cargado, no puede entrar al portal)'}</div>`; return; }
   const esc=escaparHTML, lista=x=>Array.isArray(x)&&x.length?x.map(esc).join(', '):'';
   const fila=(lbl,val)=>val?`<div class="ef-f"><span>${lbl}</span><b>${val}</b></div>`:'';
   const nivel=n=>n?`<b class="${n<=2?'ef-bajo':''}">${n}/5</b>`:'';
