@@ -272,6 +272,14 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .rc-item>div{min-width:0}
 .rc-item b{font-size:0.85rem}.rc-item small{display:block;color:var(--suave);font-size:0.74rem;margin-top:0.05rem}
 .rc-item .rc-btn{margin-left:auto}
+.ef .ef-fecha{font-weight:500;color:var(--pd-text3);font-size:0.8em}
+.ef-siempre{padding:0 1rem 0.75rem;display:flex;flex-direction:column;gap:0.3rem;font-size:0.82rem}
+.ef-salud{color:var(--pd-amber)} .ef-salud b{color:var(--pd-text)}
+.ef-ok{color:var(--pd-text3)} .ef-falta{color:var(--pd-amber)}
+.ef-cuerpo{display:flex;flex-direction:column;gap:0.35rem}
+.ef-f{display:flex;justify-content:space-between;gap:1rem;font-size:0.84rem;border-bottom:1px solid var(--pd-border);padding-bottom:0.35rem}
+.ef-f span{color:var(--pd-text3)} .ef-f b{text-align:right;font-weight:600}
+.ef-f b.ef-bajo{color:var(--pd-red)}
 .rc-nums{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0.5rem;margin-bottom:0.7rem}
 .rc-nums div{background:var(--crema);border-radius:9px;padding:0.55rem 0.7rem;min-width:0}
 .rc-nums small{color:var(--texto3);font-size:0.7rem;display:block}
@@ -1311,6 +1319,41 @@ button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
 .ent-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;justify-content:center}
 .ent-chip{padding:0.65rem 0.95rem;border-radius:22px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:0.88rem;font-weight:600;cursor:pointer}
 .ent-chip.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
+.ent-kick{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--pd-verde);font-weight:700;text-align:center}
+.ent-n{font-size:0.78rem;color:var(--pd-text3);font-variant-numeric:tabular-nums;margin-left:-4px}
+.ent-tag{align-self:center;font-size:0.7rem;padding:2px 9px;border-radius:8px;background:color-mix(in srgb,var(--pd-azul) 18%,transparent);color:var(--pd-azul);font-weight:700}
+.ent-op{display:flex;flex-direction:column;gap:8px;width:100%;margin-top:4px}
+.ent-op button{display:flex;gap:12px;align-items:center;text-align:left;padding:0.85rem 1rem;border-radius:14px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font:inherit;font-weight:600;font-size:0.95rem;cursor:pointer}
+.ent-op button i{width:18px;height:18px;border-radius:50%;border:2px solid var(--pd-border2);flex:none}
+.ent-op button.on{border-color:var(--pd-verde);background:var(--pd-verde-dim)}
+.ent-op button.on i{border-color:var(--pd-verde);background:radial-gradient(circle,var(--pd-verde) 45%,transparent 50%)}
+.ent-op small{display:block;font-weight:400;color:var(--pd-text2);font-size:0.8rem;margin-top:2px}
+.ent-esc{width:100%;margin-top:6px}
+.ent-esc b{display:block;font-size:0.95rem;margin-bottom:8px}
+.ent-esc .f{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.ent-esc .f button{height:46px;border-radius:12px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font:inherit;font-weight:700;font-size:1rem;cursor:pointer}
+.ent-esc .f button.on{border-color:var(--pd-verde);background:var(--pd-verde-dim);color:var(--pd-verde)}
+.ent-esc .f button.bajo{border-color:var(--pd-red);background:var(--pd-red-dim);color:var(--pd-red)}
+.ent-esc .x{display:flex;justify-content:space-between;font-size:0.74rem;color:var(--pd-text3);margin-top:5px}
+.ent-chip .est{margin-left:7px;opacity:0.4;font-size:0.95em}
+.ent-chip.princ{background:var(--pd-verde);color:var(--pd-sobre-acento);border-color:var(--pd-verde)}
+.ent-chip.princ .est{opacity:1}
+.ent-aviso{display:flex;gap:10px;padding:0.8rem 0.9rem;border-radius:12px;background:var(--pd-card);font-size:0.82rem;color:var(--pd-text2);line-height:1.5;margin-top:6px}
+.ent-aviso .i{width:16px;height:16px;flex:none;margin-top:2px}
+.ent-alerta{padding:0.9rem 1rem;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--pd-amber) 55%,transparent);background:color-mix(in srgb,var(--pd-amber) 10%,transparent);margin-top:6px}
+.ent-alerta b{color:var(--pd-amber);display:block;margin-bottom:4px}
+.ent-alerta p{font-size:0.82rem;color:var(--pd-text2);line-height:1.5}
+.ent-sw{display:flex;flex-direction:column;gap:7px;width:100%}
+.ent-sw button{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0.75rem 0.95rem;border-radius:12px;background:var(--pd-card);border:none;color:var(--pd-text);font:inherit;font-weight:600;font-size:0.92rem;text-align:left;cursor:pointer}
+.ent-sw i{width:40px;height:23px;border-radius:12px;background:var(--pd-border2);position:relative;flex:none;transition:background .15s}
+.ent-sw i::after{content:'';position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:left .15s}
+.ent-sw .on i{background:var(--pd-amber)} .ent-sw .on i::after{left:20px}
+.ent-decl{display:flex;gap:12px;padding:0.9rem 1rem;border-radius:14px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);text-align:left;font:inherit;font-size:0.88rem;line-height:1.5;cursor:pointer}
+.ent-decl i{width:24px;height:24px;border-radius:7px;border:2px solid var(--pd-border2);display:grid;place-items:center;font-style:normal;font-weight:800;flex:none}
+.ent-decl.on{border-color:var(--pd-verde);background:var(--pd-verde-dim)}
+.ent-decl.on i{background:var(--pd-verde);border-color:var(--pd-verde);color:var(--pd-sobre-acento)}
+.portal-completar .pc-x{background:none;border:none;color:var(--pd-text3);font-size:0.95rem;cursor:pointer;padding:4px 6px}
+.portal-completar>div[role=button]{cursor:pointer}
 .ent-error{color:var(--pd-red);font-size:0.84rem;font-weight:600}
 .ent-pie{display:flex;flex-direction:column;gap:8px;padding-top:16px}
 .ent-btn{height:54px;border-radius:14px;font-family:inherit;font-size:1rem;font-weight:700;cursor:pointer;border:none}
@@ -1979,6 +2022,9 @@ div.pv-mf.ro{cursor:default}
       <div class="stats-secundarios" id="perfil-stats-secundarios"></div>
 
 
+      <!-- ENTREVISTA (26/11): lo que respondió el alumno en el portal -->
+      <div id="perfil-entrevista"></div>
+
       <!-- SALTO RÁPIDO -->
       <div class="jump-bar">
         <button class="jump-chip" onclick="irYAbrirPerfil('body-perfil-seguimiento')"><svg class="i s"><use href="#i-notebook"/></svg> Seguimiento</button>
@@ -2332,7 +2378,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.4 · 26/11/2026';
+const VERSION_APP='1.5 · 26/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -2356,7 +2402,8 @@ const RANGO = {
   // U=mapeoUrl (handoff biblioteca-a-mapeo-externo): link al Sheet de Mapeo
   // propio de cada alumno, mismo patrón que carpetaDrive/nutriDrive.
   // W=modalidad (25/11): 'online' o vacío (= presencial). Online = sin días ni horario.
-  ALUMNOS_READ:        'Alumnos!A2:W',
+  // X=entrevista (26/11): JSON de la entrevista ampliada que escribe el alumno desde el portal (Luca solo la lee).
+  ALUMNOS_READ:        'Alumnos!A2:X',
   ALUMNOS_START:       'Alumnos!A2',
   ALUMNOS_ID_COL:      'Alumnos!A2:A',
   COBROS_READ:         'Cobros!A2:G',
@@ -2706,6 +2753,7 @@ let _portalMenuAbierto=false, _portalCuotaAbierta=false;
 function _pintarPortal(el,data){
     // El proxy avisa si ya acepta la entrevista inicial (acción "perfil"): recién ahí se muestra
     if(data && data.perfilEditable) PORTAL_PERFIL_EDITABLE=true;
+    if(data && data.entrevista2) PORTAL_ENT2=true;
     _portalDatosActual=data;
     const a = {
       ...data.alumno,
@@ -2750,8 +2798,12 @@ function _pintarPortal(el,data){
 
     const editarCuerpo=PORTAL_PERFIL_EDITABLE?'abrirEntrevista(_portalAlumnoActual,true)':'';
     const cuerpoHTML=bloqueCuerpo(a,editarCuerpo);
+    // Entrevista ampliada (26/11): si el proxy la acepta y el alumno todavía no la hizo, una tarjeta para completarla
+    let entCerrada=false; try{ entCerrada=!!localStorage.getItem('mc_ent2_cerrada_'+_portalToken); }catch(e){}
+    const faltaEnt2=PORTAL_PERFIL_EDITABLE&&PORTAL_ENT2&&!_entDe(a)&&!entCerrada;
     const completarHTML=(PORTAL_PERFIL_EDITABLE&&!cuerpoHTML)
-      ?`<button type="button" class="portal-completar" onclick="abrirEntrevista(_portalAlumnoActual,false)"><span>${ic('sprout')}</span><div><b>Completá tu perfil</b><small>5 preguntas rápidas · menos de un minuto</small></div>${ic('chev')}</button>`:'';
+      ?`<button type="button" class="portal-completar" onclick="abrirEntrevista(_portalAlumnoActual,false)"><span>${ic('sprout')}</span><div><b>Completá tu perfil</b><small>${PORTAL_ENT2?'Unas preguntas para armar tu plan · 3 minutos':'5 preguntas rápidas · menos de un minuto'}</small></div>${ic('chev')}</button>`
+      :faltaEnt2?`<div class="portal-completar"><span>${ic('sprout')}</span><div onclick="abrirEntrevista(_portalAlumnoActual,true)" role="button"><b>Completá tu entrevista</b><small>Preguntas nuevas sobre tu experiencia, tu día a día y tu salud · 3 minutos</small></div><button type="button" class="pc-x" aria-label="Cerrar" onclick="try{localStorage.setItem('mc_ent2_cerrada_'+_portalToken,'1')}catch(e){};_portalRepintar()">✕</button></div>`:'';
     // Mapeo: solo si el proxy manda el campo (si no lo manda, el botón no aparece)
     const links={fuerza:a.carpetaDrive||'', nutri:a.nutriDrive||''};
     if(a.mapeoUrl!==undefined) links.mapeo=a.mapeoUrl||'';
@@ -2815,11 +2867,38 @@ let _portalAlumnoActual=null;
 let PORTAL_PERFIL_EDITABLE=false;
 let _portalToken='';
 let _ent=null;
+let PORTAL_ENT2=false;   // el proxy acepta la entrevista ampliada (columna X): lo avisa con entrevista2:true
 const ENT_OBJETIVOS=['Ganar fuerza','Ganar músculo','Bajar de peso','Salud y bienestar','Rendimiento deportivo','Movilidad y menos dolor'];
-const ENT_PASOS=5;
+// Opciones de la entrevista ampliada (las mismas listas valida el proxy: mantener en sincronía)
+const ENT_OP={
+  modalidad:[['presencial','Presencial','Entreno con Luca en el espacio'],['online','Online','Entreno por mi cuenta con el plan de Luca']],
+  sexo:['Mujer','Hombre','Prefiero no decir'],
+  actPrev:['Fútbol','Running','Natación','Artes marciales','Danza','Yoga','Ciclismo','Crossfit','Tenis / pádel','Gimnasio','Otro','Ninguna'],
+  pesas:['Nunca','Menos de 6 meses','6 meses a 2 años','Más de 2 años'],
+  ahora:['Sí, entreno ahora','Paré hace menos de un año','Paré hace más de un año'],
+  actividad:[['Sedentario','Paso casi todo el día sentado o quieto'],['Algo activo','Camino o me muevo un poco todos los días'],['Muy activo','Estoy en movimiento buena parte del día']],
+  trabajo:['Sentado casi todo el día','De pie','En movimiento','Físico pesado'],
+  dias:['2 días','3 días','4 días','5 días'],
+  duracion:['30 min','45 min','60 min','90 min'],
+  lugares:['Casa','Gimnasio','Plaza o parque'],
+  elementos:['Mancuernas','Barra y discos','Bandas elásticas','Kettlebell','Barra de dominadas','Banco','Colchoneta','Nada'],
+  salud:['Una lesión actual','Dolor al moverme','Una condición médica diagnosticada','Medicación que afecte el ejercicio','Embarazo','Una cirugía reciente']
+};
 const _entISO=dmy=>{ const p=String(dmy||'').split('/'); return p.length===3?`${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`:''; };
 const _entDMY=iso=>{ const p=String(iso||'').split('-'); return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:''; };
-
+// Pasos según lo que soporta el proxy y la modalidad elegida. [id, sección, soloOnline]
+function _entPasos(){
+  const d=_ent?_ent.d:{}, on=d.modalidad==='online', v2=PORTAL_ENT2;
+  const L=[['hola','']];
+  if(v2) L.push(['modalidad','Sobre vos']);
+  L.push(['fecha','Sobre vos'],['altura','Sobre vos'],['peso','Sobre vos']);
+  if(v2&&on) L.push(['sexo','Sobre vos']);
+  if(v2){ L.push(['actPrev','Tu experiencia'],['pesas','Tu experiencia']); if(d.pesas!=='Nunca') L.push(['ahora','Tu experiencia']); L.push(['actividad','Tu día a día'],['trabajo','Tu día a día'],['descanso','Tu día a día']); }
+  L.push(['objetivos','Lo que querés lograr'],['molestias','Lo que querés lograr']);
+  if(v2&&on) L.push(['dias','Tu plan online'],['duracion','Tu plan online'],['lugar','Tu plan online']);
+  if(v2) L.push(['salud','Salud'],['apto','Salud']);
+  return L;
+}
 function _entPendiente(a){
   if(!PORTAL_PERFIL_EDITABLE||!_portalToken) return false;
   let visto=false; try{ visto=!!localStorage.getItem('mc_entrevista_'+_portalToken); }catch(e){}
@@ -2832,9 +2911,14 @@ function _entObjetivosPrevios(a){
 }
 function abrirEntrevista(a,editar){
   if(!PORTAL_PERFIL_EDITABLE) return;
+  const e=_entDe(a)||{};
   _ent={paso:editar?1:0, editar:!!editar, nombre:(a.nombre||'').split(' ')[0], d:{
     fechaNac:a.fechaNac||'', estatura:a.estatura||'', pesoActual:a.pesoActual||'',
-    objetivos:_entObjetivosPrevios(a), objetivoTxt:'', zonas:[], molestiaTxt:'', sinMolestias:false }, saltados:new Set(), guardando:false, error:''};
+    objetivos:_entObjetivosPrevios(a).slice(0,PORTAL_ENT2?3:99), principal:e.principal||'', objetivoTxt:'', zonas:[], molestiaTxt:'', sinMolestias:false,
+    modalidad:e.modalidad||(a.modalidad==='online'?'online':'presencial'), sexo:e.sexo||'', actPrev:e.actPrev||[], pesas:e.pesas||'', ahora:e.ahora||'',
+    actividad:e.actividad||'', trabajo:e.trabajo||'', sueno:e.sueno||0, estres:e.estres||0, dias:e.dias||'', duracion:e.duracion||'',
+    lugares:e.lugares||[], elementos:e.elementos||[], salud:e.salud||[], apto:false }, saltados:new Set(), guardando:false, error:''};
+  if(_ent.d.principal && !_ent.d.objetivos.includes(_ent.d.principal)) _ent.d.principal=_ent.d.objetivos[0]||'';
   let el=document.getElementById('entrevista');
   if(!el){ el=document.createElement('div'); el.id='entrevista'; document.body.appendChild(el); }
   el.style.display='flex';
@@ -2845,62 +2929,99 @@ function cerrarEntrevista(marcarVista){
   const el=document.getElementById('entrevista'); if(el){ el.style.display='none'; el.innerHTML=''; }
   _ent=null;
 }
+const _entId=()=>{ const L=_entPasos(); return (L[Math.min(_ent.paso,L.length-1)]||['hola'])[0]; };
 function _entLeerPaso(){
   const v=id=>{ const x=document.getElementById(id); return x?x.value.trim():''; };
-  const d=_ent.d;
-  if(_ent.paso===1) d.fechaNac=_entDMY(v('ent-fecha'));
-  if(_ent.paso===2) d.estatura=v('ent-altura');
-  if(_ent.paso===3) d.pesoActual=v('ent-peso');
-  if(_ent.paso===4) d.objetivoTxt=v('ent-obj-txt');
-  if(_ent.paso===5) d.molestiaTxt=v('ent-mol-txt');
+  const d=_ent.d, id=_entId();
+  if(id==='fecha') d.fechaNac=_entDMY(v('ent-fecha'));
+  if(id==='altura') d.estatura=v('ent-altura');
+  if(id==='peso') d.pesoActual=v('ent-peso');
+  if(id==='objetivos') d.objetivoTxt=v('ent-obj-txt');
+  if(id==='molestias') d.molestiaTxt=v('ent-mol-txt');
 }
 function _entValido(){
-  const d=_ent.d, n=x=>parseFloat(String(x).replace(',','.'));
-  if(_ent.paso===1 && d.fechaNac){ const y=+d.fechaNac.split('/')[2], hoy=new Date().getFullYear(); if(!(y>hoy-100&&y<=hoy-8)) return 'Revisá la fecha de nacimiento'; }
-  if(_ent.paso===2 && d.estatura && !(n(d.estatura)>=100&&n(d.estatura)<=230)) return 'La altura va en centímetros, por ejemplo 168';
-  if(_ent.paso===3 && d.pesoActual && !(n(d.pesoActual)>=30&&n(d.pesoActual)<=250)) return 'El peso va en kilos, por ejemplo 64,5';
+  const d=_ent.d, n=x=>parseFloat(String(x).replace(',','.')), id=_entId();
+  if(id==='fecha' && d.fechaNac){ const y=+d.fechaNac.split('/')[2], hoy=new Date().getFullYear(); if(!(y>hoy-100&&y<=hoy-8)) return 'Revisá la fecha de nacimiento'; }
+  if(id==='altura' && d.estatura && !(n(d.estatura)>=100&&n(d.estatura)<=230)) return 'La altura va en centímetros, por ejemplo 168';
+  if(id==='peso' && d.pesoActual && !(n(d.pesoActual)>=30&&n(d.pesoActual)<=250)) return 'El peso va en kilos, por ejemplo 64,5';
+  if(id==='apto' && !d.apto) return 'Para terminar tenés que confirmar la declaración';
   return '';
 }
 function entSiguiente(saltear){
   if(!_ent||_ent.guardando) return;
-  if(_ent.paso>0){
+  const id=_entId();
+  if(id!=='hola'){
     _entLeerPaso();
-    if(saltear) _ent.saltados.add(_ent.paso); else _ent.saltados.delete(_ent.paso);
-    if(!saltear){ const err=_entValido(); if(err){ _ent.error=err; _entRender(); return; } }
+    if(saltear && id!=='apto') _ent.saltados.add(id); else _ent.saltados.delete(id);
+    if(!saltear || id==='apto'){ const err=_entValido(); if(err){ _ent.error=err; _entRender(); return; } }
   }
   _ent.error='';
-  if(_ent.paso<ENT_PASOS){ _ent.paso++; _entRender(); return; }
+  if(_ent.paso<_entPasos().length-1){ _ent.paso++; _entRender(); return; }
   _entGuardar();
 }
 function entAtras(){ if(!_ent||_ent.paso<=(_ent.editar?1:0)) return; _entLeerPaso(); _ent.error=''; _ent.paso--; _entRender(); }
+// Elegir: campo de una opción (avanza solo), varias opciones, objetivos con ⭐, salud, escalas
 function entElegir(campo,valor){
   _entLeerPaso();
   const d=_ent.d;
   const alternar=(lista,v)=>lista.includes(v)?lista.filter(x=>x!==v):[...lista,v];
-  if(campo==='objetivo') d.objetivos=alternar(d.objetivos,valor);
+  if(campo==='objetivo'){
+    if(d.objetivos.includes(valor)){ d.objetivos=d.objetivos.filter(x=>x!==valor); if(d.principal===valor) d.principal=d.objetivos[0]||''; }
+    else if(PORTAL_ENT2 && d.objetivos.length>=3){ _ent.error='Podés elegir hasta 3 objetivos'; _entRender(); return; }
+    else { d.objetivos=[...d.objetivos,valor]; if(!d.principal) d.principal=valor; }
+  }
+  if(campo==='principal'){ if(d.objetivos.includes(valor)) d.principal=valor; }
   if(campo==='zona'){ d.sinMolestias=false; d.zonas=alternar(d.zonas,valor); }
   if(campo==='sin'){ d.sinMolestias=!d.sinMolestias; if(d.sinMolestias){ d.zonas=[]; d.molestiaTxt=''; } }
+  if(['actPrev','lugares','elementos','salud'].includes(campo)){
+    let L=alternar(d[campo],valor);
+    const excl=campo==='actPrev'?'Ninguna':campo==='elementos'?'Nada':null;
+    if(excl && L.includes(valor)) L=valor===excl?[excl]:L.filter(x=>x!==excl);
+    d[campo]=L;
+  }
+  if(campo==='sueno'||campo==='estres') d[campo]=+valor;
+  if(campo==='apto') d.apto=!d.apto;
+  _ent.error='';
+  // Preguntas de una sola opción: se marca y pasa sola a la siguiente
+  if(['modalidad','sexo','pesas','ahora','actividad','trabajo','dias','duracion'].includes(campo)){
+    d[campo]=valor;
+    _entRender();
+    setTimeout(()=>{ if(_ent) entSiguiente(false); },260);
+    return;
+  }
   _entRender();
 }
 async function _entGuardar(){
   const d=_ent.d, sk=_ent.saltados, datos={};
-  if(!sk.has(1)&&d.fechaNac) datos.fechaNac=d.fechaNac;
-  if(!sk.has(2)&&d.estatura) datos.estatura=String(d.estatura).replace(',','.');
-  if(!sk.has(3)&&d.pesoActual) datos.pesoActual=String(d.pesoActual).replace(',','.');
+  if(!sk.has('fecha')&&d.fechaNac) datos.fechaNac=d.fechaNac;
+  if(!sk.has('altura')&&d.estatura) datos.estatura=String(d.estatura).replace(',','.');
+  if(!sk.has('peso')&&d.pesoActual) datos.pesoActual=String(d.pesoActual).replace(',','.');
   const CAT_FICHA={'Ganar fuerza':'Fuerza','Ganar músculo':'Composición corporal','Bajar de peso':'Composición corporal','Rendimiento deportivo':'Resistencia','Movilidad y menos dolor':'Movilidad'};
-  if(!sk.has(4)&&(d.objetivos.length||d.objetivoTxt)){
-    datos.objetivos=d.objetivos.map(o=>({texto:o,categoria:CAT_FICHA[o]||''}));
+  if(!sk.has('objetivos')&&(d.objetivos.length||d.objetivoTxt)){
+    const orden=d.principal?[d.principal,...d.objetivos.filter(o=>o!==d.principal)]:d.objetivos;
+    datos.objetivos=orden.map(o=>({texto:o,categoria:CAT_FICHA[o]||''}));
     if(d.objetivoTxt) datos.objetivos.push({texto:d.objetivoTxt,categoria:''});
     // Para el proxy de antes (un solo ítem): todo junto en uno
-    datos.objetivo={texto:[d.objetivos.join(', '),d.objetivoTxt].filter(Boolean).join(' — '),categoria:CAT_FICHA[d.objetivos[0]]||''};
+    datos.objetivo={texto:[orden.join(', '),d.objetivoTxt].filter(Boolean).join(' — '),categoria:CAT_FICHA[orden[0]]||''};
   }
-  if(!sk.has(5)){
+  if(!sk.has('molestias')){
     if(d.sinMolestias) datos.molestias=[];   // "No tengo": se borran las de una entrevista anterior
     else if(d.zonas.length||d.molestiaTxt){
       const zonas=d.zonas.length?d.zonas:[''];
       datos.molestias=zonas.map(z=>({texto:d.molestiaTxt||('Molestia en '+z.toLowerCase()),zona:z}));
       datos.molestia={texto:d.molestiaTxt||('Molestia en '+d.zonas.join(', ').toLowerCase()),zona:d.zonas.join(', ')};
     }
+  }
+  if(PORTAL_ENT2){
+    const on=d.modalidad==='online', E={v:1, fecha:new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric'}), modalidad:d.modalidad};
+    const poner=(k,v)=>{ if(Array.isArray(v)?v.length:v) E[k]=v; };
+    if(on) poner('sexo',d.sexo);
+    poner('actPrev',d.actPrev); poner('pesas',d.pesas); if(d.pesas!=='Nunca') poner('ahora',d.ahora);
+    poner('actividad',d.actividad); poner('trabajo',d.trabajo); poner('sueno',d.sueno); poner('estres',d.estres);
+    if(d.objetivos.includes(d.principal)) poner('principal',d.principal);
+    if(on){ poner('dias',d.dias); poner('duracion',d.duracion); poner('lugares',d.lugares); poner('elementos',d.elementos); }
+    E.salud=d.salud; E.apto=!!d.apto;
+    datos.entrevista=E;
   }
   if(!Object.keys(datos).length){ cerrarEntrevista(true); return; }
   _ent.guardando=true; _ent.error=''; _entRender();
@@ -2918,47 +3039,92 @@ async function _entGuardar(){
 }
 function _entRender(){
   const el=document.getElementById('entrevista'); if(!_ent||!el) return;
-  const d=_ent.d, p=_ent.paso;
-  const chip=(campo,v,on)=>`<button type="button" class="ent-chip${on?' on':''}" onclick="entElegir('${campo}','${escaparHTML(v)}')">${escaparHTML(v)}</button>`;
+  const d=_ent.d, L=_entPasos();
+  if(_ent.paso>L.length-1) _ent.paso=L.length-1;
+  const p=_ent.paso, [id,seccion]=L[p];
+  const esc=escaparHTML;
+  const chip=(campo,v,on,extra='')=>`<button type="button" class="ent-chip${on?' on':''}" onclick="entElegir('${campo}','${esc(v)}')">${esc(v)}${extra}</button>`;
+  const op=(campo,v,t,desc,on)=>`<button type="button" class="${on?'on':''}" onclick="entElegir('${campo}','${esc(v)}')"><i></i><span>${esc(t)}${desc?`<small>${esc(desc)}</small>`:''}</span></button>`;
+  // lista: 'Opción' o ['Opción','descripción']
+  const uno=(campo,lista)=>`<div class="ent-op">${lista.map(o=>Array.isArray(o)?op(campo,o[0],o[0],o[1],d[campo]===o[0]):op(campo,o,o,'',d[campo]===o)).join('')}</div>`;
+  const tagOnline=PORTAL_ENT2&&['sexo','dias','duracion','lugar'].includes(id)?'<span class="ent-tag">Para tu plan online</span>':'';
   let cuerpo='';
-  if(p===0){
+  if(id==='hola'){
     cuerpo=`<div class="ent-hola"><div class="ent-ico">${ic('sprout')}</div>
-      <h2>¡Hola${_ent.nombre?', '+escaparHTML(_ent.nombre):''}!</h2>
-      <p>Antes de empezar, 5 preguntas rápidas para armar tu perfil. Tu entrenador las usa para planificar mejor.</p>
-      <p class="ent-nota">Te lleva menos de un minuto. Podés saltear cualquier pregunta y cambiar todo cuando quieras.</p></div>`;
-  } else if(p===1){
+      <h2>¡Hola${_ent.nombre?', '+esc(_ent.nombre):''}!</h2>
+      <p>${PORTAL_ENT2?'Unas preguntas para conocerte: tu cuerpo, tu experiencia, tu día a día, lo que querés lograr y tu salud. Tu entrenador las usa para armar tu plan.':'Antes de empezar, 5 preguntas rápidas para armar tu perfil. Tu entrenador las usa para planificar mejor.'}</p>
+      <p class="ent-nota">${PORTAL_ENT2?'Te lleva unos 3 minutos.':'Te lleva menos de un minuto.'} Podés saltear lo que quieras y cambiar todo después.</p></div>`;
+  } else if(id==='modalidad'){
+    cuerpo=`<h2>¿Cómo entrenás con Luca?</h2><p>Según tu respuesta te hacemos las preguntas que corresponden.</p>
+      <div class="ent-op">${ENT_OP.modalidad.map(([v,t,ds])=>op('modalidad',v,t,ds,d.modalidad===v)).join('')}</div>`;
+  } else if(id==='fecha'){
     cuerpo=`<h2>¿Cuándo naciste?</h2><p>Para calcular tu edad.</p>
       <input class="ent-input" id="ent-fecha" type="date" value="${_entISO(d.fechaNac)}" max="${_hoyISOLocal()}">`;
-  } else if(p===2){
+  } else if(id==='altura'){
     cuerpo=`<h2>¿Cuánto medís?</h2><p>En centímetros.</p>
-      <div class="ent-num"><input class="ent-input" id="ent-altura" type="number" inputmode="numeric" placeholder="168" value="${escaparHTML(d.estatura)}"><span>cm</span></div>`;
-  } else if(p===3){
+      <div class="ent-num"><input class="ent-input" id="ent-altura" type="number" inputmode="numeric" placeholder="168" value="${esc(d.estatura)}"><span>cm</span></div>`;
+  } else if(id==='peso'){
     cuerpo=`<h2>¿Cuánto pesás hoy?</h2><p>Un número aproximado alcanza. Sirve para ver tu progreso.</p>
-      <div class="ent-num"><input class="ent-input" id="ent-peso" type="number" inputmode="decimal" step="0.1" placeholder="64,5" value="${escaparHTML(d.pesoActual)}"><span>kg</span></div>`;
-  } else if(p===4){
-    cuerpo=`<h2>¿Qué querés lograr?</h2><p>Podés elegir más de uno.</p>
-      <div class="ent-chips">${ENT_OBJETIVOS.map(o=>chip('objetivo',o,d.objetivos.includes(o))).join('')}</div>
-      <input class="ent-input chico" id="ent-obj-txt" type="text" maxlength="140" placeholder="Contalo con tus palabras (opcional)" value="${escaparHTML(d.objetivoTxt)}">`;
-  } else if(p===5){
+      <div class="ent-num"><input class="ent-input" id="ent-peso" type="number" inputmode="decimal" step="0.1" placeholder="64,5" value="${esc(d.pesoActual)}"><span>kg</span></div>`;
+  } else if(id==='sexo'){
+    cuerpo=`${tagOnline}<h2>¿Con qué sexo te identificás?</h2>${uno('sexo',ENT_OP.sexo)}
+      <div class="ent-aviso">${ic('alert')}<span>Solo ordena qué ejercicios te sugiere tu entrenador primero. <b>Nunca te limita.</b></span></div>`;
+  } else if(id==='actPrev'){
+    cuerpo=`<h2>¿Qué actividad física hiciste antes?</h2><p>Elegí todas las que quieras.</p>
+      <div class="ent-chips">${ENT_OP.actPrev.map(o=>chip('actPrev',o,d.actPrev.includes(o))).join('')}</div>`;
+  } else if(id==='pesas'){
+    cuerpo=`<h2>¿Cuánto tiempo entrenaste con pesas en total?</h2><p>Sumá todo lo que entrenaste a lo largo de tu vida.</p>${uno('pesas',ENT_OP.pesas)}`;
+  } else if(id==='ahora'){
+    cuerpo=`<h2>¿Estás entrenando ahora?</h2>${uno('ahora',ENT_OP.ahora)}`;
+  } else if(id==='actividad'){
+    cuerpo=`<h2>¿Qué tan activo es tu día a día?</h2><p>Sin contar el entrenamiento.</p>${uno('actividad',ENT_OP.actividad)}`;
+  } else if(id==='trabajo'){
+    cuerpo=`<h2>¿Cómo es tu trabajo?</h2>${uno('trabajo',ENT_OP.trabajo)}`;
+  } else if(id==='descanso'){
+    const escala=(k,t,a,z)=>`<div class="ent-esc"><b>${t}</b><div class="f">${[1,2,3,4,5].map(n=>`<button type="button" class="${d[k]===n?(n<=2?'bajo':'on'):''}" onclick="entElegir('${k}',${n})">${n}</button>`).join('')}</div><div class="x"><span>${a}</span><span>${z}</span></div></div>`;
+    cuerpo=`<h2>Sueño y estrés</h2>${escala('sueno','¿Cómo dormís normalmente?','Muy mal','Excelente')}${escala('estres','¿Cuánto estrés sentís?','Mucho estrés','Sin estrés')}`;
+  } else if(id==='objetivos'){
+    const est=o=>PORTAL_ENT2&&d.objetivos.includes(o)?`<span class="est" onclick="event.stopPropagation();entElegir('principal','${esc(o)}')" role="button" aria-label="Marcar como principal">★</span>`:'';
+    cuerpo=`<h2>¿Qué querés lograr?</h2><p>${PORTAL_ENT2?'Elegí hasta 3 y tocá la ★ del más importante.':'Podés elegir más de uno.'}</p>
+      <div class="ent-chips">${ENT_OBJETIVOS.map(o=>`<button type="button" class="ent-chip${d.objetivos.includes(o)?(PORTAL_ENT2&&d.principal===o?' princ':' on'):''}" onclick="entElegir('objetivo','${esc(o)}')">${esc(o)}${est(o)}</button>`).join('')}</div>
+      <input class="ent-input chico" id="ent-obj-txt" type="text" maxlength="140" placeholder="Contalo con tus palabras (opcional)" value="${esc(d.objetivoTxt)}">`;
+  } else if(id==='molestias'){
     cuerpo=`<h2>¿Tenés alguna molestia o lesión?</h2><p>Marcá todas las zonas que correspondan. Así se tienen en cuenta en tus entrenamientos.</p>
       <div class="ent-chips">${chip('sin','No tengo',d.sinMolestias)}${MOLESTIA_ZONAS.map(z=>chip('zona',z,d.zonas.includes(z))).join('')}</div>
-      ${d.sinMolestias?'':`<input class="ent-input chico" id="ent-mol-txt" type="text" maxlength="140" placeholder="¿Qué te pasa? (opcional)" value="${escaparHTML(d.molestiaTxt)}">`}`;
+      ${d.sinMolestias?'':`<input class="ent-input chico" id="ent-mol-txt" type="text" maxlength="140" placeholder="¿Qué te pasa? (opcional)" value="${esc(d.molestiaTxt)}">`}`;
+  } else if(id==='dias'){
+    cuerpo=`${tagOnline}<h2>¿Cuántos días por semana podés entrenar?</h2><p>Elegí lo que puedas sostener, no lo ideal.</p>${uno('dias',ENT_OP.dias)}`;
+  } else if(id==='duracion'){
+    cuerpo=`${tagOnline}<h2>¿Cuánto tiempo tenés por sesión?</h2>${uno('duracion',ENT_OP.duracion)}`;
+  } else if(id==='lugar'){
+    cuerpo=`${tagOnline}<h2>¿Dónde entrenás y con qué contás?</h2><p>Elegí todo lo que tengas a mano.</p>
+      <div class="ent-chips">${ENT_OP.lugares.map(o=>chip('lugares',o,d.lugares.includes(o))).join('')}</div>
+      <div class="ent-chips" style="margin-top:14px">${ENT_OP.elementos.map(o=>chip('elementos',o,d.elementos.includes(o))).join('')}</div>`;
+  } else if(id==='salud'){
+    cuerpo=`<h2>Antes de terminar</h2><p>Contanos si algo de esto te pasa hoy.</p>
+      <div class="ent-sw">${ENT_OP.salud.map(o=>`<button type="button" class="${d.salud.includes(o)?'on':''}" onclick="entElegir('salud','${esc(o)}')"><span>${esc(o)}</span><i></i></button>`).join('')}</div>
+      ${d.salud.length?'<div class="ent-alerta"><b>Consultá con un profesional</b><p>Te recomendamos una evaluación con un profesional de la salud. Tu entrenador va a tener en cuenta lo que marcaste.</p></div>':''}`;
+  } else if(id==='apto'){
+    cuerpo=`<h2>Una última cosa</h2><p>Para entrenar necesitamos tu conformidad.</p>
+      <button type="button" class="ent-decl${d.apto?' on':''}" onclick="entElegir('apto','1')"><i>${d.apto?'✓':''}</i><span>Declaro que cuento con apto médico para realizar actividad física y que la practico bajo mi responsabilidad.</span></button>`;
   }
-  const ultimo=p===ENT_PASOS;
+  const ultimo=p===L.length-1;
+  const autoAvanza=['modalidad','sexo','pesas','ahora','actividad','trabajo','dias','duracion'].includes(id);
+  const total=L.length-1;
   el.innerHTML=`<div class="ent-caja">
     <div class="ent-top">
       ${p>(_ent.editar?1:0)?`<button type="button" class="ent-x" onclick="entAtras()" aria-label="Atrás">${ic('chev-l')}</button>`:'<span></span>'}
-      ${p>0?`<div class="ent-prog">${Array.from({length:ENT_PASOS},(_,i)=>`<i class="${i<p?'on':''}"></i>`).join('')}</div>`:'<span></span>'}
+      ${p>0?`<div class="ent-prog">${Array.from({length:Math.min(total,12)},(_,i)=>`<i class="${i<Math.round(p/total*Math.min(total,12))?'on':''}"></i>`).join('')}</div><span class="ent-n">${p}/${total}</span>`:'<span></span>'}
       <button type="button" class="ent-x" onclick="cerrarEntrevista(true)" aria-label="Cerrar">✕</button>
     </div>
-    <div class="ent-cuerpo">${cuerpo}${_ent.error?`<p class="ent-error">${escaparHTML(_ent.error)}</p>`:''}</div>
+    <div class="ent-cuerpo">${seccion?`<div class="ent-kick">${seccion}</div>`:''}${cuerpo}${_ent.error?`<p class="ent-error">${esc(_ent.error)}</p>`:''}</div>
     <div class="ent-pie">
-      ${p===0
+      ${id==='hola'
         ?`<button type="button" class="ent-btn p" onclick="entSiguiente(false)">Empezar</button><button type="button" class="ent-btn s" onclick="cerrarEntrevista(true)">Ahora no</button>`
-        :`<button type="button" class="ent-btn p" onclick="entSiguiente(false)"${_ent.guardando?' disabled':''}>${_ent.guardando?'Guardando…':(ultimo?'Guardar':'Siguiente')}</button><button type="button" class="ent-btn s" onclick="entSiguiente(true)"${_ent.guardando?' disabled':''}>Saltear</button>`}
+        :`${autoAvanza&&!ultimo?'':`<button type="button" class="ent-btn p" onclick="entSiguiente(false)"${_ent.guardando||(id==='apto'&&!d.apto)?' disabled':''}>${_ent.guardando?'Guardando…':(ultimo?'Guardar':'Siguiente')}</button>`}${id==='apto'?'':`<button type="button" class="ent-btn s" onclick="entSiguiente(true)">Saltear</button>`}`}
     </div>
   </div>`;
-  const inp=el.querySelector('.ent-input'); if(inp && p>0 && p<4) setTimeout(()=>{ try{ inp.focus(); }catch(e){} },50);
+  const inp=el.querySelector('.ent-input'); if(inp && ['fecha','altura','peso'].includes(id)) setTimeout(()=>{ try{ inp.focus(); }catch(e){} },50);
   el.querySelectorAll('.ent-input').forEach(x=>x.addEventListener('keydown',ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); entSiguiente(false); } }));
 }
 
@@ -3460,6 +3626,7 @@ async function cargarDatos(opts){
             mapeoUrl:     r[20]||'',
             email:        (r[21]||'').trim().toLowerCase(),
             modalidad:    _normModalidad(r[22]),
+            entrevista:   r[23]||'',
           })).filter(a=>a.id);
           _alumnoBaseTomar();
         }catch(e){console.warn('Error cargando Alumnos:',e);fallo=true;alumnos=[];}
@@ -3613,6 +3780,7 @@ function _renderPaginaActual(){
 
 // ── GUARDAR ALUMNO EN SHEETS ──
 // Modalidad (columna W): 'online' o '' (presencial). Tolera que Luca escriba "Online" a mano.
+function _entDe(a){ try{ const o=JSON.parse((a&&a.entrevista)||'null'); return (o&&typeof o==='object')?o:null; }catch(e){ return null; } }
 function _normModalidad(v){ return /online/i.test(String(v||''))?'online':''; }
 const _esOnline=a=>!!a&&a.modalidad==='online';
 function _alumnoAFila(a){
@@ -3621,7 +3789,7 @@ function _alumnoAFila(a){
     a.objetivos,a.notas,a.estado,a.telefono||'',
     a.fechaNac||'',a.estatura||'',a.pesoInicial||'',a.pesoActual||'',
     a.historialFis||'',a.tieneNutri||'no',a.carpetaDrive||'',a.nutriDrive||'',
-    a.portalToken||'',a.diaPago||'',a.mapeoUrl||'',a.email||'',a.modalidad||''
+    a.portalToken||'',a.diaPago||'',a.mapeoUrl||'',a.email||'',a.modalidad||'',a.entrevista||''
   ];
 }
 
@@ -3695,7 +3863,7 @@ function _filaAAlumnoObj(r){
     monto:r[5]||'0', objetivos:r[6]||'', notas:r[7]||'', estado:r[8]||'activo', telefono:r[9]||'',
     fechaNac:r[10]||'', estatura:r[11]||'', pesoInicial:r[12]||'', pesoActual:r[13]||'', historialFis:r[14]||'',
     tieneNutri:r[15]||'no', carpetaDrive:r[16]||'', nutriDrive:r[17]||'', portalToken:r[18]||'', diaPago:r[19]||'',
-    mapeoUrl:r[20]||'', email:(r[21]||'').trim().toLowerCase(), modalidad:_normModalidad(r[22]),
+    mapeoUrl:r[20]||'', email:(r[21]||'').trim().toLowerCase(), modalidad:_normModalidad(r[22]), entrevista:r[23]||'',
   };
 }
 // Objetivos/Molestias cambiados de los dos lados: lo mío, salvo el ítem de la entrevista, que es del alumno
@@ -3717,7 +3885,7 @@ async function guardarFilaAlumno(alumno){
   const base=_alumnoBase[alumno.id];
   if(base){
     let enSheet=null;
-    try{ enSheet=(await sheetsGet(`Alumnos!A${fila}:W${fila}`))[0]||[]; }catch(e){ console.warn('No se pudo releer la fila; se guarda sin fusionar',e); }
+    try{ enSheet=(await sheetsGet(`Alumnos!A${fila}:X${fila}`))[0]||[]; }catch(e){ console.warn('No se pudo releer la fila; se guarda sin fusionar',e); }
     if(enSheet){
       valores=valores.map((mio,c)=>{
         const b=base[c]??'', sh=String(enSheet[c]??'');
@@ -3729,7 +3897,7 @@ async function guardarFilaAlumno(alumno){
       Object.assign(alumno,_filaAAlumnoObj(valores));
     }
   }
-  await sheetsUpdate(`Alumnos!A${fila}:W${fila}`, [valores]);
+  await sheetsUpdate(`Alumnos!A${fila}:X${fila}`, [valores]);
   _alumnoBase[alumno.id]=valores.slice();
 }
 
@@ -3934,6 +4102,17 @@ function _rcAtender(activos, fz, finde){
     const ult=activos.filter(a=>fz.info[a.id] && fz.info[a.id].act===fz.info[a.id].ult);
     if(ult.length) items.push(`<div class="rc-item"><span class="dot" style="background:var(--verde)"></span><div><b>${ult.map(a=>escaparHTML(a.nombre)).join(', ')} · en su última semana</b><small>Plan nuevo para la semana que viene</small></div></div>`);
   }
+  // Entrevista (26/11): completada en los últimos 7 días, o respuesta de modalidad distinta a la cargada
+  activos.forEach(a=>{
+    const e=_entDe(a); if(!e) return;
+    const f=_dmyFecha(e.fecha), dias=f?Math.floor((hoy0-f)/86400000):99;
+    const figura=a.modalidad==='online'?'online':'presencial';
+    if(dias<=7){
+      const s=Array.isArray(e.salud)&&e.salud.length?` · salud: ${e.salud.join(', ').toLowerCase()}`:'';
+      items.push(`<div class="rc-item"><span class="dot" style="background:var(--${s?'amarillo':'verde'})"></span><div><b>${escaparHTML(a.nombre)} · completó su entrevista</b><small>${escaparHTML((e.fecha||'')+s)}</small></div><button class="rc-btn" onclick="verAlumno('${a.id}')">Ver</button></div>`);
+    }
+    if(e.modalidad && e.modalidad!==figura) items.push(`<div class="rc-item"><span class="dot" style="background:var(--amarillo)"></span><div><b>${escaparHTML(a.nombre)} · respondió ${e.modalidad} pero figura ${figura}</b><small>Revisá la modalidad en su ficha</small></div><button class="rc-btn" onclick="abrirModalAlumno('${a.id}')">Editar</button></div>`);
+  });
   activos.forEach(a=>{
     const falta=[];
     if(!(a.carpetaDrive||'').trim()) falta.push('sin link de Fuerza');
@@ -4254,6 +4433,7 @@ async function guardarAlumno(){
     mapeoUrl:     document.getElementById('a-mapeoUrl').value.trim(),
     email,
     modalidad,
+    entrevista: editandoId?(alumnos.find(x=>x.id===editandoId)||{}).entrevista||'':'',
   };
   // Con mail hace falta el token: el proxy responde con él cuando el alumno entra
   // con Google. Lo genera la app acá (no el proxy: la app reescribe la fila
@@ -4290,6 +4470,38 @@ function pdBadge(estado){
   if(estado==='activo') return `<span class="pd-badge-activo">Activo</span>`;
   if(estado==='pausado') return `<span class="pd-badge-pausado">Pausado</span>`;
   return `<span class="pd-badge-inactivo">Inactivo</span>`;
+}
+
+// ── Entrevista del alumno en la ficha (26/11) ──
+// La salud y la declaración de apto quedan siempre a la vista; el resto, desplegable.
+function _renderEntrevistaFicha(a){
+  const el=document.getElementById('perfil-entrevista'); if(!el) return;
+  const e=_entDe(a);
+  if(!e){ el.innerHTML=''; return; }
+  const esc=escaparHTML, lista=x=>Array.isArray(x)&&x.length?x.map(esc).join(', '):'';
+  const fila=(lbl,val)=>val?`<div class="ef-f"><span>${lbl}</span><b>${val}</b></div>`:'';
+  const nivel=n=>n?`<b class="${n<=2?'ef-bajo':''}">${n}/5</b>`:'';
+  const figura=a.modalidad==='online'?'online':'presencial';
+  const salud=Array.isArray(e.salud)?e.salud:[];
+  el.innerHTML=`<div class="pd-card ef" style="margin-bottom:0.9rem">
+    <div class="pd-card-header acordeon" onclick="toggleAcordeonPerfil(this,'body-perfil-entrevista')">
+      <span class="pd-card-title">Entrevista${e.fecha?` <small class="ef-fecha">· ${esc(e.fecha)}</small>`:''}</span>
+      <span class="chevron">▸</span>
+    </div>
+    <div class="ef-siempre">
+      ${salud.length?`<div class="ef-salud">⚠ Salud: <b>${lista(salud)}</b></div>`:'<div class="ef-ok">Salud: no marcó nada</div>'}
+      <div class="${e.apto?'ef-ok':'ef-falta'}">${e.apto?'✓ Declaró contar con apto médico':'Sin declaración de apto médico'}</div>
+      ${e.modalidad&&e.modalidad!==figura?`<div class="ef-falta">Respondió <b>${esc(e.modalidad)}</b> pero figura <b>${figura}</b></div>`:''}
+    </div>
+    <div class="pd-card-body-wrap" id="body-perfil-entrevista"><div class="pd-card-body ef-cuerpo">
+      ${fila('Modalidad',esc(e.modalidad||''))}${fila('Sexo',esc(e.sexo||''))}
+      ${fila('Objetivo principal',esc(e.principal||''))}
+      ${fila('Actividad previa',lista(e.actPrev))}${fila('Pesas',esc(e.pesas||''))}${fila('Hoy',esc(e.ahora||''))}
+      ${fila('Día a día',esc(e.actividad||''))}${fila('Trabajo',esc(e.trabajo||''))}
+      ${e.sueno?`<div class="ef-f"><span>Sueño</span>${nivel(e.sueno)}</div>`:''}${e.estres?`<div class="ef-f"><span>Estrés (5 = sin estrés)</span>${nivel(e.estres)}</div>`:''}
+      ${e.modalidad==='online'?fila('Días por semana',esc(e.dias||''))+fila('Duración',esc(e.duracion||''))+fila('Dónde entrena',lista(e.lugares))+fila('Elementos',lista(e.elementos)):''}
+    </div></div>
+  </div>`;
 }
 
 // Auditoría 24/11: cambia el código secreto (columna S) de TODOS los alumnos que
@@ -4386,6 +4598,8 @@ function verAlumno(id){
 
   // Días como pilares + próxima sesión
   renderDiasPilares(a);
+
+  _renderEntrevistaFicha(a);
 
   // WhatsApp btn
   const waBtn=document.getElementById('perfil-btn-whatsapp');

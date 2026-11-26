@@ -17,11 +17,15 @@
 //      responde 'inactivo' en vez de entregar el token.
 //   5. [25/11] doGet devuelve también la modalidad (columna W): el portal de un
 //      alumno online dice "Entrenás online, a tu ritmo" en vez de "Sin días asignados".
+//   6. [26/11] Entrevista ampliada: doGet devuelve la entrevista guardada (columna X) y
+//      entrevista2:true; la acción "perfil" acepta datos.entrevista, que se valida campo
+//      por campo contra las opciones permitidas y se guarda como JSON en la columna X de
+//      la fila del alumno (no toca nada más).
 // ═══════════════════════════════════════════════════════════════════════
 
 // Versión del proxy: el portal la muestra al pie ("Proxy 1.0 · 25/11/2026") para saber si ya se publicó.
 // SUBIRLA CADA VEZ QUE SE CAMBIA ESTE ARCHIVO.
-const VERSION_PROXY = '1.0 · 25/11/2026';
+const VERSION_PROXY = '1.1 · 26/11/2026';
 
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 
@@ -93,6 +97,7 @@ function doGet(e) {
       diaPago:      fila[19] || '',
       mapeoUrl:     fila[20] || '',   // [24/11] columna U: botón Mapeo del portal
       modalidad:    fila[22] || '',   // [25/11] columna W: 'online' o vacío (presencial)
+      entrevista:   fila[23] || '',   // [26/11] columna X: su entrevista (JSON), para editarla
     };
 
     // ── Asistencias: solo registros de este alumno ──
@@ -129,7 +134,7 @@ function doGet(e) {
 
     // [24/11] perfilEditable: avisa al portal que este proxy ya acepta la
     // entrevista inicial (acción "perfil" de doPost).
-    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, version: VERSION_PROXY };
+    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, version: VERSION_PROXY };
     const resultadoStr = JSON.stringify(resultado);
     try {
       cache.put(cacheKey, resultadoStr, CACHE_TTL_SEGUNDOS);
@@ -214,7 +219,40 @@ function probarConexionGoogle() {
 // Nunca toca monto, estado, horario, días, token, email ni datos de otros.
 // Los valores se validan y recortan; un alumno "inactivo" no puede escribir.
 // LockService evita que dos guardados simultáneos se pisen.
-const COL_PERFIL = { objetivos: 7, notas: 8, estado: 9, fechaNac: 11, estatura: 12, pesoInicial: 13, pesoActual: 14, token: 19 };
+const COL_PERFIL = { objetivos: 7, notas: 8, estado: 9, fechaNac: 11, estatura: 12, pesoInicial: 13, pesoActual: 14, token: 19, entrevista: 24 };
+
+// [26/11] Opciones válidas de la entrevista ampliada (las mismas que ENT_OP en index.html).
+// Todo lo que no esté en estas listas se descarta: el alumno no puede escribir texto libre acá.
+const ENT_VALIDAS = {
+  modalidad: ['presencial', 'online'],
+  sexo: ['Mujer', 'Hombre', 'Prefiero no decir'],
+  actPrev: ['Fútbol', 'Running', 'Natación', 'Artes marciales', 'Danza', 'Yoga', 'Ciclismo', 'Crossfit', 'Tenis / pádel', 'Gimnasio', 'Otro', 'Ninguna'],
+  pesas: ['Nunca', 'Menos de 6 meses', '6 meses a 2 años', 'Más de 2 años'],
+  ahora: ['Sí, entreno ahora', 'Paré hace menos de un año', 'Paré hace más de un año'],
+  actividad: ['Sedentario', 'Algo activo', 'Muy activo'],
+  trabajo: ['Sentado casi todo el día', 'De pie', 'En movimiento', 'Físico pesado'],
+  principal: ['Ganar fuerza', 'Ganar músculo', 'Bajar de peso', 'Salud y bienestar', 'Rendimiento deportivo', 'Movilidad y menos dolor'],
+  dias: ['2 días', '3 días', '4 días', '5 días'],
+  duracion: ['30 min', '45 min', '60 min', '90 min'],
+  lugares: ['Casa', 'Gimnasio', 'Plaza o parque'],
+  elementos: ['Mancuernas', 'Barra y discos', 'Bandas elásticas', 'Kettlebell', 'Barra de dominadas', 'Banco', 'Colchoneta', 'Nada'],
+  salud: ['Una lesión actual', 'Dolor al moverme', 'Una condición médica diagnosticada', 'Medicación que afecte el ejercicio', 'Embarazo', 'Una cirugía reciente']
+};
+function limpiarEntrevista_(e, hoy) {
+  if (!e || typeof e !== 'object') return null;
+  const out = { v: 1, fecha: hoy };
+  ['modalidad', 'sexo', 'pesas', 'ahora', 'actividad', 'trabajo', 'principal', 'dias', 'duracion'].forEach(k => {
+    if (ENT_VALIDAS[k].indexOf(String(e[k])) >= 0) out[k] = String(e[k]);
+  });
+  ['actPrev', 'lugares', 'elementos', 'salud'].forEach(k => {
+    if (!Array.isArray(e[k])) return;
+    const v = e[k].map(String).filter((x, i, a) => ENT_VALIDAS[k].indexOf(x) >= 0 && a.indexOf(x) === i);
+    if (v.length || k === 'salud') out[k] = v;
+  });
+  ['sueno', 'estres'].forEach(k => { const n = parseInt(e[k], 10); if (n >= 1 && n <= 5) out[k] = n; });
+  out.apto = e.apto === true;
+  return out;
+}
 
 function guardarPerfilAlumno_(cuerpo) {
   try {
@@ -279,6 +317,11 @@ function guardarPerfilAlumno_(cuerpo) {
       if (objs) {
         const items = objs.filter(o => o && o.texto).map(o => ({ texto: recortar(o.texto, 140), categoria: recortar(o.categoria, 40), estado: 'activo', fecha: hoy, origen: 'entrevista' }));
         if (items.length) ponerItems(COL_PERFIL.objetivos, items);
+      }
+      // [26/11] Entrevista ampliada: validada y guardada como JSON en la columna X
+      if (cuerpo && cuerpo.datos && cuerpo.datos.entrevista) {
+        const ent = limpiarEntrevista_(cuerpo.datos.entrevista, hoy);
+        if (ent) hoja.getRange(fila, COL_PERFIL.entrevista).setNumberFormat('@').setValue(JSON.stringify(ent));
       }
       // Varias molestias (máx. 8); una lista vacía ("No tengo") borra las de una entrevista anterior
       const mols = Array.isArray(datos.molestias) ? datos.molestias.slice(0, 8) : (datos.molestia ? [datos.molestia] : null);

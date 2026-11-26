@@ -30,7 +30,7 @@ Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, 
 ## Modelo de datos (pestañas del Sheet)
 | Pestaña | Columnas |
 |---|---|
-| **Alumnos** A:W | A id · B nombre · C horario (`Día:hora\|…`) · D días (`Lunes\|…`) · E frecuencia · F monto · G objetivos (una línea JSON por ítem `{texto,categoria,estado,fecha[,origen]}`) · H molestias (`{texto,zona,estado,fecha[,origen]}`) · I estado (activo/pausado/inactivo) · J teléfono · K fechaNac `dd/mm/aaaa` · L estatura · M pesoInicial · N pesoActual · O historialFis · P tieneNutri · Q **Fuerza** (link) · R nutriDrive · S **portalToken** · T diaPago · U **Mapeo** (link, con `#gid`) · V email · W modalidad (`online` o vacío = presencial; online = sin días ni horario, fuera de Agenda/Calendar) |
+| **Alumnos** A:X | A id · B nombre · C horario (`Día:hora\|…`) · D días (`Lunes\|…`) · E frecuencia · F monto · G objetivos (una línea JSON por ítem `{texto,categoria,estado,fecha[,origen]}`) · H molestias (`{texto,zona,estado,fecha[,origen]}`) · I estado (activo/pausado/inactivo) · J teléfono · K fechaNac `dd/mm/aaaa` · L estatura · M pesoInicial · N pesoActual · O historialFis · P tieneNutri · Q **Fuerza** (link) · R nutriDrive · S **portalToken** · T diaPago · U **Mapeo** (link, con `#gid`) · V email · W modalidad (`online` o vacío = presencial; online = sin días ni horario, fuera de Agenda/Calendar) · X **entrevista** (JSON que escribe el alumno desde el portal; Luca solo la lee y editar el alumno la conserva) |
 | Cobros A:G | mes `yyyy-mm` · alumnoId · estado · fecha · bono · fechaBono · monto |
 | Seguimiento A:F | alumnoId · fecha · texto · id · chips (`\|`) · origen |
 | Nutricion / NutricionCobros | clientes · pagos por mes |
@@ -54,7 +54,7 @@ Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__porta
 - Lecturas en `RANGO` sin fila final (`'Asistencias!A2:D'`), así no hay tope. Los `_WRITE` de `sheetsReplaceRange` sí la llevan: no achicar la grilla de esas pestañas.
 - Escribir **por fila**, no reescribir rangos enteros. `guardarFilaAlumno()` hace fusión de 3 vías contra `_alumnoBase` (el alumno también escribe su fila desde el portal).
 - Pestañas nuevas del Sheet: crearlas solas con `_crearPestana()` y tolerar que no existan al leer (no marcar fallo de sincronización).
-- Proxy: `doGet` solo lee y filtra por token; la única escritura es `accion:'perfil'` (campos K/L/M/N + ítems `origen:"entrevista"` de G/H). Nunca devolver datos de otro alumno ni pestañas ajenas.
+- Proxy: `doGet` solo lee y filtra por token; la única escritura es `accion:'perfil'` (campos K/L/M/N + ítems `origen:"entrevista"` de G/H + columna X con la entrevista ampliada, validada contra `ENT_VALIDAS`, que tiene que coincidir con `ENT_OP` de index.html). Nunca devolver datos de otro alumno ni pestañas ajenas.
 - Cambios de esquema retrocompatibles (líneas viejas en texto plano, columnas que faltan, proxy viejo).
 - Lo que Luca decidió no tocar (estado global, `onclick` inline, re-render por `innerHTML`): ver `PENDIENTES.md`.
 
