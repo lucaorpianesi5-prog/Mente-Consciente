@@ -2332,7 +2332,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.3 · 25/11/2026';
+const VERSION_APP='1.4 · 26/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -7446,7 +7446,15 @@ function _pvDescanso(iniciar){
 }
 
 // ── Guardado de una celda (cola por planilla; usado por los campos y por la hoja de Mapeo) ──
+// 26/11: un número decimal se guarda con el separador que ya usa la planilla. Con
+// USER_ENTERED, "22.5" en una planilla en español puede quedar como fecha o como 225.
+function _planNormDecimal(e,v){
+  if(!/^\d+[.,]\d+$/.test(v) || !e || !e.datos || !e.datos.mapa) return v;
+  _pvFmtKg(e.datos,0);   // calcula e.datos.coma (coma o punto) la primera vez
+  return e.datos.coma ? v.replace('.',',') : v.replace(',','.');
+}
 function _planGuardarCelda(e,cel,nuevo,cb){
+  nuevo=_planNormDecimal(e,nuevo);
   e.pendientes++;
   e.cola=e.cola.then(async()=>{
     try{ await _planEscribir(e,cel,nuevo); cel.text=nuevo; cb&&cb(true); }
@@ -7547,7 +7555,7 @@ async function planTerminarDia(btn){
     let listo=false;
     if(iLocal>=0){
       // La asistencia de hoy ya estaba marcada (p. ej. desde la ficha): se le suma qué día fue
-      const filas=await sheetsGet('Asistencias!A2:D1000');
+      const filas=await sheetsGet(RANGO.ASISTENCIAS_READ);
       const k=filas.findIndex(r=>esAsist(r)&&!r[3]);
       if(k>=0){ await sheetsUpdate(`Asistencias!D${k+2}`,[[det]]); asistencias[iLocal][3]=det; listo=true; }
     }
@@ -7577,9 +7585,10 @@ async function planDeshacerDia(btn){
   btn.disabled=true;
   try{
     // Se borra solo la marca del día (columna D); la asistencia de esa fecha queda
-    const filas=await sheetsGet('Asistencias!A2:D1000');
+    const filas=await sheetsGet(RANGO.ASISTENCIAS_READ);
     let k=-1; filas.forEach((r,i)=>{ if(r[0]===a.id && r[3]===det) k=i; });
-    if(k>=0) await sheetsUpdate(`Asistencias!D${k+2}`,[['']]);
+    if(k<0){ toast('No encontré ese día en la planilla. Tocá Sincronizar y volvé a probar'); btn.disabled=false; return; }
+    await sheetsUpdate(`Asistencias!D${k+2}`,[['']]);
     for(let i=asistencias.length-1;i>=0;i--){ if(asistencias[i][0]===a.id && asistencias[i][3]===det){ asistencias[i][3]=''; break; } }
     _cacheGuardar();
     toast('Listo, el día quedó sin terminar');
@@ -7625,7 +7634,9 @@ function planGuardarInput(inp){
   if(card) card.classList.remove('guardado','error');
   _planGuardarCelda(e,cel,nuevo,(ok,err)=>{
     if(ok){
-      inp.dataset.orig=nuevo;
+      const guardado=_planNormDecimal(e,nuevo);
+      if(inp.value.trim()===nuevo) inp.value=guardado;
+      inp.dataset.orig=guardado;
       if(planVista) planVista.guardados.add(clave);
       if(card && card.isConnected){ card.classList.remove('error'); card.classList.add('guardado'); }
     } else if(card && card.isConnected){

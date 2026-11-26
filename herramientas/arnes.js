@@ -30,17 +30,24 @@ function chequearSintaxis() {
 //    `valores` = { 'Rango!A2:B': [[...]] } para lecturas de values; las escrituras quedan en `escrituras`.
 async function simularSheets(page, { planillas = {}, valores = {} } = {}) {
   const escrituras = [];
-  const cel = t => ({ formattedValue: String(t), userEnteredValue: { stringValue: String(t) } });
+  // Celda: texto, o { t, f } para una fórmula (f = '=…', t = lo que muestra)
+  const cel = t => (t && typeof t === 'object') ? { formattedValue: String(t.t), userEnteredValue: { formulaValue: t.f } } : { formattedValue: String(t), userEnteredValue: { stringValue: String(t) } };
   await page.route(/accounts\.google|gstatic/, r => r.abort());
   await page.route(/sheets\.googleapis\.com/, async r => {
     const u = decodeURIComponent(r.request().url()), m = r.request().method();
     const json = b => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(b) });
-    if (m !== 'GET') { escrituras.push({ metodo: m, url: u, cuerpo: r.request().postData() }); return json({}); }
+    if (m !== 'GET') {
+      escrituras.push({ metodo: m, url: u, cuerpo: r.request().postData() });
+      // Como el Sheets real: un append agrega la fila (así una lectura posterior la encuentra)
+      const ap = u.match(/\/values\/([^!/?:]+)![^:]*:append/);
+      if (ap) { const k = Object.keys(valores).find(k => k.split('!')[0] === ap[1]); try { if (k) valores[k].push(...JSON.parse(r.request().postData()).values); } catch (e) {} }
+      return json({});
+    }
     const id = (u.match(/spreadsheets\/([^/?:]+)/) || [])[1];
     let tabs = planillas[id];
     // Como el Sheets real: con ranges=<pestaña>!A1:… devuelve solo esa pestaña
-    const rq = (u.match(/[?&]ranges=([^&]+)/) || [])[1];
-    if (tabs && rq) { const t = rq.split('!')[0].replace(/^'|'$/g, '').replace(/''/g, "'"); const f = tabs.filter(x => x.title === t); if (f.length) tabs = f; }
+    const rqs = [...u.matchAll(/[?&]ranges=([^&]+)/g)].map(m => m[1].split('!')[0].replace(/^'|'$/g, '').replace(/''/g, "'"));
+    if (tabs && rqs.length) { const f = rqs.map(t => tabs.find(x => x.title === t)).filter(Boolean); if (f.length) tabs = f; }
     if (tabs && u.includes('includeGridData')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title }, data: [{ rowData: t.filas.map(f => ({ values: f.map(cel) })) }] })) });
     if (tabs && u.includes('sheets.properties')) return json({ sheets: tabs.map(t => ({ properties: { sheetId: t.id, title: t.title } })) });
     const rango = Object.keys(valores).find(k => u.includes('/values/' + k.split('!')[0] + '!'));   // con el '!': 'Nutricion' no confunde a 'NutricionCobros'
