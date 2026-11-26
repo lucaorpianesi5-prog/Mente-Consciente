@@ -21,11 +21,15 @@
 //      entrevista2:true; la acción "perfil" acepta datos.entrevista, que se valida campo
 //      por campo contra las opciones permitidas y se guarda como JSON en la columna X de
 //      la fila del alumno (no toca nada más).
+//   7. [26/11] "Terminé el día" desde el portal, SOLO alumnos online (columna W):
+//      acciones "terminarDia" y "deshacerDia" (ver terminarDia_()). Escriben solo en
+//      Asistencias, solo filas de ese alumno, y marcan la columna E con "portal" para
+//      que el alumno pueda deshacer únicamente lo suyo y únicamente el mismo día.
 // ═══════════════════════════════════════════════════════════════════════
 
 // Versión del proxy: el portal la muestra al pie ("Proxy 1.0 · 25/11/2026") para saber si ya se publicó.
 // SUBIRLA CADA VEZ QUE SE CAMBIA ESTE ARCHIVO.
-const VERSION_PROXY = '1.1 · 26/11/2026';
+const VERSION_PROXY = '1.2 · 26/11/2026';
 
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 
@@ -106,7 +110,7 @@ function doGet(e) {
     const asistencias = [];
     for (let i = 1; i < asData.length; i++) {
       if (String(asData[i][0]) === id && asData[i][1]) {
-        asistencias.push([asData[i][1], asData[i][2] || '', asData[i][3] || '']);   // [24/11] D = día del plan
+        asistencias.push([asData[i][1], asData[i][2] || '', asData[i][3] || '', asData[i][4] || '']);   // [24/11] D = día del plan · [26/11] E = 'portal' si lo marcó el alumno
       }
     }
 
@@ -134,7 +138,7 @@ function doGet(e) {
 
     // [24/11] perfilEditable: avisa al portal que este proxy ya acepta la
     // entrevista inicial (acción "perfil" de doPost).
-    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, version: VERSION_PROXY };
+    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, terminarDia: true, version: VERSION_PROXY };
     const resultadoStr = JSON.stringify(resultado);
     try {
       cache.put(cacheKey, resultadoStr, CACHE_TTL_SEGUNDOS);
@@ -170,6 +174,7 @@ function doPost(e) {
   try {
     const body = JSON.parse((e.postData && e.postData.contents) || '{}');
     if (body.accion === 'perfil') return guardarPerfilAlumno_(body);   // [24/11]
+    if (body.accion === 'terminarDia' || body.accion === 'deshacerDia') return terminarDia_(body);   // [26/11]
 
     const idToken = body.id_token;
     if (!idToken) return _jsonOut({ error: 'missing_token' });
@@ -415,5 +420,103 @@ function planPortal_(token, tipo) {
   } catch (err) {
     Logger.log(err);
     return _jsonOut({ error: 'server_error' });
+  }
+}
+
+// ── [26/11] "Terminé el día" desde el portal (solo alumnos online) ─────────
+// Reglas: token válido · alumno no inactivo · modalidad (columna W) = online · el "Mes N",
+// el día y la semana tienen que existir en SU planilla de Fuerza y la semana tiene que estar
+// cargada (no se puede marcar una semana futura). Escribe solo en Asistencias:
+//   - si ya hay una asistencia de hoy sin día del plan (p. ej. la marcó Luca) → le suma el día (D) y E='portal-dia'
+//   - si no → agrega [id, hoy, asistencia|dia, "Mes N · Día d · Semana s", 'portal']
+// Deshacer: solo filas de ese alumno, de HOY, con E 'portal'/'portal-dia' (nunca lo que marcó Luca).
+function _hojaFuerza_(fila) {
+  const url = String(fila[16] || '').trim();
+  const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]{20,})/);
+  if (!m) return null;
+  const g = url.match(/[#?&]gid=(\d+)/), gid = g ? g[1] : null;
+  const norm = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+  const hojas = SpreadsheetApp.openById(m[1]).getSheets().filter(h => !h.isSheetHidden());
+  return (gid != null && hojas.find(x => String(x.getSheetId()) === gid && norm(x.getName()) !== 'notas'))
+    || hojas.find(x => norm(x.getName()) !== 'notas') || null;
+}
+function terminarDia_(cuerpo) {
+  try {
+    const token = String((cuerpo && cuerpo.token) || '').trim();
+    if (token.length < 20 || token.length > 100) return _jsonOut({ ok: false, error: 'token' });
+    const dia = parseInt(cuerpo.dia, 10), sem = parseInt(cuerpo.sem, 10);
+    const mesN = (String(cuerpo.mes || '').match(/^\s*mes\s*(\d{1,3})\s*$/i) || [])[1];
+    if (!(dia >= 1 && dia <= 7) || !(sem >= 1 && sem <= 12) || !mesN) return _jsonOut({ ok: false, error: 'datos' });
+    const det = 'Mes ' + (+mesN) + ' · Día ' + dia + ' · Semana ' + sem;
+
+    const lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+    try {
+      const ss = SpreadsheetApp.openById(SHEET_ID_PORTAL);
+      const al = ss.getSheetByName('Alumnos').getDataRange().getValues();
+      let fila = null;
+      for (let i = 1; i < al.length; i++) { if (al[i][18] && String(al[i][18]) === token) { fila = al[i]; break; } }
+      if (!fila) return _jsonOut({ ok: false, error: 'not_found' });
+      if (String(fila[8]).trim() === 'inactivo') return _jsonOut({ ok: false, error: 'not_found' });
+      if (!/online/i.test(String(fila[22] || ''))) return _jsonOut({ ok: false, error: 'no_online' });
+      const id = String(fila[0]);
+      const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');
+      const as = ss.getSheetByName('Asistencias');
+      const v = as.getDataRange().getDisplayValues();
+
+      if (cuerpo.accion === 'deshacerDia') {
+        for (let i = v.length - 1; i >= 1; i--) {
+          const r = v[i];
+          if (String(r[0]) === id && r[3] === det && r[1] === hoy && /^portal/.test(String(r[4] || ''))) {
+            if (r[4] === 'portal') as.getRange(i + 1, 1, 1, 5).clearContent();
+            else as.getRange(i + 1, 4, 1, 2).clearContent();   // 'portal-dia': la asistencia era de Luca, queda
+            try { CacheService.getScriptCache().remove('portal_' + token); } catch (e) {}
+            return _jsonOut({ ok: true });
+          }
+        }
+        return _jsonOut({ ok: false, error: 'no_encontrado' });
+      }
+
+      // Validar contra SU planilla de Fuerza: mismo Mes, el día existe, la semana está cargada
+      const h = _hojaFuerza_(fila);
+      if (!h) return _jsonOut({ ok: false, error: 'sin_planilla' });
+      const nf = Math.min(h.getLastRow(), 120), nc = Math.min(h.getLastColumn(), 40);
+      const g = h.getRange(1, 1, nf, nc).getDisplayValues();
+      const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+      const mesPl = (String(g[0][0]).match(/(\d+)/) || [])[1];
+      if (!/^mes/.test(norm(g[0][0])) || +mesPl !== +mesN) return _jsonOut({ ok: false, error: 'plan' });
+      let nDias = 0, activa = 0, bloque = '';
+      const semanas = [];
+      for (let c = 4; c < g[0].length; c++) { const mm = norm(g[0][c]).match(/^semana (\d+)$/); if (mm) semanas.push({ n: +mm[1], col: c }); }
+      for (let r = 1; r < g.length; r++) {
+        if (norm(g[r][1]) === 'ejercicios' && /^dia \d+$/.test(norm(g[r][0]))) { nDias++; bloque = ''; continue; }
+        if (g[r][1]) bloque = norm(g[r][1]);
+        if (!g[r][3] || /activacion|movilidad/.test(bloque)) continue;
+        semanas.forEach(s => { if (String(g[r][s.col] || '').trim() && s.n > activa) activa = s.n; });
+      }
+      if (dia > nDias || !semanas.some(s => s.n === sem) || sem > activa) return _jsonOut({ ok: false, error: 'semana' });
+
+      for (let i = 1; i < v.length; i++) { if (String(v[i][0]) === id && v[i][3] === det) return _jsonOut({ ok: true, ya: true }); }
+      let k = -1, asistioHoy = false;
+      for (let i = 1; i < v.length; i++) {
+        const r = v[i];
+        if (String(r[0]) !== id || r[1] !== hoy || (r[2] && r[2] !== 'asistencia')) continue;
+        asistioHoy = true;
+        if (!r[3]) { k = i; break; }
+      }
+      if (k >= 0) {
+        as.getRange(k + 1, 4, 1, 2).setNumberFormat('@').setValues([[det, 'portal-dia']]);
+      } else {
+        const n = as.getLastRow() + 1;
+        as.getRange(n, 1, 1, 5).setNumberFormat('@').setValues([[id, hoy, asistioHoy ? 'dia' : 'asistencia', det, 'portal']]);
+      }
+      try { CacheService.getScriptCache().remove('portal_' + token); } catch (e) {}
+      return _jsonOut({ ok: true, fecha: hoy, det: det, tipo: k >= 0 ? 'asistencia' : (asistioHoy ? 'dia' : 'asistencia'), origen: k >= 0 ? 'portal-dia' : 'portal' });
+    } finally {
+      lock.releaseLock();
+    }
+  } catch (err) {
+    Logger.log(err);
+    return _jsonOut({ ok: false, error: 'server_error' });
   }
 }

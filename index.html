@@ -268,6 +268,8 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
 .rc-turno.toca:hover{filter:brightness(1.08)}
 .rc-turno.toca:active{filter:brightness(1.15)}
 .rc-card h3 .rc-ayuda{margin-left:auto;font-weight:400}
+.rc-on-tit{margin-top:0.9rem!important}
+.rc-turno .h:not(:has(small)){color:var(--texto3);font-weight:600;font-size:0.85rem}
 .rc-ib{width:42px;height:42px;border-radius:12px;border:1px solid var(--borde);background:var(--blanco);color:var(--texto);display:grid;place-items:center;cursor:pointer;padding:0;flex:none}
 .rc-ib svg{width:19px;height:19px}
 .rc-ib:hover{border-color:var(--verde)}
@@ -1235,6 +1237,13 @@ button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
 .ent-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;justify-content:center}
 .ent-chip{padding:0.65rem 0.95rem;border-radius:22px;border:1.5px solid var(--pd-border2);background:var(--pd-card);color:var(--pd-text);font-family:inherit;font-size:0.88rem;font-weight:600;cursor:pointer}
 .ent-chip.on{background:var(--pd-verde-dim);border-color:var(--pd-verde);color:var(--pd-verde)}
+.pv-conf{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center}
+.pv-conf-caja{width:100%;max-width:520px;background:var(--pd-card);color:var(--pd-text);border-radius:22px 22px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
+.pv-conf-caja h3{font-size:1.25rem}
+.pv-conf-caja p{color:var(--pd-text2);font-size:0.9rem;line-height:1.5}
+.pv-conf-caja button{height:52px;border-radius:14px;border:none;font:inherit;font-weight:700;font-size:1rem;cursor:pointer}
+.pv-conf-caja .si{background:var(--pd-verde);color:var(--pd-sobre-acento)}
+.pv-conf-caja .no{background:transparent;color:var(--pd-text2)}
 .ent-kick{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--pd-verde);font-weight:700;text-align:center}
 .ent-n{font-size:0.78rem;color:var(--pd-text3);font-variant-numeric:tabular-nums;margin-left:-4px}
 .ent-tag{align-self:center;font-size:0.7rem;padding:2px 9px;border-radius:8px;background:color-mix(in srgb,var(--pd-azul) 18%,transparent);color:var(--pd-azul);font-weight:700}
@@ -2251,7 +2260,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.7 · 26/11/2026';
+const VERSION_APP='1.8 · 26/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -4000,7 +4009,25 @@ function _rcHoy(activos, fz){
       <div class="rc-acc" onclick="event.stopPropagation()">${(a.carpetaDrive||'').trim()?`<button class="rc-ib" onclick="_rcFuerza('${a.id}')" title="Abrir su Fuerza" aria-label="Abrir la Fuerza de ${escaparHTML(a.nombre)}">${ic('dumbbell')}</button>`:''}${vino?`<span class="rc-ib ok" title="Asistencia tomada" aria-label="Asistencia tomada">${_RC_CHECK}</span>`:`<button class="rc-ib${enCurso?' v':''}" onclick="_rcAsistencia('${a.id}')" title="Marcar asistencia" aria-label="Marcar la asistencia de ${escaparHTML(a.nombre)}">${_RC_CHECK}</button>`}</div>
     </div>`;
   }).join('');
-  return `<div class="rc-card"><h3>Hoy <small>${turnos.length?`${con} de ${turnos.length} con asistencia`:''}</small>${turnos.length?'<small class="rc-ayuda">Tocá un alumno para abrir su perfil</small>':''}</h3>${filas||'<p class="rc-vacio">Hoy no tenés turnos.</p>'}</div>`;
+  // Online (26/11): quién terminó un día hoy, quién esta semana y quién todavía no marcó nada
+  const lunes=new Date(ahora); lunes.setHours(0,0,0,0); lunes.setDate(lunes.getDate()-((lunes.getDay()+6)%7));
+  const DSEM=['dom','lun','mar','mié','jue','vie','sáb'];
+  const online=activos.filter(_esOnline).map(a=>{ const H=_rcHechosSemana(a.id,lunes); const hoyH=H.filter(h=>_mismoDia(h.fecha,ahora)); return {a,H,hoyH,orden:hoyH.length?0:H.length?1:2}; })
+    .sort((x,y)=>(x.orden-y.orden)||x.a.nombre.localeCompare(y.a.nombre,'es'));
+  const filasOn=online.map(({a,H,hoyH})=>{
+    const f=fz.info[a.id];
+    let izq='—', txt='', ok=false;
+    if(hoyH.length){ const u=hoyH[hoyH.length-1]; izq='hoy'; ok=true; txt=`Terminó Día ${u.dia} · Semana ${u.sem}`; }
+    else if(H.length){ const u=H[H.length-1]; izq=DSEM[u.fecha.getDay()]; txt=`Esta semana: Día ${u.dia} · Semana ${u.sem}`; }
+    else txt=`Todavía no marcó esta semana${f?` · cargada hasta la Semana ${f.act}`:''}`;
+    return `<div class="rc-turno toca${ok?' hecho-on':''}" onclick="verAlumno('${a.id}')" role="button" title="Abrir el perfil de ${escaparHTML(a.nombre)}">
+      <div class="h">${izq}</div>
+      <div class="n"><b>${escaparHTML(a.nombre)}</b><small>${escaparHTML(txt)}</small></div>
+      <div class="rc-acc" onclick="event.stopPropagation()">${ok?`<span class="rc-ib ok" title="Terminó un día hoy">${_RC_CHECK}</span>`:(a.carpetaDrive||'').trim()?`<button class="rc-ib" onclick="_rcFuerza('${a.id}')" title="Abrir su Fuerza" aria-label="Abrir la Fuerza de ${escaparHTML(a.nombre)}">${ic('dumbbell')}</button>`:''}</div>
+    </div>`;
+  }).join('');
+  const seccionOnline=online.length?`<div class="rc-grupo rc-on-tit">Online · hoy</div>${filasOn}`:'';
+  return `<div class="rc-card"><h3>Hoy <small>${turnos.length?`${con} de ${turnos.length} con asistencia`:''}</small>${turnos.length?'<small class="rc-ayuda">Tocá un alumno para abrir su perfil</small>':''}</h3>${filas||'<p class="rc-vacio">Hoy no tenés turnos presenciales.</p>'}${seccionOnline}</div>`;
 }
 
 function _rcPlanes(activos, fz){
@@ -6782,6 +6809,56 @@ function _portalComoAlumno(){
     estado:a.estado||'activo', carpetaDrive:a.carpetaDrive||'', mapeoUrl:a.mapeoUrl||'', nutriDrive:a.nutriDrive||''};
 }
 function _portalAbrirPlan(tipo){ abrirPlan(PORTAL_ID,tipo); }
+// ── "Terminé el día" desde el portal (26/11): solo alumnos online y si el proxy lo soporta ──
+function _portalPuedeTerminar(){
+  return !!(_portalDatosActual && _portalDatosActual.terminarDia && _portalAlumnoActual && _normModalidad(_portalAlumnoActual.modalidad)==='online');
+}
+function _portalPuedeDeshacer(mes,dia,sem){
+  if(!_portalPuedeTerminar()) return false;
+  const det=_planDetalle(mes,dia,sem), hoy=_fechaHoyAR();
+  return ((_portalDatosActual&&_portalDatosActual.asistencias)||[]).some(r=>r[0]===hoy && r[2]===det && /^portal/.test(r[3]||''));
+}
+function _pvConfirmar(titulo,texto,si,no){
+  return new Promise(res=>{
+    const v=document.createElement('div'); v.className='pv-conf';
+    v.innerHTML=`<div class="pv-conf-caja" role="dialog" aria-label="${escaparHTML(titulo)}"><h3>${escaparHTML(titulo)}</h3><p>${escaparHTML(texto)}</p><button type="button" class="si">${escaparHTML(si)}</button><button type="button" class="no">${escaparHTML(no)}</button></div>`;
+    const fin=ok=>{ v.remove(); res(ok); };
+    v.addEventListener('click',ev=>{ if(ev.target===v) fin(false); });
+    v.querySelector('.si').onclick=()=>fin(true); v.querySelector('.no').onclick=()=>fin(false);
+    document.body.appendChild(v);
+  });
+}
+async function _portalTerminarDia(btn,deshacer){
+  const e=planEntrada(PORTAL_ID,'fuerza'); if(!e||e.estado!=='ok') return;
+  const sel=_planSelDe(_portalComoAlumno(),e.datos), det=_planDetalle(e.datos.mes,sel.dia,sel.sem);
+  const ok=deshacer
+    ? await _pvConfirmar('¿Deshacer el día?',`Día ${sel.dia} · Semana ${sel.sem} vuelve a quedar sin terminar.`,'Sí, deshacer','No')
+    : await _pvConfirmar(`¿Terminaste el Día ${sel.dia}?`,`Semana ${sel.sem} · ${e.datos.mes}. Le avisamos a Luca que completaste la sesión y se suma a tu constancia.`,'Sí, terminé','Todavía no');
+  if(!ok) return;
+  btn.disabled=true;
+  try{
+    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:deshacer?'deshacerDia':'terminarDia',token:_portalToken,mes:e.datos.mes,dia:sel.dia,sem:sel.sem})});
+    const j=await r.json();
+    if(!j||!j.ok) throw new Error((j&&j.error)||'sin_ok');
+    const L=_portalDatosActual.asistencias=_portalDatosActual.asistencias||[], hoy=_fechaHoyAR();
+    if(deshacer){
+      const i=L.findIndex(x=>x[0]===hoy && x[2]===det && /^portal/.test(x[3]||''));
+      if(i>=0){ if(L[i][3]==='portal') L.splice(i,1); else { L[i][2]=''; L[i][3]=''; } }
+      toast('Listo, el día quedó sin terminar');
+    } else if(!j.ya){
+      const i=L.findIndex(x=>x[0]===hoy && (!x[1]||x[1]==='asistencia') && !x[2]);
+      if(i>=0){ L[i][2]=det; L[i][3]='portal-dia'; } else L.push([hoy, L.some(x=>x[0]===hoy&&(!x[1]||x[1]==='asistencia'))?'dia':'asistencia', det, 'portal']);
+      const sig=_planSiguiente(e.datos,sel.dia,sel.sem);
+      toast(!sig?'¡Terminaste el plan del mes! 🎉':sig.sinCargar?`¡Semana ${sel.sem} completa!`:`¡Bien! Próximo: Día ${sig.dia} · Semana ${sig.sem}`);
+    }
+    try{ localStorage.removeItem('mc_portal_cache'); }catch(x){}
+    planRenderTodo();
+  }catch(err){
+    const m={no_online:'Esta opción es para alumnos online.',semana:'Esa semana todavía no está cargada.',plan:'Tu plan cambió: cerrá y volvé a abrir la Fuerza.',no_encontrado:'No encontré ese día para deshacer.'}[err&&err.message];
+    toast(m||(navigator.onLine===false?'Sin conexión: probá de nuevo cuando tengas señal':'No se pudo guardar. Probá de nuevo en un momento'));
+    btn.disabled=false;
+  }
+}
 async function _planPortalPedir(tipo){
   let r;
   try{ r=await fetch(`${PORTAL_API_URL}?alumno=${encodeURIComponent(_portalToken)}&plan=${tipo}`); }catch(e){ throw {tipo:'red'}; }
@@ -6808,7 +6885,7 @@ async function _planPortalMapeo(){
 // Días terminados del alumno del portal: vienen en su respuesta (Asistencias con columna D)
 function _asistenciasDe(aid){
   if(aid!==PORTAL_ID) return asistencias;
-  return ((_portalDatosActual&&_portalDatosActual.asistencias)||[]).map(r=>[PORTAL_ID,r[0],r[1],r[2]||'']);
+  return ((_portalDatosActual&&_portalDatosActual.asistencias)||[]).map(r=>[PORTAL_ID,r[0],r[1],r[2]||'',r[3]||'']);
 }
 
 // ── Entradas en memoria ──
@@ -7308,7 +7385,7 @@ function _pvBodyFuerza(a,e){
     const prox=!sig?' · ¡Plan del mes completo!':sig.sinCargar?` · Semana ${sig.sem}: todavía sin cargar`:' · Próximo: '+sigTxt;
     html+=`<div class="pv-fin hecho">
       <div class="pv-fin-tit"><span class="pv-fin-check">✓</span><div><b>Día ${dia.n} · Semana ${sel.sem} terminado</b><small>${escaparHTML(hecho.fecha||'')}${prox}</small></div></div>
-      <div class="pv-fin-acc">${sig&&!sig.sinCargar?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}${_pvRO()?'':'<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button>'}</div>
+      <div class="pv-fin-acc">${sig&&!sig.sinCargar?`<button type="button" class="pv-fin-ir" data-pv="ir-prox">Ver ${sigTxt} ›</button>`:''}${_pvRO()?(_portalPuedeDeshacer(d.mes,dia.n,sel.sem)?'<button type="button" class="pv-fin-des" data-pv="deshacer-portal">Deshacer</button>':''):'<button type="button" class="pv-fin-des" data-pv="deshacer-dia">Deshacer</button>'}</div>
     </div>`;
   }
   return html;
@@ -7318,7 +7395,7 @@ function _pvPieFuerza(a,e){
   const d=e.datos, sel=_planSelDe(a,d);
   const hecho=_planHecho(a.id,d.mes,sel.dia,sel.sem);
   if(_pvRO()) return `<div class="pv-pie"><button type="button" class="pv-timer${_pvDesc.fin>Date.now()?' corre':''}" data-pv="timer" id="pv-timer">${_pvTimerTxt()}</button>
-    <div class="pv-term ${hecho?'hecho':'ro'}">${hecho?`✓ Día ${sel.dia} terminado`:'Tu entrenador marca el día al terminar'}</div></div>`;
+    ${hecho?`<div class="pv-term hecho">✓ Día ${sel.dia} terminado</div>`:_portalPuedeTerminar()?`<button type="button" class="pv-term" data-pv="terminar-portal">✓ Terminé el Día ${sel.dia}</button>`:'<div class="pv-term ro">Tu entrenador marca el día al terminar</div>'}</div>`;
   return `<div class="pv-pie"><button type="button" class="pv-timer${_pvDesc.fin>Date.now()?' corre':''}" data-pv="timer" id="pv-timer">${_pvTimerTxt()}</button>
     ${hecho?`<div class="pv-term hecho">✓ Día ${sel.dia} terminado</div>`:`<button type="button" class="pv-term" data-pv="terminar-dia">✓ Terminé el Día ${sel.dia}</button>`}</div>`;
 }
@@ -7646,6 +7723,8 @@ function planGuardarInput(inp){
       }
       case 'terminar-dia': planTerminarDia(el); break;
       case 'deshacer-dia': planDeshacerDia(el); break;
+      case 'terminar-portal': _portalTerminarDia(el,false); break;
+      case 'deshacer-portal': _portalTerminarDia(el,true); break;
       case 'ir-prox': { const sel=planSel[a.id], sig=sel&&_planSiguiente(e.datos,sel.dia,sel.sem); if(sig&&!sig.sinCargar){ sel.dia=sig.dia; sel.sem=sig.sem; planVista.expandidas=new Set(); planRenderTodo(); const b=document.getElementById('pv-body'); if(b) b.scrollTop=0; } break; }
       case 'dia': { const s=planSel[a.id]; s.dia=+el.dataset.n; planVista.expandidas=new Set(); planRenderTodo(); break; }
       case 'sem': { const n=+el.dataset.n; if(n&&n<=planSemanaActiva(e.datos)){ planSel[a.id].sem=n; planRenderTodo(); } break; }

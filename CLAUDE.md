@@ -36,7 +36,7 @@ Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, 
 | Nutricion / NutricionCobros | clientes · pagos por mes |
 | Gastos A:D | id · mes `yyyy-mm` · descripción · monto |
 | Ahorros A2:B2 | saldo inicial (config de Inversión) |
-| Asistencias A:D | alumnoId · fecha `dd/mm/aaaa` · tipo (`asistencia`/`recuperacion`/`dia`) · D día del plan terminado (`Mes 2 · Día 1 · Semana 3`) |
+| Asistencias A:E | alumnoId · fecha `dd/mm/aaaa` · tipo (`asistencia`/`recuperacion`/`dia`) · D día del plan terminado (`Mes 2 · Día 1 · Semana 3`) · E origen (`portal` = fila creada por el alumno online desde el portal, `portal-dia` = le sumó el día a una asistencia de Luca; vacío = Luca). La app lee A:D. |
 | Perfil | clave/valor de Mi perfil (se crea sola) |
 | Listos A:D | **una fila por alumno**: id · ciclo (`mes n\|id planilla`) · marcas JSON `{"día-semana":[índices]}` · fecha. Cambia el ciclo → se reemplaza (se crea sola) |
 | Frases | frases del portal |
@@ -54,7 +54,7 @@ Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__porta
 - Lecturas en `RANGO` sin fila final (`'Asistencias!A2:D'`), así no hay tope. Los `_WRITE` de `sheetsReplaceRange` sí la llevan: no achicar la grilla de esas pestañas.
 - Escribir **por fila**, no reescribir rangos enteros. `guardarFilaAlumno()` hace fusión de 3 vías contra `_alumnoBase` (el alumno también escribe su fila desde el portal).
 - Pestañas nuevas del Sheet: crearlas solas con `_crearPestana()` y tolerar que no existan al leer (no marcar fallo de sincronización).
-- Proxy: `doGet` solo lee y filtra por token; la única escritura es `accion:'perfil'` (campos K/L/M/N + ítems `origen:"entrevista"` de G/H + columna X con la entrevista ampliada, validada contra `ENT_VALIDAS`, que tiene que coincidir con `ENT_OP` de index.html). Nunca devolver datos de otro alumno ni pestañas ajenas.
+- Proxy: `doGet` solo lee y filtra por token; la única escritura es `accion:'perfil'` (campos K/L/M/N + ítems `origen:"entrevista"` de G/H + columna X con la entrevista ampliada, validada contra `ENT_VALIDAS`, que tiene que coincidir con `ENT_OP` de index.html). Además, solo para alumnos online (W), `terminarDia`/`deshacerDia` (`terminarDia_`): valida Mes/día/semana contra SU planilla de Fuerza (semana cargada), escribe solo filas de ese alumno en Asistencias con E=`portal`, y deshacer solo lo suyo del mismo día. Nunca devolver datos de otro alumno ni pestañas ajenas.
 - Cambios de esquema retrocompatibles (líneas viejas en texto plano, columnas que faltan, proxy viejo).
 - Lo que Luca decidió no tocar (estado global, `onclick` inline, re-render por `innerHTML`): ver `PENDIENTES.md`.
 
