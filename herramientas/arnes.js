@@ -86,7 +86,7 @@ async function abrirEntrenador(page, datos = {}) {
 }
 
 // 4) Abre el portal de un alumno con el proxy simulado. `respuesta` = lo que devuelve doGet
-//    (alumno, asistencias, pagos, frases, perfilEditable, planPortal); `planes` = {fuerza:{...}, mapeo:{...}}
+//    (alumno, asistencias, pagos, frases, perfilEditable, planPortal); `planes` = {fuerza:{...}, mapeo:{...}, nutri:{track:{hoja,filas},datos}}
 async function abrirPortal(page, respuesta, planes = {}) {
   const posts = [];
   await page.route(/accounts\.google|gstatic|googleapis/, r => r.abort());
@@ -96,6 +96,7 @@ async function abrirPortal(page, respuesta, planes = {}) {
     if (r.request().method() === 'POST') { posts.push(r.request().postData()); return json({ ok: true }); }
     if (u.includes('plan=fuerza')) return json(planes.fuerza || { error: 'sin_planilla' });
     if (u.includes('plan=mapeo')) return json(planes.mapeo || { error: 'sin_planilla' });
+    if (u.includes('plan=nutri')) return json(planes.nutri || { error: 'sin_planilla' });
     return json(respuesta);
   });
   await page.goto(URL_APP);

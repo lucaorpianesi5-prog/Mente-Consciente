@@ -64,7 +64,7 @@ html[data-tema="nocturno"]{
   --f1:#62B2DE; --f2:#B39AEA; --f3:#C3D45A; --f4:#F2B45C; --f5:#E688B6; --f-alpha:14%;
   --sombra:0 1px 2px rgba(0,0,0,.35),0 8px 24px rgba(0,0,0,.25);
 }
-html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #portal-alumno, html[data-tema="nocturno"] #yo-dark, html[data-tema="nocturno"] #entrevista{
+html[data-tema="nocturno"] #perfil-dark, html[data-tema="nocturno"] #plan-vista, html[data-tema="nocturno"] #nutri-vista, html[data-tema="nocturno"] #portal-alumno, html[data-tema="nocturno"] #yo-dark, html[data-tema="nocturno"] #entrevista{
   --pd-bg:#0B1310; --pd-bg2:#121C17; --pd-bg3:#19251F; --pd-card:#121C17; --pd-card2:#19251F;
   --pd-border:rgba(140,200,160,0.09); --pd-border2:rgba(140,200,160,0.16);
   --pd-verde:#5BBE7E; --pd-verde-d:#3E9A5E; --pd-verde-dim:rgba(91,190,126,0.13);
@@ -91,7 +91,7 @@ html[data-tema="calma"]{
   --f1:#5E8397; --f2:#86874A; --f3:#2E7D4F; --f4:#A07A2A; --f5:#A65A3E; --f-alpha:12%;
   --sombra:0 1px 2px rgba(20,40,30,.06),0 6px 20px rgba(20,40,30,.07);
 }
-html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #portal-alumno, html[data-tema="calma"] #yo-dark, html[data-tema="calma"] #entrevista{
+html[data-tema="calma"] #perfil-dark, html[data-tema="calma"] #plan-vista, html[data-tema="calma"] #nutri-vista, html[data-tema="calma"] #portal-alumno, html[data-tema="calma"] #yo-dark, html[data-tema="calma"] #entrevista{
   --pd-bg:#F5F5F0; --pd-bg2:#FFFFFF; --pd-bg3:#EEF0EA; --pd-card:#FFFFFF; --pd-card2:#EEF0EA;
   --pd-border:rgba(20,50,35,0.08); --pd-border2:rgba(20,50,35,0.15);
   --pd-verde:#2E7D4F; --pd-verde-d:#1F5C3A; --pd-verde-dim:rgba(46,125,79,0.09);
@@ -425,7 +425,7 @@ tr:hover td{background:color-mix(in srgb,var(--verde) 4%,transparent)}
    que reutiliza las clases pd-* / dias-pilares / racha-accion / stats-*; sin
    esto los var(--pd-...) del portal resolverían a vacío y quedarían fondos y
    bordes sin color) */
-#perfil-dark, #portal-alumno, #plan-vista, #yo-dark, #entrevista{
+#perfil-dark, #portal-alumno, #plan-vista, #nutri-vista, #yo-dark, #entrevista{
   --pd-bg:       #111B16;
   --pd-bg2:       #1C2B20;
   --pd-bg3:       #223527;
@@ -1316,6 +1316,89 @@ button.bq-pl.off{cursor:pointer} button.bq-pl.off .ab{color:var(--pd-verde)}
    chocar con .chip/.tab/.sem de otras pantallas. */
 #plan-vista{position:fixed;inset:0;z-index:350;background:var(--pd-bg);color:var(--pd-text);display:none;justify-content:center}
 body.sesion-bar-on #plan-vista{top:34px}
+/* ── Nutrición (seguimiento semanal, 27/11): misma cáscara que el visor de planes ── */
+#nutri-vista{position:fixed;inset:0;z-index:360;background:var(--pd-bg);color:var(--pd-text);display:none;justify-content:center}
+body.sesion-bar-on #nutri-vista{top:34px}
+.nv-body{flex:1;overflow-y:auto;padding:12px 14px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+.nv-eti{font-size:0.64rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--pd-text3);font-weight:700}
+.nv-card{background:var(--pd-card);border:1px solid var(--pd-border2);border-radius:14px;padding:13px 14px}
+.nv-tira{display:flex;gap:5px}
+.nv-d{flex:1;min-width:0;text-align:center;padding:7px 0 6px;border-radius:10px;border:1px solid var(--pd-border);background:var(--pd-card);font:inherit;font-size:0.7rem;font-weight:700;color:var(--pd-text2);cursor:pointer}
+.nv-d small{display:block;font-size:0.62rem;font-weight:600;color:var(--pd-text3)}
+.nv-d i{display:flex;justify-content:center;gap:2px;margin-top:4px}
+.nv-d i b{width:5px;height:5px;border-radius:50%;background:color-mix(in srgb,var(--pd-text3) 30%,transparent)}
+.nv-d i b.c{background:var(--pd-verde)}
+.nv-d.hoy{color:var(--pd-text)}
+.nv-d.sel{border-color:var(--pd-crema);box-shadow:0 0 0 1px var(--pd-crema);color:var(--pd-text)}
+.nv-d.fut{opacity:0.45}
+.nv-nota-top{font-size:0.74rem;color:var(--pd-text2);background:var(--pd-crema-dim);border-radius:10px;padding:9px 11px;line-height:1.45}
+.nv-com{background:var(--pd-card);border:1px solid var(--pd-border2);border-radius:14px;padding:11px 12px}
+.nv-com.abierta{border-color:var(--pd-verde)}
+.nv-com-h{display:flex;align-items:center;gap:10px;width:100%;background:none;border:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.nv-com-h:disabled{cursor:default}
+.nv-com-h>div{flex:1;min-width:0}
+.nv-com-h b{display:block;font-size:0.88rem}
+.nv-com-h small{font-size:0.68rem;color:var(--pd-text2)}
+.nv-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;background:var(--pd-verde-dim)}
+.nv-est{font-size:0.62rem;font-weight:700;padding:3px 8px;border-radius:20px;white-space:nowrap}
+.nv-est.ok{color:var(--pd-verde);background:var(--pd-verde-dim)}
+.nv-est.esp{color:var(--pd-crema);background:var(--pd-crema-dim)}
+.nv-est.vac{color:var(--pd-text3);border:1px dashed var(--pd-border2)}
+.nv-txt{font-size:0.82rem;margin-top:9px;padding:9px 11px;background:color-mix(in srgb,var(--pd-bg) 50%,transparent);border-radius:10px;overflow-wrap:anywhere}
+.nv-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.nv-chips span{font-size:0.66rem;font-weight:600;color:var(--pd-text2);padding:3px 7px;border-radius:7px;background:color-mix(in srgb,var(--pd-text3) 10%,transparent)}
+.nv-chips b{color:var(--pd-text)}
+.nv-area{width:100%;min-height:68px;margin-top:10px;border:1px solid var(--pd-border2);border-radius:10px;background:var(--pd-bg);color:var(--pd-text);font:inherit;font-size:16px;padding:9px 11px;resize:vertical}
+.nv-chk{display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--pd-text2);margin-top:9px;cursor:pointer}
+.nv-chk input{width:18px;height:18px;accent-color:var(--pd-verde)}
+.nv-fila{display:flex;gap:8px;margin-top:10px}
+.nv-bt{border:none;border-radius:10px;padding:11px 14px;font:inherit;font-weight:700;font-size:0.8rem;cursor:pointer;flex:1}
+.nv-bt.pri{background:var(--pd-verde);color:var(--pd-sobre-acento)}
+.nv-bt.sec{background:var(--pd-card2);color:var(--pd-text);border:1px solid var(--pd-border2)}
+.nv-bt.cam{flex:0 0 auto;background:color-mix(in srgb,#25D366 14%,transparent);color:color-mix(in srgb,#25D366 70%,var(--pd-text));border:1px solid color-mix(in srgb,#25D366 35%,transparent)}
+.nv-bt:disabled{opacity:0.6}
+.nv-ayuda{font-size:0.66rem;color:var(--pd-text3);margin-top:7px;line-height:1.4}
+.nv-kpi{display:flex;align-items:baseline;gap:8px;margin-top:5px}
+.nv-kpi b{font-size:2rem;font-weight:800;letter-spacing:-0.02em}
+.nv-kpi span{font-size:0.8rem;color:var(--pd-text2);font-weight:600}
+.nv-barra{height:10px;border-radius:6px;background:color-mix(in srgb,var(--pd-text3) 16%,transparent);overflow:hidden;margin-top:6px}
+.nv-barra i{display:block;height:100%;border-radius:6px}
+.nv-mac{margin-top:12px}
+.nv-mac-h{display:flex;justify-content:space-between;font-size:0.76rem;color:var(--pd-text2)}
+.nv-mac-h b{color:var(--pd-text)} .nv-mac-h em{font-style:normal;font-weight:700}
+.nv-nota{font-size:0.74rem;color:var(--pd-text2);line-height:1.5;margin-top:6px}
+.nv-pre{white-space:pre-line}
+.nv-tres{display:flex;padding:12px 4px}
+.nv-tres div{flex:1;text-align:center} .nv-tres div+div{border-left:1px solid var(--pd-border)}
+.nv-tres b{display:block;font-size:1.05rem} .nv-tres small{font-size:0.62rem;color:var(--pd-text3)}
+.nv-tabla{width:100%;border-collapse:collapse;font-size:0.72rem;margin-top:8px}
+.nv-tabla th{font-size:0.58rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--pd-text3);font-weight:700;text-align:right;padding:4px 3px}
+.nv-tabla td{padding:7px 3px;border-top:1px solid var(--pd-border);text-align:right}
+.nv-tabla th:first-child,.nv-tabla td:first-child{text-align:left}
+.nv-tabla tr.vac td{color:var(--pd-text3)} .nv-tabla tr.vac td+td{text-align:right}
+.nv-inc{color:var(--pd-crema);font-size:0.6rem}
+.nv-alerta{display:flex;gap:10px;align-items:center;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,var(--pd-card) 0%,var(--pd-tip-fin) 100%);border:1px solid color-mix(in srgb,var(--pd-amber) 45%,transparent)}
+.nv-alerta .n{width:34px;height:34px;border-radius:50%;background:color-mix(in srgb,var(--pd-amber) 16%,transparent);color:var(--pd-amber);font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nv-alerta b{display:block;font-size:0.86rem} .nv-alerta small{font-size:0.7rem;color:var(--pd-text2)}
+.nv-alerta.ok{background:var(--pd-card);border-color:var(--pd-border2)} .nv-alerta.ok .n{background:var(--pd-verde-dim);color:var(--pd-verde)}
+.nv-dia-l{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:6px 2px -2px}
+.nv-dia-l b{font-size:0.8rem} .nv-dia-l span{font-size:0.66rem;color:var(--pd-text2)}
+.nv-lista{padding:4px 14px}
+.nv-lin{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--pd-border)}
+.nv-lin:first-child{border-top:none}
+.nv-lin .et{font-size:0.6rem;font-weight:700;color:var(--pd-text3);width:64px;flex-shrink:0;padding-top:3px;text-transform:uppercase;letter-spacing:0.04em}
+.nv-lin .tx{flex:1;min-width:0;font-size:0.8rem;overflow-wrap:anywhere}
+.nv-lin-bt{display:block;width:100%;background:none;border:none;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.nv-lin small{display:block;font-size:0.66rem;color:var(--pd-text3);margin-top:2px}
+.nv-lin small.falta{color:var(--pd-amber);font-weight:600}
+.nv-lin.vacia .et{opacity:0.7}
+.nv-gris{color:var(--pd-text3)}
+.nv-alc{display:inline-block;font-size:0.6rem;font-weight:700;padding:1px 6px;border-radius:10px;color:var(--pd-amber);background:color-mix(in srgb,var(--pd-amber) 14%,transparent)}
+.nv-cargar{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-top:9px}
+.nv-cargar label span{display:block;text-align:center;font-size:0.54rem;text-transform:uppercase;color:var(--pd-text3);font-weight:700;letter-spacing:0.04em}
+.nv-cargar input{width:100%;margin-top:3px;background:var(--pd-bg);border:1px solid var(--pd-border2);border-radius:8px;padding:8px 2px;text-align:center;font:inherit;font-size:16px;font-weight:700;color:var(--pd-text)}
+.nv-cargar input:focus{outline:none;border-color:var(--pd-verde)}
+@media(min-width:769px){ .nv-area,.nv-cargar input{font-size:0.86rem} }
 .pv-col{width:100%;max-width:600px;height:100%;display:flex;flex-direction:column;position:relative}
 .pv-top{padding:0.85rem 14px 0.6rem;border-bottom:1px solid var(--pd-border);display:flex;flex-direction:column;gap:0.55rem;background:var(--pd-bg);flex-shrink:0}
 .pv-fila1{display:flex;align-items:center;gap:0.6rem}
@@ -1890,7 +1973,7 @@ div.pv-mf.ro{cursor:default}
             <button class="accion-circular" id="perfil-accion-biblioteca" style="display:none">
               <div class="accion-circulo biblio"><svg class="i"><use href="#i-map"/></svg></div><span class="accion-label">Mapeo</span>
             </button>
-            <button class="accion-circular" id="perfil-accion-nutri" onclick="showPage('nutricion')">
+            <button class="accion-circular" id="perfil-accion-nutri" onclick="_perfilNutri()">
               <div class="accion-circulo nutri"><svg class="i"><use href="#i-apple"/></svg><span class="dot-activo" id="perfil-nutri-dot" style="display:none"></span></div><span class="accion-label">Nutri</span>
             </button>
           </div>
@@ -2245,6 +2328,8 @@ div.pv-mf.ro{cursor:default}
 
 <!-- Plan del alumno dentro de la app (Fuerza y Mapeo), pantalla completa -->
 <div id="plan-vista"></div>
+<!-- Nutrición: seguimiento semanal (portal del alumno y app del entrenador), pantalla completa -->
+<div id="nutri-vista"></div>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -2260,7 +2345,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.9 · 27/11/2026';
+const VERSION_APP='1.10 · 27/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -2579,7 +2664,7 @@ function bloquePlanes(links,opts){
     if(!url) return `<${o.sinLink?'button type="button"':'div'} class="bq-pl ${t} off"${o.sinLink?` onclick="${o.sinLink}"`:''}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${o.sinLink?'Sin link cargado':'Todavía no tenés plan'}</small></div><span class="ab">${o.sinLink?'Cargar link':'Consultalo con tu entrenador'}</span></${o.sinLink?'button':'div'}>`;
     const usaAccion=o.accion&&(!o.accionTipos||o.accionTipos.includes(t));
     const accion=usaAccion?` onclick="${o.accion}('${t}')"`:` data-open-url="${escaparHTML(url)}"`;
-    return `<button type="button" class="bq-pl ${t}"${accion}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${SUB[t]}</small></div><span class="ab">Abrir ↗</span></button>`;
+    return `<button type="button" class="bq-pl ${t}"${accion}><span class="ic">${ic(ICON[t])}</span><div><b>${TIT[t]}</b><small>${t==='nutri'&&usaAccion?'Tu seguimiento semanal':SUB[t]}</small></div><span class="ab">Abrir ↗</span></button>`;
   }).join('')}</div>`;
 }
 
@@ -2690,6 +2775,7 @@ function _pintarPortal(el,data){
     const links={fuerza:a.carpetaDrive||'', nutri:a.nutriDrive||''};
     if(a.mapeoUrl!==undefined) links.mapeo=a.mapeoUrl||'';
     const enApp=data.planPortal?['fuerza','mapeo'].filter(t=>planParseUrl(links[t]||'')):[];
+    if(data.nutri && planParseUrl(links.nutri||'')) enApp.push('nutri');   // [27/11] seguimiento de Nutrición en la app
     const planes=bloquePlanes({fuerza:links.fuerza, mapeo:links.mapeo, nutri:links.nutri},{accion:'_portalAbrirPlan',accionTipos:enApp});
 
     el.innerHTML = `
@@ -3414,6 +3500,7 @@ function cerrarSesion(){
   accessToken=null; tokenExp=0; emailGuardado=''; _loginEmailEntrenador=''; datosFrescos=false; cacheTs=0;
   _lsDel(AUTH_KEY); _lsDel(CACHE_KEY);
   planCache={}; planSel={}; if(_planAbierto) _planOcultar();
+  nutriCache={}; if(_nvAbierta) _nvOcultar();
   alumnos=[];cobros={};seguimiento={};
   asistencias=[];clientesNutri=[];cobrosNutri={};gastos=[];configFinanzas={saldoInicial:0,fechaReferencia:''};
   biblioteca=[];progresionActual=[];miPerfil={};planListos={};
@@ -3950,11 +4037,22 @@ function _rcFuerza(aid){
   const a=alumnos.find(x=>x.id===aid); if(!a) return;
   if(planParseUrl(a.carpetaDrive)) abrirPlan(aid,'fuerza'); else if(a.carpetaDrive) window.open(a.carpetaDrive.trim(),'_blank','noopener');
 }
+// Ficha → "Nutri": el seguimiento en la app si tiene planilla; si no, la página de Nutrición
+function _perfilNutri(){
+  const id=document.getElementById('page-perfil').dataset.alumnoId, a=alumnos.find(x=>x.id===id);
+  if(a && planParseUrl(a.nutriDrive)) abrirNutri(id); else showPage('nutricion');
+}
 function _rcSheets(aid){ const a=alumnos.find(x=>x.id===aid); if(a&&a.carpetaDrive) window.open(a.carpetaDrive.trim(),'_blank','noopener'); }
 
 function _rcAtender(activos, fz, finde){
   const hoy0=new Date(); hoy0.setHours(0,0,0,0);
   const mk=mesKey(), items=[];
+  // Nutrición (27/11): comidas que el alumno cargó en su portal y todavía no tienen macros
+  nutriPrecargar(()=>{ if(document.getElementById('page-dashboard')?.classList.contains('active') && !_nvAbierta) renderDashboard(); });
+  activos.forEach(a=>{
+    const n=nutriPendientes(a.id); if(!n) return;
+    items.push(`<div class="rc-item"><span class="dot" style="background:var(--amarillo)"></span><div><b>${escaparHTML(a.nombre)} · ${n} comida${n===1?'':'s'} para pasar a PULSO</b><small>Nutrición · cargada${n===1?'':'s'} desde su portal</small></div><button class="rc-btn" onclick="abrirNutri('${a.id}')">Ver</button></div>`);
+  });
   activos.map(a=>calcularVencimiento(a,hoy0)).filter(r=>r.categoria==='vencido'||r.categoria==='vencePronto')
     .sort((x,y)=>(x.categoria==='vencido'?0:1)-(y.categoria==='vencido'?0:1))
     .forEach(r=>{
@@ -5457,7 +5555,9 @@ function renderNutri(){
   const mk=document.getElementById('nutri-mes-select').value;
 
   // Combinar clientes nutri dedicados + alumnos con tieneNutri=si
-  const alumnosNutri=alumnos.filter(a=>a.tieneNutri==='si'&&a.estado==='activo');
+  // También los alumnos con planilla de Nutri cargada (27/11: seguimiento semanal desde la app)
+  const alumnosNutri=alumnos.filter(a=>(a.tieneNutri==='si'||planParseUrl(a.nutriDrive))&&a.estado==='activo');
+  nutriPrecargar(()=>{ if(document.getElementById('page-nutricion').classList.contains('active') && !_nvAbierta) renderNutri(); });
   const todosClientes=[
     ...clientesNutri.filter(c=>c.estado==='activo'),
     ...alumnosNutri.filter(a=>!clientesNutri.find(c=>c.id===a.id)) // evitar duplicados
@@ -5502,6 +5602,7 @@ function renderNutri(){
           ${waBtn}
           ${!esAlumno?`<button class="btn btn-secondary btn-sm" onclick="editarClienteNutri('${c.id}')">Editar</button>
           <button class="btn btn-danger btn-sm" onclick="eliminarClienteNutri('${c.id}')">×</button>`:''}
+          ${esAlumno&&planParseUrl(esAlumno.nutriDrive)?`<button class="btn btn-primary btn-sm" onclick="abrirNutri('${c.id}')">Seguimiento${nutriPendientes(c.id)?` · ${nutriPendientes(c.id)} para PULSO`:''}</button>`:''}
           ${esAlumno?`<button class="btn btn-secondary btn-sm" onclick="verAlumno('${c.id}')">Ver perfil</button>`:''}
         </div>
         <div style="width:100%;padding-top:0.75rem;border-top:1px solid var(--borde);display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
@@ -6835,7 +6936,7 @@ function _portalComoAlumno(){
   return {id:PORTAL_ID, nombre:a.nombre||'', dias:a.dias||[], horario:a.horario||'', frecuencia:a.frecuencia||'',
     estado:a.estado||'activo', carpetaDrive:a.carpetaDrive||'', mapeoUrl:a.mapeoUrl||'', nutriDrive:a.nutriDrive||''};
 }
-function _portalAbrirPlan(tipo){ abrirPlan(PORTAL_ID,tipo); }
+function _portalAbrirPlan(tipo){ if(tipo==='nutri') abrirNutri(PORTAL_ID); else abrirPlan(PORTAL_ID,tipo); }
 // ── "Terminé el día" desde el portal (26/11): solo alumnos online y si el proxy lo soporta ──
 function _portalPuedeTerminar(){
   return !!(_portalDatosActual && _portalDatosActual.terminarDia && _portalAlumnoActual && _normModalidad(_portalAlumnoActual.modalidad)==='online');
@@ -7819,6 +7920,410 @@ function _planRenderLista(q){
   if(resto.length) html+='<div class="pv-lista-sec">Todos</div>'+resto.map(a=>item(a,'')).join('');
   body.innerHTML=html||'<div class="pv-nota">Sin resultados.</div>';
 }
+
+// ══ NUTRICIÓN (seguimiento semanal, 27/11) ══
+// La planilla de Nutri de cada alumno (link en Alumnos R, formato "Template - Nutri") sigue
+// siendo la fuente: una pestaña Track (Fecha · Etapa del día · Comida · Kcal · Proteína ·
+// Carbohidratos · Grasas · Fibra · Alcohol; la fecha va en la primera fila de cada día) y una
+// pestaña Datos (objetivos "… óptimas" y notas). Las columnas se reconocen POR EL TÍTULO, nunca
+// por la posición: así un macro no puede leerse ni escribirse en la columna de otro.
+//   · Alumno (portal): carga QUÉ comió (columna Comida + Alcohol) a través del proxy (acción
+//     "comida"), hasta que Luca le carga los macros. La camarita comparte la foto a WhatsApp.
+//   · Luca (app): ve lo que cargó, lo pasa a PULSO y escribe los macros de cada comida.
+// Mismas reglas que _nutriCols_/_nutriFecha_ de portal-proxy.gs: si se cambia una, cambiar la otra.
+const NUTRI_COLS={fecha:/^fecha/, etapa:/^etapa|^momento/, comida:/^comidas?$/, kcal:/^kcal|^calorias/, prot:/^proteina/, carb:/^carbohidrato/, grasa:/^grasa/, fibra:/^fibra/, alcohol:/^alcohol/};
+const NUTRI_MACROS=[['kcal','Kcal',''],['prot','Prot','g'],['carb','Carb','g'],['grasa','Grasa','g'],['fibra','Fibra','g']];
+const _NV_DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+function _nutriCols(filas){
+  for(let r=0;r<Math.min(filas.length,5);r++){
+    const cols={};
+    (filas[r]||[]).forEach((v,c)=>{ const t=_normTxt(v); Object.keys(NUTRI_COLS).forEach(k=>{ if(cols[k]==null && NUTRI_COLS[k].test(t)) cols[k]=c; }); });
+    if(['fecha','etapa','comida','kcal','prot','carb','grasa'].every(k=>cols[k]!=null)){ cols.fila=r; return cols; }
+  }
+  return null;
+}
+function _nutriFecha(v){
+  const m=String(v||'').trim().match(/^(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?$/);
+  if(!m) return '';
+  let a=m[3]?+m[3]:new Date().getFullYear(); if(a<100) a+=2000;
+  const d=+m[1], mes=+m[2];
+  if(d<1||d>31||mes<1||mes>12) return '';
+  return String(d).padStart(2,'0')+'/'+String(mes).padStart(2,'0')+'/'+a;
+}
+const _nutriNum=f=>{ const p=String(f).split('/'); return +(p[2]+p[1]+p[0]); };
+// "1.691" (miles) · "4,6" · "35" → número; vacío, "-" o texto → null
+function _nutriValor(v){
+  let s=String(v==null?'':v).trim().replace(/\s/g,'');
+  if(!s) return null;
+  if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s=s.replace(/\./g,'');
+  const n=parseFloat(s.replace(',','.'));
+  return isFinite(n)?n:null;
+}
+const _nutriSi=v=>/^(true|verdadero|si|x|1)$/.test(_normTxt(v));
+// Track (+ Datos, opcional) → {cols, dias:[{fecha, comidas:[{fila, etapa, comida, kcal…, alcohol}]}], obj, notas}
+function nutriParse(track,datos){
+  const filas=(track||[]).map(f=>(f||[]).map(x=>String(x==null?'':x)));
+  const cols=_nutriCols(filas);
+  if(!cols) throw {tipo:'formato'};
+  const dias=[]; let dia=null;
+  for(let i=cols.fila+1;i<filas.length;i++){
+    const f=filas[i], fecha=_nutriFecha(f[cols.fecha]);
+    if(fecha && (!dia||dia.fecha!==fecha)){ dia={fecha,comidas:[]}; dias.push(dia); }
+    const etapa=String(f[cols.etapa]||'').trim();
+    if(!dia||!etapa) continue;
+    const c={fila:i+1, etapa, comida:String(f[cols.comida]||'').trim(), alcohol:cols.alcohol!=null&&_nutriSi(f[cols.alcohol])};
+    NUTRI_MACROS.forEach(([k])=>{ c[k]=cols[k]!=null?_nutriValor(f[cols[k]]):null; });
+    dia.comidas.push(c);
+  }
+  // Datos: el objetivo está debajo de su título ("Kcal óptimas", "Proteínas óptimas"…); las notas, a la derecha de "Notas…"
+  const obj={}, D=(datos||[]).map(f=>(f||[]).map(x=>String(x==null?'':x)));
+  const OBJ={kcal:/^kcal optim/, prot:/^proteinas? optim/, carb:/^carbohidratos? optim/, grasa:/^grasas? optim/, fibra:/^fibras? optim/};
+  let notas='';
+  D.forEach((f,r)=>f.forEach((v,c)=>{
+    const t=_normTxt(v);
+    Object.keys(OBJ).forEach(k=>{
+      if(obj[k]==null && OBJ[k].test(t)){ for(let rr=r+1;rr<=r+2&&rr<D.length;rr++){ const n=_nutriValor((D[rr]||[])[c]); if(n!=null&&n>0){ obj[k]=n; break; } } }
+    });
+    if(!notas && /^notas/.test(t)){
+      const vistos=[]; f.slice(c+1).forEach(x=>{ x=x.trim(); if(x&&!vistos.includes(x)) vistos.push(x); });
+      notas=vistos.join('\n');
+    }
+  }));
+  return {cols, dias, obj, notas};
+}
+const _nvTiene=c=>!!(c.comida||c.kcal!=null);
+const _nvPendiente=c=>!!(c.comida&&c.kcal==null);
+// Totales del día y de la semana. El promedio es sobre los días con kcal (igual que la planilla)
+function nutriResumen(d){
+  const sum=(cs,k)=>cs.reduce((t,c)=>t+(c[k]||0),0);
+  const dias=d.dias.map(x=>{ const t={fecha:x.fecha, completo:x.comidas.length>0&&x.comidas.every(c=>c.kcal!=null), cargado:x.comidas.some(_nvTiene)}; NUTRI_MACROS.forEach(([k])=>{ t[k]=sum(x.comidas,k); }); return t; });
+  const conKcal=dias.filter(t=>t.kcal>0), prom={};
+  NUTRI_MACROS.forEach(([k])=>{ prom[k]=conKcal.length?conKcal.reduce((s,t)=>s+t[k],0)/conKcal.length:0; });
+  const todas=d.dias.flatMap(x=>x.comidas);
+  return {dias, prom, nDias:conKcal.length, incompletos:conKcal.filter(t=>!t.completo).length,
+    cargados:dias.filter(t=>t.cargado).length, comidas:todas.filter(_nvTiene).length,
+    alcohol:todas.filter(c=>c.alcohol).length, pendientes:todas.filter(_nvPendiente).length};
+}
+
+// ── Lectura ──
+let nutriCache={};   // alumnoId → {url, estado:'cargando'|'ok'|'error', datos, error, ts, promesa, spreadsheetId, hoja}
+const NUTRI_VIEJO_MS=30000;
+function _nvAlumno(id){ return id===PORTAL_ID ? _portalComoAlumno() : alumnos.find(x=>x.id===id); }
+function _nvUrl(a){ return String((a&&a.nutriDrive)||'').trim(); }
+function nutriEntrada(id){ return nutriCache[id]||null; }
+// Trae (o reusa) la planilla. forzar: aunque esté al día (al abrir la vista)
+function nutriAsegurar(a,forzar){
+  const url=_nvUrl(a), p=planParseUrl(url);
+  if(!p) return Promise.resolve(null);
+  let e=nutriCache[a.id];
+  if(e && e.url===url){
+    if(e.promesa) return e.promesa;
+    if(!forzar && e.estado==='ok' && Date.now()-e.ts<NUTRI_VIEJO_MS*10) return Promise.resolve(e);
+    if(!forzar && e.estado==='error' && Date.now()-e.ts<NUTRI_VIEJO_MS) return Promise.resolve(e);
+    if(forzar && e.estado==='ok' && Date.now()-e.ts<NUTRI_VIEJO_MS) return Promise.resolve(e);
+  } else {
+    e=nutriCache[a.id]={url,estado:'cargando',datos:null,error:null,ts:0,promesa:null,spreadsheetId:p.id,hoja:''};
+  }
+  e.promesa=(async()=>{
+    try{
+      const r=a.id===PORTAL_ID ? await _nutriPedirPortal() : await _nutriLeerApi(p.id,p.gid);
+      e.datos=nutriParse(r.track,r.datos); e.hoja=r.hoja; e.hoy=r.hoy||''; e.estado='ok'; e.error=null;
+    }catch(err){
+      if(e.estado!=='ok'){ e.estado='error'; e.error=(err&&err.tipo)||'red'; }
+      if(!(err&&err.tipo)) console.warn('Nutri:',err);
+    }
+    e.ts=Date.now(); e.promesa=null;
+    if(nutriVista && nutriVista.alumnoId===a.id) nutriRender();
+    return e;
+  })();
+  return e.promesa;
+}
+// App de Luca: todas las pestañas visibles en un pedido; la de Track se reconoce por sus títulos.
+// Nunca se adivina entre varias pestañas tipo Track (podrían ser de otros alumnos): sin #gid → error.
+async function _nutriLeerApi(spreadsheetId,gid){
+  const meta=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?fields=sheets.properties(sheetId,title,hidden)`);
+  const hojas=(meta.sheets||[]).map(x=>x.properties).filter(h=>!h.hidden).slice(0,15);
+  if(!hojas.length) throw {tipo:'formato'};
+  const qs=hojas.map(h=>'ranges='+encodeURIComponent(`'${h.title.replace(/'/g,"''")}'!A1:N200`)).join('&');
+  const data=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?includeGridData=true&${qs}&fields=sheets(properties(sheetId,title),data(rowData(values(formattedValue))))`);
+  const tracks=[], datos=[];
+  (data.sheets||[]).forEach(sh=>{
+    const filas=((((sh.data||[])[0]||{}).rowData)||[]).map(f=>(f.values||[]).map(c=>(c&&c.formattedValue!=null)?String(c.formattedValue):''));
+    if(_nutriCols(filas)) tracks.push({id:String(sh.properties.sheetId), title:sh.properties.title, filas});
+    else if(filas.slice(0,10).some(f=>f.some(v=>/optim/.test(_normTxt(v))))) datos.push(filas);
+  });
+  const t=(gid!=null&&tracks.find(x=>x.id===String(gid))) || (tracks.length===1?tracks[0]:null);
+  if(!t) throw {tipo:tracks.length?'pestana':'formato'};
+  return {hoja:t.title, track:t.filas, datos:datos.length===1?datos[0]:null};
+}
+async function _nutriPedirPortal(){
+  let r;
+  try{ r=await fetch(`${PORTAL_API_URL}?alumno=${encodeURIComponent(_portalToken)}&plan=nutri`); }catch(e){ throw {tipo:'red'}; }
+  if(!r.ok) throw {tipo:'red'};
+  const d=await r.json();
+  if(d.error) throw {tipo:{acceso:'acceso',formato:'formato',pestana:'pestana',sin_planilla:'formato'}[d.error]||'red'};
+  return {hoja:(d.track||{}).hoja||'', track:(d.track||{}).filas||[], datos:d.datos||null, hoy:d.hoy||''};
+}
+// Comidas para pasar a PULSO (solo lo que ya está en memoria; ver nutriPrecargar)
+function nutriPendientes(id){ const e=nutriCache[id]; return e&&e.estado==='ok'?nutriResumen(e.datos).pendientes:0; }
+// Lee de fondo las planillas de los alumnos con Nutri (para el Resumen y la lista de Nutrición)
+function nutriPrecargar(alRefrescar){
+  if(!accessToken||tokenExp<=Date.now()) return;
+  alumnos.filter(a=>a.estado==='activo'&&planParseUrl(_nvUrl(a))).forEach(a=>{
+    const e=nutriCache[a.id];
+    if(e&&!e.promesa&&Date.now()-e.ts<NUTRI_VIEJO_MS*10) return;   // ya está (o falló hace poco)
+    nutriAsegurar(a).then(x=>{ if(x&&x.estado==='ok'&&alRefrescar) alRefrescar(); });   // si ya se estaba leyendo, espera esa lectura
+  });
+}
+
+// ── Vista ──
+let nutriVista=null, _nvAbierta=false;   // {alumnoId, tab, dia, abierta, editando, guardando}
+function _nvHoy(){ const e=nutriVista&&nutriCache[nutriVista.alumnoId]; return _nutriFecha((e&&e.hoy)||_fechaHoyAR()); }
+function abrirNutri(alumnoId){
+  const a=_nvAlumno(alumnoId); if(!a) return;
+  const url=_nvUrl(a);
+  if(!planParseUrl(url)){ if(url) window.open(url,'_blank','noopener'); return; }
+  nutriVista={alumnoId, tab:alumnoId===PORTAL_ID?'hoy':'comidas', dia:'', abierta:null, editando:null, guardando:false};
+  if(!_nvAbierta){ try{ history.pushState({mcNutri:1},''); }catch(e){} _nvAbierta=true; }
+  document.getElementById('nutri-vista').style.display='flex';
+  nutriRender();
+  nutriAsegurar(a,true);
+}
+function _nvOcultar(){
+  _nvAbierta=false; nutriVista=null;
+  const c=document.getElementById('nutri-vista'); c.style.display='none'; c.innerHTML='';
+  if(document.getElementById('page-nutricion')?.classList.contains('active')) renderNutri();
+  if(document.getElementById('page-dashboard')?.classList.contains('active')) renderDashboard();
+}
+function cerrarNutri(){
+  if(!_nvAbierta) return;
+  if(history.state && history.state.mcNutri) history.back(); else _nvOcultar();
+}
+const _nvDiaTxt=(f,corto)=>{ const d=_dmyFecha(f); if(!d) return f; const n=_NV_DIAS[d.getDay()]; return `${corto?n.slice(0,3):n} ${f.slice(0,5)}`; };
+const _nvFmt=n=>Math.round(n||0).toLocaleString('es-AR');
+const _nvIcono=et=>{ const t=_normTxt(et); return /desayuno/.test(t)?'☕':/almuerzo/.test(t)?'🍽️':/merienda/.test(t)?'🥪':/cena/.test(t)?'🍲':'🍴'; };
+function _nvMacrosTxt(c){ return NUTRI_MACROS.filter(([k])=>c[k]!=null).map(([k,l])=>k==='kcal'?`${_nvFmt(c.kcal)} kcal`:`${l[0]} ${String(Math.round(c[k]*10)/10).replace('.',',')}`).join(' · '); }
+// Día que se muestra en el portal: el elegido, si no hoy, si no el último que ya pasó
+function _nvDiaSel(d){
+  const hoy=_nvHoy(), fs=d.dias.map(x=>x.fecha);
+  if(nutriVista.dia && fs.includes(nutriVista.dia)) return nutriVista.dia;
+  if(fs.includes(hoy)) return hoy;
+  const pasados=fs.filter(f=>_nutriNum(f)<=_nutriNum(hoy));
+  return pasados.length?pasados[pasados.length-1]:(fs[0]||'');
+}
+function nutriRender(){
+  if(!nutriVista) return;
+  const cont=document.getElementById('nutri-vista');
+  const a=_nvAlumno(nutriVista.alumnoId); if(!a){ _nvOcultar(); return; }
+  const esPortal=a.id===PORTAL_ID, e=nutriCache[a.id], ok=e&&e.estado==='ok';
+  // No pisar lo que se está escribiendo (un re-render por la lectura de fondo borraría el texto)
+  const foco=document.activeElement, escribiendo=foco&&cont.contains(foco)&&/^(TEXTAREA|INPUT)$/.test(foco.tagName);
+  const borrador={}; cont.querySelectorAll('[data-nv-campo]').forEach(x=>{ borrador[x.dataset.nvCampo]=x.type==='checkbox'?x.checked:x.value; });
+  const r=ok?nutriResumen(e.datos):null;
+  const semana=ok&&e.datos.dias.length?`${e.datos.dias[0].fecha.slice(0,5)} al ${e.datos.dias[e.datos.dias.length-1].fecha.slice(0,5)}`:'';
+  const tabs=esPortal?[['hoy','Hoy'],['semana','Mi semana']]:[['comidas','Comidas'],['semana','Semana']];
+  let cuerpo;
+  if(!e||e.estado==='cargando') cuerpo='<div class="pv-esq"></div><div class="pv-esq"></div><div class="pv-esq"></div>';
+  else if(!ok){
+    const msg={formato:'No reconozco el formato de la planilla de Nutri (falta la pestaña con Fecha · Etapa del día · Comida · Kcal…).',pestana:'La planilla tiene varias pestañas de seguimiento: el link tiene que apuntar a una (con su #gid).',acceso:esPortal?'Todavía no se puede abrir tu planilla. Avisale a Luca.':'No tengo acceso a esa planilla.',sesion:'La sesión venció: volvé a entrar.',permisos:'Faltan permisos de Google.',excel:'La planilla es un Excel subido a Drive: hay que guardarla como Hoja de cálculo de Google.'}[e.error]||'No se pudo cargar. Revisá la conexión y probá de nuevo.';
+    cuerpo=`<div class="pv-aviso"><div>${escaparHTML(msg)}</div>${esPortal?'':`<a href="${escaparHTML(_nvUrl(a))}" target="_blank" rel="noopener">Abrir en Sheets ↗</a>`}<button type="button" class="nv-bt sec" data-nv="reintentar">Reintentar</button></div>`;
+  }
+  else if(nutriVista.tab==='semana') cuerpo=_nvSemana(e.datos,r,esPortal);
+  else cuerpo=esPortal?_nvHoyPortal(e.datos):_nvComidasLuca(a,e.datos,r);
+  cont.innerHTML=`<div class="pv-col nv-col">
+    <div class="pv-top">
+      <div class="pv-fila1">
+        <button type="button" class="pv-cerrar" data-nv="cerrar" aria-label="Cerrar">✕</button>
+        <div class="pv-tit"><div class="pv-nombre">${esPortal?'Nutrición':escaparHTML(a.nombre)}</div><div class="pv-meta">${esPortal?`Tu semana con Luca${semana?' · '+semana:''}`:`Nutrición${semana?' · semana '+semana:''}`}</div></div>
+        ${esPortal?'':`<a class="pv-sheets" href="${escaparHTML(_nvUrl(a))}" target="_blank" rel="noopener">Abrir en Sheets ↗</a>`}
+      </div>
+      <div class="pv-tabs">${tabs.map(([k,l])=>`<button type="button" class="pv-tab${nutriVista.tab===k?' on':''}" data-nv="tab" data-k="${k}">${l}</button>`).join('')}</div>
+    </div>
+    <div class="nv-body">${cuerpo}</div>
+  </div>`;
+  // Lo que se estaba escribiendo vuelve a su lugar
+  Object.keys(borrador).forEach(k=>{ const x=cont.querySelector(`[data-nv-campo="${k}"]`); if(!x) return; if(x.type==='checkbox') x.checked=borrador[k]; else x.value=borrador[k]; });
+  if(escribiendo && foco.dataset && foco.dataset.nvCampo){ const x=cont.querySelector(`[data-nv-campo="${foco.dataset.nvCampo}"]`); if(x) x.focus(); }
+}
+
+// Portal · Hoy: tira de días + las comidas del día elegido
+function _nvHoyPortal(d){
+  if(!d.dias.length) return '<div class="pv-aviso"><div>Luca todavía no armó tu semana de seguimiento.</div></div>';
+  const hoy=_nvHoy(), sel=_nvDiaSel(d), dia=d.dias.find(x=>x.fecha===sel);
+  const ult=d.dias[d.dias.length-1].fecha, fuera=_nutriNum(hoy)>_nutriNum(ult);
+  const tira=`<div class="nv-tira">${d.dias.map(x=>{
+    const fut=_nutriNum(x.fecha)>_nutriNum(hoy);
+    const pts=x.comidas.map(c=>`<b class="${_nvTiene(c)?'c':''}"></b>`).join('');
+    const dt=_dmyFecha(x.fecha);
+    return `<button type="button" class="nv-d${x.fecha===sel?' sel':''}${x.fecha===hoy?' hoy':''}${fut?' fut':''}" data-nv="dia" data-f="${x.fecha}">${dt?_NV_DIAS[dt.getDay()].slice(0,3):''}<small>${dt?dt.getDate():''}</small><i>${pts}</i></button>`;
+  }).join('')}</div>`;
+  const aviso=fuera?'<div class="nv-nota-top">Esta semana ya terminó: Luca va a armar la próxima. Mientras, podés completar lo que te faltó.</div>':'';
+  const fut=_nutriNum(sel)>_nutriNum(hoy);
+  return `${tira}${aviso}<div class="nv-eti">${escaparHTML(_nvDiaTxt(sel))}${sel===hoy?' · hoy':''}</div>
+    ${dia.comidas.map(c=>_nvComidaPortal(c,sel,fut)).join('')}`;
+}
+function _nvComidaPortal(c,fecha,fut){
+  const rev=c.kcal!=null, esp=!rev&&c.comida, clave=fecha+'|'+c.etapa;
+  const abierta=!rev&&!fut&&nutriVista.abierta===clave;
+  const est=rev?'<span class="nv-est ok">Luca lo revisó</span>':esp?'<span class="nv-est esp">Esperando a Luca</span>':fut?'<span class="nv-est vac">Todavía no</span>':'<span class="nv-est vac">Sin cargar</span>';
+  const sub=rev?(c.alcohol?'Con alcohol':'Revisada'):esp?(c.alcohol?'Cargada · con alcohol':'Cargada · tocá para editar'):fut?'Más adelante':'¿Qué comiste?';
+  let html=`<div class="nv-com${abierta?' abierta':''}">
+    <button type="button" class="nv-com-h" ${rev||fut?'disabled':`data-nv="abrir" data-k="${escaparHTML(clave)}"`}><span class="nv-ic">${_nvIcono(c.etapa)}</span><div><b>${escaparHTML(c.etapa)}</b><small>${sub}</small></div>${est}</button>`;
+  if(c.comida && !abierta) html+=`<div class="nv-txt">${escaparHTML(c.comida)}</div>`;
+  if(rev) html+=`<div class="nv-chips">${NUTRI_MACROS.filter(([k])=>c[k]!=null).map(([k,l])=>`<span>${k==='kcal'?`<b>${_nvFmt(c.kcal)}</b> kcal`:`${l[0]} <b>${String(Math.round(c[k]*10)/10).replace('.',',')}</b>`}</span>`).join('')}</div>`;
+  if(abierta){
+    const g=nutriVista.guardando;
+    html+=`<textarea class="nv-area" data-nv-campo="txt" maxlength="300" placeholder="Ej.: yogur griego con banana y un puñado de almendras">${escaparHTML(c.comida)}</textarea>
+      <label class="nv-chk"><input type="checkbox" data-nv-campo="alc"${c.alcohol?' checked':''}> Hubo alcohol</label>
+      <div class="nv-fila"><button type="button" class="nv-bt cam" data-nv="foto" data-k="${escaparHTML(clave)}">📷 Mandar foto</button><button type="button" class="nv-bt pri" data-nv="guardar-comida" data-k="${escaparHTML(clave)}"${g?' disabled':''}>${g?'Guardando…':'Guardar'}</button></div>
+      <p class="nv-ayuda">"Mandar foto" abre Compartir con el texto <b>"${escaparHTML(_nvDiaTxt(fecha)+' · '+c.etapa)}"</b> listo: elegí WhatsApp y el grupo con Luca.</p>`;
+  }
+  return html+'</div>';
+}
+
+// Semana (portal y Luca): promedio contra el objetivo, números y día por día
+function _nvSemana(d,r,esPortal){
+  const o=d.obj||{}, barra=(k,v,col)=>{ const p=o[k]?Math.min(100,Math.round(v/o[k]*100)):0; return `<div class="nv-barra"><i style="width:${p}%;background:${col}"></i></div>`; };
+  const pct=(k,v)=>o[k]?`${Math.round(v/o[k]*100)}%`:'';
+  const MAC=[['prot','Proteína','var(--f1)'],['carb','Carbohidratos','var(--f4)'],['grasa','Grasas','var(--f2)'],['fibra','Fibra','var(--f3)']];
+  const g=v=>String(Math.round(v)).replace('.',',');
+  const notaProm=!r.nDias?'Todavía no hay comidas con macros esta semana.'
+    :`Sobre ${r.nDias===1?'el <b>día</b>':`los <b>${r.nDias} días</b>`} con datos.${r.incompletos?` ${r.incompletos===1?'Uno está incompleto':`${r.incompletos} están incompletos`}: baja${r.incompletos===1?'':'n'} el promedio.`:''}`;
+  return `<div class="nv-card">
+      <div class="nv-eti">Promedio por día</div>
+      <div class="nv-kpi"><b>${_nvFmt(r.prom.kcal)}</b><span>kcal${o.kcal?' de '+_nvFmt(o.kcal):''}</span></div>
+      ${o.kcal?barra('kcal',r.prom.kcal,'var(--pd-crema)'):''}
+      <p class="nv-nota">${notaProm}</p>
+      ${MAC.map(([k,l,col])=>`<div class="nv-mac"><div class="nv-mac-h"><span><b>${l}</b> · ${g(r.prom[k])}${o[k]?' de '+_nvFmt(o[k]):''} g</span><em style="color:${col}">${pct(k,r.prom[k])}</em></div>${o[k]?barra(k,r.prom[k],col):''}</div>`).join('')}
+    </div>
+    <div class="nv-card nv-tres"><div><b>${r.cargados} / ${d.dias.length}</b><small>días cargados</small></div><div><b>${r.comidas}</b><small>comidas</small></div><div><b>${r.alcohol}</b><small>con alcohol</small></div></div>
+    <div class="nv-card"><div class="nv-eti">Día por día</div>
+      <table class="nv-tabla"><tr><th>Día</th><th>Kcal</th><th>P</th><th>C</th><th>G</th><th>F</th></tr>
+      ${r.dias.map(t=>t.kcal>0?`<tr><td>${escaparHTML(_nvDiaTxt(t.fecha,true))}${t.completo?'':' <span class="nv-inc">· incompleto</span>'}</td><td>${_nvFmt(t.kcal)}</td><td>${g(t.prot)}</td><td>${g(t.carb)}</td><td>${g(t.grasa)}</td><td>${g(t.fibra)}</td></tr>`
+        :`<tr class="vac"><td>${escaparHTML(_nvDiaTxt(t.fecha,true))}</td><td colspan="5">${t.cargado?'esperando macros':'—'}</td></tr>`).join('')}
+      </table></div>
+    ${d.notas?`<div class="nv-card"><div class="nv-eti">${esPortal?'Notas de Luca':'Notas (pestaña Datos)'}</div><p class="nv-nota nv-pre">${escaparHTML(d.notas)}</p></div>`:''}`;
+}
+
+// Luca · Comidas: lo que cargó el alumno, lo que falta pasar a PULSO y la carga de macros
+function _nvComidasLuca(a,d,r){
+  if(!d.dias.length) return '<div class="pv-aviso"><div>La planilla no tiene días cargados todavía (Fecha en la primera fila de cada día).</div></div>';
+  const hoy=_nvHoy();
+  const alerta=r.pendientes?`<div class="nv-alerta"><span class="n">${r.pendientes}</span><div><b>Comida${r.pendientes===1?'':'s'} para pasar a PULSO</b><small>Cargada${r.pendientes===1?'':'s'} por ${escaparHTML(a.nombre.split(' ')[0])}, todavía sin macros</small></div></div>`
+    :`<div class="nv-alerta ok"><span class="n">✓</span><div><b>Nada pendiente</b><small>Todas las comidas cargadas tienen sus macros</small></div></div>`;
+  const dias=d.dias.filter(x=>x.comidas.some(_nvTiene)||x.fecha===hoy);
+  const g=nutriVista.guardando;
+  return alerta+(dias.length?'':'<p class="nv-nota" style="text-align:center;padding:1rem 0">Todavía no hay comidas cargadas esta semana.</p>')+dias.map(x=>{
+    const t=r.dias.find(y=>y.fecha===x.fecha), falta=x.comidas.filter(_nvPendiente).length, carg=x.comidas.filter(_nvTiene).length;
+    return `<div class="nv-dia-l"><b>${escaparHTML(_nvDiaTxt(x.fecha))}${x.fecha===hoy?' · hoy':''}</b><span>${t.kcal?_nvFmt(t.kcal)+' kcal · ':''}${falta?`faltan ${falta}`:`${carg} de ${x.comidas.length} cargadas`}</span></div>
+    <div class="nv-card nv-lista">${x.comidas.map(c=>{
+      const ed=nutriVista.editando===c.fila;
+      const macros=c.kcal!=null?`<small>${escaparHTML(_nvMacrosTxt(c))}</small>`:c.comida?'<small class="falta">Sin macros · tocá para cargarlos</small>':'<small>Sin cargar</small>';
+      let h=`<div class="nv-lin${ed?' ed':''}${_nvTiene(c)?'':' vacia'}"><span class="et">${escaparHTML(c.etapa)}</span><div class="tx">`;
+      h+=ed?`${c.comida?escaparHTML(c.comida):'<span class="nv-gris">Sin descripción</span>'}${c.alcohol?' <span class="nv-alc">🍷 alcohol</span>':''}
+        <div class="nv-cargar">${NUTRI_MACROS.map(([k,l])=>`<label><span>${l}</span><input type="text" inputmode="decimal" data-nv-campo="m-${k}" value="${c[k]!=null?escaparHTML(String(c[k]).replace('.',',')):''}" placeholder="${k==='kcal'?'kcal':'g'}" autocomplete="off"></label>`).join('')}</div>
+        <div class="nv-fila"><button type="button" class="nv-bt sec" data-nv="cancelar">Cancelar</button><button type="button" class="nv-bt pri" data-nv="guardar-macros" data-fila="${c.fila}"${g?' disabled':''}>${g?'Guardando…':'Guardar macros'}</button></div>`
+        :`<button type="button" class="nv-lin-bt" data-nv="editar" data-fila="${c.fila}">${c.comida?escaparHTML(c.comida):'<span class="nv-gris">—</span>'}${c.alcohol?' <span class="nv-alc">🍷 alcohol</span>':''}${macros}</button>`;
+      return h+'</div></div>';
+    }).join('')}</div>`;
+  }).join('');
+}
+
+// ── Acciones ──
+function _nvComidaDe(clave){
+  const e=nutriCache[nutriVista.alumnoId]; if(!e||e.estado!=='ok') return null;
+  const [fecha,etapa]=clave.split('|'), dia=e.datos.dias.find(x=>x.fecha===fecha);
+  const c=dia&&dia.comidas.find(x=>x.etapa===etapa);
+  return c?{e,fecha,c}:null;
+}
+async function _nvGuardarComida(clave){
+  const x=_nvComidaDe(clave); if(!x||nutriVista.guardando) return;
+  const cont=document.getElementById('nutri-vista');
+  const texto=(cont.querySelector('[data-nv-campo="txt"]')||{}).value||'', alc=!!(cont.querySelector('[data-nv-campo="alc"]')||{}).checked;
+  const limpio=texto.replace(/\s+/g,' ').trim().slice(0,300);
+  if(!limpio && !x.c.comida){ toast('Escribí qué comiste'); return; }
+  nutriVista.guardando=true; nutriRender();
+  try{
+    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'comida',token:_portalToken,fecha:x.fecha,etapa:x.c.etapa,texto:limpio,alcohol:alc})});
+    const j=await r.json();
+    if(!j||!j.ok) throw new Error((j&&j.error)||'sin_ok');
+    x.c.comida=limpio; x.c.alcohol=alc;
+    nutriVista.abierta=null;
+    toast(limpio?'¡Listo! Le llegó a Luca':'Comida borrada');
+  }catch(err){
+    const m={revisada:'Luca ya la revisó: no se puede cambiar',futuro:'Ese día todavía no llegó',sin_fila:'Luca cambió la planilla: cerrá y volvé a abrir',pestana:'Tu planilla de Nutri tiene un problema: avisale a Luca',formato:'Tu planilla de Nutri tiene un problema: avisale a Luca'}[err&&err.message];
+    toast(m||(navigator.onLine===false?'Sin conexión: probá de nuevo cuando tengas señal':'No se pudo guardar. Probá de nuevo en un momento'));
+    if(err&&(err.message==='revisada'||err.message==='sin_fila')){ nutriVista.abierta=null; const a=_nvAlumno(PORTAL_ID); if(a) nutriAsegurar(a,true); }
+  }
+  nutriVista.guardando=false; nutriRender();
+}
+// Camarita: saca la foto y abre Compartir con el texto armado (WhatsApp no deja elegir el grupo desde una app)
+function _nvFoto(clave){
+  const x=_nvComidaDe(clave); if(!x) return;
+  const cont=document.getElementById('nutri-vista');
+  const desc=((cont.querySelector('[data-nv-campo="txt"]')||{}).value||'').replace(/\s+/g,' ').trim();
+  const texto=`${_nvDiaTxt(x.fecha)} · ${x.c.etapa}${desc?'\n'+desc:''}`;
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='image/*'; inp.setAttribute('capture','environment'); inp.style.display='none';
+  inp.onchange=async()=>{
+    const f=inp.files&&inp.files[0]; inp.remove(); if(!f) return;
+    try{
+      if(navigator.canShare && navigator.canShare({files:[f]})){ await navigator.share({files:[f],text:texto}); return; }
+    }catch(err){ if(err&&err.name==='AbortError') return; }
+    // Sin "Compartir" con archivos (p. ej. en la compu): WhatsApp con el texto, la foto se adjunta allá
+    window.open('https://wa.me/?text='+encodeURIComponent(texto),'_blank','noopener');
+    toast('Adjuntá la foto en WhatsApp');
+  };
+  document.body.appendChild(inp); inp.click();
+}
+// Luca: escribe los macros de UNA comida en la planilla del alumno (columnas por título, números RAW)
+async function _nvGuardarMacros(fila){
+  const e=nutriCache[nutriVista.alumnoId]; if(!e||e.estado!=='ok'||nutriVista.guardando) return;
+  const c=e.datos.dias.flatMap(x=>x.comidas).find(x=>x.fila===fila); if(!c) return;
+  const cont=document.getElementById('nutri-vista'), nuevos={};
+  for(const [k,l] of NUTRI_MACROS){
+    if(e.datos.cols[k]==null) continue;
+    const s=((cont.querySelector(`[data-nv-campo="m-${k}"]`)||{}).value||'').trim();
+    if(!s){ nuevos[k]=null; continue; }
+    const n=_nutriValor(s);
+    if(n==null||n<0||n>(k==='kcal'?20000:2000)){ toast(`Revisá ${l}: tiene que ser un número`); return; }
+    nuevos[k]=Math.round(n*10)/10;
+  }
+  if(nuevos.kcal==null && ['prot','carb','grasa','fibra'].some(k=>nuevos[k]!=null)){ toast('Cargá también las kcal'); return; }
+  if(!accessToken||tokenExp<=Date.now()){ toast('La sesión venció: volvé a entrar'); return; }
+  const hoja=`'${e.hoja.replace(/'/g,"''")}'`;
+  const data=Object.keys(nuevos).map(k=>({range:`${hoja}!${_planA1(fila,e.datos.cols[k])}`,values:[[nuevos[k]==null?'':nuevos[k]]]}));
+  nutriVista.guardando=true; nutriRender();
+  try{
+    const r=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${e.spreadsheetId}/values:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({valueInputOption:'RAW',data})});
+    if(!r.ok) throw new Error(r.status);
+    Object.assign(c,nuevos);
+    nutriVista.editando=null;
+    toast('Macros guardados ✓');
+  }catch(err){
+    toast(navigator.onLine===false?'Sin conexión: no se guardó':'No se pudo guardar. Vuelvo a leer la planilla');
+    const a=_nvAlumno(nutriVista.alumnoId); if(a) nutriAsegurar(a,true);
+  }
+  if(nutriVista){ nutriVista.guardando=false; nutriRender(); }
+}
+(function(){
+  const cont=()=>document.getElementById('nutri-vista');
+  document.addEventListener('click',ev=>{
+    const b=ev.target.closest('[data-nv]'); if(!b||!nutriVista||!cont().contains(b)) return;
+    const k=b.dataset.nv, a=_nvAlumno(nutriVista.alumnoId);
+    if(k==='cerrar') return cerrarNutri();
+    if(k==='reintentar'){ if(a){ const e=nutriCache[a.id]; if(e&&e.estado==='error') e.estado='cargando'; nutriAsegurar(a,true); nutriRender(); } return; }
+    if(k==='tab'){ nutriVista.tab=b.dataset.k; nutriVista.editando=null; nutriRender(); cont().querySelector('.nv-body')?.scrollTo(0,0); return; }
+    if(k==='dia'){ nutriVista.dia=b.dataset.f; nutriVista.abierta=null; nutriRender(); return; }
+    if(k==='abrir'){ nutriVista.abierta=nutriVista.abierta===b.dataset.k?null:b.dataset.k; nutriRender(); const t=cont().querySelector('[data-nv-campo="txt"]'); if(t) t.focus(); return; }
+    if(k==='guardar-comida') return _nvGuardarComida(b.dataset.k);
+    if(k==='foto') return _nvFoto(b.dataset.k);
+    if(k==='editar'){ nutriVista.editando=+b.dataset.fila; nutriRender(); const t=cont().querySelector('[data-nv-campo="m-kcal"]'); if(t) t.focus(); return; }
+    if(k==='cancelar'){ nutriVista.editando=null; nutriRender(); return; }
+    if(k==='guardar-macros') return _nvGuardarMacros(+b.dataset.fila);
+  });
+  window.addEventListener('popstate',()=>{ if(_nvAbierta) _nvOcultar(); });
+})();
 
 // ── TOAST ──
 let toastTimer;

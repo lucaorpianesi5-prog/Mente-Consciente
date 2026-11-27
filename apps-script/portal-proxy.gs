@@ -25,11 +25,16 @@
 //      acciones "terminarDia" y "deshacerDia" (ver terminarDia_()). Escriben solo en
 //      Asistencias, solo filas de ese alumno, y marcan la columna E con "portal" para
 //      que el alumno pueda deshacer únicamente lo suyo y únicamente el mismo día.
+//   8. [27/11] Nutrición desde el portal (ver nutriPortal_() y guardarComida_() al final):
+//      doGet(?alumno=TOKEN&plan=nutri) devuelve, SOLO PARA LEER, las pestañas Track y Datos
+//      de la planilla de Nutri de ESE alumno (columna R). La acción "comida" escribe SOLO la
+//      columna "Comida" (y "Alcohol") de UNA fila de su Track: la de esa fecha y esa comida del
+//      día, hasta hoy, y solo mientras Luca no le cargó los macros. doGet avisa con nutri:true.
 // ═══════════════════════════════════════════════════════════════════════
 
 // Versión del proxy: el portal la muestra al pie ("Proxy 1.0 · 25/11/2026") para saber si ya se publicó.
 // SUBIRLA CADA VEZ QUE SE CAMBIA ESTE ARCHIVO.
-const VERSION_PROXY = '1.2 · 26/11/2026';
+const VERSION_PROXY = '1.3 · 27/11/2026';
 
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 
@@ -51,6 +56,7 @@ function doGet(e) {
     if (!token) {
       return _jsonOut({ error: 'missing_id' });
     }
+    if (e.parameter.plan === 'nutri') return nutriPortal_(token);   // [27/11]
     if (e.parameter.plan) return planPortal_(token, String(e.parameter.plan));   // [24/11]
 
     // Cache por token: solo se usa para respuestas ya exitosas (ver más abajo)
@@ -138,7 +144,7 @@ function doGet(e) {
 
     // [24/11] perfilEditable: avisa al portal que este proxy ya acepta la
     // entrevista inicial (acción "perfil" de doPost).
-    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, terminarDia: true, version: VERSION_PROXY };
+    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, terminarDia: true, nutri: true, version: VERSION_PROXY };
     const resultadoStr = JSON.stringify(resultado);
     try {
       cache.put(cacheKey, resultadoStr, CACHE_TTL_SEGUNDOS);
@@ -175,6 +181,7 @@ function doPost(e) {
     const body = JSON.parse((e.postData && e.postData.contents) || '{}');
     if (body.accion === 'perfil') return guardarPerfilAlumno_(body);   // [24/11]
     if (body.accion === 'terminarDia' || body.accion === 'deshacerDia') return terminarDia_(body);   // [26/11]
+    if (body.accion === 'comida') return guardarComida_(body);   // [27/11]
 
     const idToken = body.id_token;
     if (!idToken) return _jsonOut({ error: 'missing_token' });
@@ -515,6 +522,125 @@ function terminarDia_(cuerpo) {
     } finally {
       lock.releaseLock();
     }
+  } catch (err) {
+    Logger.log(err);
+    return _jsonOut({ ok: false, error: 'server_error' });
+  }
+}
+
+// ── [27/11] Nutrición del alumno (planilla de la columna R) ─────────────────
+// Formato (el de "Template - Nutri"): una pestaña Track con títulos en una de las primeras
+// 5 filas (Fecha · Etapa del día · Comida · Kcal · Proteína · Carbohidratos · Grasas · Fibra ·
+// Alcohol, en cualquier orden: las columnas se reconocen POR EL TÍTULO, nunca por la posición,
+// así un macro no puede caer en la columna de otro) y una pestaña Datos con los objetivos.
+// La fecha va en la primera fila de cada día; las filas siguientes son de ese mismo día.
+// Mismas reglas que index.html (nutriParse): si se cambia una, cambiar la otra.
+const _nNorm_ = s => String(s == null ? '' : s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+const NUTRI_COLS_ = { fecha: /^fecha/, etapa: /^etapa|^momento/, comida: /^comidas?$/, kcal: /^kcal|^calorias/, prot: /^proteina/, carb: /^carbohidrato/, grasa: /^grasa/, fibra: /^fibra/, alcohol: /^alcohol/ };
+function _nutriCols_(filas) {
+  for (let r = 0; r < Math.min(filas.length, 5); r++) {
+    const cols = {};
+    filas[r].forEach((v, c) => { const t = _nNorm_(v); Object.keys(NUTRI_COLS_).forEach(k => { if (cols[k] == null && NUTRI_COLS_[k].test(t)) cols[k] = c; }); });
+    if (['fecha', 'etapa', 'comida', 'kcal', 'prot', 'carb', 'grasa'].every(k => cols[k] != null)) { cols.fila = r; return cols; }
+  }
+  return null;
+}
+// '25/11/2026', '25/11/26', '25-11' (sin año: el año actual) → 'dd/mm/aaaa'
+function _nutriFecha_(v) {
+  const m = String(v || '').trim().match(/^(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?$/);
+  if (!m) return '';
+  let a = m[3] ? +m[3] : new Date().getFullYear(); if (a < 100) a += 2000;
+  const d = +m[1], mes = +m[2];
+  if (d < 1 || d > 31 || mes < 1 || mes > 12) return '';
+  return ('0' + d).slice(-2) + '/' + ('0' + mes).slice(-2) + '/' + a;
+}
+const _nutriNum_ = f => { const p = f.split('/'); return +(p[2] + p[1] + p[0]); };
+// Pestañas de la planilla de Nutri del alumno: { ss, track:{hoja, filas, cols}, datos:filas|null } o { error }
+function _nutriHojas_(fila) {
+  const url = String(fila[17] || '').trim();
+  const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]{20,})/);
+  if (!m) return { error: 'sin_planilla' };
+  const g = url.match(/[#?&]gid=(\d+)/), gid = g ? g[1] : null;
+  let ss;
+  try { ss = SpreadsheetApp.openById(m[1]); } catch (err) { return { error: 'acceso' }; }
+  const tracks = [], datos = [];
+  ss.getSheets().filter(h => !h.isSheetHidden()).slice(0, 15).forEach(h => {
+    const nf = Math.min(h.getLastRow(), 200), nc = Math.min(h.getLastColumn(), 14);
+    if (nf < 1 || nc < 1) return;
+    const filas = h.getRange(1, 1, nf, nc).getDisplayValues();
+    const cols = _nutriCols_(filas);
+    if (cols) tracks.push({ hoja: h, filas: filas, cols: cols });
+    else if (filas.slice(0, 10).some(f => f.some(v => /optim/.test(_nNorm_(v))))) datos.push(filas);
+  });
+  // Nunca adivinar entre varias pestañas: podrían ser de otros alumnos
+  const track = (gid != null && tracks.find(t => String(t.hoja.getSheetId()) === gid)) || (tracks.length === 1 ? tracks[0] : null);
+  if (!track) return { error: tracks.length ? 'pestana' : 'formato' };
+  return { ss: ss, track: track, datos: datos.length === 1 ? datos[0] : null };
+}
+function _alumnoPorToken_(ss, token) {
+  const al = ss.getSheetByName('Alumnos').getDataRange().getValues();
+  for (let i = 1; i < al.length; i++) { if (al[i][18] && String(al[i][18]) === token) return al[i]; }
+  return null;
+}
+
+// Lectura (solo valores visibles, solo Track y Datos). Caché corta: Luca carga macros desde la app
+// y el alumno tiene que verlos pronto.
+function nutriPortal_(token) {
+  try {
+    const cache = CacheService.getScriptCache(), cacheKey = 'nutri_' + token;
+    const cached = cache.get(cacheKey);
+    if (cached) return ContentService.createTextOutput(cached).setMimeType(ContentService.MimeType.JSON);
+    const fila = _alumnoPorToken_(SpreadsheetApp.openById(SHEET_ID_PORTAL), token);
+    if (!fila || String(fila[8]).trim() === 'inactivo') return _jsonOut({ error: 'not_found' });
+    const n = _nutriHojas_(fila);
+    if (n.error) return _jsonOut({ error: n.error });
+    const res = { track: { hoja: n.track.hoja.getName(), filas: n.track.filas }, datos: n.datos, hoy: Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy') };
+    const str = JSON.stringify(res);
+    if (str.length < 95000) { try { cache.put(cacheKey, str, 60); } catch (e) {} }
+    return ContentService.createTextOutput(str).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    Logger.log(err);
+    return _jsonOut({ error: 'server_error' });
+  }
+}
+
+// Escritura: { accion:'comida', token, fecha:'dd/mm/aaaa', etapa:'Almuerzo', texto, alcohol:true|false }
+// Solo la celda "Comida" (y "Alcohol") de la fila de esa fecha + etapa en SU Track; la fecha no puede
+// ser futura; si Luca ya cargó las kcal de esa comida, no se toca (error 'revisada').
+function guardarComida_(cuerpo) {
+  try {
+    const token = String((cuerpo && cuerpo.token) || '').trim();
+    if (token.length < 20 || token.length > 100) return _jsonOut({ ok: false, error: 'token' });
+    const fecha = _nutriFecha_(cuerpo.fecha), etapa = _nNorm_(cuerpo.etapa);
+    if (!fecha || !etapa || etapa.length > 30) return _jsonOut({ ok: false, error: 'datos' });
+    const texto = String(cuerpo.texto == null ? '' : cuerpo.texto).replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+    const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');
+    if (_nutriNum_(fecha) > _nutriNum_(hoy)) return _jsonOut({ ok: false, error: 'futuro' });
+
+    const lock = LockService.getScriptLock();
+    lock.waitLock(10000);
+    try {
+      const fila = _alumnoPorToken_(SpreadsheetApp.openById(SHEET_ID_PORTAL), token);
+      if (!fila || String(fila[8]).trim() === 'inactivo') return _jsonOut({ ok: false, error: 'not_found' });
+      const n = _nutriHojas_(fila);
+      if (n.error) return _jsonOut({ ok: false, error: n.error });
+      const t = n.track, c = t.cols;
+      let actual = '', r = -1;
+      for (let i = c.fila + 1; i < t.filas.length; i++) {
+        const f = _nutriFecha_(t.filas[i][c.fecha]);
+        if (f) actual = f;
+        if (actual === fecha && _nNorm_(t.filas[i][c.etapa]) === etapa) { r = i; break; }
+      }
+      if (r < 0) return _jsonOut({ ok: false, error: 'sin_fila' });
+      if (String(t.filas[r][c.kcal] || '').trim()) return _jsonOut({ ok: false, error: 'revisada' });
+      // Como texto ('@'): algo que empiece con "=" queda escrito tal cual, nunca como fórmula
+      t.hoja.getRange(r + 1, c.comida + 1).setNumberFormat('@').setValue(texto);
+      if (c.alcohol != null && typeof cuerpo.alcohol === 'boolean') t.hoja.getRange(r + 1, c.alcohol + 1).setValue(cuerpo.alcohol);
+    } finally {
+      lock.releaseLock();
+    }
+    try { CacheService.getScriptCache().remove('nutri_' + token); } catch (e) {}
+    return _jsonOut({ ok: true });
   } catch (err) {
     Logger.log(err);
     return _jsonOut({ ok: false, error: 'server_error' });

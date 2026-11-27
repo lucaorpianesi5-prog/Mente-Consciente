@@ -5,7 +5,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 ---
 
 ## Estado al 27/11 (fin de la sesión larga del 24–27/11)
-- Publicado: **App 1.9 · Proxy 1.2**. Luca está probando con sus alumnos: el portal (entrar con Google, entrevista ampliada) y, con los **online** (Ampi, Cinde, Noe), "Terminé el día" desde el portal. Bruno ya completó la entrevista nueva.
+- Publicado: **App 1.10 · Proxy 1.2** (el proxy 1.3, con Nutrición, está para publicar). Luca está probando con sus alumnos: el portal (entrar con Google, entrevista ampliada) y, con los **online** (Ampi, Cinde, Noe), "Terminé el día" desde el portal. Bruno ya completó la entrevista nueva.
 - Próximo paso acordado: según cómo salga la prueba, RIR por ejercicio + RPE y comentario al terminar la sesión (ver Decisiones pendientes) y decidir si "Terminé el día" pasa a los presenciales.
 - Opcional para Luca: cargar sus datos en Mi perfil (solo los ve él).
 
@@ -33,7 +33,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
-- **Nutrición en el portal (Ivan)** — maqueta del 27/11 (4 pantallas: cargar comida · camarita → Compartir a WhatsApp con "Día dd/mm · Comida" · resumen semanal · vista de Luca con "Comidas para pasar a PULSO" y carga de macros). Los macros los calcula Luca en PULSO, **por comida**; la planilla de Nutri del alumno (Alumnos R, formato "Template - Nutri": Track A Fecha · B Etapa · C Comida · D Kcal · E Prot · F Carbs · G Grasas · H Fibra · I Alcohol, 4 filas por día) sigue siendo la fuente; el alumno escribiría solo la columna C (+ I) de su fila por fecha+etapa vía proxy (pasar por Auditoría). Fotos: siguen por WhatsApp (Web Share, el alumno elige el grupo). Archivo: Luca baja el PDF al cerrar la semana. Esperando el OK de Luca a la maqueta. Fórmulas del Template corregidas a mano por Luca (promedio sobre días con datos, % sin error, fechas encadenadas, alcohol).
+- **Nutrición: publicar el proxy 1.3** (27/11) — hasta que Luca lo publique, la parte de Luca (ver comidas y cargar macros) ya funciona, pero en el portal la tarjeta Nutrición sigue abriendo la planilla. Después: probar con Ivan (cargar comidas, camarita, Mi semana) y decidir si suma un botón "Empezar semana nueva" (bajar el PDF antes; correr fechas y borrar comidas/macros con confirmación).
 
 - **"Terminé el día" en el portal: probar con los online** (desde 26/11) y después decidir si se suma a los presenciales.
 - **Próximo paso del portal online** (pedido de Luca 26/11, después de probar "Terminé el día"): que el alumno cargue el **RIR al terminar cada ejercicio** (se escribe en su planilla de Fuerza) y, al terminar la sesión, el **RPE de la sesión** y un **comentario** para Luca (definir dónde se guardan: Seguimiento o una columna nueva de Asistencias).
