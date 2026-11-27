@@ -19,7 +19,7 @@ App de gestión para **Luca**, entrenador personal (único desarrollador y quien
 - **Datos**: un Google Sheet (`SHEET_ID`) leído/escrito con la API de Sheets usando el **OAuth del entrenador** (solo `ALLOWED_EMAILS`). Google Calendar para los turnos.
 - **Portal del alumno**: misma `index.html` en modo portal. Los datos vienen de un **Apps Script** (`apps-script/portal-proxy.gs`, `PORTAL_API_URL`) que corre con la cuenta de Luca y filtra por el token del alumno. Ese archivo **no se despliega solo**: Luca lo pega en Planilla → Extensiones → Apps Script y publica con *Implementar → Administrar implementaciones → lápiz → Nueva versión* (**nunca** "Nueva implementación": cambia la URL). Si lo modificás, mandale el archivo completo.
 - El portal detecta lo que soporta el proxy publicado: `perfilEditable` (entrevista inicial), `planPortal` (Fuerza/Mapeo en la app), `entrevista2` (entrevista ampliada, columna X), `terminarDia` ("Terminé el día" para online), `nutri` (seguimiento de Nutrición en la app) y `version`. Si no vienen, cae al comportamiento anterior.
-- **Versiones publicadas (27/11):** App **1.10** · Proxy **1.2** publicado (el **1.3**, con Nutrición, falta que Luca lo publique). El portal muestra ambas al pie; Mi perfil y la barra lateral, la de la app.
+- **Versiones publicadas (27/11):** App **1.10** · Proxy **1.3** (Luca ya lo publicó). El portal muestra ambas al pie; Mi perfil y la barra lateral, la de la app.
 - Las planillas de **Fuerza** y **Mapeo** de cada alumno son archivos aparte de Luca (links en Alumnos Q y U).
 
 ## Mapa de `index.html` (buscá los marcadores con grep)
