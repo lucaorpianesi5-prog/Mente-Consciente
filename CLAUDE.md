@@ -18,14 +18,15 @@ App de gestión para **Luca**, entrenador personal (único desarrollador y quien
 - **Un solo archivo**: `index.html` (~7.400 líneas: CSS, HTML y JS juntos). Sin build, sin dependencias, sin backend propio. `sw.js` + `manifest.webmanifest` = app instalable (PWA).
 - **Datos**: un Google Sheet (`SHEET_ID`) leído/escrito con la API de Sheets usando el **OAuth del entrenador** (solo `ALLOWED_EMAILS`). Google Calendar para los turnos.
 - **Portal del alumno**: misma `index.html` en modo portal. Los datos vienen de un **Apps Script** (`apps-script/portal-proxy.gs`, `PORTAL_API_URL`) que corre con la cuenta de Luca y filtra por el token del alumno. Ese archivo **no se despliega solo**: Luca lo pega en Planilla → Extensiones → Apps Script y publica con *Implementar → Administrar implementaciones → lápiz → Nueva versión* (**nunca** "Nueva implementación": cambia la URL). Si lo modificás, mandale el archivo completo.
-- El portal detecta lo que soporta el proxy publicado: `perfilEditable` (entrevista inicial) y `planPortal` (Fuerza/Mapeo en la app). Si no vienen, cae al comportamiento anterior.
+- El portal detecta lo que soporta el proxy publicado: `perfilEditable` (entrevista inicial), `planPortal` (Fuerza/Mapeo en la app), `entrevista2` (entrevista ampliada, columna X), `terminarDia` ("Terminé el día" para online) y `version`. Si no vienen, cae al comportamiento anterior.
+- **Versiones publicadas (27/11):** App **1.9** · Proxy **1.2** (Luca ya lo publicó). El portal muestra ambas al pie; Mi perfil y la barra lateral, la de la app.
 - Las planillas de **Fuerza** y **Mapeo** de cada alumno son archivos aparte de Luca (links en Alumnos Q y U).
 
 ## Mapa de `index.html` (buscá los marcadores con grep)
 CSS: temas `NOCTURNO`/`CALMA` (variables `--…`; la ficha, el portal y el visor usan `--pd-…`), luego bloques por pantalla (`FICHA REDISEÑADA`, `ALUMNOS`, `MI PERFIL`, `FINANZAS (rediseño)`, `PORTAL PÚBLICO`, `Bloques del portal`, `Entrevista`, `Fuerza v2`, `Mapeo v2`, `MOBILE`).
-JS (marcadores `// ──` y `// ══`): `CONFIG` · `PORTAL PÚBLICO` · `Instalar como app` · `BLOQUES COMPARTIDOS` (portal + Mi perfil) · `ENTREVISTA INICIAL` · `SESIÓN PERSISTENTE + CACHÉ` · `SHEETS API` · `CARGAR DATOS` · `GUARDAR ALUMNO` · `NAVEGACIÓN` · `DASHBOARD` · `ALUMNOS` · `OBJETIVOS`/`MOLESTIAS` · `FINANZAS` · `NUTRICIÓN` · `GOOGLE CALENDAR` · `AGENDA` · `COBROS`/`VENCIMIENTOS` · `MI PERFIL` · `PLAN DEL ALUMNO` (visor Fuerza/Mapeo) · `FUERZA (v2)` · `MAPEO (v2)` · `Eventos de la vista`.
+JS (marcadores `// ──` y `// ══`): `CONFIG` (incluye `VERSION_APP`) · `PORTAL PÚBLICO` · `Instalar como app` · `BLOQUES COMPARTIDOS` (portal + Mi perfil) · `ENTREVISTA INICIAL` · `SESIÓN PERSISTENTE + CACHÉ` · `SHEETS API` · `CARGAR DATOS` · `GUARDAR ALUMNO` · `NAVEGACIÓN` · `DASHBOARD` (`renderDashboard` → `RESUMEN COMPU`: `renderResumenCompu`, compu y celu; entre semana Hoy (+ "Online · hoy") / Para atender / Cómo viene el proyecto; sábado y domingo Planes para actualizar) · `ALUMNOS` · `OBJETIVOS`/`MOLESTIAS` · `FINANZAS` · `NUTRICIÓN` · `GOOGLE CALENDAR` · `AGENDA` · `COBROS`/`VENCIMIENTOS` · `MI PERFIL` · `PLAN DEL ALUMNO` (visor Fuerza/Mapeo) · `FUERZA (v2)` · `MAPEO (v2)` · `Eventos de la vista`.
 
-Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, centro) · Finanzas (Cobros + Inversión) · Alumnos (Alumnos + Nutrición). `_navDe()` decide qué ítem se resalta.
+Navegación: `showPage(id)`; barra inferior Resumen · Agenda · **Yo** (brote, centro) · Finanzas (Cobros + Inversión) · Alumnos (Alumnos + Nutrición). `_navDe()` decide qué ítem se resalta. En la compu, barra lateral de íconos (72 px). El botón "+" solo aparece en Alumnos/Nutrición.
 
 ## Modelo de datos (pestañas del Sheet)
 | Pestaña | Columnas |
@@ -59,6 +60,8 @@ Ids especiales en el visor: `MI_ID='__yo'` (mi propio plan), `PORTAL_ID='__porta
 - Lo que Luca decidió no tocar (estado global, `onclick` inline, re-render por `innerHTML`): ver `PENDIENTES.md`.
 
 ## Cómo probar (entorno de Claude en la nube)
+- **Con datos reales** (lo que más sirvió): bajar la planilla con el conector de Google Drive (`download_file_content`, exportando a xlsx) al **scratchpad**, convertirla con openpyxl al formato `{ 'Alumnos!A2:V': filas, … }` y pasarla a `simularSheets`. Lo mismo con las Fuerzas/Mapeos (`planillas: { id: [{id, title, filas}] }`). **Nunca** commitear esos datos (el repo es público). `script.google.com` está bloqueado desde acá: el proxy se prueba con una imitación de Apps Script (stubs de SpreadsheetApp, etc.) evaluando `portal-proxy.gs` en Node.
+- El simulador del arnés responde como Sheets: filas puntuales (`A7:X7`), columnas que no empiezan en A (`D2:D`), `ranges=` de una o varias pestañas, celdas con fórmula (`{t, f}`) y guarda las filas de un `append`.
 - **Arnés**: `node herramientas/arnes.js` → chequea sintaxis de `index.html` y del proxy y recorre las pantallas del entrenador buscando errores de JS. En otros scripts: `require('./herramientas/arnes.js')` → `simularSheets`, `abrirEntrenador`, `abrirPortal` (ver comentarios del archivo).
 - Abrí la app por `file://` (levantar un servidor local está bloqueado en este entorno). No hay login real: se inyectan datos y se simulan Sheets y el proxy con `page.route`.
 - Scripts largos (Python/JS) escribilos con la herramienta de archivos en el scratchpad y ejecutalos; los heredocs complejos en bash los frena el chequeo de seguridad.

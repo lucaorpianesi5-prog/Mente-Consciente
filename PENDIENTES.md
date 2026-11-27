@@ -4,6 +4,11 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ---
 
+## Estado al 27/11 (fin de la sesión larga del 24–27/11)
+- Publicado: **App 1.9 · Proxy 1.2**. Luca está probando con sus alumnos: el portal (entrar con Google, entrevista ampliada) y, con los **online** (Ampi, Cinde, Noe), "Terminé el día" desde el portal. Bruno ya completó la entrevista nueva.
+- Próximo paso acordado: según cómo salga la prueba, RIR por ejercicio + RPE y comentario al terminar la sesión (ver Decisiones pendientes) y decidir si "Terminé el día" pasa a los presenciales.
+- Opcional para Luca: cargar sus datos en Mi perfil (solo los ve él).
+
 ## Bugs activos
 
 - [ ] IDs de Google (`CLIENT_ID`/`SHEET_ID`/`CALENDAR_ID`) hardcodeados sin forma de rotar sin redeploy — auditoría del 09/07 (SEGURIDAD/MEDIO, riesgo aceptado por ahora) — no requiere backend propio hoy; se resuelve solo si/cuando se migre a uno (ver nota en "Login de alumno por email", Features planificadas)
