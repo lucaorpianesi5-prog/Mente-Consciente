@@ -33,6 +33,8 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
+- **Nutrición en el portal (Ivan)** — maqueta del 27/11 (4 pantallas: cargar comida · camarita → Compartir a WhatsApp con "Día dd/mm · Comida" · resumen semanal · vista de Luca con "Comidas para pasar a PULSO" y carga de macros). Los macros los calcula Luca en PULSO, **por comida**; la planilla de Nutri del alumno (Alumnos R, formato "Template - Nutri": Track A Fecha · B Etapa · C Comida · D Kcal · E Prot · F Carbs · G Grasas · H Fibra · I Alcohol, 4 filas por día) sigue siendo la fuente; el alumno escribiría solo la columna C (+ I) de su fila por fecha+etapa vía proxy (pasar por Auditoría). Fotos: siguen por WhatsApp (Web Share, el alumno elige el grupo). Archivo: Luca baja el PDF al cerrar la semana. Esperando el OK de Luca a la maqueta. Fórmulas del Template corregidas a mano por Luca (promedio sobre días con datos, % sin error, fechas encadenadas, alcohol).
+
 - **"Terminé el día" en el portal: probar con los online** (desde 26/11) y después decidir si se suma a los presenciales.
 - **Próximo paso del portal online** (pedido de Luca 26/11, después de probar "Terminé el día"): que el alumno cargue el **RIR al terminar cada ejercicio** (se escribe en su planilla de Fuerza) y, al terminar la sesión, el **RPE de la sesión** y un **comentario** para Luca (definir dónde se guardan: Seguimiento o una columna nueva de Asistencias).
 
