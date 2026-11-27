@@ -5,7 +5,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 ---
 
 ## Estado al 27/11 (fin de la sesión larga del 24–27/11)
-- Publicado: **App 1.10 · Proxy 1.3** (Nutrición en el portal, publicado por Luca el 27/11). Luca está probando con sus alumnos: el portal (entrar con Google, entrevista ampliada) y, con los **online** (Ampi, Cinde, Noe), "Terminé el día" desde el portal. Bruno ya completó la entrevista nueva.
+- Publicado: **App 1.11 · Proxy 1.3** (el 1.4, con favoritas de Nutrición, está para publicar). Luca está probando con sus alumnos: el portal (entrar con Google, entrevista ampliada) y, con los **online** (Ampi, Cinde, Noe), "Terminé el día" desde el portal. Bruno ya completó la entrevista nueva.
 - Próximo paso acordado: según cómo salga la prueba, RIR por ejercicio + RPE y comentario al terminar la sesión (ver Decisiones pendientes) y decidir si "Terminé el día" pasa a los presenciales.
 - Opcional para Luca: cargar sus datos en Mi perfil (solo los ve él).
 
@@ -33,7 +33,7 @@ Este archivo vive en la raíz del repo (junto al `index.html`) y es la única fu
 
 ## Decisiones pendientes
 
-- **Nutrición: probar con Ivan** (proxy 1.3 publicado el 27/11): cargar comidas, camarita (ver si WhatsApp conserva el texto con la foto), Mi semana. Después decidir si suma un botón "Empezar semana nueva" (bajar el PDF antes; correr fechas y borrar comidas/macros con confirmación).
+- **Nutrición: publicar el proxy 1.4** (favoritas, 27/11) y probar con Ivan: cargar comidas, camarita (ver si WhatsApp conserva el texto con la foto), ⭐ favoritas, Mi semana. Después decidir si suma un botón "Empezar semana nueva" (bajar el PDF antes; correr fechas y borrar comidas/macros con confirmación). Nota: las comidas ⭐ completas que Luca no abre quedan editables por el alumno hasta que se borra la semana.
 
 - **"Terminé el día" en el portal: probar con los online** (desde 26/11) y después decidir si se suma a los presenciales.
 - **Próximo paso del portal online** (pedido de Luca 26/11, después de probar "Terminé el día"): que el alumno cargue el **RIR al terminar cada ejercicio** (se escribe en su planilla de Fuerza) y, al terminar la sesión, el **RPE de la sesión** y un **comentario** para Luca (definir dónde se guardan: Seguimiento o una columna nueva de Asistencias).

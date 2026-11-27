@@ -1398,7 +1398,40 @@ body.sesion-bar-on #nutri-vista{top:34px}
 .nv-cargar label span{display:block;text-align:center;font-size:0.54rem;text-transform:uppercase;color:var(--pd-text3);font-weight:700;letter-spacing:0.04em}
 .nv-cargar input{width:100%;margin-top:3px;background:var(--pd-bg);border:1px solid var(--pd-border2);border-radius:8px;padding:8px 2px;text-align:center;font:inherit;font-size:16px;font-weight:700;color:var(--pd-text)}
 .nv-cargar input:focus{outline:none;border-color:var(--pd-verde)}
-@media(min-width:769px){ .nv-area,.nv-cargar input{font-size:0.86rem} }
+/* Favoritas */
+.nv-est.fv{color:var(--pd-crema);background:var(--pd-crema-dim)}
+.nv-chips{align-items:center}
+.nv-fav-bt{margin-left:auto;font:inherit;font-size:0.7rem;font-weight:700;color:var(--pd-crema);background:var(--pd-crema-dim);border:none;border-radius:20px;padding:5px 10px;cursor:pointer}
+.nv-fav-bt.on{background:var(--pd-crema);color:var(--pd-sobre-acento)}
+.nv-fav-abrir{display:flex;align-items:center;gap:10px;width:100%;margin-top:10px;border:1px dashed color-mix(in srgb,var(--pd-crema) 55%,transparent);background:var(--pd-crema-dim);color:var(--pd-text);border-radius:12px;padding:11px 12px;font:inherit;text-align:left;cursor:pointer}
+.nv-fav-abrir>div{flex:1;min-width:0} .nv-fav-abrir b{display:block;font-size:0.84rem} .nv-fav-abrir small{font-size:0.66rem;color:var(--pd-text2)}
+.nv-fav-abrir .st{font-size:1.1rem} .nv-fav-abrir .ch{color:var(--pd-crema);font-weight:800}
+.nv-elegidas{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.nv-eleg{display:flex;align-items:center;gap:8px;background:var(--pd-card2);border:1px solid var(--pd-crema);border-radius:10px;padding:7px 6px 7px 11px;font-size:0.78rem}
+.nv-eleg>div{flex:1;min-width:0;overflow-wrap:anywhere} .nv-eleg small{display:block;font-size:0.62rem;color:var(--pd-crema)}
+.nv-x{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:1px solid var(--pd-border2);background:var(--pd-card2);color:var(--pd-text2);font:inherit;font-size:0.8rem;cursor:pointer}
+.nv-eleg .nv-x{border:none;background:transparent}
+.nv-suma{margin-top:10px;border-radius:10px;padding:9px 11px;background:color-mix(in srgb,var(--pd-verde) 10%,transparent);border:1px solid color-mix(in srgb,var(--pd-verde) 30%,transparent);font-size:0.74rem;color:var(--pd-text2);line-height:1.45}
+.nv-suma b{color:var(--pd-text)}
+.nv-tagfv{display:inline-block;font-size:0.6rem;font-weight:700;padding:1px 7px;border-radius:10px;color:var(--pd-crema);background:var(--pd-crema-dim)}
+.nv-velo{position:absolute;inset:0;background:rgba(0,0,0,0.55);z-index:2}
+.nv-hoja{position:absolute;left:0;right:0;bottom:0;max-height:82%;z-index:3;background:var(--pd-card);border-radius:20px 20px 0 0;border-top:1px solid var(--pd-border2);padding:14px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.nv-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.nv-hd b{font-size:1.05rem;flex:1}
+.nv-volver{width:32px;height:32px;border-radius:50%;border:1px solid var(--pd-border2);background:var(--pd-bg3);color:var(--pd-text2);font:inherit;font-size:1.1rem;cursor:pointer}
+.nv-link{background:none;border:none;color:var(--pd-verde);font:inherit;font-size:0.74rem;font-weight:600;cursor:pointer;padding:4px}
+.nv-buscar{border:1px solid var(--pd-border2);border-radius:10px;background:var(--pd-bg);color:var(--pd-text);padding:10px 12px;font:inherit;font-size:16px}
+.nv-hoja-body{overflow-y:auto;min-height:0;flex:1}
+.nv-op{display:flex;align-items:center;gap:10px;width:100%;padding:10px 2px;border:none;border-top:1px solid var(--pd-border);background:none;color:var(--pd-text);font:inherit;text-align:left;cursor:pointer}
+.nv-op:first-child{border-top:none}
+.nv-op .ck{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--pd-border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:800}
+.nv-op.on .ck{background:var(--pd-crema);border-color:var(--pd-crema);color:var(--pd-sobre-acento)}
+.nv-op>div{flex:1;min-width:0;font-size:0.82rem;overflow-wrap:anywhere} .nv-op small,.nv-fav-it small{display:block;font-size:0.64rem;color:var(--pd-text3);margin-top:1px}
+.nv-otras{display:block;width:100%;text-align:center;padding:10px}
+.nv-grupo{margin:12px 2px 6px}
+.nv-fav-it{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--pd-border);font-size:0.8rem}
+.nv-fav-it:first-child{border-top:none} .nv-fav-it>div{flex:1;min-width:0;overflow-wrap:anywhere}
+@media(min-width:769px){ .nv-area,.nv-cargar input,.nv-buscar{font-size:0.86rem} }
 .pv-col{width:100%;max-width:600px;height:100%;display:flex;flex-direction:column;position:relative}
 .pv-top{padding:0.85rem 14px 0.6rem;border-bottom:1px solid var(--pd-border);display:flex;flex-direction:column;gap:0.55rem;background:var(--pd-bg);flex-shrink:0}
 .pv-fila1{display:flex;align-items:center;gap:0.6rem}
@@ -2345,7 +2378,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.10 · 27/11/2026';
+const VERSION_APP='1.11 · 27/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -7961,7 +7994,7 @@ function _nutriValor(v){
 }
 const _nutriSi=v=>/^(true|verdadero|si|x|1)$/.test(_normTxt(v));
 // Track (+ Datos, opcional) → {cols, dias:[{fecha, comidas:[{fila, etapa, comida, kcal…, alcohol}]}], obj, notas}
-function nutriParse(track,datos){
+function nutriParse(track,datos,favFilas){
   const filas=(track||[]).map(f=>(f||[]).map(x=>String(x==null?'':x)));
   const cols=_nutriCols(filas);
   if(!cols) throw {tipo:'formato'};
@@ -7989,7 +8022,15 @@ function nutriParse(track,datos){
       notas=vistos.join('\n');
     }
   }));
-  return {cols, dias, obj, notas};
+  // Favoritas (pestaña "Favoritas": Comida · Etapas · Kcal · Proteína · Carbohidratos · Grasas · Fibra · Fecha)
+  const favs=[];
+  (favFilas||[]).slice(1).forEach(f=>{
+    const nombre=String((f||[])[0]||'').trim(); if(!nombre) return;
+    const it={nombre, etapas:String(f[1]||'').split('|').map(s=>s.trim()).filter(Boolean)};
+    NUTRI_MACROS.forEach(([k],j)=>{ it[k]=_nutriValor(f[2+j]); });
+    if(it.kcal!=null) favs.push(it);
+  });
+  return {cols, dias, obj, notas, favs};
 }
 const _nvTiene=c=>!!(c.comida||c.kcal!=null);
 const _nvPendiente=c=>!!(c.comida&&c.kcal==null);
@@ -8027,7 +8068,7 @@ function nutriAsegurar(a,forzar){
   e.promesa=(async()=>{
     try{
       const r=a.id===PORTAL_ID ? await _nutriPedirPortal() : await _nutriLeerApi(p.id,p.gid);
-      e.datos=nutriParse(r.track,r.datos); e.hoja=r.hoja; e.hoy=r.hoy||''; e.estado='ok'; e.error=null;
+      e.datos=nutriParse(r.track,r.datos,r.favs); e.hoja=r.hoja; e.hoy=r.hoy||''; e.estado='ok'; e.error=null;
     }catch(err){
       if(e.estado!=='ok'){ e.estado='error'; e.error=(err&&err.tipo)||'red'; }
       if(!(err&&err.tipo)) console.warn('Nutri:',err);
@@ -8047,14 +8088,16 @@ async function _nutriLeerApi(spreadsheetId,gid){
   const qs=hojas.map(h=>'ranges='+encodeURIComponent(`'${h.title.replace(/'/g,"''")}'!A1:N200`)).join('&');
   const data=await _planApi(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}?includeGridData=true&${qs}&fields=sheets(properties(sheetId,title),data(rowData(values(formattedValue))))`);
   const tracks=[], datos=[];
+  let favs=null;
   (data.sheets||[]).forEach(sh=>{
     const filas=((((sh.data||[])[0]||{}).rowData)||[]).map(f=>(f.values||[]).map(c=>(c&&c.formattedValue!=null)?String(c.formattedValue):''));
+    if(_normTxt(sh.properties.title)==='favoritas'){ favs=filas; return; }   // nunca es el Track (también tiene Comida/Kcal…)
     if(_nutriCols(filas)) tracks.push({id:String(sh.properties.sheetId), title:sh.properties.title, filas});
     else if(filas.slice(0,10).some(f=>f.some(v=>/optim/.test(_normTxt(v))))) datos.push(filas);
   });
   const t=(gid!=null&&tracks.find(x=>x.id===String(gid))) || (tracks.length===1?tracks[0]:null);
   if(!t) throw {tipo:tracks.length?'pestana':'formato'};
-  return {hoja:t.title, track:t.filas, datos:datos.length===1?datos[0]:null};
+  return {hoja:t.title, track:t.filas, datos:datos.length===1?datos[0]:null, favs};
 }
 async function _nutriPedirPortal(){
   let r;
@@ -8062,7 +8105,7 @@ async function _nutriPedirPortal(){
   if(!r.ok) throw {tipo:'red'};
   const d=await r.json();
   if(d.error) throw {tipo:{acceso:'acceso',formato:'formato',pestana:'pestana',sin_planilla:'formato'}[d.error]||'red'};
-  return {hoja:(d.track||{}).hoja||'', track:(d.track||{}).filas||[], datos:d.datos||null, hoy:d.hoy||''};
+  return {hoja:(d.track||{}).hoja||'', track:(d.track||{}).filas||[], datos:d.datos||null, favs:d.favoritas||null, hoy:d.hoy||''};
 }
 // Comidas para pasar a PULSO (solo lo que ya está en memoria; ver nutriPrecargar)
 function nutriPendientes(id){ const e=nutriCache[id]; return e&&e.estado==='ok'?nutriResumen(e.datos).pendientes:0; }
@@ -8077,13 +8120,39 @@ function nutriPrecargar(alRefrescar){
 }
 
 // ── Vista ──
-let nutriVista=null, _nvAbierta=false;   // {alumnoId, tab, dia, abierta, editando, guardando}
+let nutriVista=null, _nvAbierta=false;   // {alumnoId, tab, dia, abierta, editando, guardando, sel, extra, hojaFav, otras, limpio}
+// ── Favoritas (27/11): "⭐ …" en Comida = la cargó el alumno con favoritas y Luca todavía no la revisó ──
+const _nvEstrella=c=>/^⭐/.test(String((c&&c.comida)||''));
+const _nvSinEstrella=s=>String(s||'').replace(/^⭐\s*/,'');
+const _nvRevisada=c=>c.kcal!=null&&!_nvEstrella(c);
+function _nvFavSoportado(){ return !!(nutriVista&&nutriVista.alumnoId===PORTAL_ID&&_portalDatosActual&&_portalDatosActual.favoritas); }
+const _nvEsDeEtapa=(f,et)=>f.etapas.some(e=>_normTxt(e)===_normTxt(et));
+const _nvEsFav=(c,favs)=>(favs||[]).some(f=>_normTxt(f.nombre)===_normTxt(c.comida)&&_nvEsDeEtapa(f,c.etapa));
+// "⭐ A + B (N kcal) + algo más" → {sel:['A','B'], extra:'algo más'} (los nombres pueden tener " + " adentro)
+function _nvLeerEstrella(c,favs){
+  if(!_nvEstrella(c)) return {sel:[], extra:c.comida||''};
+  let cuerpo=_nvSinEstrella(c.comida), extra='';
+  const m=cuerpo.match(/^(.*?) \((\d+) kcal\) \+ (.*)$/); if(m){ cuerpo=m[1]; extra=m[3]; }
+  const nombres=(favs||[]).map(f=>f.nombre).sort((x,y)=>y.length-x.length), sel=[];
+  let resto=cuerpo;
+  while(resto){
+    const r=_normTxt(resto), n=nombres.find(x=>r===_normTxt(x)||r.startsWith(_normTxt(x)+' + '));
+    if(!n) return {sel:[], extra:_nvSinEstrella(c.comida)};
+    sel.push(n); resto=resto.slice(n.length).replace(/^\s*\+\s*/,'');
+  }
+  return {sel, extra};
+}
+function _nvSuma(nombres,favs){
+  const el=nombres.map(n=>(favs||[]).find(f=>f.nombre===n)).filter(Boolean), s={};
+  NUTRI_MACROS.forEach(([k])=>{ s[k]=el.every(f=>f[k]==null)?null:Math.round(el.reduce((t,f)=>t+(f[k]||0),0)*10)/10; });
+  return s;
+}
 function _nvHoy(){ const e=nutriVista&&nutriCache[nutriVista.alumnoId]; return _nutriFecha((e&&e.hoy)||_fechaHoyAR()); }
 function abrirNutri(alumnoId){
   const a=_nvAlumno(alumnoId); if(!a) return;
   const url=_nvUrl(a);
   if(!planParseUrl(url)){ if(url) window.open(url,'_blank','noopener'); return; }
-  nutriVista={alumnoId, tab:alumnoId===PORTAL_ID?'hoy':'comidas', dia:'', abierta:null, editando:null, guardando:false};
+  nutriVista={alumnoId, tab:alumnoId===PORTAL_ID?'hoy':'comidas', dia:'', abierta:null, editando:null, guardando:false, sel:[], extra:'', hojaFav:null, otras:false, limpio:false};
   if(!_nvAbierta){ try{ history.pushState({mcNutri:1},''); }catch(e){} _nvAbierta=true; }
   document.getElementById('nutri-vista').style.display='flex';
   nutriRender();
@@ -8119,6 +8188,7 @@ function nutriRender(){
   // No pisar lo que se está escribiendo (un re-render por la lectura de fondo borraría el texto)
   const foco=document.activeElement, escribiendo=foco&&cont.contains(foco)&&/^(TEXTAREA|INPUT)$/.test(foco.tagName);
   const borrador={}; cont.querySelectorAll('[data-nv-campo]').forEach(x=>{ borrador[x.dataset.nvCampo]=x.type==='checkbox'?x.checked:x.value; });
+  if(nutriVista.limpio){ Object.keys(borrador).forEach(k=>delete borrador[k]); nutriVista.limpio=false; }   // otra comida: no arrastrar lo escrito
   const r=ok?nutriResumen(e.datos):null;
   const semana=ok&&e.datos.dias.length?`${e.datos.dias[0].fecha.slice(0,5)} al ${e.datos.dias[e.datos.dias.length-1].fecha.slice(0,5)}`:'';
   const tabs=esPortal?[['hoy','Hoy'],['semana','Mi semana']]:[['comidas','Comidas'],['semana','Semana']];
@@ -8140,10 +8210,40 @@ function nutriRender(){
       <div class="pv-tabs">${tabs.map(([k,l])=>`<button type="button" class="pv-tab${nutriVista.tab===k?' on':''}" data-nv="tab" data-k="${k}">${l}</button>`).join('')}</div>
     </div>
     <div class="nv-body">${cuerpo}</div>
+    ${ok&&nutriVista.hojaFav?_nvHojaFav(e.datos):''}
   </div>`;
   // Lo que se estaba escribiendo vuelve a su lugar
   Object.keys(borrador).forEach(k=>{ const x=cont.querySelector(`[data-nv-campo="${k}"]`); if(!x) return; if(x.type==='checkbox') x.checked=borrador[k]; else x.value=borrador[k]; });
   if(escribiendo && foco.dataset && foco.dataset.nvCampo){ const x=cont.querySelector(`[data-nv-campo="${foco.dataset.nvCampo}"]`); if(x) x.focus(); }
+  _nvFiltrarFav();
+}
+function _nvFiltrarFav(){
+  const b=document.querySelector('#nutri-vista [data-nv-campo="fav-busca"]'); if(!b) return;
+  const q=_normTxt(b.value);
+  document.querySelectorAll('#nutri-vista .nv-op').forEach(x=>{ x.style.display=!q||x.dataset.busca.includes(q)?'':'none'; });
+}
+// Hoja que se abre con "Elegir de mis favoritas": solo las de esa comida (con buscador) o, en "Editar", todas para sacar
+function _nvHojaFav(d){
+  const favs=d.favs||[], sel=nutriVista.sel||[];
+  const item=f=>`${escaparHTML(f.nombre)}<small>${escaparHTML(_nvMacrosTxt(f))}</small>`;
+  if(nutriVista.hojaFav==='editar'){
+    const orden=[...new Set((d.dias[0]?d.dias[0].comidas.map(c=>c.etapa):[]).concat(favs.flatMap(f=>f.etapas)))];
+    const grupos=orden.map(et=>{ const fs=favs.filter(f=>_nvEsDeEtapa(f,et)); return fs.length?`<div class="nv-eti nv-grupo">${escaparHTML(et)}</div><div class="nv-card nv-lista">${fs.map(f=>`<div class="nv-fav-it"><div>${item(f)}</div><button type="button" class="nv-x" data-nv="fav-quitar" data-i="${favs.indexOf(f)}" data-e="${escaparHTML(et)}" aria-label="Sacar de ${escaparHTML(et)}">✕</button></div>`).join('')}</div>`:''; }).join('');
+    return `<div class="nv-velo" data-nv="fav-cerrar"></div><div class="nv-hoja" role="dialog" aria-label="Tus favoritas">
+      <div class="nv-hd"><button type="button" class="nv-volver" data-nv="fav-elegir" aria-label="Volver">‹</button><b>Tus favoritas</b></div>
+      <div class="nv-hoja-body">${grupos||'<p class="nv-nota">Todavía no tenés favoritas.</p>'}<p class="nv-ayuda">Para sumar una, tocá ☆ Favorita en una comida que Luca ya revisó. Los valores son los de Luca: no se pueden cambiar.</p></div>
+      <button type="button" class="nv-bt pri" data-nv="fav-cerrar"${nutriVista.guardando?' disabled':''}>Listo</button></div>`;
+  }
+  const x=nutriVista.abierta&&_nvComidaDe(nutriVista.abierta); if(!x) return '';
+  const et=x.c.etapa, de=favs.filter(f=>_nvEsDeEtapa(f,et)), otras=favs.filter(f=>!_nvEsDeEtapa(f,et));
+  const todas=nutriVista.otras||!de.length, lista=todas?de.concat(otras):de, s=_nvSuma(sel,favs);
+  return `<div class="nv-velo" data-nv="fav-cerrar"></div><div class="nv-hoja" role="dialog" aria-label="Favoritas">
+    <div class="nv-hd"><b>${todas&&otras.length?'Tus favoritas':'Favoritas de '+escaparHTML(et.toLowerCase())}</b><button type="button" class="nv-link" data-nv="fav-editar">Editar</button></div>
+    <input class="nv-buscar" type="search" data-nv-campo="fav-busca" placeholder="Buscar…" autocomplete="off">
+    <div class="nv-hoja-body">${lista.map(f=>{ const on=sel.includes(f.nombre); return `<button type="button" class="nv-op${on?' on':''}" data-nv="fav-tog" data-i="${favs.indexOf(f)}" data-busca="${escaparHTML(_normTxt(f.nombre))}"><span class="ck">${on?'✓':''}</span><div>${item(f)}</div></button>`; }).join('')}
+      ${!todas&&otras.length?`<button type="button" class="nv-link nv-otras" data-nv="fav-otras">Ver también las de otras comidas (${otras.length}) ›</button>`:''}</div>
+    ${sel.length?`<div class="nv-suma">Elegiste ${sel.length}: <b>${escaparHTML(_nvMacrosTxt(s))}</b></div>`:''}
+    <button type="button" class="nv-bt pri" data-nv="fav-cerrar">Listo</button></div>`;
 }
 
 // Portal · Hoy: tira de días + las comidas del día elegido
@@ -8160,20 +8260,28 @@ function _nvHoyPortal(d){
   const aviso=fuera?'<div class="nv-nota-top">Esta semana ya terminó: Luca va a armar la próxima. Mientras, podés completar lo que te faltó.</div>':'';
   const fut=_nutriNum(sel)>_nutriNum(hoy);
   return `${tira}${aviso}<div class="nv-eti">${escaparHTML(_nvDiaTxt(sel))}${sel===hoy?' · hoy':''}</div>
-    ${dia.comidas.map(c=>_nvComidaPortal(c,sel,fut)).join('')}`;
+    ${dia.comidas.map(c=>_nvComidaPortal(c,sel,fut,d)).join('')}`;
 }
-function _nvComidaPortal(c,fecha,fut){
-  const rev=c.kcal!=null, esp=!rev&&c.comida, clave=fecha+'|'+c.etapa;
-  const abierta=!rev&&!fut&&nutriVista.abierta===clave;
-  const est=rev?'<span class="nv-est ok">Luca lo revisó</span>':esp?'<span class="nv-est esp">Esperando a Luca</span>':fut?'<span class="nv-est vac">Todavía no</span>':'<span class="nv-est vac">Sin cargar</span>';
-  const sub=rev?(c.alcohol?'Con alcohol':'Revisada'):esp?(c.alcohol?'Cargada · con alcohol':'Cargada · tocá para editar'):fut?'Más adelante':'¿Qué comiste?';
+function _nvComidaPortal(c,fecha,fut,d){
+  const estrella=_nvEstrella(c), rev=_nvRevisada(c), completa=estrella&&c.kcal!=null, esp=c.kcal==null&&c.comida, clave=fecha+'|'+c.etapa;
+  const abierta=!rev&&!fut&&nutriVista.abierta===clave, favOk=_nvFavSoportado(), favs=d.favs||[];
+  const est=rev?'<span class="nv-est ok">Luca lo revisó</span>':completa?'<span class="nv-est fv">⭐ Completa</span>':esp?'<span class="nv-est esp">Esperando a Luca</span>':fut?'<span class="nv-est vac">Todavía no</span>':'<span class="nv-est vac">Sin cargar</span>';
+  const sub=rev?(c.alcohol?'Con alcohol':'Revisada'):completa?'Con tus favoritas · tocá para editar':esp?(c.alcohol?'Cargada · con alcohol':'Cargada · tocá para editar'):fut?'Más adelante':'¿Qué comiste?';
   let html=`<div class="nv-com${abierta?' abierta':''}">
     <button type="button" class="nv-com-h" ${rev||fut?'disabled':`data-nv="abrir" data-k="${escaparHTML(clave)}"`}><span class="nv-ic">${_nvIcono(c.etapa)}</span><div><b>${escaparHTML(c.etapa)}</b><small>${sub}</small></div>${est}</button>`;
-  if(c.comida && !abierta) html+=`<div class="nv-txt">${escaparHTML(c.comida)}</div>`;
-  if(rev) html+=`<div class="nv-chips">${NUTRI_MACROS.filter(([k])=>c[k]!=null).map(([k,l])=>`<span>${k==='kcal'?`<b>${_nvFmt(c.kcal)}</b> kcal`:`${l[0]} <b>${String(Math.round(c[k]*10)/10).replace('.',',')}</b>`}</span>`).join('')}</div>`;
+  if(c.comida && !abierta) html+=`<div class="nv-txt">${escaparHTML(_nvSinEstrella(c.comida))}</div>`;
+  if(c.kcal!=null && !abierta){
+    const on=rev&&favOk&&_nvEsFav(c,favs);
+    html+=`<div class="nv-chips">${NUTRI_MACROS.filter(([k])=>c[k]!=null).map(([k,l])=>`<span>${k==='kcal'?`<b>${_nvFmt(c.kcal)}</b> kcal`:`${l[0]} <b>${String(Math.round(c[k]*10)/10).replace('.',',')}</b>`}</span>`).join('')}${rev&&favOk&&c.comida?`<button type="button" class="nv-fav-bt${on?' on':''}" data-nv="fav-marcar" data-k="${escaparHTML(clave)}"${nutriVista.guardando?' disabled':''}>${on?'★':'☆'} Favorita</button>`:''}</div>`;
+  }
+  if(esp && !estrella && !abierta && favOk) html+='<p class="nv-ayuda">Cuando Luca la revise, la vas a poder guardar como favorita.</p>';
   if(abierta){
-    const g=nutriVista.guardando;
-    html+=`<textarea class="nv-area" data-nv-campo="txt" maxlength="300" placeholder="Ej.: yogur griego con banana y un puñado de almendras">${escaparHTML(c.comida)}</textarea>
+    const g=nutriVista.guardando, sel=nutriVista.sel||[];
+    const de=favs.filter(f=>_nvEsDeEtapa(f,c.etapa)).length;
+    const favHTML=favOk&&favs.length?`<button type="button" class="nv-fav-abrir" data-nv="fav-elegir"><span class="st">⭐</span><div><b>Elegir de mis favoritas</b><small>${de?`${de} de ${escaparHTML(c.etapa.toLowerCase())}`:`${favs.length} en total`}</small></div><span class="ch">›</span></button>
+      ${sel.length?`<div class="nv-elegidas">${sel.map((n,i)=>{ const f=favs.find(x=>x.nombre===n); return `<div class="nv-eleg"><div>${escaparHTML(n)}<small>${f?escaparHTML(_nvMacrosTxt(f)):''}</small></div><button type="button" class="nv-x" data-nv="fav-sacar" data-i="${i}" aria-label="Sacar">✕</button></div>`; }).join('')}</div>`:''}`:'';
+    html+=`${favHTML}<textarea class="nv-area" data-nv-campo="txt" maxlength="300" placeholder="${sel.length?'¿Algo más? (ej.: + una banana)':'Ej.: yogur griego con banana y un puñado de almendras'}">${escaparHTML(nutriVista.extra||'')}</textarea>
+      ${sel.length?`<div class="nv-suma">Tus favoritas suman <b>${escaparHTML(_nvMacrosTxt(_nvSuma(sel,favs)))}</b>. Si no agregás nada más se guarda <b>completa</b>; si agregás algo, la completa Luca.</div>`:''}
       <label class="nv-chk"><input type="checkbox" data-nv-campo="alc"${c.alcohol?' checked':''}> Hubo alcohol</label>
       <div class="nv-fila"><button type="button" class="nv-bt cam" data-nv="foto" data-k="${escaparHTML(clave)}">📷 Mandar foto</button><button type="button" class="nv-bt pri" data-nv="guardar-comida" data-k="${escaparHTML(clave)}"${g?' disabled':''}>${g?'Guardando…':'Guardar'}</button></div>
       <p class="nv-ayuda">"Mandar foto" abre Compartir con el texto <b>"${escaparHTML(_nvDiaTxt(fecha)+' · '+c.etapa)}"</b> listo: elegí WhatsApp y el grupo con Luca.</p>`;
@@ -8217,13 +8325,17 @@ function _nvComidasLuca(a,d,r){
     const t=r.dias.find(y=>y.fecha===x.fecha), falta=x.comidas.filter(_nvPendiente).length, carg=x.comidas.filter(_nvTiene).length;
     return `<div class="nv-dia-l"><b>${escaparHTML(_nvDiaTxt(x.fecha))}${x.fecha===hoy?' · hoy':''}</b><span>${t.kcal?_nvFmt(t.kcal)+' kcal · ':''}${falta?`faltan ${falta}`:`${carg} de ${x.comidas.length} cargadas`}</span></div>
     <div class="nv-card nv-lista">${x.comidas.map(c=>{
-      const ed=nutriVista.editando===c.fila;
+      const ed=nutriVista.editando===c.fila, est=_nvEstrella(c);
+      const txt=c.comida?`${escaparHTML(_nvSinEstrella(c.comida))}${est?' <span class="nv-tagfv">⭐ favoritas</span>':''}`:'';
+      const pre=ed&&est&&c.kcal==null?(()=>{ const p=_nvLeerEstrella(c,d.favs); return p.sel.length?_nvSuma(p.sel,d.favs):null; })():null;
       const macros=c.kcal!=null?`<small>${escaparHTML(_nvMacrosTxt(c))}</small>`:c.comida?'<small class="falta">Sin macros · tocá para cargarlos</small>':'<small>Sin cargar</small>';
       let h=`<div class="nv-lin${ed?' ed':''}${_nvTiene(c)?'':' vacia'}"><span class="et">${escaparHTML(c.etapa)}</span><div class="tx">`;
-      h+=ed?`${c.comida?escaparHTML(c.comida):'<span class="nv-gris">Sin descripción</span>'}${c.alcohol?' <span class="nv-alc">🍷 alcohol</span>':''}
-        <div class="nv-cargar">${NUTRI_MACROS.map(([k,l])=>`<label><span>${l}</span><input type="text" inputmode="decimal" data-nv-campo="m-${k}" value="${c[k]!=null?escaparHTML(String(c[k]).replace('.',',')):''}" placeholder="${k==='kcal'?'kcal':'g'}" autocomplete="off"></label>`).join('')}</div>
+      const ini=k=>c[k]!=null?c[k]:pre&&pre[k]!=null?pre[k]:null;
+      h+=ed?`${txt||'<span class="nv-gris">Sin descripción</span>'}${c.alcohol?' <span class="nv-alc">🍷 alcohol</span>':''}
+        <div class="nv-cargar">${NUTRI_MACROS.map(([k,l])=>`<label><span>${l}</span><input type="text" inputmode="decimal" data-nv-campo="m-${k}" value="${ini(k)!=null?escaparHTML(String(ini(k)).replace('.',',')):''}" placeholder="${k==='kcal'?'kcal':'g'}" autocomplete="off"></label>`).join('')}</div>
+        ${est?`<p class="nv-ayuda">${pre?'Precargado con lo que suman sus favoritas: sumale lo que agregó. ':''}Al guardar se va la ⭐: queda revisada y ${escaparHTML(a.nombre.split(' ')[0])} ya no la puede cambiar.</p>`:''}
         <div class="nv-fila"><button type="button" class="nv-bt sec" data-nv="cancelar">Cancelar</button><button type="button" class="nv-bt pri" data-nv="guardar-macros" data-fila="${c.fila}"${g?' disabled':''}>${g?'Guardando…':'Guardar macros'}</button></div>`
-        :`<button type="button" class="nv-lin-bt" data-nv="editar" data-fila="${c.fila}">${c.comida?escaparHTML(c.comida):'<span class="nv-gris">—</span>'}${c.alcohol?' <span class="nv-alc">🍷 alcohol</span>':''}${macros}</button>`;
+        :`<button type="button" class="nv-lin-bt" data-nv="editar" data-fila="${c.fila}">${txt||'<span class="nv-gris">—</span>'}${c.alcohol?' <span class="nv-alc">🍷 alcohol</span>':''}${macros}</button>`;
       return h+'</div></div>';
     }).join('')}</div>`;
   }).join('');
@@ -8241,20 +8353,63 @@ async function _nvGuardarComida(clave){
   const cont=document.getElementById('nutri-vista');
   const texto=(cont.querySelector('[data-nv-campo="txt"]')||{}).value||'', alc=!!(cont.querySelector('[data-nv-campo="alc"]')||{}).checked;
   const limpio=texto.replace(/\s+/g,' ').trim().slice(0,300);
-  if(!limpio && !x.c.comida){ toast('Escribí qué comiste'); return; }
+  const sel=_nvFavSoportado()?(nutriVista.sel||[]).slice():[], teniaEstrella=_nvEstrella(x.c);
+  if(!limpio && !sel.length && !x.c.comida){ toast('Escribí qué comiste o elegí una favorita'); return; }
   nutriVista.guardando=true; nutriRender();
   try{
-    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'comida',token:_portalToken,fecha:x.fecha,etapa:x.c.etapa,texto:limpio,alcohol:alc})});
+    const cuerpo={accion:'comida',token:_portalToken,fecha:x.fecha,etapa:x.c.etapa,texto:limpio,alcohol:alc};
+    if(sel.length) cuerpo.favoritas=sel;
+    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(cuerpo)});
     const j=await r.json();
     if(!j||!j.ok) throw new Error((j&&j.error)||'sin_ok');
-    x.c.comida=limpio; x.c.alcohol=alc;
-    nutriVista.abierta=null;
-    toast(limpio?'¡Listo! Le llegó a Luca':'Comida borrada');
+    // Lo que quedó escrito lo dice el proxy (con favoritas arma "⭐ …" y suma los macros él)
+    x.c.comida=j.comida!=null?j.comida:limpio; x.c.alcohol=alc;
+    if(j.macros) NUTRI_MACROS.forEach(([k])=>{ x.c[k]=j.macros[k]!=null?j.macros[k]:null; });
+    else if(teniaEstrella) NUTRI_MACROS.forEach(([k])=>{ x.c[k]=null; });
+    nutriVista.abierta=null; nutriVista.sel=[]; nutriVista.extra='';
+    toast(j.macros?'⭐ ¡Listo! Quedó completa':x.c.comida?'¡Listo! Le llegó a Luca':'Comida borrada');
   }catch(err){
-    const m={revisada:'Luca ya la revisó: no se puede cambiar',futuro:'Ese día todavía no llegó',sin_fila:'Luca cambió la planilla: cerrá y volvé a abrir',pestana:'Tu planilla de Nutri tiene un problema: avisale a Luca',formato:'Tu planilla de Nutri tiene un problema: avisale a Luca'}[err&&err.message];
+    const m={favoritas:'Una de tus favoritas ya no está: elegila de nuevo',revisada:'Luca ya la revisó: no se puede cambiar',futuro:'Ese día todavía no llegó',sin_fila:'Luca cambió la planilla: cerrá y volvé a abrir',pestana:'Tu planilla de Nutri tiene un problema: avisale a Luca',formato:'Tu planilla de Nutri tiene un problema: avisale a Luca'}[err&&err.message];
     toast(m||(navigator.onLine===false?'Sin conexión: probá de nuevo cuando tengas señal':'No se pudo guardar. Probá de nuevo en un momento'));
     if(err&&(err.message==='revisada'||err.message==='sin_fila')){ nutriVista.abierta=null; const a=_nvAlumno(PORTAL_ID); if(a) nutriAsegurar(a,true); }
   }
+  nutriVista.guardando=false; nutriRender();
+}
+// ☆/★ en una comida revisada: el proxy la guarda (o la saca) de las favoritas de esa comida del día
+async function _nvMarcarFav(clave){
+  const x=_nvComidaDe(clave); if(!x||nutriVista.guardando) return;
+  nutriVista.guardando=true; nutriRender();
+  try{
+    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'favorita',token:_portalToken,fecha:x.fecha,etapa:x.c.etapa})});
+    const j=await r.json();
+    if(!j||!j.ok) throw new Error((j&&j.error)||'sin_ok');
+    const favs=x.e.datos.favs=x.e.datos.favs||[], f=favs.find(y=>_normTxt(y.nombre)===_normTxt(x.c.comida));
+    if(j.favorita){
+      const mac={}; NUTRI_MACROS.forEach(([k])=>{ mac[k]=x.c[k]; });
+      if(f){ if(!_nvEsDeEtapa(f,x.c.etapa)) f.etapas.push(x.c.etapa); Object.assign(f,mac); }
+      else favs.push({nombre:x.c.comida, etapas:[x.c.etapa], ...mac});
+      toast(`⭐ Guardada en tus favoritas de ${x.c.etapa.toLowerCase()}`);
+    } else if(f){
+      f.etapas=f.etapas.filter(e=>_normTxt(e)!==_normTxt(x.c.etapa));
+      if(!f.etapas.length) favs.splice(favs.indexOf(f),1);
+      toast('Sacada de tus favoritas');
+    }
+  }catch(err){
+    toast({sin_revisar:'Solo se guardan comidas que Luca ya revisó',muchas:'Llegaste al máximo de favoritas: sacá alguna'}[err&&err.message]||(navigator.onLine===false?'Sin conexión: probá de nuevo cuando tengas señal':'No se pudo guardar. Probá de nuevo en un momento'));
+  }
+  nutriVista.guardando=false; nutriRender();
+}
+async function _nvQuitarFav(i,etapa){
+  const e=nutriCache[nutriVista.alumnoId], favs=e&&e.datos&&e.datos.favs, f=favs&&favs[i];
+  if(!f||nutriVista.guardando) return;
+  nutriVista.guardando=true; nutriRender();
+  try{
+    const r=await fetch(PORTAL_API_URL,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify({accion:'quitarFavorita',token:_portalToken,nombre:f.nombre,etapa})});
+    const j=await r.json();
+    if(!j||!j.ok) throw new Error((j&&j.error)||'sin_ok');
+    f.etapas=f.etapas.filter(x=>_normTxt(x)!==_normTxt(etapa));
+    if(!f.etapas.length){ favs.splice(i,1); nutriVista.sel=(nutriVista.sel||[]).filter(n=>n!==f.nombre); }
+  }catch(err){ toast(navigator.onLine===false?'Sin conexión: probá de nuevo cuando tengas señal':'No se pudo sacar. Probá de nuevo'); }
   nutriVista.guardando=false; nutriRender();
 }
 // Camarita: saca la foto y abre Compartir con el texto armado (WhatsApp no deja elegir el grupo desde una app)
@@ -8293,11 +8448,15 @@ async function _nvGuardarMacros(fila){
   if(!accessToken||tokenExp<=Date.now()){ toast('La sesión venció: volvé a entrar'); return; }
   const hoja=`'${e.hoja.replace(/'/g,"''")}'`;
   const data=Object.keys(nuevos).map(k=>({range:`${hoja}!${_planA1(fila,e.datos.cols[k])}`,values:[[nuevos[k]==null?'':nuevos[k]]]}));
+  // Cargada con favoritas: al revisarla se le saca la ⭐ (desde ahí el alumno ya no la puede cambiar). RAW: queda como texto
+  const sinEst=_nvEstrella(c)&&nuevos.kcal!=null?_nvSinEstrella(c.comida):null;
+  if(sinEst!=null) data.push({range:`${hoja}!${_planA1(fila,e.datos.cols.comida)}`,values:[[sinEst]]});
   nutriVista.guardando=true; nutriRender();
   try{
     const r=await fetchConRenovacion(`https://sheets.googleapis.com/v4/spreadsheets/${e.spreadsheetId}/values:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({valueInputOption:'RAW',data})});
     if(!r.ok) throw new Error(r.status);
     Object.assign(c,nuevos);
+    if(sinEst!=null) c.comida=sinEst;
     nutriVista.editando=null;
     toast('Macros guardados ✓');
   }catch(err){
@@ -8314,8 +8473,27 @@ async function _nvGuardarMacros(fila){
     if(k==='cerrar') return cerrarNutri();
     if(k==='reintentar'){ if(a){ const e=nutriCache[a.id]; if(e&&e.estado==='error') e.estado='cargando'; nutriAsegurar(a,true); nutriRender(); } return; }
     if(k==='tab'){ nutriVista.tab=b.dataset.k; nutriVista.editando=null; nutriRender(); cont().querySelector('.nv-body')?.scrollTo(0,0); return; }
-    if(k==='dia'){ nutriVista.dia=b.dataset.f; nutriVista.abierta=null; nutriRender(); return; }
-    if(k==='abrir'){ nutriVista.abierta=nutriVista.abierta===b.dataset.k?null:b.dataset.k; nutriRender(); const t=cont().querySelector('[data-nv-campo="txt"]'); if(t) t.focus(); return; }
+    if(k==='dia'){ nutriVista.dia=b.dataset.f; nutriVista.abierta=null; nutriVista.limpio=true; nutriRender(); return; }
+    if(k==='abrir'){
+      nutriVista.abierta=nutriVista.abierta===b.dataset.k?null:b.dataset.k; nutriVista.limpio=true; nutriVista.otras=false;
+      const x=nutriVista.abierta&&_nvComidaDe(nutriVista.abierta);
+      const p=x?_nvLeerEstrella(x.c,x.e.datos.favs):{sel:[],extra:''};
+      nutriVista.sel=p.sel; nutriVista.extra=p.extra;
+      nutriRender(); const t=cont().querySelector('[data-nv-campo="txt"]'); if(t&&!p.sel.length) t.focus(); return;
+    }
+    if(k==='fav-marcar') return _nvMarcarFav(b.dataset.k);
+    if(k==='fav-elegir'){ nutriVista.hojaFav='elegir'; nutriRender(); return; }
+    if(k==='fav-editar'){ nutriVista.hojaFav='editar'; nutriRender(); return; }
+    if(k==='fav-cerrar'){ nutriVista.hojaFav=null; nutriRender(); return; }
+    if(k==='fav-otras'){ nutriVista.otras=true; nutriRender(); return; }
+    if(k==='fav-quitar') return _nvQuitarFav(+b.dataset.i,b.dataset.e);
+    if(k==='fav-sacar'){ nutriVista.sel.splice(+b.dataset.i,1); nutriRender(); return; }
+    if(k==='fav-tog'){
+      const e=nutriCache[nutriVista.alumnoId], f=e&&e.datos.favs[+b.dataset.i]; if(!f) return;
+      const i=nutriVista.sel.indexOf(f.nombre);
+      if(i>=0) nutriVista.sel.splice(i,1); else if(nutriVista.sel.length<10) nutriVista.sel.push(f.nombre);
+      nutriRender(); return;
+    }
     if(k==='guardar-comida') return _nvGuardarComida(b.dataset.k);
     if(k==='foto') return _nvFoto(b.dataset.k);
     if(k==='editar'){ nutriVista.editando=+b.dataset.fila; nutriRender(); const t=cont().querySelector('[data-nv-campo="m-kcal"]'); if(t) t.focus(); return; }
@@ -8323,6 +8501,7 @@ async function _nvGuardarMacros(fila){
     if(k==='guardar-macros') return _nvGuardarMacros(+b.dataset.fila);
   });
   window.addEventListener('popstate',()=>{ if(_nvAbierta) _nvOcultar(); });
+  document.addEventListener('input',ev=>{ if(ev.target&&ev.target.dataset&&ev.target.dataset.nvCampo==='fav-busca') _nvFiltrarFav(); });
 })();
 
 // ── TOAST ──

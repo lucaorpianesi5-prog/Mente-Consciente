@@ -30,11 +30,16 @@
 //      de la planilla de Nutri de ESE alumno (columna R). La acción "comida" escribe SOLO la
 //      columna "Comida" (y "Alcohol") de UNA fila de su Track: la de esa fecha y esa comida del
 //      día, hasta hoy, y solo mientras Luca no le cargó los macros. doGet avisa con nutri:true.
+//   9. [27/11, v1.4] Favoritas: pestaña "Favoritas" en la planilla de Nutri (la crea el proxy). El alumno
+//      marca ⭐ una comida que Luca ya revisó (acción "favorita": nombre y macros salen de la planilla) y la
+//      saca ("quitarFavorita"). Al cargar una comida puede elegir favoritas: el proxy suma los macros (el
+//      alumno nunca manda números) y la comida queda "⭐ …" completa; puede corregirla mientras tenga la ⭐
+//      (Luca la saca al revisarla desde la app). doGet avisa con favoritas:true.
 // ═══════════════════════════════════════════════════════════════════════
 
 // Versión del proxy: el portal la muestra al pie ("Proxy 1.0 · 25/11/2026") para saber si ya se publicó.
 // SUBIRLA CADA VEZ QUE SE CAMBIA ESTE ARCHIVO.
-const VERSION_PROXY = '1.3 · 27/11/2026';
+const VERSION_PROXY = '1.4 · 27/11/2026';
 
 const SHEET_ID_PORTAL = '1mHE-llV4vVZqwS-_mKjOmse_sOGJJaeO81jT6wOsUSY';
 
@@ -144,7 +149,7 @@ function doGet(e) {
 
     // [24/11] perfilEditable: avisa al portal que este proxy ya acepta la
     // entrevista inicial (acción "perfil" de doPost).
-    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, terminarDia: true, nutri: true, version: VERSION_PROXY };
+    const resultado = { alumno, asistencias, frases, pagos, perfilEditable: true, planPortal: true, entrevista2: true, terminarDia: true, nutri: true, favoritas: true, version: VERSION_PROXY };
     const resultadoStr = JSON.stringify(resultado);
     try {
       cache.put(cacheKey, resultadoStr, CACHE_TTL_SEGUNDOS);
@@ -182,6 +187,8 @@ function doPost(e) {
     if (body.accion === 'perfil') return guardarPerfilAlumno_(body);   // [24/11]
     if (body.accion === 'terminarDia' || body.accion === 'deshacerDia') return terminarDia_(body);   // [26/11]
     if (body.accion === 'comida') return guardarComida_(body);   // [27/11]
+    if (body.accion === 'favorita') return favorita_(body);   // [favoritas 27/11]
+    if (body.accion === 'quitarFavorita') return quitarFavorita_(body);
 
     const idToken = body.id_token;
     if (!idToken) return _jsonOut({ error: 'missing_token' });
@@ -555,7 +562,17 @@ function _nutriFecha_(v) {
   return ('0' + d).slice(-2) + '/' + ('0' + mes).slice(-2) + '/' + a;
 }
 const _nutriNum_ = f => { const p = f.split('/'); return +(p[2] + p[1] + p[0]); };
-// Pestañas de la planilla de Nutri del alumno: { ss, track:{hoja, filas, cols}, datos:filas|null } o { error }
+// "1.691" (miles) · "4,6" · "35" → número; vacío o texto → null (igual que _nutriValor de index.html)
+function _nutriValor_(v) {
+  let s = String(v == null ? '' : v).trim().replace(/\s/g, '');
+  if (!s) return null;
+  if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) s = s.replace(/\./g, '');
+  const n = parseFloat(s.replace(',', '.'));
+  return isFinite(n) ? n : null;
+}
+const NUTRI_MAC_ = ['kcal', 'prot', 'carb', 'grasa', 'fibra'];
+const _esFavHoja_ = h => _nNorm_(h.getName()) === 'favoritas';
+// Pestañas de la planilla de Nutri del alumno: { ss, track:{hoja, filas, cols}, datos:filas|null, favs:hoja|null } o { error }
 function _nutriHojas_(fila) {
   const url = String(fila[17] || '').trim();
   const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]{20,})/);
@@ -564,7 +581,9 @@ function _nutriHojas_(fila) {
   let ss;
   try { ss = SpreadsheetApp.openById(m[1]); } catch (err) { return { error: 'acceso' }; }
   const tracks = [], datos = [];
+  let favs = null;
   ss.getSheets().filter(h => !h.isSheetHidden()).slice(0, 15).forEach(h => {
+    if (_esFavHoja_(h)) { favs = h; return; }   // [favoritas] nunca es el Track (también tiene Comida/Kcal…)
     const nf = Math.min(h.getLastRow(), 200), nc = Math.min(h.getLastColumn(), 14);
     if (nf < 1 || nc < 1) return;
     const filas = h.getRange(1, 1, nf, nc).getDisplayValues();
@@ -575,15 +594,48 @@ function _nutriHojas_(fila) {
   // Nunca adivinar entre varias pestañas: podrían ser de otros alumnos
   const track = (gid != null && tracks.find(t => String(t.hoja.getSheetId()) === gid)) || (tracks.length === 1 ? tracks[0] : null);
   if (!track) return { error: tracks.length ? 'pestana' : 'formato' };
-  return { ss: ss, track: track, datos: datos.length === 1 ? datos[0] : null };
+  return { ss: ss, track: track, datos: datos.length === 1 ? datos[0] : null, favs: favs };
 }
 function _alumnoPorToken_(ss, token) {
   const al = ss.getSheetByName('Alumnos').getDataRange().getValues();
   for (let i = 1; i < al.length; i++) { if (al[i][18] && String(al[i][18]) === token) return al[i]; }
   return null;
 }
+// ── [favoritas] Pestaña "Favoritas" de la planilla de Nutri: Comida · Etapas (Desayuno|Merienda) ·
+// Kcal · Proteína · Carbohidratos · Grasas · Fibra · Fecha. Solo salen de comidas que Luca revisó.
+const FAV_TITULOS_ = ['Comida', 'Etapas', 'Kcal', 'Proteína', 'Carbohidratos', 'Grasas', 'Fibra', 'Fecha'];
+function _favFilas_(h) {
+  if (!h) return [];
+  const nf = Math.min(h.getLastRow(), 201);
+  return nf < 1 ? [] : h.getRange(1, 1, nf, 8).getDisplayValues();
+}
+function _favItems_(filas) {
+  return filas.slice(1).map((f, i) => {
+    const it = { fila: i + 2, nombre: String(f[0] || '').trim(), etapas: String(f[1] || '').split('|').map(s => s.trim()).filter(Boolean) };
+    NUTRI_MAC_.forEach((k, j) => { it[k] = _nutriValor_(f[2 + j]); });
+    return it;
+  }).filter(it => it.nombre && it.kcal != null);
+}
+function _favHoja_(n) {
+  if (n.favs) return n.favs;
+  const h = n.ss.insertSheet('Favoritas');
+  h.getRange(1, 1, 1, 8).setValues([FAV_TITULOS_]).setFontWeight('bold');
+  n.favs = h;
+  return h;
+}
+// Fila del Track de esa fecha + etapa (índice en t.filas) o -1
+function _nutriFila_(t, fecha, etapa) {
+  const c = t.cols;
+  let actual = '';
+  for (let i = c.fila + 1; i < t.filas.length; i++) {
+    const f = _nutriFecha_(t.filas[i][c.fecha]);
+    if (f) actual = f;
+    if (actual === fecha && _nNorm_(t.filas[i][c.etapa]) === etapa) return i;
+  }
+  return -1;
+}
 
-// Lectura (solo valores visibles, solo Track y Datos). Caché corta: Luca carga macros desde la app
+// Lectura (solo valores visibles, solo Track, Datos y Favoritas). Caché corta: Luca carga macros desde la app
 // y el alumno tiene que verlos pronto.
 function nutriPortal_(token) {
   try {
@@ -594,7 +646,7 @@ function nutriPortal_(token) {
     if (!fila || String(fila[8]).trim() === 'inactivo') return _jsonOut({ error: 'not_found' });
     const n = _nutriHojas_(fila);
     if (n.error) return _jsonOut({ error: n.error });
-    const res = { track: { hoja: n.track.hoja.getName(), filas: n.track.filas }, datos: n.datos, hoy: Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy') };
+    const res = { track: { hoja: n.track.hoja.getName(), filas: n.track.filas }, datos: n.datos, favoritas: _favFilas_(n.favs), hoy: Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy') };
     const str = JSON.stringify(res);
     if (str.length < 95000) { try { cache.put(cacheKey, str, 60); } catch (e) {} }
     return ContentService.createTextOutput(str).setMimeType(ContentService.MimeType.JSON);
@@ -604,45 +656,114 @@ function nutriPortal_(token) {
   }
 }
 
-// Escritura: { accion:'comida', token, fecha:'dd/mm/aaaa', etapa:'Almuerzo', texto, alcohol:true|false }
-// Solo la celda "Comida" (y "Alcohol") de la fila de esa fecha + etapa en SU Track; la fecha no puede
-// ser futura; si Luca ya cargó las kcal de esa comida, no se toca (error 'revisada').
-function guardarComida_(cuerpo) {
+// Escrituras de Nutrición: valida token, alumno activo y su planilla; corre con lock; limpia la caché.
+function _nutriEscribir_(cuerpo, hacer) {
   try {
     const token = String((cuerpo && cuerpo.token) || '').trim();
     if (token.length < 20 || token.length > 100) return _jsonOut({ ok: false, error: 'token' });
-    const fecha = _nutriFecha_(cuerpo.fecha), etapa = _nNorm_(cuerpo.etapa);
-    if (!fecha || !etapa || etapa.length > 30) return _jsonOut({ ok: false, error: 'datos' });
-    const texto = String(cuerpo.texto == null ? '' : cuerpo.texto).replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
-    const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');
-    if (_nutriNum_(fecha) > _nutriNum_(hoy)) return _jsonOut({ ok: false, error: 'futuro' });
-
     const lock = LockService.getScriptLock();
     lock.waitLock(10000);
+    let res;
     try {
       const fila = _alumnoPorToken_(SpreadsheetApp.openById(SHEET_ID_PORTAL), token);
       if (!fila || String(fila[8]).trim() === 'inactivo') return _jsonOut({ ok: false, error: 'not_found' });
       const n = _nutriHojas_(fila);
       if (n.error) return _jsonOut({ ok: false, error: n.error });
-      const t = n.track, c = t.cols;
-      let actual = '', r = -1;
-      for (let i = c.fila + 1; i < t.filas.length; i++) {
-        const f = _nutriFecha_(t.filas[i][c.fecha]);
-        if (f) actual = f;
-        if (actual === fecha && _nNorm_(t.filas[i][c.etapa]) === etapa) { r = i; break; }
-      }
-      if (r < 0) return _jsonOut({ ok: false, error: 'sin_fila' });
-      if (String(t.filas[r][c.kcal] || '').trim()) return _jsonOut({ ok: false, error: 'revisada' });
-      // Como texto ('@'): algo que empiece con "=" queda escrito tal cual, nunca como fórmula
-      t.hoja.getRange(r + 1, c.comida + 1).setNumberFormat('@').setValue(texto);
-      if (c.alcohol != null && typeof cuerpo.alcohol === 'boolean') t.hoja.getRange(r + 1, c.alcohol + 1).setValue(cuerpo.alcohol);
+      res = hacer(n);
     } finally {
       lock.releaseLock();
     }
     try { CacheService.getScriptCache().remove('nutri_' + token); } catch (e) {}
-    return _jsonOut({ ok: true });
+    return _jsonOut(res);
   } catch (err) {
     Logger.log(err);
     return _jsonOut({ ok: false, error: 'server_error' });
   }
+}
+
+// { accion:'comida', token, fecha:'dd/mm/aaaa', etapa:'Almuerzo', texto, alcohol:true|false, favoritas:['nombre', …] }
+// Solo la fila de esa fecha + etapa en SU Track; la fecha no puede ser futura. Se puede escribir si la comida
+// no tiene kcal o si la cargó el alumno con favoritas ("⭐ …", todavía sin revisar por Luca); si Luca ya la
+// revisó, no se toca (error 'revisada').
+//   · Sin favoritas: Comida = texto (sin ⭐) y, si tenía macros de favoritas, se borran (queda para Luca).
+//   · Con favoritas, sin texto: Comida = "⭐ A + B" y los macros = la suma de esas favoritas (los calcula
+//     ESTE proxy desde la pestaña Favoritas: el alumno nunca manda números) → queda completa.
+//   · Con favoritas y texto: Comida = "⭐ A + B (N kcal) + texto", sin macros → queda para Luca.
+function guardarComida_(cuerpo) {
+  const fecha = _nutriFecha_(cuerpo && cuerpo.fecha), etapa = _nNorm_(cuerpo && cuerpo.etapa);
+  if (!fecha || !etapa || etapa.length > 30) return _jsonOut({ ok: false, error: 'datos' });
+  const texto = String(cuerpo.texto == null ? '' : cuerpo.texto).replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim().replace(/^⭐\s*/, '').slice(0, 300);
+  const pedidas = Array.isArray(cuerpo.favoritas) ? cuerpo.favoritas.slice(0, 10).map(x => String(x).slice(0, 300)) : [];
+  const hoy = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy');
+  if (_nutriNum_(fecha) > _nutriNum_(hoy)) return _jsonOut({ ok: false, error: 'futuro' });
+  return _nutriEscribir_(cuerpo, n => {
+    const t = n.track, c = t.cols, r = _nutriFila_(t, fecha, etapa);
+    if (r < 0) return { ok: false, error: 'sin_fila' };
+    const conEstrella = /^⭐/.test(String(t.filas[r][c.comida] || '').trim());
+    if (String(t.filas[r][c.kcal] || '').trim() && !conEstrella) return { ok: false, error: 'revisada' };
+    let comida = texto, macros = null;
+    if (pedidas.length) {
+      const lista = _favItems_(_favFilas_(n.favs));
+      const elegidas = pedidas.map(x => lista.find(f => _nNorm_(f.nombre) === _nNorm_(x)));
+      if (elegidas.some(x => !x)) return { ok: false, error: 'favoritas' };
+      const suma = {};
+      NUTRI_MAC_.forEach(k => { suma[k] = elegidas.every(f => f[k] == null) ? null : Math.round(elegidas.reduce((s, f) => s + (f[k] || 0), 0) * 10) / 10; });
+      const base = '⭐ ' + elegidas.map(f => f.nombre).join(' + ');
+      const extra = texto.replace(/^\+\s*/, '').trim();
+      if (extra) comida = base + ' (' + Math.round(suma.kcal) + ' kcal) + ' + extra;
+      else { comida = base; macros = suma; }
+    }
+    // Como texto ('@'): algo que empiece con "=" queda escrito tal cual, nunca como fórmula
+    t.hoja.getRange(r + 1, c.comida + 1).setNumberFormat('@').setValue(comida.slice(0, 700));
+    if (macros || conEstrella) NUTRI_MAC_.forEach(k => { if (c[k] != null) t.hoja.getRange(r + 1, c[k] + 1).setValue(macros && macros[k] != null ? macros[k] : ''); });
+    if (c.alcohol != null && typeof cuerpo.alcohol === 'boolean') t.hoja.getRange(r + 1, c.alcohol + 1).setValue(cuerpo.alcohol);
+    return { ok: true, comida: comida, macros: macros };
+  });
+}
+
+// { accion:'favorita', token, fecha, etapa } — marca/desmarca como favorita UNA comida revisada por Luca
+// (con kcal y sin ⭐): nombre y macros salen de la planilla, nunca del alumno. Si ya es favorita de esa
+// etapa, la desmarca; si es favorita de otra etapa, le suma esta.
+function favorita_(cuerpo) {
+  const fecha = _nutriFecha_(cuerpo && cuerpo.fecha), etapa = _nNorm_(cuerpo && cuerpo.etapa);
+  if (!fecha || !etapa || etapa.length > 30) return _jsonOut({ ok: false, error: 'datos' });
+  return _nutriEscribir_(cuerpo, n => {
+    const t = n.track, c = t.cols, r = _nutriFila_(t, fecha, etapa);
+    if (r < 0) return { ok: false, error: 'sin_fila' };
+    const nombre = String(t.filas[r][c.comida] || '').trim().slice(0, 300);
+    if (!nombre || /^⭐/.test(nombre) || _nutriValor_(t.filas[r][c.kcal]) == null) return { ok: false, error: 'sin_revisar' };
+    const etapaTxt = String(t.filas[r][c.etapa]).trim();
+    const h = _favHoja_(n), items = _favItems_(_favFilas_(h));
+    const ya = items.find(f => _nNorm_(f.nombre) === _nNorm_(nombre));
+    const macros = NUTRI_MAC_.map(k => { const v = c[k] != null ? _nutriValor_(t.filas[r][c[k]]) : null; return v == null ? '' : v; });
+    if (ya) {
+      const tiene = ya.etapas.some(e => _nNorm_(e) === etapa);
+      const etapas = tiene ? ya.etapas.filter(e => _nNorm_(e) !== etapa) : ya.etapas.concat([etapaTxt]);
+      if (!etapas.length) { h.deleteRow(ya.fila); return { ok: true, favorita: false }; }
+      h.getRange(ya.fila, 2).setNumberFormat('@').setValue(etapas.join('|'));
+      if (!tiene) h.getRange(ya.fila, 3, 1, 5).setValues([macros]);
+      return { ok: true, favorita: !tiene };
+    }
+    if (items.length >= 150) return { ok: false, error: 'muchas' };
+    const nf = h.getLastRow() + 1;
+    h.getRange(nf, 1, 1, 2).setNumberFormat('@').setValues([[nombre, etapaTxt]]);
+    h.getRange(nf, 3, 1, 5).setValues([macros]);
+    h.getRange(nf, 8).setNumberFormat('@').setValue(Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'dd/MM/yyyy'));
+    return { ok: true, favorita: true };
+  });
+}
+
+// { accion:'quitarFavorita', token, nombre, etapa } — la saca de esa etapa (si no le queda ninguna, borra la fila)
+function quitarFavorita_(cuerpo) {
+  const nombre = _nNorm_(cuerpo && cuerpo.nombre), etapa = _nNorm_(cuerpo && cuerpo.etapa);
+  if (!nombre || !etapa || etapa.length > 30) return _jsonOut({ ok: false, error: 'datos' });
+  return _nutriEscribir_(cuerpo, n => {
+    if (!n.favs) return { ok: false, error: 'no_encontrada' };
+    const ya = _favItems_(_favFilas_(n.favs)).find(f => _nNorm_(f.nombre) === nombre);
+    if (!ya || !ya.etapas.some(e => _nNorm_(e) === etapa)) return { ok: false, error: 'no_encontrada' };
+    const etapas = ya.etapas.filter(e => _nNorm_(e) !== etapa);
+    if (etapas.length) n.favs.getRange(ya.fila, 2).setNumberFormat('@').setValue(etapas.join('|'));
+    else n.favs.deleteRow(ya.fila);
+    return { ok: true };
+  });
 }
