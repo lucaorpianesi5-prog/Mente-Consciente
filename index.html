@@ -2260,7 +2260,7 @@ const SCOPES      = 'https://www.googleapis.com/auth/spreadsheets https://www.go
 const ALLOWED_EMAILS = ['lucaorpianesi5@gmail.com'];
 // Versión de la app: se ve al final de Mi perfil, en la barra lateral (compu) y al pie del portal,
 // para saber si el celu ya cargó lo último. SUBIRLA EN CADA CAMBIO QUE SE PUBLICA (como en Profe Virtual).
-const VERSION_APP='1.8 · 26/11/2026';
+const VERSION_APP='1.9 · 27/11/2026';
 function versionHTML(proxy){
   const px=proxy===undefined?'':proxy?` · Proxy <b>${escaparHTML(proxy)}</b>`:' · Proxy anterior al 25/11';
   return `<p class="version">App <b>${VERSION_APP}</b>${px}</p>`;
@@ -3141,7 +3141,9 @@ function actualizarBarraSesion(){
   if(appVisible){
     const ahora=Date.now();
     const sinToken=!accessToken || tokenExp<=ahora;
-    if(sinToken){
+    if(_faltanPermisos){
+      txt='Faltan permisos de Google'; aviso=true; btn='Dar permisos'; accion=()=>pedirToken(true);
+    } else if(sinToken){
       txt='Sesión vencida'; aviso=true;
       // Solo la parte antes de la @: el mail entero no entra en una barra de 375 px
       btn=emailGuardado ? 'Continuar como '+emailGuardado.split('@')[0] : 'Reconectar';
@@ -3241,7 +3243,17 @@ function iniciarSesion(){ pedirToken(); }
 // Pide un token a Google. Siempre se llama desde un toque del usuario (botón de
 // login o de la barra): con login_hint Google saltea el selector de cuentas y la
 // ventana aparece y se cierra sola.
-function pedirToken(){
+// 27/11: Google muestra cada permiso con su casilla; si queda sin tildar "hojas de cálculo",
+// la app entra pero no puede leer ni guardar nada. _faltanPermisos lo marca y la barra ofrece
+// "Dar permisos" (pide el token de nuevo con la pantalla de permisos completa).
+let _faltanPermisos=false;
+const _SCOPE_SHEETS='https://www.googleapis.com/auth/spreadsheets';
+function _marcarFaltanPermisos(){ if(_faltanPermisos) return; _faltanPermisos=true; actualizarBarraSesion(); toast('Faltan permisos de Google: tocá "Dar permisos" arriba y tildá todas las casillas'); }
+// ¿Un 403 de Google es por permisos que no se dieron (y no por una planilla no compartida)?
+async function _esFaltaDePermisos(r){
+  try{ const j=await r.clone().json(); const m=JSON.stringify(j.error||j); return /insufficient authentication scopes|ACCESS_TOKEN_SCOPE_INSUFFICIENT|insufficientPermissions/i.test(m); }catch(e){ return false; }
+}
+function pedirToken(consent){
   if(!window._googleListo){
     toast('Cargando Google... intentá de nuevo en un momento');
     return;
@@ -3249,7 +3261,7 @@ function pedirToken(){
   const cfg={
     client_id: CLIENT_ID,
     scope: SCOPES,
-    prompt: '',
+    prompt: consent===true?'consent':'',
     callback: _alRecibirToken,
     error_callback: (err)=>{
       if(err && err.type==='popup_failed_to_open') toast('No se pudo abrir la ventana de Google');
@@ -3257,7 +3269,7 @@ function pedirToken(){
   };
   if(emailGuardado) cfg.login_hint=emailGuardado;
   tokenClient=google.accounts.oauth2.initTokenClient(cfg);
-  tokenClient.requestAccessToken({prompt:''});
+  tokenClient.requestAccessToken({prompt:consent===true?'consent':''});
 }
 
 async function _alRecibirToken(resp){
@@ -3275,6 +3287,18 @@ async function _alRecibirToken(resp){
     toast('Esta cuenta no está autorizada para acceder al panel');
     return;
   }
+  let conSheets=true;
+  try{ conSheets=google.accounts.oauth2.hasGrantedAllScopes(resp,_SCOPE_SHEETS); }catch(e){}
+  if(!conSheets){
+    _faltanPermisos=true; actualizarBarraSesion();
+    toast('No diste permiso para tus hojas de cálculo: tocá "Dar permisos" arriba y tildá todas las casillas');
+    return;
+  }
+  if(_faltanPermisos){   // las planillas que fallaron por falta de permisos se vuelven a leer
+    Object.values(planCache).forEach(x=>Object.keys(x).forEach(t=>{ if(x[t]&&x[t].error==='permisos') delete x[t]; }));
+    datosFrescos=false;
+  }
+  _faltanPermisos=false;
   const yaEnLaApp=document.getElementById('app').style.display==='block';
   accessToken=token;
   _authGuardar(token, resp.expires_in, email);
@@ -3376,6 +3400,7 @@ async function _escribirSheets(url, opciones){
   let r;
   try{ r=await fetchConRenovacion(url, opciones); }
   catch(e){ _avisoBloqueo(navigator.onLine===false?MSG_SIN_RED:MSG_FALLO); _trasFalloEscritura(); throw e; }
+  if(r.status===403 && await _esFaltaDePermisos(r)){ _marcarFaltanPermisos(); _avisoBloqueo('Faltan permisos de Google: tocá "Dar permisos" arriba y tildá todas las casillas'); throw new Error('permisos'); }
   if(!r.ok){
     _avisoBloqueo(r.status===401?MSG_SESION:MSG_FALLO);
     _trasFalloEscritura();
@@ -3408,6 +3433,7 @@ async function sheetsGet(range, unformatted=false){
   const qs=unformatted?'?valueRenderOption=UNFORMATTED_VALUE':'';
   const url=`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeRange(range)}${qs}`;
   const r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}});
+  if(r.status===403 && await _esFaltaDePermisos(r)) _marcarFaltanPermisos();
   if(!r.ok) throw new Error('Error leyendo Sheets');
   return (await r.json()).values||[];
 }
@@ -3620,7 +3646,7 @@ async function cargarDatos(opts){
       if(habiaDatos){
         ({alumnos,cobros,seguimiento,asistencias,clientesNutri,cobrosNutri,gastos,configFinanzas,biblioteca,progresionActual,miPerfil,planListos}=antes);
       }
-      toast(habiaDatos ? 'No se pudo actualizar. Mostrando los últimos datos guardados' : 'No se pudieron cargar los datos. Tocá Sincronizar para reintentar');
+      toast(_faltanPermisos ? 'Faltan permisos de Google: tocá "Dar permisos" arriba y tildá todas las casillas' : habiaDatos ? 'No se pudo actualizar. Mostrando los últimos datos guardados' : 'No se pudieron cargar los datos. Tocá Sincronizar para reintentar');
     } else {
       datosFrescos=true;
       _cacheGuardar();
@@ -6632,6 +6658,7 @@ async function _planApi(url){
   try{ r=await fetchConRenovacion(url,{headers:{Authorization:'Bearer '+accessToken}}); }
   catch(e){ throw {tipo:'red'}; }
   if(r.status===401) throw {tipo:'sesion'};
+  if(r.status===403 && await _esFaltaDePermisos(r)){ _marcarFaltanPermisos(); throw {tipo:'permisos'}; }
   if(r.status===403||r.status===404) throw {tipo:'acceso'};
   // Un Excel (.xlsx) subido a Drive se abre en Sheets, pero la API no lo puede leer
   if(r.status===400){
@@ -7187,7 +7214,7 @@ function planRenderBody(){
   if(!e || e.estado==='cargando'){ body.innerHTML=_pvEsqueleto(); return; }
   if(e.estado==='error'){
     const msgRO={pestana:'Tu Mapeo todavía no se puede ver acá. Abrilo en Sheets o avisale a tu entrenador.',formato:'Tu planilla todavía no se puede ver acá. Abrila en Sheets.',acceso:'No se pudo abrir tu planilla. Avisale a tu entrenador.'};
-    const msg=(_pvRO()&&msgRO[e.error])||{pestana:'Esta planilla tiene varias pestañas y el link no dice cuál es el Mapeo. Abrí la pestaña del Mapeo en Sheets y copiá el link completo: tiene que terminar en #gid=…',excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:tipo==='mapeo'?'No encuentro los títulos del Mapeo: en alguna de las primeras 10 filas tiene que haber una fila con Ejercicio, Reps y KG (Enfoque y Patrón son opcionales).':'No reconozco el formato de esta planilla: la celda A1 tiene que decir "Mes N" y la fila 1, desde la columna E, "Semana 1", "Semana 2"… Podés abrirla en Sheets con el botón de arriba.',acceso:'No tengo acceso a esta planilla.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
+    const msg=(_pvRO()&&msgRO[e.error])||{pestana:'Esta planilla tiene varias pestañas y el link no dice cuál es el Mapeo. Abrí la pestaña del Mapeo en Sheets y copiá el link completo: tiene que terminar en #gid=…',excel:'Esta planilla es un archivo Excel (.xlsx) y la app solo puede leer hojas de Google Sheets. Abrila en Sheets, andá a Archivo → Guardar como Hojas de cálculo de Google, y pegá el link de la copia nueva.',formato:tipo==='mapeo'?'No encuentro los títulos del Mapeo: en alguna de las primeras 10 filas tiene que haber una fila con Ejercicio, Reps y KG (Enfoque y Patrón son opcionales).':'No reconozco el formato de esta planilla: la celda A1 tiene que decir "Mes N" y la fila 1, desde la columna E, "Semana 1", "Semana 2"… Podés abrirla en Sheets con el botón de arriba.',acceso:'No tengo acceso a esta planilla.',permisos:'Faltan permisos de Google para leer tus planillas: tocá "Dar permisos" arriba y tildá todas las casillas.',sesion:'Tu sesión venció. Reconectá con el botón de arriba para ver el plan.',red:navigator.onLine===false?'Sin conexión: no pude leer la planilla.':'No pude leer la planilla. Probá de nuevo en un momento.'}[e.error]||'No pude leer la planilla.';
     body.innerHTML=_pvAviso(escaparHTML(msg),a,tipo)+((e.error==='red'||e.error==='sesion')?'<div class="pv-aviso" style="padding-top:0"><button type="button" data-pv="reintentar-plan">Reintentar</button></div>':'');
     return;
   }
